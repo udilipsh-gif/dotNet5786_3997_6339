@@ -13,7 +13,7 @@ internal partial class Program
     {
         Console.WriteLine("Hello, World!");
         Console.Write("Enter your name: ");
-        string? n = Console.ReadLine();
+        string? name = Console.ReadLine();
         Console.WriteLine("{0}, welcome to my first application!", n);
     }
 }
