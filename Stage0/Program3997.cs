@@ -14,6 +14,6 @@ internal partial class Program
         Console.WriteLine("Hello, World!");
         Console.Write("Enter your name: ");
         string? name = Console.ReadLine();
-        Console.WriteLine("{0}, welcome to the first application!", n);
+        Console.WriteLine("{0}, welcome to the first application!", name);
     }
 }
