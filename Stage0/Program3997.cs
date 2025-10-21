@@ -17,3 +17,4 @@ internal partial class Program
         Console.WriteLine("{0}, welcome to the first application!", name);
     }
 }
+
