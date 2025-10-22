@@ -1,20 +1,23 @@
 ﻿using System;
-namespace stage0;
-internal partial class Program
+namespace stage0
 {
-    private static void Main(string[] args)
+    partial class Program
     {
-        Welcome3997();
-        Welcome6339();
+        private void Main(string[] args)
+        {
+            Welcome3997();
+            Welcome6339();
 
-    }
-    static partial void Welcome6339();
-    private static void Welcome3997()
-    {
-        Console.WriteLine("Hello, World!");
-        Console.Write("Enter your name: ");
-        string? name = Console.ReadLine();
-        Console.WriteLine("{0}, welcome to the first application!", name);
+        }
+        static partial void Welcome6339();
+        private static void Welcome3997()
+        {
+            Console.WriteLine("Hello, World!");
+            Console.Write("Enter your name: ");
+            string? name = Console.ReadLine();
+            Console.WriteLine("{0}, welcome to the first application!", name);
+        }
     }
 }
+
 
