@@ -3,7 +3,7 @@ namespace stage0
 {
     partial class Program
     {
-        private void Main(string[] args)
+        static void Main(string[] args)
         {
             Welcome3997();
             Welcome6339();

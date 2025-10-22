@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stage0;
-
-partial class Program
+namespace stage0
 {
-    static partial void Welcome6339()
+    partial class Program
     {
-        Console.WriteLine("i am also here!");
+        static partial void Welcome6339()
+        {
+            Console.WriteLine("i am 6339 also here!");
+        }
     }
 }
+
+
