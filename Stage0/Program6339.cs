@@ -10,7 +10,11 @@ namespace stage0
     {
         static partial void Welcome6339()
         {
-            Console.WriteLine("i am 6339 also here!"); 
+            Console.WriteLine("i am 6339 also here!");
+            string notEmtyString = Console.ReadLine()!;
+            Console.WriteLine("You entered: " + notEmtyString);
+            char myCharUnicode = (char)Console.Read();
+            Console.WriteLine("Unicode of the character entered: " + myCharUnicode);
         }
     }
 }
