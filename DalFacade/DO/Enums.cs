@@ -1,5 +1,9 @@
 ﻿namespace DO;
 
-internal class Enums
+public enum ShippingType
 {
+    CAR,
+    MOTORCYCLE,
+    BIKE,
+    FOOT
 }
