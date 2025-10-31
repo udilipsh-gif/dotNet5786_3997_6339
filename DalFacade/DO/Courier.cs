@@ -7,14 +7,14 @@
 /// <remarks>This record encapsulates information about a courier, such as their contact details,  delivery
 /// capabilities, and working status. It is designed to be used in systems that manage  delivery personnel and their
 /// assignments.</remarks>
-internal record Courier
+public record Courier
 {
     public required int Id { get; init; }
-    public required string Name { get; set; } = string.Empty;
-    public required string Phone { get; set; } = string.Empty;
-    public required string Email { get; set; } = string.Empty;
-    public required string Password { get; set; } = string.Empty;
-    public required bool Active { get; set; } = false;
+    public required string Name { get; set; }
+    public required string Phone { get; set; }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
+    public required bool Active { get; set; }
     public double MaxDistanceDelivery { get; set; }
     public required ShippingType ShippingType { get; set; }
     public DateTime WorkingSince { get; init; } = DateTime.Now;
