@@ -7,3 +7,9 @@ public enum TheTypeShipment
     BIKE,
     FOOT
 }
+public enum TypeOfOrder
+{
+    BOOK,
+    TOY,
+    NEWSPAPER
+}
