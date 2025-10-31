@@ -11,11 +11,11 @@ internal record Courier
 {
     public required int Id { get; init; }
     public required string Name { get; set; } = string.Empty;
-    public required string Phone { get; init; }
+    public required string Phone { get; set; } = string.Empty;
     public required string Email { get; set; } = string.Empty;
     public required string Password { get; set; } = string.Empty;
     public required bool Active { get; set; } = false;
     public double MaxDistanceDelivery { get; set; }
-    public required ShippingType ShippingType { CAR, MOTORCYCLE, BIKE, FOOT }
+    public required ShippingType ShippingType { get; set; }
     public DateTime WorkingSince { get; init; } = DateTime.Now;
 }
