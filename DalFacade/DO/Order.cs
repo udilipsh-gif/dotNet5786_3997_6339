@@ -20,7 +20,7 @@
 
 public record Order
 {
-    public required int Id { get; init; }
+    public required int Id { get; init; } 
     public required TypeOfOrder TypeOfOrder { get; set; }
     public string? Details { get; set; }
     public required string addres { get; set; }

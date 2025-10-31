@@ -1,6 +1,6 @@
 ﻿namespace DO;
 
-internal class Delivery
+internal record Delivery
 {
     public required int Id { get; init; }
     public required int OrderId { get; init; }
