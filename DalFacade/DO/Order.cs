@@ -2,9 +2,9 @@
 
 public record Order
 {
-    public required int Id { get; init; }//ini
+    public required int Id { get; init; }
     public required TypeOfOrder TypeOfOrder { get; set; }
-    public string? Details { set; get; }
+    public string? Details { get; set; }
     public required string addres { get; set; }
     public required double Latitude { get; init; }
     public required double Longitude { get; init; }
