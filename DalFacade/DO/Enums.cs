@@ -13,3 +13,9 @@ public enum TypeOfOrder
     TOY,
     NEWSPAPER
 }
+public enum EndDelivery
+{
+    PENDING,
+    INPROGRESS,
+    DELIVERED
+}
