@@ -16,6 +16,6 @@ internal record Courier
     public required string Password { get; set; } = string.Empty;
     public required bool Active { get; set; } = false;
     public double MaxDistanceDelivery { get; set; }
-    public required ShippingType ShippingType { get; set; }
+    public required TheTypeShipment TheTypeShipment { get; set; }
     public DateTime WorkingSince { get; init; } = DateTime.Now;
 }

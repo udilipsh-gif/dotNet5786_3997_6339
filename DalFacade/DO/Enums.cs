@@ -1,6 +1,6 @@
 ﻿namespace DO;
 
-public enum ShippingType
+public enum TheTypeShipment
 {
     CAR,
     MOTORCYCLE,
