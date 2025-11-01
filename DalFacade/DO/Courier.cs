@@ -24,7 +24,7 @@ public record Courier
     public required string Email { get; set; }
     public required string Password { get; set; }
     public required bool Active { get; set; }
-    public double MaxDistanceDelivery { get; set; }
+    public double? MaxDistanceDelivery { get; set; }
     public required TheTypeShipment TheTypeShipment { get; set; }
     public required DateTime WorkingSince { get; init; } = DateTime.Now;
 }
