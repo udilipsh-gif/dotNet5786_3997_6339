@@ -13,7 +13,7 @@
 /// <param name="ActualDistance"> The actual distance traveled for the delivery (optional).</param>
 /// <param name="EndDelivery"> The current status of the delivery (e.g., pending, in progress, delivered).</param>
 /// <param name="TimeEndDelivery"> The date and time when the delivery was completed (optional).</param>
-internal class Delivery
+public class Delivery
 {
     public required int Id { get; init; }
     public required int OrderId { get; init; }
