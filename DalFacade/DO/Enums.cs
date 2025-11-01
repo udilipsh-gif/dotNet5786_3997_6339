@@ -9,9 +9,10 @@ public enum TheTypeShipment
 }
 public enum TypeOfOrder
 {
-    BOOK,
-    TOY,
-    NEWSPAPER
+    BOXIT,
+    STANDART,
+    FAST_DELIVERY,
+    DELIVER_IMMEDIATELY
 }
 public enum EndDelivery
 {
