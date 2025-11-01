@@ -3,24 +3,29 @@
 namespace Dal;
 using DalApi;
 using DO;
-using System.Collections.Generic;
 
 internal class DeliveryImplementation : IDelivery
 {
     public void Create(Delivery item)
     {
-        throw new NotImplementedException();
+        if (Read(item.Id) is not null)
+            throw new Exception($"Delivery with ID={item.Id} already exists");
+        else
+            DataSource.Deliveries.Add(item);
     }
 
     public void Delete(int id)
     {
-        throw new NotImplementedException();
+        var delivery = Read(id);
+        if (delivery is null)
+            throw new Exception($"Delivery with ID={id} does not exists");
+        else
+        {
+            DataSource.Deliveries.Remove(delivery!);
+        }
     }
 
-    public void DeleteAll()
-    {
-        throw new NotImplementedException();
-    }
+    public void DeleteAll() => DataSource.Deliveries.Clear();
 
     public Delivery? Read(int id)
     {
@@ -33,13 +38,18 @@ internal class DeliveryImplementation : IDelivery
         return null;
     }
 
-    public List<Delivery> ReadAll()
-    {
-        throw new NotImplementedException();
-    }
+    public List<Delivery> ReadAll() => new List<Delivery>(DataSource.Deliveries);
+
 
     public void Update(Delivery item)
     {
-        throw new NotImplementedException();
+        var delivery = Read(item.Id);
+        if (delivery is not null)
+        {
+            DataSource.Deliveries.Remove(delivery);
+            DataSource.Deliveries.Add(item);
+        }
+        else
+            throw new Exception($"Delivery with ID={item.Id} does not exists");
     }
 }
