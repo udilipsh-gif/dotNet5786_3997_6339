@@ -3,6 +3,8 @@
 namespace Dal;
 using DalApi;
 using DO;
+using System.Reflection.Metadata.Ecma335;
+
 //using System.Collections.Generic;
 
 public class CourierImplementation : ICourier
@@ -11,21 +13,22 @@ public class CourierImplementation : ICourier
     {
         if(Read(item.Id)is not null)
             throw new Exception($"Courier with ID={item.Id} already exists");
-
-        DataSource.Couriers.Add(item);
+        else
+            DataSource.Couriers.Add(item);
     }
 
     public void Delete(int id)
     {
-        if (Read(id) is not not null)
+        var courier = Read(id);
+        if(courier is not null)
+            DataSource.Couriers.Remove(courier);
+        else
+            throw new Exception($"Courier with ID={id} does not exists");
     }
 
-    public void DeleteAll()
-    {
-        throw new NotImplementedException();
-    }
-
-    
+    public void DeleteAll()  => DataSource.Couriers.Clear();
+  
+   
     public Courier? Read(int id)
     {
         foreach (var courier in DataSource.Couriers)
@@ -38,18 +41,18 @@ public class CourierImplementation : ICourier
     }
 
 
-    public List<Courier> ReadAll()
-    {
-        return new List<Courier>(DataSource.Couriers);
-    }
+    public List<Courier> ReadAll() => new List<Courier>(DataSource.Couriers);
 
 
     public void Update(Courier item)
     {
-        var returnCourier = Read(item.Id);
-        if (returnCourier is null)
+        var courier = Read(item.Id);
+        if (courier is not null)
+        {
+            DataSource.Couriers.Remove(courier);
+            DataSource.Couriers.Add(item);
+        }
+        else
             throw new Exception($"Courier with ID={item.Id} does not exists");
-        int index = DataSource.Couriers.IndexOf(returnCourier);
-        DataSource.Couriers[index] = item;
     }
 }

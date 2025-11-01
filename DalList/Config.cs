@@ -1,4 +1,6 @@
-﻿namespace Dal;
+﻿///צריך להוסיף כאן בדיקות תקינות
+
+namespace Dal;
 
 internal static class Config
 {
@@ -6,7 +8,7 @@ internal static class Config
     private static int order_id = StartOrderId;
     internal static int NextOrderId { get => order_id++; }
 
-    internal const int StartDeliveryId = 100001;
+    internal const int StartDeliveryId = 200001;
     private static int delivery_id = StartDeliveryId;
     internal static int NextDeliveryId { get => delivery_id++; }
 
