@@ -8,10 +8,9 @@ internal class DeliveryImplementation : IDelivery
 {
     public void Create(Delivery item)
     {
-        if (Read(item.Id) is not null)
-            throw new Exception($"Delivery with ID={item.Id} already exists");
-        else
-            DataSource.Deliveries.Add(item);
+        int newId = Config.NextDeliveryId;
+        var newItem = item with { Id = newId };
+        DataSource.Deliveries.Add(newItem);
     }
 
     public void Delete(int id)
