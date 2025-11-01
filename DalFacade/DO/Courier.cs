@@ -18,13 +18,29 @@
 /// <param name="WorkingSince"> The date and time when the courier started working.</param>
 public record Courier
 {
-    public required int Id { get; init; }
-    public required string Name { get; set; }
-    public required string Phone { get; set; }
-    public required string Email { get; set; }
-    public required string Password { get; set; }
-    public required bool Active { get; set; }
-    public double? MaxDistanceDelivery { get; set; }
-    public required TheTypeShipment TheTypeShipment { get; set; }
-    public required DateTime WorkingSince { get; init; } = DateTime.Now;
+    private object workingSince;
+
+    public Courier(int id, string name, string phone, string email, string password, bool active, double maxDistanceDelivery , TheTypeShipment typeShipment, object workingSince)
+    {
+        Id = id;
+        Name = name;
+        Phone = phone;
+        Email = email;
+        Password = password;
+        Active = active;
+        MaxDistanceDelivery = maxDistanceDelivery;
+        TypeShipment = typeShipment;
+        this.workingSince = workingSince;
+    }
+
+    public int Id { get; init; }
+    public string Name { get; set; }
+    public string Phone { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public bool Active { get; set; }
+    public double? MaxDistanceDelivery { get; set; } = null;
+    public TheTypeShipment TypeShipment { get; set; }
+    public DateTime WorkingSince { get; init; }
 }
+
