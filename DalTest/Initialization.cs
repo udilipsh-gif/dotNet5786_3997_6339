@@ -34,6 +34,7 @@ public static class Initialization
             string email = name.Replace(" ", ".").ToLower() + "@courier.com";
             string password = "Pass#" + s_rand.Next(100000, 500000).ToString();
             bool active = true; //s_rand.Next(0, 2) == 0 ? false : true;
+
             double maxDistanceDelivery = s_rand.Next(0, 51); //5-50 km
             TheTypeShipment theTypeShipment = (TheTypeShipment)s_rand.Next(0, 4);
             DataTime workingSince=DateTime.Now;
