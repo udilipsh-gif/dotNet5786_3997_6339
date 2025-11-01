@@ -7,10 +7,9 @@ public interface IConfig
 {
     DateTime Clock { get; set; }
     int ManagerId { get; set; }
-    int MaxRange { get; set; }
     string PasswordManager { get; set; }
-    string storeAddress { get; set; }
-    double maxDeliveryRange { get; set; }
+    string? storeAddress { get; set; }
+    double? maxDeliveryRange { get; set; }
     double AvgSpeedCar { get; set; }
     double AvgSpeedMotorcycle { get; set; }
     double AvgSpeedBike { get; set; }
