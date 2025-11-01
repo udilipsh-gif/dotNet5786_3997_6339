@@ -24,7 +24,13 @@ internal class OrderImplementation : IOrder
 
     public Order? Read(int id)
     {
-        throw new NotImplementedException();
+        foreach (var order in DataSource.Orders)
+        {
+            if (order.Id == id)
+                return order;
+        }
+
+        return null;
     }
 
     public List<Order> ReadAll()

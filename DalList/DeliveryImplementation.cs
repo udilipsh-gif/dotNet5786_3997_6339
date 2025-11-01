@@ -24,7 +24,13 @@ internal class DeliveryImplementation : IDelivery
 
     public Delivery? Read(int id)
     {
-        throw new NotImplementedException();
+        foreach (var delivery in DataSource.Deliveries)
+        {
+            if (delivery.Id == id)
+                return delivery;
+        }
+
+        return null;
     }
 
     public List<Delivery> ReadAll()
