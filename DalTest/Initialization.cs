@@ -17,7 +17,7 @@ public static class Initialization
     {
         return new Courier
         {
-            Id = s_rand.Next(1, 1000),
+            int Id = s_rand.Next(1,10000),
             Name = "Test Courier",
             Vehicle = Vehicle.Bike,
             IsAvailable = true
