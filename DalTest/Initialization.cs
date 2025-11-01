@@ -36,15 +36,14 @@ public static class Initialization
             bool active = true; //s_rand.Next(0, 2) == 0 ? false : true;
 
             double maxDistanceDelivery = s_rand.Next(0, 51); //5-50 km
-            TheTypeShipment theTypeShipment = (TheTypeShipment)s_rand.Next(0, 4);
-            DataTime workingSince=DateTime.Now;
-
+            TheTypeShipment typeShipment = (TheTypeShipment)s_rand.Next(0, 3);
+            DateTime workingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)); //up to 1 year ago
             //bool? even = (id % 2) == 0 ? true : false;
             //string? alias = even ? name + "ALIAS" : null;
             //DateTime start = new DateTime(1995, 1, 1);
-           // DateTime bdt = start.AddDays(s_rand.Next((s_dalConfig.Clock - start).Days));
+            // DateTime bdt = start.AddDays(s_rand.Next((s_dalConfig.Clock - start).Days));
 
-            s_dalCourier!.Create(new(id, name, phone, email, password, active, maxDistanceDelivery, theTypeShipment, workingSince ));
+            s_dalCourier!.Create(new( id,  name,  phone,  email,  password,  active,  maxDistanceDelivery, typeShipment,  workingSince));
         }
     }
 
