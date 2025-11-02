@@ -14,7 +14,7 @@
 /// <param name="Password"> The password for the courier's account.</param>
 /// <param name="Active"> Indicates whether the courier is currently active and available for deliveries.</param>
 /// <param name="MaxDistanceDelivery"> The maximum distance the courier is willing to travel for deliveries.</param>
-/// <param name="TheTypeShipment"> The type of shipment the courier is equipped to handle (e.g., car, motorcycle, bike, foot).</param>
+/// <param name="TypeShipment"> The type of shipment the courier is equipped to handle (e.g., car, motorcycle, bike, foot).</param>
 /// <param name="WorkingSince"> The date and time when the courier started working.</param>
 public record Courier
 {
@@ -25,7 +25,7 @@ public record Courier
     public required string Password { get; set; }
     public required bool Active { get; set; }
     public double? MaxDistanceDelivery { get; set; }
-    public required TheTypeShipment TheTypeShipment { get; set; }
+    public required TheTypeShipment TypeShipment { get; set; }
     public required DateTime WorkingSince { get; init; }
 }
 

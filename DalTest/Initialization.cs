@@ -1,5 +1,4 @@
-﻿
-namespace DalTest;
+﻿namespace DalTest;
 using DalApi;
 using DO;
 
@@ -15,72 +14,53 @@ public static class Initialization
 
     private static readonly Random s_rand = new();
 
-    private static void CreateCourier()    
+    private static void CreateCourier()
     {
-
         string[] courierNames =
         {
-            "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein", "Shira Israelof",
-            "Nadav Katz", "Rina Cohen", "Moshe Bar", "Rachel Adler", "Itay Mizrahi", "Noa Ben-David",
-            "Yaniv Shapiro", "Maya Rosen", "Omer Azulay", "Lior Kaplan", "Tamar Weiss", "Ariel Gold",
-            "Galit Peretz", "Eden Harari"
-        };
+                "Dani Levy", "Eli Amar", "Yair Cohen", "Ariela Levin", "Dina Klein", "Shira Israelof",
+                "Nadav Katz", "Rina Cohen", "Moshe Bar", "Rachel Adler", "Itay Mizrahi", "Noa Ben-David",
+                "Yaniv Shapiro", "Maya Rosen", "Omer Azulay", "Lior Kaplan", "Tamar Weiss", "Ariel Gold",
+                "Galit Peretz", "Eden Harari"
+            };
+
+        static int getUniqueId()
+        {
+            int id; do id = s_rand.Next(MIN_ID, MAX_ID);
+            while (s_dalCourier!.Read(id) != null);
+            return id;
+        }
+
+        static double? getMaxDistanceDelivery(TheTypeShipment shipment)
+        {
+
+            return shipment switch
+            {
+                TheTypeShipment.CAR => s_rand.Next(50, 701), // 50 to 700 km
+                TheTypeShipment.MOTORCYCLE => s_rand.Next(20, 101), // 20 to 100 km
+                TheTypeShipment.BIKE => s_rand.Next(5, 51), // 5 to 50 km
+                TheTypeShipment.FOOT => s_rand.NextDouble() * 5, // up to 5 km
+                _ => null
+            };
+        }
+        ;
+
+        var typeShipment = (TheTypeShipment)s_rand.Next(0, 4); // 0..3 עבור 4 ערכים
 
         foreach (var name in courierNames)
         {
-            int id;
-            do
-                id = s_rand.Next(MIN_ID, MAX_ID);
-            while (s_dalCourier!.Read(id) != null);
-
-            string phone = "+972" + s_rand.Next(500000000, 599999999).ToString();
-            string email = name.Replace(" ", ".").ToLower() + "@courier.com";
-            string password = "Pass#" + s_rand.Next(100000, 500000).ToString();
-            bool active = s_rand.Next(0, 5) == 0 ? false : true;
-            TheTypeShipment typeShipment = (TheTypeShipment)s_rand.Next(0, 3);
-
-            Func<double?> getMaxDistanceDelivery = () =>
+            s_dalCourier!.Create(new()
             {
-                double? maxDistanceDelivery = s_dalConfig!.maxDeliveryRange != null ? s_dalConfig!.maxDeliveryRange : 100000000;
-                switch (typeShipment)
-                {
-                    case TheTypeShipment.CAR:
-                        {
-                            int maxRenage = Math.Min(700, (int)maxDistanceDelivery);
-                            double distance = s_rand.Next(5, maxRenage);
-                            return distance > 700 ? null : distance;
-                        }
-                    case TheTypeShipment.MOTORCYCLE:
-                        {
-                            double distance = s_rand.Next(1, 50);
-                            return Math.Min(distance, (double)maxDistanceDelivery);
-                        }
-                    case TheTypeShipment.BIKE:
-                        {
-                            double distance = s_rand.Next(1, 10);
-                            return Math.Min(distance, (double)maxDistanceDelivery);
-                        }
-                    case TheTypeShipment.FOOT:
-                        {
-                            double distance = s_rand.NextDouble() * 5 / 2; // up to 2.5
-                            return Math.Min(distance, (double)maxDistanceDelivery);
-                        }
-                    default:
-                        return null;
-                }
-
-            };
-            DateTime workingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)); //up to 1 year ago
-
-            s_dalCourier!.Create(new() { Id = id,
+                Id = getUniqueId(),
                 Name = name,
-                Email = email,
-                Phone = phone,
-                Password = password,
-                Active = active,
-                MaxDistanceDelivery = getMaxDistanceDelivery(),
-                TheTypeShipment = typeShipment,
-                WorkingSince = workingSince
+                Email = name.Replace(" ", ".").ToLower() + "@courier.com",
+                Phone = "0" + s_rand.Next(500000000, 599999999).ToString(),
+                Password = "Pass#" + s_rand.Next(100000, 500000).ToString(),
+                Active = s_rand.Next(0, 5) != 0 ? true : false,
+                TypeShipment = typeShipment,
+                WorkingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)), //up to 1 year ago
+                MaxDistanceDelivery = getMaxDistanceDelivery(typeShipment)
+
             });
         }
     }
@@ -89,7 +69,8 @@ public static class Initialization
     {
         for (int i = 0; i < 200; i++)
         {
-            s_dalOrder!.Create(new() { 
+            s_dalOrder!.Create(new()
+            {
                 Id = i,
                 TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 3),
                 Phone = "0" + s_rand.Next(500000000, 599999999).ToString(),
