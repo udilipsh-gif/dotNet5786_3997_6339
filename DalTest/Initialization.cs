@@ -106,19 +106,34 @@ public static class Initialization
 
     private static void CreateDelivery() 
     {
-        for (int i = 0; i < 100; i++)
-        {
-            s_dalDelivery!.Create(new()
-            {
-                Id = i,
-                OrderId = s_rand.Next(0, 200),
-                CourierId = s_rand.Next(MIN_ID, MAX_ID),
-                AssignedTime = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, 72)), // within last 3 days
-                PickupTime = null,
-                DeliveryTime = null,
-                Status = DeliveryStatus.Pending
-            }
+        var list_order = s_dalOrder?.ReadAll();
+        var Courior_order = s_dalCourier?.ReadAll();
 
-        }
+        Random rnd = new Random();
+        int index = rnd.Next(list_order.Count);
+        var randomOrder = list_order[index];//הגרלת הזמנה 
+        var TypeOfOrder=randomOrder.TypeOfOrder;//שליפה של הסוג שלה
+        //צריך כאן לשלוח לפונקציה שתחשב מרחק -
+        //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
+        //נקבע על פי סןג השילוח, כרגע נשים נול
+
+
+
+        s_dalDelivery!.Create(new()
+        {
+            Id = 0,
+            OrderId = randomOrder.Id,
+            TypeOfOrder = randomOrder.TypeOfOrder,
+            ActualDistance = null,
+
+            CourierId = s_rand.Next(MIN_ID, MAX_ID),
+            AssignedTime = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, 72)), // within last 3 days
+            PickupTime = null,
+            DeliveryTime = null,
+            Status = DeliveryStatus.Pending
+        });
+        
+
+        
     }
 }

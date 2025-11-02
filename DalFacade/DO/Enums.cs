@@ -9,10 +9,10 @@ public enum TheTypeShipment
 }
 public enum TypeOfOrder
 {
-    BOXIT,
-    STANDART,
-    FAST_DELIVERY,
-    DELIVER_IMMEDIATELY
+    BOXIT,//only car
+    STANDART,//motorocycle or car
+    FAST_DELIVERY,//only motorosycle
+    DELIVER_IMMEDIATELY//only foot
 }
 public enum EndDelivery
 {

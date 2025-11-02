@@ -39,8 +39,6 @@ public class CourierImplementation : ICourier
 
        return null;
     }
-
-
     public List<Courier> ReadAll() => new List<Courier>(DataSource.Couriers);
 
 

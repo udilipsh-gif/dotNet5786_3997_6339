@@ -14,14 +14,14 @@ internal static class Config
 
 
     internal static int StartManagerId = 100000000;
-    private static int manager_id = StartOrderId;
+    private static int manager_id = StartManagerId;
     internal static int ManagerId
     {
         get => manager_id;
         set
         {
             if (!s_isValidIsraeliId(value))
-                throw new ArgumentException("תעודת זהות אינה תקינה");
+                throw new ArgumentException("id is not valid");
             manager_id = value;
         }
     }
