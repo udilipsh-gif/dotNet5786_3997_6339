@@ -20,18 +20,16 @@
 
 public record Order
 {
-    public required int Id { get; init; } 
-    public required TypeOfOrder TypeOfOrder { get; set; }
+    public int Id { get; init; } 
+    public TypeOfOrder TypeOfOrder { get; set; }
     public string? Details { get; set; }
-    public required string addres { get; set; }
-    public required double Latitude { get; init; }
-    public required double Longitude { get; init; }
-    public required string Name { get; set; }
-    public required string Phone { get; set; }
-    public required int Weight { get; set; }
-    public required DateTime OrderData { get; init;}
-
-
+    public  string Addres { get; set; }
+    public  double Latitude { get; init; }
+    public  double Longitude { get; init; }
+    public  string Name { get; set; }
+    public  string Phone { get; set; }
+    public  int Weight { get; set; }
+    public  DateTime OrderData { get; init;}
 
 
 }
