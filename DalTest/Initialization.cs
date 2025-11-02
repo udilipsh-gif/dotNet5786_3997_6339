@@ -34,7 +34,7 @@ public static class Initialization
         static double? getMaxDistanceDelivery(TheTypeShipment shipment)
         {
 
-            return shipment switch
+            double? distens = shipment switch
             {
                 TheTypeShipment.CAR => s_rand.Next(50, 701), // 50 to 700 km
                 TheTypeShipment.MOTORCYCLE => s_rand.Next(20, 101), // 20 to 100 km
@@ -42,6 +42,7 @@ public static class Initialization
                 TheTypeShipment.FOOT => s_rand.NextDouble() * 5, // up to 5 km
                 _ => null
             };
+            return distens > 500 ? null : distens;
         }
         ;
 
@@ -87,12 +88,15 @@ public static class Initialization
 
     private static void CreateDelivery() 
     {
-        var list_order = s_dalOrder?.ReadAll();
-        var Courior_order = s_dalCourier?.ReadAll();
+        var list_order = s_dalOrder?.ReadAll() ?? 
+            throw new Exception("No orders available");
+        var Courior_order = s_dalCourier?.ReadAll() ??
+            throw new Exception("No couriers available");
 
         Random rnd = new Random();
         int index = rnd.Next(list_order.Count);
         var randomOrder = list_order[index];//הגרלת הזמנה 
+
         var TypeOfOrder=randomOrder.TypeOfOrder;//שליפה של הסוג שלה
         //צריך כאן לשלוח לפונקציה שתחשב מרחק -
         //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
