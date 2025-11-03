@@ -147,35 +147,38 @@ public static class Initialization
             throw new Exception("No couriers available");
 
         Random rnd = new Random();
-        int index = 0;
-        do
-            index = rnd.Next(list_order.Count);
-        while (list_order[index].OrderStatus == OrderStatus.OPEN);//בודק שההזמנה לא סופקה כבר
-        list_order[index].OrderStatus = OrderStatus.DELIVERING;//עדכון סטטוס ההזמנה לסופקה
-        var randomOrder = list_order[index];//הגרלת הזמנה 
 
-
-        var TypeOfOrder=randomOrder.TypeOfOrder;//שליפה של הסוג שלה
-        //צריך כאן לשלוח לפונקציה שתחשב מרחק -
-        //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
-        //נקבע על פי סןג השילוח, כרגע נשים נול
-
-
-
-        s_dalDelivery!.Create(new()
+        for (int i = 0; i < 20; i++) //יצירת 20 משלוחים
         {
-            Id = 0,
-            OrderId = randomOrder.Id,
-            TypeOfOrder = randomOrder.TypeOfOrder,
-            ActualDistance = null,
+            int index = 0;
+            do
+                index = rnd.Next(list_order.Count);
+            while (list_order[index].OrderStatus == OrderStatus.OPEN);//בודק שההזמנה לא סופקה כבר
+            list_order[index].OrderStatus = OrderStatus.DELIVERING;//עדכון סטטוס ההזמנה לסופקה
+            var randomOrder = list_order[index];//הגרלת הזמנה 
 
-            CourierId = s_rand.Next(MIN_ID, MAX_ID),
-            AssignedTime = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, 72)), // within last 3 days
-            PickupTime = null,
-            DeliveryTime = null,
-            Status = DeliveryStatus.Pending
-        });
-        
+
+            var TypeOfOrder = randomOrder.TypeOfOrder;//שליפה של הסוג שלה
+                                                      //צריך כאן לשלוח לפונקציה שתחשב מרחק -
+                                                      //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
+                                                      //נקבע על פי סןג השילוח, כרגע נשים נול
+
+
+
+            s_dalDelivery!.Create(new()
+            {
+                Id = 0,
+                OrderId = randomOrder.Id,
+                TypeOfOrder = randomOrder.TypeOfOrder,
+                ActualDistance = null,
+
+                CourierId = s_rand.Next(MIN_ID, MAX_ID),
+                AssignedTime = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, 72)), // within last 3 days
+                PickupTime = null,
+                DeliveryTime = null,
+                Status = DeliveryStatus.Pending
+            });
+        }
 
         
     }
