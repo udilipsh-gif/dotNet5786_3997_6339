@@ -16,7 +16,25 @@ public enum TypeOfOrder
 }
 public enum EndDelivery
 {
-    PENDING,
-    INPROGRESS,
-    DELIVERED
+    DELIVERED,
+    REFUSED,
+    CONCELLED,
+    NOTFOUND,
+    FAILED
+}
+
+public enum OrderStatus
+{
+    OPEN,
+    DELIVERING,
+    COMPLETED,
+    REFUSED,
+    CONCELLED
+}
+
+public enum ScheduleStatus
+{
+    ONTYME,
+    INRISK,
+    LATE
 }

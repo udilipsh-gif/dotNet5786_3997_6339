@@ -17,19 +17,20 @@
 /// <param name="Phone"> The contact phone number of the recipient.</param>
 /// <param name="Weight"> The weight of the order.</param>
 /// <param name="OrderData"> The date and time when the order was placed.</param>
+/// <param name="OrderStatus"> The current status of the order (e.g., open, in progress, delivered).</param>
 
 public record Order
 {
-    public int Id { get; init; } 
-    public TypeOfOrder TypeOfOrder { get; set; }
+    public required int Id { get; init; } 
+    public required TypeOfOrder TypeOfOrder { get; set; }
     public string? Details { get; set; }
-    public  string Addres { get; set; }
-    public  double Latitude { get; init; }
-    public  double Longitude { get; init; }
-    public  string Name { get; set; }
-    public  string Phone { get; set; }
-    public  int Weight { get; set; }
-    public  DateTime OrderData { get; init;}
-
+    public  required string Addres { get; set; }
+    public required double Latitude { get; init; }
+    public  required double Longitude { get; init; }
+    public  required string Name { get; set; }
+    public  required string Phone { get; set; }
+    public  required int Weight { get; set; }
+    public  required DateTime OrderData { get; init;}
+    public OrderStatus OrderStatus { get; set; } = OrderStatus.OPEN;
 
 }

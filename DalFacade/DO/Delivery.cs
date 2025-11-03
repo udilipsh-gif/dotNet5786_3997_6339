@@ -13,6 +13,7 @@
 /// <param name="ActualDistance"> The actual distance traveled for the delivery (optional).</param>
 /// <param name="EndDelivery"> The current status of the delivery (e.g., pending, in progress, delivered).</param>
 /// <param name="TimeEndDelivery"> The date and time when the delivery was completed (optional).</param>
+/// <param name="EndDelivery"> The status of the delivery.</param>
 public record Delivery
 {
     public required int Id { get; init; }
@@ -21,7 +22,7 @@ public record Delivery
     public required TypeOfOrder TypeOfOrder { get; init; }
     public required DateTime OrderData { get; init; }
     public double? ActualDistance { get; init; }
-    public EndDelivery EndDelivery { get; init; }
+    public EndDelivery? EndDelivery { get; init; } = null;
     public DateTime TimeEndDelivery { get; init; }
 }
     
