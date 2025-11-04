@@ -3,8 +3,9 @@ using DalApi;
 using DO;
 using System.Runtime.CompilerServices;
 
-
-
+/// <summary>
+/// static class for initializing the data store
+/// </summary>
 public static class Initialization
 {
     const int MIN_ID = 200000000;
@@ -15,10 +16,95 @@ public static class Initialization
     private static IDelivery? s_dalDelivery; //stage 1
     private static IConfig? s_dalConfig; //stage 1
 
+    // Random generator
     private static readonly Random s_rand = new();
 
-    
+    /// <summary>
+    /// Represents a collection of predefined addresses with associated geographic coordinates and a distance metric.
+    /// </summary>
+    /// <remarks>Each entry in the collection contains the following data: <list type="bullet"> <item>
+    /// <description>A string representing the address.</description> </item> <item> <description>A latitude value as a
+    /// <see cref="double"/>.</description> </item> <item> <description>A longitude value as a <see
+    /// cref="double"/>.</description> </item> <item> <description>A distance metric as a <see
+    /// cref="double"/>.</description> </item> </list> This data can be used for geographic calculations, such as
+    /// finding nearby locations or mapping.</remarks>
+    private static object[][] s_addresses =
+    {
+       [ "הירקון 50 תל אביב", 32.09487, 34.825308, 0.45 ],
+       [ "שד' התמרים 12 רמת גן", 32.088052, 34.820129, 0.49 ],
+       [ "המסגר 20 רמת גן", 32.086789, 34.819234, 0.65 ],
+       [ "ראשון לציון 35 רמת גן", 32.085432, 34.818901, 0.8 ],
+       [ "שד' בן גוריון 55 רמת גן", 32.084567, 34.820123, 0.86 ],
+       [ "הירקון 75 תל אביב", 32.098123, 34.828765, 0.93 ],
+       [ "הרצל 40 רמת גן", 32.083456, 34.819012, 1.01 ],
+       [ "השלום 50 רמת גן", 32.082345, 34.819876, 1.11 ],
+       [ "שד' יצחק רבין 25 רמת גן", 32.082345, 34.818345, 1.14 ],
+       [ "הרצל 15 רמת גן", 32.0810786, 34.8180973, 1.28 ],
+       [ "שד' בן גוריון 40 רמת גן", 32.080456, 34.821233, 1.31 ],
+       [ "ראשון לציון 50 בני ברק", 32.080234, 34.824345, 1.35 ],
+       [ "שד' ההסתדרות 14 בני ברק", 32.080123, 34.825678, 1.39 ],
+       [ "שד' רוקח 5 רמת גן", 32.079876, 34.817654, 1.42 ],
+       [ "שד' גולדה מאיר 50 תל אביב", 32.101234, 34.832345, 1.42 ],
+       [ "העצמאות 45 בני ברק", 32.078901, 34.823456, 1.49 ],
+       [ "שד' התמרים 20 בני ברק", 32.079012, 34.824567, 1.49 ],
+       [ "הבנים 20 בני ברק", 32.077654, 34.823789, 1.63 ],
+       [ "שד' בן צבי 18 בני ברק", 32.076543, 34.821234, 1.74 ],
+       [ "השלום 80 בני ברק", 32.075123, 34.825678, 1.93 ],
+       [ "שד' ירושלים 12 בני ברק", 32.07491, 34.824194, 1.94 ],
+       [ "שד' ירושלים 45 רמת גן", 32.073393, 34.822611, 2.09 ],
+       [ "הירקון 85 בני ברק", 32.073456, 34.823901, 2.09 ],
+       [ "הירקון 100 תל אביב", 32.109456, 34.831234, 2.12 ],
+       [ "הירקון 30 בני ברק", 32.071234, 34.822345, 2.33 ],
+       [ "ויצמן 5 גבעתיים", 32.074703, 34.807631, 2.36 ],
+       [ "הבנים 9 רמת גן", 32.065432, 34.812345, 3.1 ],
+       [ "ויצמן 22 תל אביב", 32.08197, 34.787879, 3.39 ],
+       [ "שד' יצחק רבין 7 פתח תקווה", 32.076664, 34.859017, 3.91 ],
+       [ "רמת חן 30 רמת גן", 32.054005, 34.815657, 4.29 ],
+       [ "סוקלוב 30 תל אביב", 32.087445, 34.776397, 4.3 ],
+       [ "ויצמן 15 תל אביב", 32.075678, 34.77789, 4.52 ],
+       [ "שד' ירושלים 30 תל אביב", 32.072345, 34.779012, 4.59 ],
+       [ "הבנים 35 תל אביב", 32.073567, 34.778123, 4.6 ],
+       [ "שד' התמרים 35 תל אביב", 32.069234, 34.780123, 4.68 ],
+       [ "הרצל 25 תל אביב", 32.068901, 34.779345, 4.76 ],
+       [ "השלום 18 תל אביב", 32.070789, 34.777345, 4.81 ],
+       [ "ריינס 5 תל אביב", 32.077475, 34.773417, 4.84 ],
+       [ "המסגר 8 תל אביב", 32.071567, 34.776234, 4.86 ],
+       [ "שד' יצחק רבין 10 תל אביב", 32.067345, 34.778901, 4.89 ],
+       [ "הרצל 15 תל אביב", 32.06682, 34.777819, 5.01 ],
+       [ "ראשון לציון 20 פתח תקווה", 32.104233, 34.874897, 5.18 ],
+       [ "העצמאות 60 פתח תקווה", 32.073523, 34.872251, 5.19 ],
+       [ "העצמאות 22 תל אביב", 32.065789, 34.775432, 5.26 ],
+       [ "בני ברק 8 תל אביב-יפו", 32.057181, 34.778104, 5.66 ],
+       [ "ויצמן 40 פתח תקווה", 32.090123, 34.885678, 6.03 ],
+       [ "שד' גולדה מאיר 25 פתח תקווה", 32.098765, 34.885432, 6.04 ],
+       [ "בני ברק 15 פתח תקווה", 32.092345, 34.887654, 6.21 ],
+       [ "המסגר 12 פתח תקווה", 32.085678, 34.890123, 6.48 ],
+       [ "השלום 25 פתח תקווה", 32.088765, 34.892345, 6.66 ],
+       [ "השלום 60 פתח תקווה", 32.092456, 34.893456, 6.76 ],
+       [ "שד' ההסתדרות 30 פתח תקווה", 32.095678, 34.895678, 6.98 ],
+       [ "הרצל 55 פתח תקווה", 32.094123, 34.896789, 7.07 ],
+       [ "שד' רוקח 10 פתח תקווה", 32.089923, 34.899951, 7.37 ]
+    };
 
+    //בדיקה האם סוג ההזמנה מתאים לסוג השליח
+    public static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
+    {
+        return order switch
+        {
+            TypeOfOrder.BOXIT => courier == TheTypeShipment.CAR,
+            TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
+            TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
+            TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
+            _ => false
+        };
+    }
+    
+     /// <summary>
+     /// Initializes the configuration settings for the system with default values.
+     /// </summary>
+     /// <remarks>This method sets up the initial configuration for the system, including the starting clock
+     /// time,  manager credentials, store location, delivery parameters, and other operational settings.  It is
+     /// intended to be called during the system's initialization phase.</remarks>
     private static void CreateConfig()//אתחול ראשוני של הקונפיג
     {
        
@@ -27,8 +113,8 @@ public static class Initialization
         s_dalConfig.ManagerId = 203383997;
         s_dalConfig.PasswordManager = "Admin1234$";
         s_dalConfig.storeAddress = "bar cochva, 21, Bney Braq";//כתובת המכללה
-        s_dalConfig.Latitude = 32.093801259122344;
-        s_dalConfig.Longitude = 34.82298922030868;
+        s_dalConfig.Latitude = 32.0936195;
+        s_dalConfig.Longitude = 34.8229463;
         s_dalConfig.MaxDeliveryRange = 50.0; // in km
         s_dalConfig.AvgSpeedCar = 60.0; // in km/h
         s_dalConfig.AvgSpeedMotorcycle = 40.0; // in km/h
@@ -63,13 +149,13 @@ public static class Initialization
 
             double? distens = shipment switch
             {
-                TheTypeShipment.CAR => s_rand.Next(50, 701), // 50 to 700 km
-                TheTypeShipment.MOTORCYCLE => s_rand.Next(20, 101), // 20 to 100 km
-                TheTypeShipment.BIKE => s_rand.Next(5, 51), // 5 to 50 km
+                TheTypeShipment.CAR => s_rand.Next(20, 701), // 50 to 700 km
+                TheTypeShipment.MOTORCYCLE => s_rand.Next(2, 50), // 20 to 100 km
+                TheTypeShipment.BIKE => s_rand.Next(1, 15), // 5 to 50 km
                 TheTypeShipment.FOOT => s_rand.NextDouble() * 5, // up to 5 km
                 _ => null
             };
-            return distens > 500 ? null : distens;
+            return distens > 100 ? null : distens;
         }
         ;
 
@@ -86,83 +172,50 @@ public static class Initialization
                 Password = "Pass#" + s_rand.Next(100000, 500000).ToString(),
                 Active = s_rand.Next(0, 5) != 0 ? true : false,
                 TypeShipment = typeShipment,
-                WorkingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)), //up to 1 year ago
+                WorkingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(5, 366)), //up to 1 year ago
                 MaxDistanceDelivery = getMaxDistanceDelivery(typeShipment)
 
             });
         }
     }
 
+    /// <summary>
+    /// Creates and initializes a collection of 50 orders with randomized data.
+    /// </summary>
+    /// <remarks>This method generates 50 orders with randomized properties such as order type, phone number, 
+    /// address, geographic coordinates, customer name, weight, and order details. The orders are  created using the
+    /// <see cref="s_dalOrder"/> data access layer and are assigned timestamps  within the last three days.</remarks>
     private static void CreateOrders()
     {
-
-    // רדיוס כדור הארץ בקילומטרים
-    const double EarthRadiusKm = 6371.0;
-
-    // פונקציות עזר להמרת מעלות לרדיאנים
-    static double ToRadians(double degrees)
-    {
-        return degrees * Math.PI / 180.0;
-    }
-
-    // פונקציות עזר להמרת רדיאנים למעלות
-    static double ToDegrees(double radians)
-    {
-        return radians * 180.0 / Math.PI;
-    }
-
-    (double, double, double) getRandomLocation()
-        {
-            var rand = new Random();
-
-            double baseLatRad = ToRadians(32.092194);
-            double baseLonRad = ToRadians(34.821748);
-
-            // 1. בחירת מרחק אקראי בין 0.5 ל-100 ק"מ
-            double randomDistanceKm = rand.NextDouble() * (100.0 - 0.5) + 0.5;
-
-            // 2. בחירת כיוון (Bearing) אקראי ב-360 מעלות
-            double randomBearingRad = ToRadians(rand.NextDouble() * 360.0);
-
-            // 3. חישוב הנקודה החדשה (נוסחת יעד גיאוגרפית)
-            double angularDistance = randomDistanceKm / EarthRadiusKm;
-
-            double newLatRad = Math.Asin(
-                Math.Sin(baseLatRad) * Math.Cos(angularDistance) +
-                Math.Cos(baseLatRad) * Math.Sin(angularDistance) * Math.Cos(randomBearingRad)
-            );
-
-            double newLonRad = baseLonRad + Math.Atan2(
-                Math.Sin(randomBearingRad) * Math.Sin(angularDistance) * Math.Cos(baseLatRad),
-                Math.Cos(angularDistance) - Math.Sin(baseLatRad) * Math.Sin(newLatRad)
-            );
-
-            // 4. המרה חזרה למעלות והוספה לרשימה
-            double newLatDeg = ToDegrees(newLatRad);
-            double newLonDeg = ToDegrees(newLonRad);
-
-             return (newLatDeg, newLonDeg, randomDistanceKm);
-        }
-
-        for (int i = 0; i < 200; i++)
+        for (int i = 0; i < 50; i++)
         {   
-            var (latitude, longitude, distance) = getRandomLocation();
+            var adressIndex = s_rand.Next(s_addresses.Length);
             s_dalOrder!.Create(new()
             {
                 Id = i,
                 TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 3),
                 Phone = "0" + s_rand.Next(500000000, 599999999).ToString(),
-                Addres = s_rand.Next(1, 200).ToString() + " Main St, City",
-                Latitude = longitude, // Random latitude between -90 and 90
-                Longitude = longitude, // Random longitude between -180 and 180
+                Addres = (string)s_addresses[adressIndex][0],
+                Latitude = (double)s_addresses[adressIndex][2], 
+                Longitude = (double)s_addresses[adressIndex][2], 
                 Name = "Customer" + i,
                 Weight = s_rand.Next(1, 21), // Weight between 1 and 20
                 Details = "Order details for order " + i,
-                OrderData = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 3)) // Orders within the last month
+                OrderData = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 3)), // Orders within the last month
+                DistanceKm = (double)s_addresses[adressIndex][3]
             });
         }
     }
 
+    /// <summary>
+    /// Creates and assigns a batch of delivery records based on available orders and couriers.
+    /// </summary>
+    /// <remarks>This method generates 50 delivery records by randomly selecting orders and matching them with
+    /// couriers.  Orders that are already in the "Open" status are excluded from selection. The method ensures that the
+    /// courier's shipment type matches the order's requirements before assigning the delivery.  The deliveries are
+    /// initialized with default values, including a pending status and a random assignment  time within the last 72
+    /// hours.</remarks>
+    /// <exception cref="Exception">Thrown if no orders or no couriers are available.</exception>
     private static void CreateDelivery() 
     {
         //פונקציה שבודקת אם סוג ההזמנה מתאים לסוג השליח 
