@@ -3,6 +3,8 @@ using DalApi;
 using DO;
 using System.Runtime.CompilerServices;
 
+
+
 public static class Initialization
 {
     const int MIN_ID = 200000000;
@@ -15,18 +17,7 @@ public static class Initialization
 
     private static readonly Random s_rand = new();
 
-    //בדיקה האם סוג ההזמנה מתאים לסוג השליח
-    public static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
-    {
-        return order switch
-        {
-            TypeOfOrder.BOXIT => courier == TheTypeShipment.CAR,
-            TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
-            TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
-            TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
-            _ => false
-        };
-    }
+    
 
     private static void CreateConfig()//אתחול ראשוני של הקונפיג
     {
@@ -174,6 +165,17 @@ public static class Initialization
 
     private static void CreateDelivery() 
     {
+        //פונקציה שבודקת אם סוג ההזמנה מתאים לסוג השליח 
+        static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
+        {
+            return order switch
+            {
+                TypeOfOrder.BOXIT => courier == TheTypeShipment.CAR,
+                TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
+                TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
+                TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
+            };
+        }
 
         var list_order = s_dalOrder?.ReadAll() ?? //רשימת ההזמנות
             throw new Exception("No orders available");
@@ -190,21 +192,24 @@ public static class Initialization
             while (list_order[index].OrderStatus == OrderStatus.OPEN);//בודק שההזמנה לא סופקה כבר
             list_order[index].OrderStatus = OrderStatus.DELIVERING;//עדכון סטטוס ההזמנה לסופקה
             var randomOrder = list_order[index];//משיכת הזמנה 
-
-
-            var TypeOfOrder = randomOrder.TypeOfOrder;//שליפה של הסוג שלה
-                                                      //צריך כאן לשלוח לפונקציה שתחשב מרחק -
-                                                      //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
-                                                      //נקבע על פי סןג השילוח, כרגע נשים נול
-
-           
+            var typeOfOrder = randomOrder.TypeOfOrder;//שליפה של הסוג שלה
 
             do
-                index = rnd.Next(list_order.Count)
+                index = rnd.Next(list_courier.Count);//הגרלת שליח כל עוד אין התאמה של הזמנה לשליח המשך להגריל
+            while (!MatchTypeShipmentAndOrder(list_courier[index].TypeShipment, typeOfOrder));
+            
 
-    
-            while (!MatchTypeShipmentAndOrder(list_courier[index].TypeShipment, OrderStatus))
-                index = rnd.Next(list_courier.Count);
+            //צריך כאן לשלוח לפונקציה שתחשב מרחק -
+            //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
+            //נקבע על פי סןג השילוח, כרגע נשים נול
+
+
+
+            //צריך לעשות דו ןןייל על הגרלת שליח ורק בתנאי טרו
+            //שיחזור
+            //מהסוג של השליח
+            //וסג ההזמנה
+            //הקיימת, לשלוח לפונקציה של MatchTypeShipmentAndOrder
 
             double GetActualDistance(){//אני צריך לקבל את כתובת הבסיס של החנות...
 
