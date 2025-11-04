@@ -15,13 +15,14 @@ public static class Initialization
 
     private static readonly Random s_rand = new();
 
-    private static void CreateConfig()
+    private static void CreateConfig()//אתחול ראשוני של הקונפיג
     {
        
-        s_dalConfig.Clock = DateTime.Now;
+        
+        s_dalConfig!.Clock = new DateTime(2024, 01, 01, 00, 00, 00);//התחלת פעילות המערכת תחילת 24
         s_dalConfig.ManagerId = 203383997;
         s_dalConfig.PasswordManager = "Admin1234$";
-        s_dalConfig.storeAddress = "bar cochva, 21, Bney Braq";
+        s_dalConfig.storeAddress = "bar cochva, 21, Bney Braq";//כתובת המכללה
         s_dalConfig.Latitude = 32.093801259122344;
         s_dalConfig.Longitude = 34.82298922030868;
         s_dalConfig.MaxDeliveryRange = 50.0; // in km
