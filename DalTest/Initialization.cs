@@ -62,7 +62,7 @@ public static class Initialization
                 Password = "Pass#" + s_rand.Next(100000, 500000).ToString(),
                 Active = s_rand.Next(0, 5) != 0 ? true : false,
                 TypeShipment = typeShipment,
-                WorkingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)), //up to 1 year ago
+                WorkingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(5, 366)), //up to 1 year ago
                 MaxDistanceDelivery = getMaxDistanceDelivery(typeShipment)
 
             });
@@ -73,35 +73,35 @@ public static class Initialization
     {
 
     // רדיוס כדור הארץ בקילומטרים
-    const double EarthRadiusKm = 6371.0;
+    const double s_earthRadiusKm = 6371.0;
 
     // פונקציות עזר להמרת מעלות לרדיאנים
-    static double ToRadians(double degrees)
+    static double s_toRadians(double degrees)
     {
         return degrees * Math.PI / 180.0;
     }
 
     // פונקציות עזר להמרת רדיאנים למעלות
-    static double ToDegrees(double radians)
+    static double s_toDegrees(double radians)
     {
         return radians * 180.0 / Math.PI;
     }
 
-    (double, double, double) getRandomLocation()
+    static (double, double, double) getRandomLocation()
         {
             var rand = new Random();
 
-            double baseLatRad = ToRadians(32.092194);
-            double baseLonRad = ToRadians(34.821748);
+            double baseLatRad = s_toRadians(32.092194);
+            double baseLonRad = s_toRadians(34.821748);
 
             // 1. בחירת מרחק אקראי בין 0.5 ל-100 ק"מ
             double randomDistanceKm = rand.NextDouble() * (100.0 - 0.5) + 0.5;
 
             // 2. בחירת כיוון (Bearing) אקראי ב-360 מעלות
-            double randomBearingRad = ToRadians(rand.NextDouble() * 360.0);
+            double randomBearingRad = s_toRadians(rand.NextDouble() * 360.0);
 
             // 3. חישוב הנקודה החדשה (נוסחת יעד גיאוגרפית)
-            double angularDistance = randomDistanceKm / EarthRadiusKm;
+            double angularDistance = randomDistanceKm / s_earthRadiusKm;
 
             double newLatRad = Math.Asin(
                 Math.Sin(baseLatRad) * Math.Cos(angularDistance) +
@@ -114,8 +114,8 @@ public static class Initialization
             );
 
             // 4. המרה חזרה למעלות והוספה לרשימה
-            double newLatDeg = ToDegrees(newLatRad);
-            double newLonDeg = ToDegrees(newLonRad);
+            double newLatDeg = s_toDegrees(newLatRad);
+            double newLonDeg = s_toDegrees(newLonRad);
 
              return (newLatDeg, newLonDeg, randomDistanceKm);
         }
