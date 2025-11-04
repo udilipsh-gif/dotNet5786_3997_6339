@@ -15,6 +15,19 @@ public static class Initialization
 
     private static readonly Random s_rand = new();
 
+    //בדיקה האם סוג ההזמנה מתאים לסוג השליח
+    public static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
+    {
+        return order switch
+        {
+            TypeOfOrder.BOXIT => courier == TheTypeShipment.CAR,
+            TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
+            TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
+            TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
+            _ => false
+        };
+    }
+
     private static void CreateConfig()//אתחול ראשוני של הקונפיג
     {
        
@@ -161,9 +174,10 @@ public static class Initialization
 
     private static void CreateDelivery() 
     {
-        var list_order = s_dalOrder?.ReadAll() ?? 
+
+        var list_order = s_dalOrder?.ReadAll() ?? //רשימת ההזמנות
             throw new Exception("No orders available");
-        var Courior_order = s_dalCourier?.ReadAll() ??
+        var list_courier = s_dalCourier?.ReadAll() ??//רשימת השליחים
             throw new Exception("No couriers available");
 
         Random rnd = new Random();
@@ -182,6 +196,16 @@ public static class Initialization
                                                       //צריך כאן לשלוח לפונקציה שתחשב מרחק -
                                                       //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
                                                       //נקבע על פי סןג השילוח, כרגע נשים נול
+
+           
+
+            do
+                index = rnd.Next(list_order.Count)
+
+    
+            while (!MatchTypeShipmentAndOrder(list_courier[index].TypeShipment, OrderStatus))
+                index = rnd.Next(list_courier.Count);
+
             double GetActualDistance(){//אני צריך לקבל את כתובת הבסיס של החנות...
 
 
