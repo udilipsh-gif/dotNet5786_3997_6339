@@ -15,6 +15,25 @@ public static class Initialization
 
     private static readonly Random s_rand = new();
 
+    private static void CreateConfig()
+    {
+       
+        s_dalConfig.Clock = DateTime.Now;
+        s_dalConfig.ManagerId = 203383997;
+        s_dalConfig.PasswordManager = "Admin1234$";
+        s_dalConfig.storeAddress = "bar cochva, 21, Bney Braq";
+        s_dalConfig.Latitude = 32.093801259122344;
+        s_dalConfig.Longitude = 34.82298922030868;
+        s_dalConfig.MaxDeliveryRange = 50.0; // in km
+        s_dalConfig.AvgSpeedCar = 60.0; // in km/h
+        s_dalConfig.AvgSpeedMotorcycle = 40.0; // in km/h
+        s_dalConfig.AvgSpeedBike = 15.0; // in km/h
+        s_dalConfig.AvgSpeedFoot = 5.0; // in km/h
+        s_dalConfig.MaxDeliveryTime = TimeSpan.FromHours(5);
+        s_dalConfig.RiskRange = TimeSpan.FromDays(4);
+        s_dalConfig.MaxTimeInactivity = TimeSpan.FromDays(14);
+    }
+
     private static void CreateCourier()
     {
         string[] courierNames =
@@ -148,21 +167,30 @@ public static class Initialization
 
         Random rnd = new Random();
 
-        for (int i = 0; i < 20; i++) //יצירת 20 משלוחים
+        for (int i = 0; i < 50; i++) //יצירת 50 משלוחים
         {
             int index = 0;
             do
-                index = rnd.Next(list_order.Count);
+                index = rnd.Next(list_order.Count);//הגרלת הזמנה
             while (list_order[index].OrderStatus == OrderStatus.OPEN);//בודק שההזמנה לא סופקה כבר
             list_order[index].OrderStatus = OrderStatus.DELIVERING;//עדכון סטטוס ההזמנה לסופקה
-            var randomOrder = list_order[index];//הגרלת הזמנה 
+            var randomOrder = list_order[index];//משיכת הזמנה 
 
 
             var TypeOfOrder = randomOrder.TypeOfOrder;//שליפה של הסוג שלה
                                                       //צריך כאן לשלוח לפונקציה שתחשב מרחק -
                                                       //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
                                                       //נקבע על פי סןג השילוח, כרגע נשים נול
+            double GetActualDistance(){//אני צריך לקבל את כתובת הבסיס של החנות...
 
+
+
+                return
+
+            
+            
+            
+            }
 
 
             s_dalDelivery!.Create(new()
