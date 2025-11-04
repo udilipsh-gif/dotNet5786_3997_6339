@@ -8,7 +8,7 @@ public class ConfigImplementation : IConfig
 {
     public DateTime Clock {
         get => Config.Clock;
-        set => Config.Clock = DateTime.Now;
+        set => Config.Clock = value;
     }
     public int ManagerId {
         get => Config.ManagerId;
@@ -22,7 +22,16 @@ public class ConfigImplementation : IConfig
         get => Config.StoreAddress;
         set => Config.StoreAddress = value;
     }
-    public double? maxDeliveryRange {
+    public double? Latitude
+    {
+        get => Config.Latitude;
+        set => Config.Latitude = value;
+    }
+    public double? Longitude {
+        get => Config.Longitude;
+        set => Config.Longitude = value;
+    }
+    public double? MaxDeliveryRange {
         get =>Config.MaxDeliveryRange;
         set => Config.MaxDeliveryRange = value;
     }

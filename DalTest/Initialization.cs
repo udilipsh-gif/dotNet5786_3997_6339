@@ -15,6 +15,39 @@ public static class Initialization
 
     private static readonly Random s_rand = new();
 
+    //בדיקה האם סוג ההזמנה מתאים לסוג השליח
+    public static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
+    {
+        return order switch
+        {
+            TypeOfOrder.BOXIT => courier == TheTypeShipment.CAR,
+            TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
+            TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
+            TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
+            _ => false
+        };
+    }
+
+    private static void CreateConfig()//אתחול ראשוני של הקונפיג
+    {
+       
+        
+        s_dalConfig!.Clock = new DateTime(2024, 01, 01, 00, 00, 00);//התחלת פעילות המערכת תחילת 24
+        s_dalConfig.ManagerId = 203383997;
+        s_dalConfig.PasswordManager = "Admin1234$";
+        s_dalConfig.storeAddress = "bar cochva, 21, Bney Braq";//כתובת המכללה
+        s_dalConfig.Latitude = 32.093801259122344;
+        s_dalConfig.Longitude = 34.82298922030868;
+        s_dalConfig.MaxDeliveryRange = 50.0; // in km
+        s_dalConfig.AvgSpeedCar = 60.0; // in km/h
+        s_dalConfig.AvgSpeedMotorcycle = 40.0; // in km/h
+        s_dalConfig.AvgSpeedBike = 15.0; // in km/h
+        s_dalConfig.AvgSpeedFoot = 5.0; // in km/h
+        s_dalConfig.MaxDeliveryTime = TimeSpan.FromHours(5);
+        s_dalConfig.RiskRange = TimeSpan.FromDays(4);
+        s_dalConfig.MaxTimeInactivity = TimeSpan.FromDays(14);
+    }
+
     private static void CreateCourier()
     {
         string[] courierNames =
@@ -141,21 +174,22 @@ public static class Initialization
 
     private static void CreateDelivery() 
     {
-        var list_order = s_dalOrder?.ReadAll() ?? 
+
+        var list_order = s_dalOrder?.ReadAll() ?? //רשימת ההזמנות
             throw new Exception("No orders available");
-        var Courior_order = s_dalCourier?.ReadAll() ??
+        var list_courier = s_dalCourier?.ReadAll() ??//רשימת השליחים
             throw new Exception("No couriers available");
 
         Random rnd = new Random();
 
-        for (int i = 0; i < 20; i++) //יצירת 20 משלוחים
+        for (int i = 0; i < 50; i++) //יצירת 50 משלוחים
         {
             int index = 0;
             do
-                index = rnd.Next(list_order.Count);
+                index = rnd.Next(list_order.Count);//הגרלת הזמנה
             while (list_order[index].OrderStatus == OrderStatus.OPEN);//בודק שההזמנה לא סופקה כבר
             list_order[index].OrderStatus = OrderStatus.DELIVERING;//עדכון סטטוס ההזמנה לסופקה
-            var randomOrder = list_order[index];//הגרלת הזמנה 
+            var randomOrder = list_order[index];//משיכת הזמנה 
 
 
             var TypeOfOrder = randomOrder.TypeOfOrder;//שליפה של הסוג שלה
@@ -163,6 +197,25 @@ public static class Initialization
                                                       //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
                                                       //נקבע על פי סןג השילוח, כרגע נשים נול
 
+           
+
+            do
+                index = rnd.Next(list_order.Count)
+
+    
+            while (!MatchTypeShipmentAndOrder(list_courier[index].TypeShipment, OrderStatus))
+                index = rnd.Next(list_courier.Count);
+
+            double GetActualDistance(){//אני צריך לקבל את כתובת הבסיס של החנות...
+
+
+
+                return
+
+            
+            
+            
+            }
 
 
             s_dalDelivery!.Create(new()
