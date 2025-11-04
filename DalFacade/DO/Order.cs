@@ -32,5 +32,6 @@ public record Order
     public  required int Weight { get; set; }
     public  required DateTime OrderData { get; init;}
     public OrderStatus OrderStatus { get; set; } = OrderStatus.OPEN;
+    public double? DistanceKm { get; init; } = null;
 
 }
