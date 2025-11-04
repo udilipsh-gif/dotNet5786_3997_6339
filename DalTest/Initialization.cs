@@ -95,7 +95,7 @@ public static class Initialization
             TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
             TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
             TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
-            _ => false
+           
         };
     }
     
@@ -218,17 +218,7 @@ public static class Initialization
     /// <exception cref="Exception">Thrown if no orders or no couriers are available.</exception>
     private static void CreateDelivery() 
     {
-        //פונקציה שבודקת אם סוג ההזמנה מתאים לסוג השליח 
-        static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
-        {
-            return order switch
-            {
-                TypeOfOrder.BOXIT => courier == TheTypeShipment.CAR,
-                TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
-                TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
-                TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
-            };
-        }
+        
 
         var list_order = s_dalOrder?.ReadAll() ?? //רשימת ההזמנות
             throw new Exception("No orders available");
@@ -250,30 +240,13 @@ public static class Initialization
             do
                 index = rnd.Next(list_courier.Count);//הגרלת שליח כל עוד אין התאמה של הזמנה לשליח המשך להגריל
             while (!MatchTypeShipmentAndOrder(list_courier[index].TypeShipment, typeOfOrder));
-            
 
-            //צריך כאן לשלוח לפונקציה שתחשב מרחק -
-            //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
-            //נקבע על פי סןג השילוח, כרגע נשים נול
-
-
-
-            //צריך לעשות דו ןןייל על הגרלת שליח ורק בתנאי טרו
-            //שיחזור
-            //מהסוג של השליח
-            //וסג ההזמנה
-            //הקיימת, לשלוח לפונקציה של MatchTypeShipmentAndOrder
-
-            double GetActualDistance(){//אני צריך לקבל את כתובת הבסיס של החנות...
-
-
-
-                return
-
-            
-            
-            
-            }
+            double? getActualDistance = null;//משתנה לשמירת המרחק האמיתי בהתאם לסוג השליח
+            getActualDistance =
+                (list_courier[index].TypeShipment
+                is TheTypeShipment.CAR or TheTypeShipment.MOTORCYCLE)//אם השליח הוא ברכב או אופנוע
+                ? randomOrder.DistanceKmRoad
+                : randomOrder.DistanceKmWalk;
 
 
             s_dalDelivery!.Create(new()
@@ -281,13 +254,16 @@ public static class Initialization
                 Id = 0,
                 OrderId = randomOrder.Id,
                 TypeOfOrder = randomOrder.TypeOfOrder,
-                ActualDistance = null,
+                ActualDistance =getActualDistance,
 
-                CourierId = s_rand.Next(MIN_ID, MAX_ID),
-                AssignedTime = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, 72)), // within last 3 days
-                PickupTime = null,
-                DeliveryTime = null,
-                Status = DeliveryStatus.Pending
+                CourierId = list_courier[index].Id,
+                OrderData=s_dalConfig!.Clock,
+                EndDelivery=(EndDelivery)s_rand.Next(0,3),
+
+                TimeEndDelivery=//צריך לחשוב איך אני מגדיר את שעון
+                                //ובעצם לבדוק איזה סוג סיום הוגרל בשורה קודם,
+                                //ולפי זה להחליט בכמה לקדם את השעון
+
             });
         }
 
