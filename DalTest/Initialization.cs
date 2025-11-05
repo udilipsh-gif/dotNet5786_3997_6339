@@ -101,17 +101,17 @@ public static class Initialization
             _ => false
         };
     }
-    
-     /// <summary>
-     /// Initializes the configuration settings for the system with default values.
-     /// </summary>
-     /// <remarks>This method sets up the initial configuration for the system, including the starting clock
-     /// time,  manager credentials, store location, delivery parameters, and other operational settings.  It is
-     /// intended to be called during the system's initialization phase.</remarks>
+
+    /// <summary>
+    /// Initializes the configuration settings for the system with default values.
+    /// </summary>
+    /// <remarks>This method sets up the initial configuration for the system, including the starting clock
+    /// time,  manager credentials, store location, delivery parameters, and other operational settings.  It is
+    /// intended to be called during the system's initialization phase.</remarks>
     private static void CreateConfig()//אתחול ראשוני של הקונפיג
     {
-       
-        
+
+
         s_dalConfig!.Clock = DateTime.Now;//התחלת פעילות המערכת תחילת 24
         s_dalConfig.ManagerId = 203383997;
         s_dalConfig.PasswordManager = "Admin1234$";
@@ -190,24 +190,38 @@ public static class Initialization
     /// <see cref="s_dalOrder"/> data access layer and are assigned timestamps  within the last three days.</remarks>
     private static void CreateOrders()
     {
+        int num_of_order = 0;
+        static OrderStatus getRandomOrderStatus(int num_of_order)
+        {
+
+            return num_of_order++ switch
+            {
+                < 20 => OrderStatus.OPEN,
+                < 30 => OrderStatus.DELIVERING,
+                _ => (OrderStatus)s_rand.Next(2, 5)
+            };
+
+        }
+
         for (int i = 0; i < 50; i++)
-        {   
+        {
             var adressIndex = s_rand.Next(s_addresses.Length);
             s_dalOrder!.Create(new()
             {
-                Id = i,
+                Id = 0,
                 TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 2),
                 Phone = "0" + s_rand.Next(500000000, 599999999).ToString(),
                 Addres = (string)s_addresses[adressIndex][0],
-                Latitude = (double)s_addresses[adressIndex][2], 
-                Longitude = (double)s_addresses[adressIndex][2], 
+                Latitude = (double)s_addresses[adressIndex][2],
+                Longitude = (double)s_addresses[adressIndex][2],
                 Name = "Customer" + i,
                 Weight = s_rand.Next(1, 21), // Weight between 1 and 20
                 Details = "Order details for order " + i,
                 OrderData = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)), // זמן פתיחת הזמנה רנדומלי
                 DistanceKm = (double)s_addresses[adressIndex][3],
-                DistanceKmWalk=(double)s_addresses[adressIndex][4],
-                DistanceKmRoad=(double)s_addresses[adressIndex][5],
+                DistanceKmWalk = (double)s_addresses[adressIndex][4],
+                DistanceKmRoad = (double)s_addresses[adressIndex][5],
+                OrderStatus = getRandomOrderStatus(num_of_order),
             });
         }
     }
@@ -221,7 +235,7 @@ public static class Initialization
     /// initialized with default values, including a pending status and a random assignment  time within the last 72
     /// hours.</remarks>
     /// <exception cref="Exception">Thrown if no orders or no couriers are available.</exception>
-    private static void CreateDelivery() 
+    private static void CreateDelivery()
     {
         //פונקציה שבודקת אם סוג ההזמנה מתאים לסוג השליח 
         static bool MatchTypeShipmentAndOrder(TheTypeShipment courierType, TypeOfOrder order)
@@ -234,12 +248,25 @@ public static class Initialization
                 _ => false
             };
         }
+        //פונקציה לחישוב זמן סיום המשלוח בהתאם לסוג הסיום
+        static DateTime? getTimeEndDelivery(DateTime orderDate, TimeSpan duration, EndDelivery endDelivery)
+        {
+            return endDelivery switch
+            {
+                EndDelivery.DELIVERED => orderDate.Add(duration),
+                EndDelivery.REFUSED => orderDate.Add(duration).AddMinutes(s_rand.Next(5, 31)), // 5 to 30 minutes after expected delivery time
+                EndDelivery.CONCELLED => null, // No end time for cancelled deliveries
+                EndDelivery.NOTFOUND => orderDate.Add(duration).AddMinutes(s_rand.Next(10, 61)), // 10 to 60 minutes after expected delivery time
+                EndDelivery.FAILED => orderDate.Add(duration).AddMinutes(s_rand.Next(15, 91)), // 15 to 90 minutes after expected delivery time
+                _ => null,
+            };
+        }
 
         var list_order = s_dalOrder?.ReadAll() ?? //רשימת ההזמנות
             throw new Exception("No orders available");
-        foreach(var order in list_order.ToList()) // הסרת הזמנות שלא במצב פתוח
+        foreach (var order in list_order.ToList()) // הסרת הזמנות שלא במצב פתוח
         {
-            if(order.OrderStatus != OrderStatus.OPEN)
+            if (order.OrderStatus != OrderStatus.OPEN)
                 list_order.Remove(order);
         }
 
@@ -248,32 +275,51 @@ public static class Initialization
             var randomOrder = list_order[s_rand.Next(list_order.Count)];//משיכת הזמנה אקראית
 
             var matchedCouriers = s_dalCourier?.ReadAll() ??//רשימת השליחים
-                    throw new Exception("No couriers available"); 
+                    throw new Exception("No couriers available");
 
             foreach (var courier in matchedCouriers.ToList()) //בדיקת התאמה בין סוג ההזמנה לסוג השליח
             {
-                if(courier.Active == false)//אם השליח לא פעיל הסרתו מהרשימה
+                if (courier.Active == false)//אם השליח לא פעיל הסרתו מהרשימה
                     matchedCouriers.Remove(courier);
-                
+
                 if (!MatchTypeShipmentAndOrder(courier.TypeShipment, randomOrder.TypeOfOrder))
                     matchedCouriers.Remove(courier);
-                
-                if(courier.MaxDistanceDelivery < randomOrder.DistanceKm)
+
+                if (courier.MaxDistanceDelivery < randomOrder.DistanceKm)
                     matchedCouriers.Remove(courier);
             }
             if (matchedCouriers.Count == 0)
                 throw new Exception("No matched couriers available for the order");
-            
-            var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)]; //הגרלת שליח מתאים
-            randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה
-            s_dalOrder.Update(randomOrder);//עדכון ההזמנה במסד הנתונים
-            list_order.Remove(randomOrder); //הסרת ההזמנה מהרשימה כדי לא ליצור לה שוב משלוח
 
-            double? getActualDistance = null;//משתנה לשמירת המרחק האמיתי בהתאם לסוג השליח
-            getActualDistance = (selectedCourier.TypeShipment is TheTypeShipment.CAR or TheTypeShipment.MOTORCYCLE)//אם השליח הוא ברכב או אופנוע
+            var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)]; //הגרלת שליח מתאים
+            //randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה
+            //s_dalOrder.Update(randomOrder);//עדכון ההזמנה במסד הנתונים
+            //list_order.Remove(randomOrder); //הסרת ההזמנה מהרשימה כדי לא ליצור לה שוב משלוח
+
+            double? getActualDistance = //שמירת המרחק האמיתי בהתאם לסוג השליח
+                (selectedCourier.TypeShipment is TheTypeShipment.CAR or TheTypeShipment.MOTORCYCLE)//אם השליח הוא ברכב או אופנוע
                 ? randomOrder.DistanceKmRoad
                 : randomOrder.DistanceKmWalk;
-            TimeSpan duration = s_dalConfig!.Clock - randomOrder.OrderData;
+
+            TimeSpan duration = getActualDistance.HasValue//חישוב משך זמן המשלוח בהתאם לסוג השליח
+                ? TimeSpan.FromHours(getActualDistance.Value /
+                    (selectedCourier.TypeShipment switch
+                    {
+                        TheTypeShipment.CAR => s_dalConfig!.AvgSpeedCar,
+                        TheTypeShipment.MOTORCYCLE => s_dalConfig!.AvgSpeedMotorcycle,
+                        TheTypeShipment.BIKE => s_dalConfig!.AvgSpeedBike,
+                        TheTypeShipment.FOOT => s_dalConfig!.AvgSpeedFoot,
+                        _ => 1.0
+                    }))
+                : TimeSpan.FromHours(1); // ברירת מחדל של שעה אם המרחק לא ידוע
+
+            DateTime orderData = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, duration.Hours)); // בתוך 3 הימים האחרונים
+
+            EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 4);//הגרלת סוג סיום המשלוח
+            
+            if (getEndDelivery==EndDelivery.DELIVERED||getEndDelivery==EndDelivery.REFUSED||getEndDelivery==EndDelivery.CONCELLED)
+                s_dalOrder.Delete(randomOrder.Id);//מחיקת ההזמנה אם המשלוח הסתיים בהצלחה או בסירוב או בביטול
+
 
             //יצירת משלוח חדש
 
@@ -284,12 +330,13 @@ public static class Initialization
                 TypeOfOrder = randomOrder.TypeOfOrder,
                 ActualDistance = getActualDistance,//עדכון צערך*************
                 CourierId = selectedCourier.Id,
-                OrderData = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, duration.Hours)), // within last 3 days
-                EndDelivery
-                
+                OrderData = orderData,
+                EndDelivery = getEndDelivery,
+                TimeEndDelivery= getTimeEndDelivery(orderData, duration, getEndDelivery) ?? default
+
             });
         }
 
-        
+
     }
 }
