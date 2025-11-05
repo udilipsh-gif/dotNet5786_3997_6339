@@ -4,7 +4,7 @@ namespace Dal;
 using DalApi;
 using DO;
 
-internal class DeliveryImplementation : IDelivery
+public class DeliveryImplementation : IDelivery
 {
     public void Create(Delivery item)
     {
