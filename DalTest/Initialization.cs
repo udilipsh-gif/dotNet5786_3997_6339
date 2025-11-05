@@ -1,6 +1,7 @@
 ﻿namespace DalTest;
 using DalApi;
 using DO;
+using System;
 using System.Runtime.CompilerServices;
 
 /// <summary>
@@ -91,7 +92,6 @@ public static class Initialization
     {
         return order switch
         {
-            TypeOfOrder.BOXIT => courier == TheTypeShipment.CAR,
             TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
             TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
             TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
@@ -109,7 +109,7 @@ public static class Initialization
     {
        
         
-        s_dalConfig!.Clock = new DateTime(2024, 01, 01, 00, 00, 00);//התחלת פעילות המערכת תחילת 24
+        s_dalConfig!.Clock = DateTime.Now;//התחלת פעילות המערכת תחילת 24
         s_dalConfig.ManagerId = 203383997;
         s_dalConfig.PasswordManager = "Admin1234$";
         s_dalConfig.storeAddress = "bar cochva, 21, Bney Braq";//כתובת המכללה
@@ -149,10 +149,10 @@ public static class Initialization
 
             double? distens = shipment switch
             {
-                TheTypeShipment.CAR => s_rand.Next(20, 701), // 50 to 700 km
-                TheTypeShipment.MOTORCYCLE => s_rand.Next(2, 50), // 20 to 100 km
-                TheTypeShipment.BIKE => s_rand.Next(1, 15), // 5 to 50 km
-                TheTypeShipment.FOOT => s_rand.NextDouble() * 5, // up to 5 km
+                TheTypeShipment.CAR => s_rand.Next(10, 100), // 10 to 100 km
+                TheTypeShipment.MOTORCYCLE => s_rand.Next(2, 25), // 2 to 25 km
+                TheTypeShipment.BIKE => s_rand.Next(1, 5), // 1 to 5 km
+                TheTypeShipment.FOOT => s_rand.NextDouble() * 2, // up to 2 km
                 _ => null
             };
             return distens > 100 ? null : distens;
@@ -219,75 +219,69 @@ public static class Initialization
     private static void CreateDelivery() 
     {
         //פונקציה שבודקת אם סוג ההזמנה מתאים לסוג השליח 
-        static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
+        static bool MatchTypeShipmentAndOrder(TheTypeShipment courierType, TypeOfOrder order)
         {
             return order switch
             {
-                TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
-                TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
-                TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
+                TypeOfOrder.STANDART => true,
+                TypeOfOrder.FAST_DELIVERY => courierType == TheTypeShipment.MOTORCYCLE || courierType == TheTypeShipment.CAR,
+                TypeOfOrder.DELIVER_IMMEDIATELY => courierType == TheTypeShipment.MOTORCYCLE,
+                _ => false
             };
         }
 
         var list_order = s_dalOrder?.ReadAll() ?? //רשימת ההזמנות
             throw new Exception("No orders available");
-        var list_courier = s_dalCourier?.ReadAll() ??//רשימת השליחים
-            throw new Exception("No couriers available");
-
-        Random rnd = new Random();
+        foreach(var order in list_order.ToList()) // הסרת הזמנות שלא במצב פתוח
+        {
+            if(order.OrderStatus != OrderStatus.OPEN)
+                list_order.Remove(order);
+        }
 
         for (int i = 0; i < 50; i++) //יצירת 50 משלוחים
         {
-            int index = 0;
-            do
-                index = rnd.Next(list_order.Count);//הגרלת הזמנה
-            while (list_order[index].OrderStatus == OrderStatus.OPEN);//בודק שההזמנה לא סופקה כבר
-            list_order[index].OrderStatus = OrderStatus.DELIVERING;//עדכון סטטוס ההזמנה לסופקה
-            var randomOrder = list_order[index];//משיכת הזמנה 
-            var typeOfOrder = randomOrder.TypeOfOrder;//שליפה של הסוג שלה
-            List<DO.Courier> matchedCouriers = s_dalCourier.ReadAll();
+            var randomOrder = list_order[s_rand.Next(list_order.Count)];//משיכת הזמנה אקראית
 
-            do
-                index = rnd.Next(list_courier.Count);//הגרלת שליח כל עוד אין התאמה של הזמנה לשליח המשך להגריל
-            while (!MatchTypeShipmentAndOrder(list_courier[index].TypeShipment, typeOfOrder));
-            
+            var matchedCouriers = s_dalCourier?.ReadAll() ??//רשימת השליחים
+                    throw new Exception("No couriers available"); 
 
-            //צריך כאן לשלוח לפונקציה שתחשב מרחק -
-            //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
-            //נקבע על פי סןג השילוח, כרגע נשים נול
-
-
-
-            //צריך לעשות דו ןןייל על הגרלת שליח ורק בתנאי טרו
-            //שיחזור
-            //מהסוג של השליח
-            //וסג ההזמנה
-            //הקיימת, לשלוח לפונקציה של MatchTypeShipmentAndOrder
-
-            double GetActualDistance(){//אני צריך לקבל את כתובת הבסיס של החנות...
-
-
-
-                return
-
-            
-            
-            
+            foreach (var courier in matchedCouriers.ToList()) //בדיקת התאמה בין סוג ההזמנה לסוג השליח
+            {
+                if(courier.Active == false)//אם השליח לא פעיל הסרתו מהרשימה
+                    matchedCouriers.Remove(courier);
+                
+                if (!MatchTypeShipmentAndOrder(courier.TypeShipment, randomOrder.TypeOfOrder))
+                    matchedCouriers.Remove(courier);
+                
+                if(courier.MaxDistanceDelivery < randomOrder.DistanceKm)
+                    matchedCouriers.Remove(courier);
             }
+            if (matchedCouriers.Count == 0)
+                throw new Exception("No matched couriers available for the order");
+            
+            var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)]; //הגרלת שליח מתאים
+            randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה
+            s_dalOrder.Update(randomOrder);//עדכון ההזמנה במסד הנתונים
+            list_order.Remove(randomOrder); //הסרת ההזמנה מהרשימה כדי לא ליצור לה שוב משלוח
 
+            double? getActualDistance = null;//משתנה לשמירת המרחק האמיתי בהתאם לסוג השליח
+            getActualDistance = (selectedCourier.TypeShipment is TheTypeShipment.CAR or TheTypeShipment.MOTORCYCLE)//אם השליח הוא ברכב או אופנוע
+                ? randomOrder.DistanceKmRoad
+                : randomOrder.DistanceKmWalk;
+            TimeSpan duration = s_dalConfig!.Clock - randomOrder.OrderData;
+
+            //יצירת משלוח חדש
 
             s_dalDelivery!.Create(new()
             {
                 Id = 0,
                 OrderId = randomOrder.Id,
                 TypeOfOrder = randomOrder.TypeOfOrder,
-                ActualDistance = null,
-
-                CourierId = s_rand.Next(MIN_ID, MAX_ID),
-                AssignedTime = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, 72)), // within last 3 days
-                PickupTime = null,
-                DeliveryTime = null,
-                Status = DeliveryStatus.Pending
+                ActualDistance = getActualDistance,//עדכון צערך*************
+                CourierId = selectedCourier.Id,
+                OrderData = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, duration.Hours)), // within last 3 days
+                EndDelivery
+                
             });
         }
 
