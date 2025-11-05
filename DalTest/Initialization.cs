@@ -292,9 +292,9 @@ public static class Initialization
                 throw new Exception("No matched couriers available for the order");
 
             var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)]; //הגרלת שליח מתאים
-            //randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה
-            //s_dalOrder.Update(randomOrder);//עדכון ההזמנה במסד הנתונים
-            //list_order.Remove(randomOrder); //הסרת ההזמנה מהרשימה כדי לא ליצור לה שוב משלוח
+            randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה
+            s_dalOrder.Update(randomOrder);//עדכון ההזמנה במסד הנתונים
+            list_order.Remove(randomOrder); //הסרת ההזמנה מהרשימה כדי לא ליצור לה שוב משלוח
 
             double? getActualDistance = //שמירת המרחק האמיתי בהתאם לסוג השליח
                 (selectedCourier.TypeShipment is TheTypeShipment.CAR or TheTypeShipment.MOTORCYCLE)//אם השליח הוא ברכב או אופנוע
@@ -316,9 +316,13 @@ public static class Initialization
             DateTime orderData = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, duration.Hours)); // בתוך 3 הימים האחרונים
 
             EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 4);//הגרלת סוג סיום המשלוח
-            
-            if (getEndDelivery==EndDelivery.DELIVERED||getEndDelivery==EndDelivery.REFUSED||getEndDelivery==EndDelivery.CONCELLED)
-                s_dalOrder.Delete(randomOrder.Id);//מחיקת ההזמנה אם המשלוח הסתיים בהצלחה או בסירוב או בביטול
+
+            if (getEndDelivery == EndDelivery.DELIVERED// עדכון סטטוס ההזמנה
+                s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.COMPLETED });
+            if (getEndDelivery == EndDelivery.REFUSED)
+                s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.REFUSED });
+            if (getEndDelivery == EndDelivery.CONCELLED)
+                s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.CONCELLED });
 
 
             //יצירת משלוח חדש
@@ -328,15 +332,45 @@ public static class Initialization
                 Id = 0,
                 OrderId = randomOrder.Id,
                 TypeOfOrder = randomOrder.TypeOfOrder,
-                ActualDistance = getActualDistance,//עדכון צערך*************
+                ActualDistance = getActualDistance,
                 CourierId = selectedCourier.Id,
                 OrderData = orderData,
                 EndDelivery = getEndDelivery,
-                TimeEndDelivery= getTimeEndDelivery(orderData, duration, getEndDelivery) ?? default
+                TimeEndDelivery = getTimeEndDelivery(orderData, duration, getEndDelivery) ?? default
 
             });
         }
 
 
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static void Do(ICourier? dalCourier, IOrder? dalOrder, IDelivery? dalDelivery, IConfig? dalConfig) //stage 1
+    {
+        s_dalCourier = dalCourier ?? throw new NullReferenceException("DAL object can not be null!"); //stage 1
+        s_dalOrder = dalOrder ?? throw new NullReferenceException("DAL object can not be null!"); //stage 1
+        s_dalDelivery = dalDelivery ?? throw new NullReferenceException("DAL object can not be null!"); //stage 1
+        s_dalConfig = dalConfig ?? throw new NullReferenceException("DAL object can not be null!"); //stage 1
+
+        ///מחיקה של כל המידע אם קיים
+        Console.WriteLine("Reset Configuration values and List values...");
+        s_dalConfig.Reset();
+        s_dalCourier.DeleteAll();
+        s_dalOrder.DeleteAll();
+        s_dalDelivery.DeleteAll();
+
+        ///יצירת מידע ראשוני
+        Console.WriteLine("Creating Configuration values...");
+        CreateConfig();
+        Console.WriteLine("Creating Courier values...");
+        CreateCourier();
+        Console.WriteLine("Creating Order values...");
+        CreateOrders();
+        Console.WriteLine("Creating Delivery values...");
+        CreateDelivery();
+        Console.WriteLine("Data initialization completed.");
     }
 }
