@@ -95,7 +95,7 @@ public static class Initialization
             TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
             TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
             TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
-           
+            _ => false
         };
     }
     
@@ -193,7 +193,7 @@ public static class Initialization
             s_dalOrder!.Create(new()
             {
                 Id = i,
-                TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 3),
+                TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 2),
                 Phone = "0" + s_rand.Next(500000000, 599999999).ToString(),
                 Addres = (string)s_addresses[adressIndex][0],
                 Latitude = (double)s_addresses[adressIndex][2], 
@@ -218,7 +218,16 @@ public static class Initialization
     /// <exception cref="Exception">Thrown if no orders or no couriers are available.</exception>
     private static void CreateDelivery() 
     {
-        
+        //פונקציה שבודקת אם סוג ההזמנה מתאים לסוג השליח 
+        static bool MatchTypeShipmentAndOrder(TheTypeShipment courier, TypeOfOrder order)
+        {
+            return order switch
+            {
+                TypeOfOrder.STANDART => courier == TheTypeShipment.CAR || courier == TheTypeShipment.MOTORCYCLE,
+                TypeOfOrder.FAST_DELIVERY => courier == TheTypeShipment.MOTORCYCLE,
+                TypeOfOrder.DELIVER_IMMEDIATELY => courier == TheTypeShipment.FOOT,
+            };
+        }
 
         var list_order = s_dalOrder?.ReadAll() ?? //רשימת ההזמנות
             throw new Exception("No orders available");
@@ -236,17 +245,35 @@ public static class Initialization
             list_order[index].OrderStatus = OrderStatus.DELIVERING;//עדכון סטטוס ההזמנה לסופקה
             var randomOrder = list_order[index];//משיכת הזמנה 
             var typeOfOrder = randomOrder.TypeOfOrder;//שליפה של הסוג שלה
+            List<DO.Courier> matchedCouriers = s_dalCourier.ReadAll();
 
             do
                 index = rnd.Next(list_courier.Count);//הגרלת שליח כל עוד אין התאמה של הזמנה לשליח המשך להגריל
             while (!MatchTypeShipmentAndOrder(list_courier[index].TypeShipment, typeOfOrder));
+            
 
-            double? getActualDistance = null;//משתנה לשמירת המרחק האמיתי בהתאם לסוג השליח
-            getActualDistance =
-                (list_courier[index].TypeShipment
-                is TheTypeShipment.CAR or TheTypeShipment.MOTORCYCLE)//אם השליח הוא ברכב או אופנוע
-                ? randomOrder.DistanceKmRoad
-                : randomOrder.DistanceKmWalk;
+            //צריך כאן לשלוח לפונקציה שתחשב מרחק -
+            //אם זה ברגל או באוטו וכו, רגל או אוטו וכו'
+            //נקבע על פי סןג השילוח, כרגע נשים נול
+
+
+
+            //צריך לעשות דו ןןייל על הגרלת שליח ורק בתנאי טרו
+            //שיחזור
+            //מהסוג של השליח
+            //וסג ההזמנה
+            //הקיימת, לשלוח לפונקציה של MatchTypeShipmentAndOrder
+
+            double GetActualDistance(){//אני צריך לקבל את כתובת הבסיס של החנות...
+
+
+
+                return
+
+            
+            
+            
+            }
 
 
             s_dalDelivery!.Create(new()
@@ -254,16 +281,13 @@ public static class Initialization
                 Id = 0,
                 OrderId = randomOrder.Id,
                 TypeOfOrder = randomOrder.TypeOfOrder,
-                ActualDistance =getActualDistance,
+                ActualDistance = null,
 
-                CourierId = list_courier[index].Id,
-                OrderData=s_dalConfig!.Clock,
-                EndDelivery=(EndDelivery)s_rand.Next(0,3),
-
-                TimeEndDelivery=//צריך לחשוב איך אני מגדיר את שעון
-                                //ובעצם לבדוק איזה סוג סיום הוגרל בשורה קודם,
-                                //ולפי זה להחליט בכמה לקדם את השעון
-
+                CourierId = s_rand.Next(MIN_ID, MAX_ID),
+                AssignedTime = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, 72)), // within last 3 days
+                PickupTime = null,
+                DeliveryTime = null,
+                Status = DeliveryStatus.Pending
             });
         }
 

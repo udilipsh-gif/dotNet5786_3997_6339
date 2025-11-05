@@ -34,8 +34,4 @@ public record Order
     public OrderStatus OrderStatus { get; set; } = OrderStatus.OPEN;
     public double? DistanceKm { get; init; } = null;
 
-    public double? DistanceKmRoad { get; init; } = null;
-    public double? DistanceKmWalk { get; init; } = null;
-
-
 }
