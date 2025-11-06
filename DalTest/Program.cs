@@ -140,6 +140,7 @@ namespace DalTest
             try
             {
                 Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);
+
             }
             catch (Exception ex)
             {
