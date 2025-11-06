@@ -317,7 +317,7 @@ public static class Initialization
 
             EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 4);//הגרלת סוג סיום המשלוח
 
-            if (getEndDelivery == EndDelivery.DELIVERED// עדכון סטטוס ההזמנה
+            if (getEndDelivery == EndDelivery.DELIVERED) // עדכון סטטוס ההזמנה
                 s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.COMPLETED });
             if (getEndDelivery == EndDelivery.REFUSED)
                 s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.REFUSED });
