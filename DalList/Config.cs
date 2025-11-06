@@ -20,28 +20,47 @@ internal static class Config
         get => manager_id;
         set
         {
-            if (!s_isValidIsraeliId(value))
+            if (!validId(value))
                 throw new ArgumentException("id is not valid");
             manager_id = value;
         }
     }
-
-    private static bool s_isValidIsraeliId(int id)
+    static bool validId(int id)
     {
-        string idStr = id.ToString().PadLeft(9, '0');
-        if (!System.Text.RegularExpressions.Regex.IsMatch(idStr, @"^\d{9}$"))
-            return false;
-
+        int tempId = id;
         int sum = 0;
-        for (int i = 0; i < 9; i++)
-        {
-            int digit = idStr[i] - '0';
-            int incNum = digit * ((i % 2) + 1);
-            sum += (incNum > 9) ? incNum - 9 : incNum;
-        }
 
-        return sum % 10 == 0;
+        for (int i = 1; i < 9; i++)
+        {
+            int temp = tempId % 10;
+            if (i % 2 != 0)
+                sum = sum + temp;
+            else
+            {
+                temp = temp * 2;
+                sum = sum + (temp % 10 + temp / 10);
+            }
+            tempId = tempId / 10;
+        }
+        return (tempId == (10 - (sum % 10)));
     }
+
+    /* private static bool s_isValidIsraeliId(int id)
+     {
+         string idStr = id.ToString().PadLeft(9, '0');
+         if (!System.Text.RegularExpressions.Regex.IsMatch(idStr, @"^\d{9}$"))
+             return false;
+
+         int sum = 0;
+         for (int i = 0; i < 9; i++)
+         {
+             int digit = idStr[i] - '0';
+             int incNum = digit * ((i % 2) + 1);
+             sum += (incNum > 9) ? incNum - 9 : incNum;
+         }
+
+         return sum % 10 == 0;
+     }*/
 
     internal static string PasswordManager { get; set; } = "Admin1234$";
     internal static string? StoreAddress {  get; set; } = null;
