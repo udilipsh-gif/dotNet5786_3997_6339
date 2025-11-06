@@ -20,12 +20,12 @@ internal static class Config
         get => manager_id;
         set
         {
-            if (!validId(value))
+            if (!ValidId(value))
                 throw new ArgumentException("id is not valid");
             manager_id = value;
         }
     }
-    static bool validId(int id)
+    static bool ValidId(int id)
     {
         int tempId = id;
         int sum = 0;
