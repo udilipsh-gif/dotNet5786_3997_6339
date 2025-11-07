@@ -30,7 +30,7 @@ public record Order
     public  required string Name { get; set; }
     public  required string Phone { get; set; }
     public  required int Weight { get; set; }
-    public  required DateTime OrderData { get; init;}
+    public  required DateTime OrderDate { get; init;}
     public OrderStatus OrderStatus { get; set; } = OrderStatus.OPEN;
     public double? DistanceKm { get; init; } = null;
     public double? DistanceKmRoad { get; init; } = null;
