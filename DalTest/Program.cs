@@ -693,6 +693,9 @@ namespace DalTest
                 // פעולה לפי הבחירה
                 switch (choice)
                 {
+                    case 0:
+                        Console.WriteLine("good bay");
+                        break;
                     case 1:
                         SetCourier();
                         break;
@@ -702,9 +705,7 @@ namespace DalTest
                     case 3:
                         SetDelivery();
                         break;
-                    case 0:
-                        Console.WriteLine("good bay");
-                        break;
+                   
                     default:
                         Console.WriteLine("error");
                         break;
