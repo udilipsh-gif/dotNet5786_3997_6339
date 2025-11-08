@@ -217,7 +217,7 @@ public static class Initialization
                 Name = "Customer" + i,
                 Weight = s_rand.Next(1, 21), // Weight between 1 and 20
                 Details = "Order details for order " + i,
-                OrderData = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)), // זמן פתיחת הזמנה רנדומלי
+                OrderDate = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)), // זמן פתיחת הזמנה רנדומלי
                 DistanceKm = (double)s_addresses[adressIndex][3],
                 DistanceKmWalk = (double)s_addresses[adressIndex][4],
                 DistanceKmRoad = (double)s_addresses[adressIndex][5],
@@ -334,7 +334,7 @@ public static class Initialization
                 TypeOfOrder = randomOrder.TypeOfOrder,
                 ActualDistance = getActualDistance,
                 CourierId = selectedCourier.Id,
-                OrderData = orderData,
+                OrderDate = orderData,
                 EndDelivery = getEndDelivery,
                 TimeEndDelivery = getTimeEndDelivery(orderData, duration, getEndDelivery) ?? default
 

@@ -29,26 +29,69 @@ namespace DalTest
                 Console.Error.WriteLine($"DAL initialization failed: {ex}");
             }
         }
-        private static object DataReception(string action,string type) 
+
+        private static void PrintCourierDetails(Courier courier)
         {
-            
-            Console.Write("Enter Name: ");
+            Console.WriteLine($"Courier Details: " +
+                $"ID: {courier.Id} " +
+                $"Name: {courier.Name} " +
+                $"Phone: {courier.Phone} " +
+                $"Email: {courier.Email} " +
+                $"Active: {courier.Active} " +
+                $"Max Distance Delivery: {courier.MaxDistanceDelivery} " +
+                $"Type Shipment: {courier.TypeShipment} " +
+                $"Working Since: {courier.WorkingSince}");
+        }
+        private static void PrintOrderDetails(Order order)
+        {
+            Console.WriteLine($"Order Details: " +
+                $"ID: {order.Id} " +
+                $"Type of order: {order.TypeOfOrder} " +
+                $"Details: {order.Details} " +
+                $"Address: {order.Addres} " +
+                $"Name: {order.Name} " +
+                $"Phone: {order.Phone} " +
+                $"Weight: {order.Weight} " +
+                $"OrderDate: {order.OrderDate} " +
+                $"OrderStatus: {order.OrderStatus} " +
+                $"Distance Km: {order.DistanceKm}");
+        }
+        private static object DataReception(string action, string type)
+        {
+
+            Console.Write("     Enter Name: ");
             string name = Console.ReadLine();
 
-            Console.Write("Enter Phone: ");
+            Console.Write("     Enter Phone: ");
             string phone = Console.ReadLine();
 
             if (type == "order")
             {
-                Console.Write("Enter Customer Address: ");
+                Console.Write("     Enter Customer Address: ");
                 string address = Console.ReadLine();
-                Console.Write("Enter datails of yor order");
+                Console.Write("     Enter datails of yor order");
                 string? datails = Console.ReadLine();
-                Console.Write("enter Weight of order");
+                Console.Write("     enter Weight of order");
                 int Weight = int.Parse(Console.ReadLine());
-                Console.Write("Enter Type Shipment (0=STANDART, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
+                Console.Write("     Enter Type Shipment (0=STANDART, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
                 DO.TypeOfOrder typeOfOrder = (DO.TypeOfOrder)int.Parse(Console.ReadLine());
-               
+
+                Order newOrder = new DO.Order
+                {
+                    Id = 0, // ID will be set by DAL
+                    Name = name,
+                    Phone = phone,
+                    Addres = address,
+                    Details = datails,
+                    Weight = Weight,
+                    TypeOfOrder = typeOfOrder,
+                    OrderStatus = 0,
+                    Latitude = 0.0, // Placeholder, should be set appropriately
+                    Longitude = 0.0, // Placeholder, should be set appropriately
+                    OrderDate = DateTime.Now
+                };
+                return newOrder;
+
             }
 
             if (type == "courier")
@@ -56,20 +99,20 @@ namespace DalTest
                 int id = 0;//במקרה עדכון בין כך לא נשתמש במשתנה הזה, ובמקרה יצירה ניקח את הערך שהוזן ע"י המשתמש
                 if (action is "create")
                 {
-                    Console.Write("Enter ID: ");
+                    Console.Write("     Enter ID: ");
                     id = int.Parse(Console.ReadLine());
                 }
 
-                Console.Write("Enter Email: ");
+                Console.Write("     Enter Email: ");
                 string email = Console.ReadLine();
 
-                Console.Write("Enter Password: ");
+                Console.Write("     Enter Password: ");
                 string password = Console.ReadLine();
 
-                Console.Write("Enter Max Distance Delivery (in km): ");
+                Console.Write("     Enter Max Distance Delivery (in km): ");
                 double maxDistanceDelivery = double.Parse(Console.ReadLine());
 
-                Console.Write("Enter Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
+                Console.Write("     Enter Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
                 DO.TheTypeShipment typeShipment = (DO.TheTypeShipment)int.Parse(Console.ReadLine());
 
                 Courier newCourier = new DO.Courier
@@ -83,21 +126,14 @@ namespace DalTest
                     MaxDistanceDelivery = maxDistanceDelivery,
                     TypeShipment = typeShipment,
                     WorkingSince = DateTime.Now
-                  
+
                 };
                 return newCourier;
 
             }
-
-            
-
-            
-              
             else
-            {
-                throw new ArgumentException($"Unsupported type: {typeof(T).Name}");
-            }
-            
+                return null;
+
         }
 
 
@@ -108,13 +144,13 @@ namespace DalTest
             do
             {
                 Console.WriteLine(
-                "to exit press 0\n" +
-                "to create courier press 1\n" +
-                "to read courier press 2\n" +
-                "to read all couriers press 3\n" +
-                "to update press 4\n" +
-                "to delete courier press 5\n" +
-                "to delete all couriers press 6\n");
+                "   to exit press 0\n" +
+                "   to create courier press 1\n" +
+                "   to read courier press 2\n" +
+                "   to read all couriers press 3\n" +
+                "   to update press 4\n" +
+                "   to delete courier press 5\n" +
+                "   to delete all couriers press 6\n");
 
 
                 choiche = int.Parse(Console.ReadLine());
@@ -127,9 +163,9 @@ namespace DalTest
 
                         try
                         {
-                            
 
-                            object a= DataReception("create", "courier");
+
+                            object a = DataReception("create", "courier");
                             Courier temp = (Courier)a;
 
                             Courier newCourier = new DO.Courier
@@ -138,7 +174,7 @@ namespace DalTest
                                 Id = temp.Id,
                                 Name = temp.Name,
                                 Phone = temp.Phone,
-                                Email =temp.Email,
+                                Email = temp.Email,
                                 Password = temp.Password,
                                 Active = true,
                                 MaxDistanceDelivery = temp.MaxDistanceDelivery,
@@ -166,7 +202,7 @@ namespace DalTest
                         Courier? courier = s_dalCourier?.Read(idRead);
                         if (courier != null)
                         {
-                            Console.WriteLine($"Courier Details:\nID: {courier.Id}\nName: {courier.Name}\nPhone: {courier.Phone}\nEmail: {courier.Email}\nActive: {courier.Active}\nMax Distance Delivery: {courier.MaxDistanceDelivery}\nType Shipment: {courier.TypeShipment}\nWorking Since: {courier.WorkingSince}");
+                            PrintCourierDetails(courier);
                         }
                         else
                         {
@@ -179,7 +215,7 @@ namespace DalTest
 
                         s_dalCourier?.ReadAll().ForEach(courier =>
                         {
-                            Console.WriteLine($"ID: {courier.Id}, Name: {courier.Name}, Phone: {courier.Phone}, Email: {courier.Email}, Active: {courier.Active}, Max Distance Delivery: {courier.MaxDistanceDelivery}, Type Shipment: {courier.TypeShipment}, Working Since: {courier.WorkingSince}");
+                            PrintCourierDetails(courier);
                         });
 
                         break;
@@ -194,7 +230,7 @@ namespace DalTest
                         }
                         else
                         {
-                            Console.WriteLine($"Current Details:\nID: {courierUpdate.Id}\nName: {courierUpdate.Name}\nPhone: {courierUpdate.Phone}\nEmail: {courierUpdate.Email}\nActive: {courierUpdate.Active}\nMax Distance Delivery: {courierUpdate.MaxDistanceDelivery}\nType Shipment: {courierUpdate.TypeShipment}\nWorking Since: {courierUpdate.WorkingSince}");
+                            PrintCourierDetails(courierUpdate);
                         }
 
                         try
@@ -205,7 +241,7 @@ namespace DalTest
                             object a = DataReception("update", "courier");
                             Courier temp = (Courier)a;
 
-                            
+
 
                             Courier newCourier = new DO.Courier
                             {
@@ -271,13 +307,13 @@ namespace DalTest
             do
             {
                 Console.WriteLine(
-                "to exit press 0\n" +
-                "to create order press 1\n" +
-                "to read order press 2\n" +
-                "to read all orders press 3\n" +
-                "to update press 4\n" +
-                "to delete order press 5\n" +
-                "to delete all orders press 6\n");
+                "   to exit press 0\n" +
+                "   to create order press 1\n" +
+                "   to read order press 2\n" +
+                "   to read all orders press 3\n" +
+                "   to update press 4\n" +
+                "   to delete order press 5\n" +
+                "   to delete all orders press 6\n");
                 choiche = int.Parse(Console.ReadLine());
                 switch (choiche)
                 {
@@ -311,7 +347,7 @@ namespace DalTest
                         Order order = s_dalOrder?.Read(idRead);
                         if (order is not null)
                         {
-                            Console.WriteLine($"Order Details:\nID:Type of order: {order.TypeOfOrder}\nDetails: {order.Details}\nAddres: {order.Addres}\n {order.Id}\nName: {order.Name}\nPhone: {order.Phone}\nWeight: {order.Weight}\nOrderDate: {order.OrderDate}\nOrderStatus: {order.OrderStatus}\nDistance Km: {order.DistanceKm}");
+                            PrintOrderDetails(order);
                         }
                         else
                         {
@@ -323,7 +359,7 @@ namespace DalTest
                         Console.WriteLine("Read All Orders selected.");
                         s_dalOrder?.ReadAll().ForEach(order =>
                         {
-                            Console.WriteLine($"Order Details:\nID:Type of order: {order.TypeOfOrder}\nDetails: {order.Details}\nAddres: {order.Addres}\n {order.Id}\nName: {order.Name}\nPhone: {order.Phone}\nWeight: {order.Weight}\nOrderDate: {order.OrderDate}\nOrderStatus: {order.OrderStatus}\nDistance Km: {order.DistanceKm}");
+                            PrintOrderDetails(order);
                         });
 
                         break;
@@ -338,16 +374,16 @@ namespace DalTest
                         }
                         else
                         {
-                            Console.WriteLine($"Current Details:\nID:Type of order: {orderUpdate.TypeOfOrder}\nDetails: {orderUpdate.Details}\nAddres: {orderUpdate.Addres}\n {orderUpdate.Id}\nName: {orderUpdate.Name}\nPhone: {orderUpdate.Phone}\nWeight: {orderUpdate.Weight}\nOrderDate: {orderUpdate.OrderDate}\nOrderStatus: {orderUpdate.OrderStatus}\nDistance Km: {orderUpdate.DistanceKm}");
+                            PrintOrderDetails(orderUpdate);
                         }
                         try
                         {
-                             a = DataReception("update", "order");
+                            a = DataReception("update", "order");
                             Order temp1 = (Order)a;
 
                             Order newOrder1 = new DO.Order
                             {
-                                Id = orderUpdate.Id, 
+                                Id = orderUpdate.Id,
                                 Name = temp1.Name,
                                 Phone = temp1.Phone,
                                 Addres = temp1.Addres,
@@ -355,8 +391,8 @@ namespace DalTest
                                 Weight = temp1.Weight,
                                 TypeOfOrder = temp1.TypeOfOrder,
                                 OrderStatus = orderUpdate.OrderStatus,//נדרש טיפול בחלק הזה
-                                Latitude = orderUpdate.Latitude, 
-                                Longitude = orderUpdate.Longitude, 
+                                Latitude = orderUpdate.Latitude,
+                                Longitude = orderUpdate.Longitude,
                                 OrderDate = orderUpdate.OrderDate,
                             };
 
@@ -374,6 +410,68 @@ namespace DalTest
                     case 6:
                         Console.WriteLine("Delete All Orders selected.");
                         // Implementation for deleting all orders goes here
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice, please try again.");
+                        break;
+                }
+            } while (choiche != 0);
+        }
+
+        private static void SetDelivery()
+        {
+            Console.WriteLine("SetDelivery method called.");
+            int choiche;
+            do
+            {
+                Console.WriteLine(
+                "   to exit press 0\n" +
+                "   to create delivery press 1\n" +
+                "   to read delivery press 2\n" +
+                "   to read all deliveries press 3\n" +
+                "   to update press 4\n" +
+                "   to delete delivery press 5\n" +
+                "   to delete all deliveries press 6\n");
+                choiche = int.Parse(Console.ReadLine());
+                switch (choiche)
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        Console.WriteLine("Create Delivery selected.");
+                        object a = DataReception("create", "delivery");
+                        Delivery temp = (Delivery)a;
+                        Delivery newDelivery = new DO.Delivery
+                        {
+                            Id = 0, // ID will be set by DAL
+                            OrderId = temp.OrderId,
+                            CourierId = temp.CourierId,
+                            TypeOfOrder = temp.TypeOfOrder,
+                            OrderDate = DateTime.Now,
+                            ActualDistance = temp.ActualDistance,
+                            EndDelivery = temp.EndDelivery,
+                            TimeEndDelivery = temp.TimeEndDelivery
+                        };
+                        break;
+                    case 2:
+                        Console.WriteLine("Read Delivery selected.");
+                        
+                        break;
+                    case 3:
+                        Console.WriteLine("Read All Deliveries selected.");
+                        // Implementation for reading all deliveries goes here
+                        break;
+                    case 4:
+                        Console.WriteLine("Update Delivery selected.");
+                        // Implementation for updating a delivery goes here
+                        break;
+                    case 5:
+                        Console.WriteLine("Delete Delivery selected.");
+                        // Implementation for deleting a delivery goes here
+                        break;
+                    case 6:
+                        Console.WriteLine("Delete All Deliveries selected.");
+                        // Implementation for deleting all deliveries goes here
                         break;
                     default:
                         Console.WriteLine("Invalid choice, please try again.");
@@ -402,7 +500,12 @@ namespace DalTest
             do
             {
 
-                Console.WriteLine("Main Menu \n to exit press 0\n   to set courier press 1\n  to set order press 2\n  to set delivery press 3\n       enter your choice: ");
+                Console.WriteLine("Main Menu \n" +
+                    " to exit press 0\n" +
+                    "   to set courier press 1\n" +
+                    "  to set order press 2\n" +
+                    "  to set delivery press 3\n" +
+                    "       enter your choice: ");
 
                 //string? input = Console.ReadLine();
                 choice = int.Parse(Console.ReadLine());
@@ -431,9 +534,9 @@ namespace DalTest
                     case 2:
                         SetOrder();
                         break;
-                    //case 3:
-                    //    SetDelivery();
-                    //    break;
+                    case 3:
+                       SetDelivery();
+                        break;
                     case 0:
                         Console.WriteLine("good bay");
                         break;
