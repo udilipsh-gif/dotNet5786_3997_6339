@@ -1,4 +1,8 @@
-﻿namespace DalApi;
+﻿
+
+using DO;
+
+namespace DalApi;
 
 public interface ICrud<T> where T : class
 {
@@ -9,3 +13,4 @@ public interface ICrud<T> where T : class
     void Delete(int id); //Deletes an object by its Id
     void DeleteAll(); //Delete all entity objects
 }
+
