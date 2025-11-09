@@ -7,14 +7,36 @@ using System.Numerics;
 
 namespace DalTest
 {
+    /// <summary>
+    /// Main program class for testing the Data Access Layer (DAL) functionality.
+    /// Provides interactive console menus for CRUD operations on couriers, orders, and deliveries.
+    /// </summary>
     internal class Program
     {
+        /// <summary>
+        /// Data access layer interface for courier operations.
+        /// </summary>
         private static ICourier? s_dalCourier;
+        
+        /// <summary>
+        /// Data access layer interface for order operations.
+        /// </summary>
         private static IOrder? s_dalOrder;
+        
+        /// <summary>
+        /// Data access layer interface for delivery operations.
+        /// </summary>
         private static IDelivery? s_dalDelivery;
+        
+        /// <summary>
+        /// Data access layer interface for configuration operations.
+        /// </summary>
         private static IConfig? s_dalConfig;
 
-        // static ctor runs once before any static member access / before Main
+        /// <summary>
+        /// Static constructor that initializes all DAL implementations.
+        /// Runs once before any static member access or before Main method execution.
+        /// </summary>
         static Program()
         {
             try
@@ -26,11 +48,16 @@ namespace DalTest
             }
             catch (Exception ex)
             {
-                // Log and rethrow (or set a fallback / mark failure)
                 Console.Error.WriteLine($"DAL initialization failed: {ex}");
             }
         }
 
+        /// <summary>
+        /// Validates whether the courier's shipment type is compatible with the order type.
+        /// </summary>
+        /// <param name="courierType">The type of shipment the courier uses.</param>
+        /// <param name="order">The type of order to be delivered.</param>
+        /// <returns>True if the courier can handle the order type; otherwise, false.</returns>
         static bool MatchTypeShipmentAndOrder(TheTypeShipment courierType, TypeOfOrder order)
         {
             return order switch
@@ -42,6 +69,10 @@ namespace DalTest
             };
         }
 
+        /// <summary>
+        /// Prompts the user for courier information and creates a new courier object.
+        /// </summary>
+        /// <returns>A new Courier instance with user-provided data.</returns>
         private static Courier CreateCourier()
         {
             Console.WriteLine("Creating a new courier...");
@@ -85,6 +116,10 @@ namespace DalTest
             };
         }
 
+        /// <summary>
+        /// Provides an interactive menu for updating courier properties.
+        /// </summary>
+        /// <param name="id">The ID of the courier to update.</param>
         private static void UpdateCourier(int id)
         {
             int choiche = 0;
@@ -172,6 +207,11 @@ namespace DalTest
             }
             while (choiche != 0);
         }
+        
+        /// <summary>
+        /// Prompts the user for order information and creates a new order object.
+        /// </summary>
+        /// <returns>A new Order instance with user-provided data.</returns>
         private static Order CreateOrder()
         {
             Console.WriteLine("Creating a new order...");
@@ -196,7 +236,7 @@ namespace DalTest
 
             return new Order
             {
-                Id = 0, // ID will be set by DAL
+                Id = 0,
                 Name = name,
                 Phone = phone,
                 Addres = address,
@@ -204,12 +244,16 @@ namespace DalTest
                 Weight = weight,
                 TypeOfOrder = typeOfOrder,
                 OrderStatus = OrderStatus.OPEN,
-                Latitude = 0.0, // Placeholder
-                Longitude = 0.0, // Placeholder
+                Latitude = 0.0,
+                Longitude = 0.0,
                 OrderDate = s_dalConfig?.Clock ?? DateTime.Now,
             };
         }
 
+        /// <summary>
+        /// Provides an interactive menu for updating order properties.
+        /// </summary>
+        /// <param name="id">The ID of the order to update.</param>
         private static void UpdateOrder(int id)
         {
             int choiche = 0;
@@ -297,6 +341,9 @@ namespace DalTest
             while (choiche != 0);
         }
 
+        /// <summary>
+        /// Provides an interactive menu for updating system configuration settings.
+        /// </summary>
         private static void UpdateSetting()
         {
             if (s_dalConfig == null)
@@ -416,6 +463,9 @@ namespace DalTest
             while (choiche != 0);
         }
 
+        /// <summary>
+        /// Provides an interactive menu for reading and displaying system configuration settings.
+        /// </summary>
         private static void ReadSetting()
         {
             if (s_dalConfig == null)
@@ -465,6 +515,13 @@ namespace DalTest
             }
             while (choiche != 0);
         }
+        
+        /// <summary>
+        /// Prompts the user to select an open order and a suitable courier, then creates a new delivery object.
+        /// Filters orders by OPEN status and couriers by active status, shipment type compatibility, and distance capability.
+        /// </summary>
+        /// <returns>A new Delivery instance with user-selected order and courier.</returns>
+        /// <exception cref="Exception">Thrown when no orders, couriers, or suitable matches are available.</exception>
         private static Delivery CreateDelivery()
         {
             Console.WriteLine("Creating a new delivery...");
@@ -472,7 +529,6 @@ namespace DalTest
             var matchedOrders = s_dalOrder?.ReadAll() ??
                 throw new Exception("No orders available to create a delivery.");
 
-            // סינון הזמנות פתוחות
             matchedOrders = matchedOrders.Where(o => o.OrderStatus == OrderStatus.OPEN).ToList();
 
             if (matchedOrders.Count == 0)
@@ -499,7 +555,6 @@ namespace DalTest
 
             Console.WriteLine($"Selected order: {selectedOrder.Id}");
 
-            // מסננים שליחים מתאימים
             var matchedCouriers = s_dalCourier?.ReadAll() ??
                 throw new Exception("No couriers available to create a delivery.");
 
@@ -536,7 +591,7 @@ namespace DalTest
 
             return new Delivery
             {
-                Id = 0, // ID will be set by DAL
+                Id = 0,
                 OrderId = orderid,
                 CourierId = courierId,
                 TypeOfOrder = selectedOrder.TypeOfOrder,
@@ -545,6 +600,12 @@ namespace DalTest
                 TimeEndDelivery = null
             };
         }
+        
+        /// <summary>
+        /// Prompts the user for integer input and validates it.
+        /// Continues prompting until valid integer input is received.
+        /// </summary>
+        /// <returns>A valid integer entered by the user.</returns>
         public static int GetIntInput()
         {
             int result;
@@ -559,6 +620,11 @@ namespace DalTest
             }
         }
 
+        /// <summary>
+        /// Provides a generic interactive menu for CRUD operations on any entity type.
+        /// </summary>
+        /// <typeparam name="T">The entity type (must be a class).</typeparam>
+        /// <param name="dal">The data access layer interface for the entity type.</param>
         private static void DataMenu<T>(ICrud<T>? dal) where T : class
         {
             string typeName = typeof(T).Name.ToLower();
@@ -671,6 +737,9 @@ Set {typeName} method called.
             } while (choiche != 0);
         }
 
+        /// <summary>
+        /// Provides an interactive menu for system settings management, including clock manipulation and configuration updates.
+        /// </summary>
         private static void SettingMenu()
         {
             int choiche;
@@ -749,6 +818,12 @@ Set {typeName} method called.
             }
             while (choiche != 0);
         }
+        
+        /// <summary>
+        /// Main entry point of the application.
+        /// Displays the main menu and handles user navigation between different entity management menus.
+        /// </summary>
+        /// <param name="args">Command line arguments (not used).</param>
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, Book Soop!");

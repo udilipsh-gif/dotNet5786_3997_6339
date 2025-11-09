@@ -1,14 +1,17 @@
-﻿
-
-using DO;
+﻿using DO;
 
 namespace DalApi;
-
+/// <summary>
+/// Generic CRUD interface for data access layer operations.
+/// Defines standard Create, Read, Update, and Delete operations for entity objects.
+/// Constraint: T must be a reference type (class).
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public interface ICrud<T> where T : class
 {
     void Create(T item); //Creates new entity object in DAL
     T? Read(int id); //Reads entity object by its ID 
-    List<T> ReadAll(); //stage 1 only, Reads all entity objects
+    List<T> ReadAll(); //stage 1 only, Reads all entity objects 
     void Update(T item); //Updates entity object
     void Delete(int id); //Deletes an object by its Id
     void DeleteAll(); //Delete all entity objects
