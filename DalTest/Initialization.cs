@@ -1,8 +1,7 @@
 ﻿namespace DalTest;
 using DalApi;
 using DO;
-using System;
-using System.Runtime.CompilerServices;
+
 
 /// <summary>
 /// Static class for initializing the data store with sample data for couriers, orders, deliveries, and configuration settings.
@@ -13,31 +12,33 @@ public static class Initialization
     /// Minimum value for generating random courier IDs.
     /// </summary>
     const int MIN_ID = 200000000;
-    
+
     /// <summary>
     /// Maximum value for generating random courier IDs.
     /// </summary>
     const int MAX_ID = 400000000;
 
-    /// <summary>
-    /// Data access layer interface for courier operations.
-    /// </summary>
-    private static ICourier? s_dalCourier;
-    
-    /// <summary>
-    /// Data access layer interface for order operations.
-    /// </summary>
-    private static IOrder? s_dalOrder;
-    
-    /// <summary>
-    /// Data access layer interface for delivery operations.
-    /// </summary>
-    private static IDelivery? s_dalDelivery;
-    
-    /// <summary>
-    /// Data access layer interface for configuration operations.
-    /// </summary>
-    private static IConfig? s_dalConfig;
+    ///// <summary>
+    ///// Data access layer interface for courier operations.
+    ///// </summary>
+    //private static ICourier? s_dalCourier; // Stage1
+
+    ///// <summary>
+    ///// Data access layer interface for order operations.
+    ///// </summary>
+    //private static IOrder? s_dalOrder; // Stage1
+
+    ///// <summary>
+    ///// Data access layer interface for delivery operations.
+    ///// </summary>
+    //private static IDelivery? s_dalDelivery; // Stage1
+
+    ///// <summary>
+    ///// Data access layer interface for configuration operations.
+    ///// </summary>
+    //private static IConfig? s_dalConfig; // Stage1
+
+    private static IDal? s_dal; //stage 2
 
     /// <summary>
     /// Random number generator for creating randomized test data.
@@ -129,20 +130,20 @@ public static class Initialization
     /// </summary>
     private static void CreateConfig()
     {
-        s_dalConfig!.Clock = DateTime.Now;
-        s_dalConfig.ManagerId = 203383997;
-        s_dalConfig.PasswordManager = "Admin1234$";
-        s_dalConfig.storeAddress = "bar cochva, 21, Bney Braq";
-        s_dalConfig.Latitude = 32.0936195;
-        s_dalConfig.Longitude = 34.8229463;
-        s_dalConfig.MaxDeliveryRange = 50.0;
-        s_dalConfig.AvgSpeedCar = 60.0;
-        s_dalConfig.AvgSpeedMotorcycle = 40.0;
-        s_dalConfig.AvgSpeedBike = 15.0;
-        s_dalConfig.AvgSpeedFoot = 5.0;
-        s_dalConfig.MaxDeliveryTime = TimeSpan.FromDays(5);
-        s_dalConfig.RiskRange = TimeSpan.FromDays(4);
-        s_dalConfig.MaxTimeInactivity = TimeSpan.FromDays(14);
+        s_dal!.Config!.Clock = DateTime.Now;
+        s_dal!.Config.ManagerId = 203383997;
+        s_dal!.Config.PasswordManager = "Admin1234$";
+        s_dal!.Config.storeAddress = "bar cochva, 21, Bney Braq";
+        s_dal!.Config.Latitude = 32.0936195;
+        s_dal!.Config.Longitude = 34.8229463;
+        s_dal!.Config.MaxDeliveryRange = 50.0;
+        s_dal!.Config.AvgSpeedCar = 60.0;
+        s_dal!.Config.AvgSpeedMotorcycle = 40.0;
+        s_dal!.Config.AvgSpeedBike = 15.0;
+        s_dal!.Config.AvgSpeedFoot = 5.0;
+        s_dal!.Config.MaxDeliveryTime = TimeSpan.FromDays(5);
+        s_dal!.Config.RiskRange = TimeSpan.FromDays(4);
+        s_dal!.Config.MaxTimeInactivity = TimeSpan.FromDays(14);
     }
 
     /// <summary>
@@ -180,7 +181,7 @@ public static class Initialization
             int id;
             do
                 id = s_rand.Next(MIN_ID, MAX_ID);
-            while (s_dalCourier!.Read(id) != null);
+            while (s_dal?.Courier.Read(id) != null);
             return id;
         }
 
@@ -209,7 +210,7 @@ public static class Initialization
         {
             var typeShipment = (TheTypeShipment)s_rand.Next(0, 4);
 
-            s_dalCourier!.Create(new()
+            s_dal?.Courier!.Create(new()
             {
                 Id = getUniqueId(),
                 Name = name,
@@ -218,7 +219,7 @@ public static class Initialization
                 Password = "Pass#" + s_rand.Next(100000, 500000).ToString(),
                 Active = s_rand.Next(0, 5) != 0 ? true : false,
                 TypeShipment = typeShipment,
-                WorkingSince = s_dalConfig!.Clock.AddDays(-s_rand.Next(5, 366)),
+                WorkingSince = s_dal.Config.Clock.AddDays(-s_rand.Next(5, 366)),
                 MaxDistanceDelivery = getMaxDistanceDelivery(typeShipment)
             });
         }
@@ -241,7 +242,7 @@ public static class Initialization
     private static void CreateOrders()
     {
         int num_of_order = 0;
-        
+
         /// <summary>
         /// Determines the order status based on the order number.
         /// </summary>
@@ -260,7 +261,7 @@ public static class Initialization
         for (int i = 0; i < 50; i++)
         {
             var adressIndex = s_rand.Next(s_addresses.Length);
-            s_dalOrder!.Create(new()
+            s_dal?.Order.Create(new()
             {
                 Id = 0,
                 TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 2),
@@ -271,7 +272,7 @@ public static class Initialization
                 Name = "Customer" + i,
                 Weight = s_rand.Next(1, 21),
                 Details = "Order details for order " + i,
-                OrderDate = s_dalConfig!.Clock.AddDays(-s_rand.Next(0, 366)),
+                OrderDate = s_dal.Config.Clock.AddDays(-s_rand.Next(0, 366)),
                 DistanceKm = (double)s_addresses[adressIndex][3],
                 DistanceKmWalk = (double)s_addresses[adressIndex][4],
                 DistanceKmRoad = (double)s_addresses[adressIndex][5],
@@ -316,7 +317,7 @@ public static class Initialization
                 _ => false
             };
         }
-        
+
         /// <summary>
         /// Calculates the end time of a delivery based on the order date, duration, and delivery outcome.
         /// </summary>
@@ -340,9 +341,9 @@ public static class Initialization
             };
         }
 
-        var list_order = s_dalOrder?.ReadAll() ??
+        var list_order = s_dal?.Order?.ReadAll() ??
             throw new Exception("No orders available");
-        
+
         foreach (var order in list_order.ToList())
         {
             if (order.OrderStatus != OrderStatus.OPEN)
@@ -353,7 +354,7 @@ public static class Initialization
         {
             var randomOrder = list_order[s_rand.Next(list_order.Count)];
 
-            var matchedCouriers = s_dalCourier?.ReadAll() ??
+            var matchedCouriers = s_dal?.Courier?.ReadAll() ??
                     throw new Exception("No couriers available");
 
             foreach (var courier in matchedCouriers.ToList())
@@ -367,13 +368,13 @@ public static class Initialization
                 if (courier.MaxDistanceDelivery < randomOrder.DistanceKm)
                     matchedCouriers.Remove(courier);
             }
-            
+
             if (matchedCouriers.Count == 0)
                 throw new Exception("No matched couriers available for the order");
 
             var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)];
             randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };
-            s_dalOrder.Update(randomOrder);
+            s_dal?.Order.Update(randomOrder);
             list_order.Remove(randomOrder);
 
             double? getActualDistance =
@@ -382,29 +383,30 @@ public static class Initialization
                 : randomOrder.DistanceKmWalk;
 
             TimeSpan duration = getActualDistance.HasValue
-                ? TimeSpan.FromHours(getActualDistance.Value /
-                    (selectedCourier.TypeShipment switch
-                    {
-                        TheTypeShipment.CAR => s_dalConfig!.AvgSpeedCar,
-                        TheTypeShipment.MOTORCYCLE => s_dalConfig!.AvgSpeedMotorcycle,
-                        TheTypeShipment.BIKE => s_dalConfig!.AvgSpeedBike,
-                        TheTypeShipment.FOOT => s_dalConfig!.AvgSpeedFoot,
-                        _ => 1.0
-                    }))
-                : TimeSpan.FromHours(1);
+            ? TimeSpan.FromHours(getActualDistance.Value /
+            (selectedCourier.TypeShipment switch
+            {
+                // תקן: השתמש ב-s_dal. במקום s_dal?.
+                TheTypeShipment.CAR => s_dal!.Config!.AvgSpeedCar,
+                TheTypeShipment.MOTORCYCLE => s_dal!.Config!.AvgSpeedMotorcycle,
+                TheTypeShipment.BIKE => s_dal!.Config!.AvgSpeedBike,
+                TheTypeShipment.FOOT => s_dal!.Config!.AvgSpeedFoot,
+                _ => 1.0
+            }))
+    :       TimeSpan.FromHours(1);
 
-            DateTime orderData = s_dalConfig!.Clock.AddHours(-s_rand.Next(0, duration.Hours));
+            DateTime orderData = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
 
             EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 4);
 
             if (getEndDelivery == EndDelivery.DELIVERED)
-                s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.COMPLETED });
+                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.COMPLETED });
             if (getEndDelivery == EndDelivery.REFUSED)
-                s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.REFUSED });
+                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.REFUSED });
             if (getEndDelivery == EndDelivery.CONCELLED)
-                s_dalOrder.Update(randomOrder with { OrderStatus = OrderStatus.CONCELLED });
+                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.CONCELLED });
 
-            s_dalDelivery!.Create(new()
+            s_dal?.Delivery!.Create(new()
             {
                 Id = 0,
                 OrderId = randomOrder.Id,
@@ -437,18 +439,17 @@ public static class Initialization
     /// </list>
     /// </remarks>
     /// <exception cref="NullReferenceException">Thrown if any of the DAL parameters are null.</exception>
-    public static void Do(ICourier? dalCourier, IOrder? dalOrder, IDelivery? dalDelivery, IConfig? dalConfig)
+    public static void Do(IDal dal) //stage 2
     {
-        s_dalCourier = dalCourier ?? throw new NullReferenceException("DAL object can not be null!");
-        s_dalOrder = dalOrder ?? throw new NullReferenceException("DAL object can not be null!");
-        s_dalDelivery = dalDelivery ?? throw new NullReferenceException("DAL object can not be null!");
-        s_dalConfig = dalConfig ?? throw new NullReferenceException("DAL object can not be null!");
+        //s_dalCourier = dalCourier ?? throw new NullReferenceException("DAL object can not be null!");
+        //s_dalOrder = dalOrder ?? throw new NullReferenceException("DAL object can not be null!");
+        //s_dalDelivery = dalDelivery ?? throw new NullReferenceException("DAL object can not be null!");
+        //s_dalConfig = dalConfig ?? throw new NullReferenceException("DAL object can not be null!");
+        s_dal = dal ?? throw new NullReferenceException("DAL object can not be null!"); // stage 2
+
 
         Console.WriteLine("Reset Configuration values and List values...");
-        s_dalConfig.Reset();
-        s_dalCourier.DeleteAll();
-        s_dalOrder.DeleteAll();
-        s_dalDelivery.DeleteAll();
+        s_dal.ResetDB(); // stage 2
 
         Console.WriteLine("Creating Configuration values...");
         CreateConfig();

@@ -13,44 +13,34 @@ namespace DalTest
     /// </summary>
     internal class Program
     {
-        /// <summary>
-        /// Data access layer interface for courier operations.
-        /// </summary>
-        private static ICourier? s_dalCourier;
-        
-        /// <summary>
-        /// Data access layer interface for order operations.
-        /// </summary>
-        private static IOrder? s_dalOrder;
-        
-        /// <summary>
-        /// Data access layer interface for delivery operations.
-        /// </summary>
-        private static IDelivery? s_dalDelivery;
-        
-        /// <summary>
-        /// Data access layer interface for configuration operations.
-        /// </summary>
-        private static IConfig? s_dalConfig;
+        ///// <summary>
+        ///// Data access layer interface for courier operations.
+        ///// </summary>
+        //private static ICourier? s_dalCourier;
+
+        ///// <summary>
+        ///// Data access layer interface for order operations.
+        ///// </summary>
+        //private static IOrder? s_dalOrder;
+
+        ///// <summary>
+        ///// Data access layer interface for delivery operations.
+        ///// </summary>
+        //private static IDelivery? s_dalDelivery;
+
+        ///// <summary>
+        ///// Data access layer interface for configuration operations.
+        ///// </summary>
+        //private static IConfig? s_dalConfig;
+
+        static readonly IDal s_dal = new DalList(); //stage 2
+
 
         /// <summary>
         /// Static constructor that initializes all DAL implementations.
         /// Runs once before any static member access or before Main method execution.
         /// </summary>
-        static Program()
-        {
-            try
-            {
-                s_dalCourier = new CourierImplementation();
-                s_dalOrder = new OrderImplementation();
-                s_dalDelivery = new DeliveryImplementation();
-                s_dalConfig = new ConfigImplementation();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"DAL initialization failed: {ex}");
-            }
-        }
+        static readonly IDal s_dal = DalList.Instance; //stage 2 - using singleton
 
         /// <summary>
         /// Validates whether the courier's shipment type is compatible with the order type.
@@ -112,7 +102,7 @@ namespace DalTest
                 Active = true,
                 MaxDistanceDelivery = maxDistanceDelivery,
                 TypeShipment = (TheTypeShipment)typeShipmentInput,
-                WorkingSince = s_dalConfig?.Clock ?? DateTime.Now
+                WorkingSince = s_dal.Config?.Clock ?? DateTime.Now
             };
         }
 
@@ -125,7 +115,7 @@ namespace DalTest
             int choiche = 0;
             do
             {
-                Courier? courierToUpdate = s_dalCourier?.Read(id);
+                Courier? courierToUpdate = s_dal.Courier?.Read(id);
                 if (courierToUpdate == null)
                 {
                     Console.WriteLine($"not found courier with ID: {id}");
@@ -150,7 +140,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Name: ");
                         string name = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Name = name;
-                        s_dalCourier?.Update(courierToUpdate);
+                        s_dal.Courier?.Update(courierToUpdate);
 
                     }
                     ,
@@ -159,7 +149,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Phone: ");
                         string phone = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Phone = phone;
-                        s_dalCourier?.Update(courierToUpdate);
+                        s_dal.Courier?.Update(courierToUpdate);
                     }
                     ,
                     3 => () =>
@@ -167,7 +157,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Email: ");
                         string email = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Email = email;
-                        s_dalCourier?.Update(courierToUpdate);
+                        s_dal.Courier?.Update(courierToUpdate);
                     }
                     ,
                     4 => () =>
@@ -175,7 +165,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Password: ");
                         string password = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Password = password;
-                        s_dalCourier?.Update(courierToUpdate);
+                        s_dal.Courier?.Update(courierToUpdate);
                     }
                     ,
                     5 => () =>
@@ -183,7 +173,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Active status (true/false): ");
                         bool isActive = bool.Parse(Console.ReadLine() ?? "true");
                         courierToUpdate.Active = isActive;
-                        s_dalCourier?.Update(courierToUpdate);
+                        s_dal.Courier?.Update(courierToUpdate);
                     }
                     ,
                     6 => () =>
@@ -191,7 +181,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Max Distance Delivery (in km): ");
                         double maxDistance = double.Parse(Console.ReadLine() ?? "0");
                         courierToUpdate.MaxDistanceDelivery = maxDistance;
-                        s_dalCourier?.Update(courierToUpdate);
+                        s_dal.Courier?.Update(courierToUpdate);
                     }
                     ,
                     7 => () =>
@@ -199,7 +189,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
                         int typeShipmentInput = GetIntInput();
                         courierToUpdate.TypeShipment = (TheTypeShipment)typeShipmentInput;
-                        s_dalCourier?.Update(courierToUpdate);
+                        s_dal.Courier?.Update(courierToUpdate);
                     }
                     ,
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
@@ -246,7 +236,7 @@ namespace DalTest
                 OrderStatus = OrderStatus.OPEN,
                 Latitude = 0.0,
                 Longitude = 0.0,
-                OrderDate = s_dalConfig?.Clock ?? DateTime.Now,
+                OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
             };
         }
 
@@ -259,7 +249,7 @@ namespace DalTest
             int choiche = 0;
             do
             {
-                Order? orderToUpdate = s_dalOrder?.Read(id);
+                Order? orderToUpdate = s_dal.Order?.Read(id);
                 if (orderToUpdate == null)
                 {
                     Console.WriteLine($"not found order with ID: {id}");
@@ -284,7 +274,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Name: ");
                         string name = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Name = name;
-                        s_dalOrder?.Update(orderToUpdate);
+                        s_dal.Order?.Update(orderToUpdate);
                     }
                     ,
                     2 => () =>
@@ -292,7 +282,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Phone: ");
                         string phone = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Phone = phone;
-                        s_dalOrder?.Update(orderToUpdate);
+                        s_dal.Order?.Update(orderToUpdate);
                     }
                     ,
                     3 => () =>
@@ -300,7 +290,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Address: ");
                         string address = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Addres = address;
-                        s_dalOrder?.Update(orderToUpdate);
+                        s_dal.Order?.Update(orderToUpdate);
                     }
                     ,
                     4 => () =>
@@ -308,7 +298,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Details: ");
                         string details = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Details = details;
-                        s_dalOrder?.Update(orderToUpdate);
+                        s_dal.Order?.Update(orderToUpdate);
                     }
                     ,
                     5 => () =>
@@ -316,7 +306,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Weight: ");
                         int weight = GetIntInput();
                         orderToUpdate.Weight = weight;
-                        s_dalOrder?.Update(orderToUpdate);
+                        s_dal.Order?.Update(orderToUpdate);
                     }
                     ,
                     6 => () =>
@@ -324,7 +314,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Type of Order (0=STANDARD, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
                         int typeOfOrderInput = GetIntInput();
                         orderToUpdate.TypeOfOrder = (TypeOfOrder)typeOfOrderInput;
-                        s_dalOrder?.Update(orderToUpdate);
+                        s_dal.Order?.Update(orderToUpdate);
                     }
                     ,
                     7 => () =>
@@ -332,7 +322,7 @@ namespace DalTest
                         Console.WriteLine("Enter new Order Status (0=OPEN, 1=IN PROGRESS, 2=DELIVERED): ");
                         int orderStatusInput = GetIntInput();
                         orderToUpdate.OrderStatus = (OrderStatus)orderStatusInput;
-                        s_dalOrder?.Update(orderToUpdate);
+                        s_dal.Order?.Update(orderToUpdate);
                     }
                     ,
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
@@ -346,7 +336,7 @@ namespace DalTest
         /// </summary>
         private static void UpdateSetting()
         {
-            if (s_dalConfig == null)
+            if (s_dal.Config == null)
             {
                 Console.WriteLine("Configuration DAL is not initialized.");
                 return;
@@ -377,84 +367,84 @@ namespace DalTest
                     {
                         Console.WriteLine("Enter new Manager ID: ");
                         int id = GetIntInput();
-                        s_dalConfig.ManagerId = id;
+                        s_dal.Config.ManagerId = id;
                     }
                     ,
                     2 => () =>
                     {
                         Console.WriteLine("Enter new Menu Password: ");
                         string password = Console.ReadLine() ?? string.Empty;
-                        s_dalConfig.PasswordManager = password;
+                        s_dal.Config.PasswordManager = password;
                     }
                     ,
                     3 => () =>
                     {
                         Console.WriteLine("Enter new Store Address: ");
                         string address = Console.ReadLine() ?? string.Empty;
-                        s_dalConfig.storeAddress = address;
+                        s_dal.Config.storeAddress = address;
                     }
                     ,
                     5 => () =>
                     {
                         Console.WriteLine("Enter new Delivery Latitude: ");
                         double latitude = double.Parse(Console.ReadLine() ?? "0");
-                        s_dalConfig.Latitude = latitude;
+                        s_dal.Config.Latitude = latitude;
                     }
                     ,
                     6 => () =>
                     {
                         Console.WriteLine("Enter new Delivery Longitude: ");
                         double longitude = double.Parse(Console.ReadLine() ?? "0");
-                        s_dalConfig.Longitude = longitude;
+                        s_dal.Config.Longitude = longitude;
                     }
                     ,
                     7 => () =>
                     {
                         Console.WriteLine("Enter new Max Delivery Range (in km): ");
                         double maxRange = double.Parse(Console.ReadLine() ?? "0");
-                        s_dalConfig.MaxDeliveryRange = maxRange;
+                        s_dal.Config.MaxDeliveryRange = maxRange;
                     }
                     ,
                     8 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Car (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dalConfig.AvgSpeedCar = speed;
+                        s_dal.Config.AvgSpeedCar = speed;
                     }
                     ,
                     9 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Motorcycle (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dalConfig.AvgSpeedMotorcycle = speed;
+                        s_dal.Config.AvgSpeedMotorcycle = speed;
                     }
                     ,
                     10 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Bike (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dalConfig.AvgSpeedBike = speed;
+                        s_dal.Config.AvgSpeedBike = speed;
                     }
                     ,
                     11 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Foot (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dalConfig.AvgSpeedFoot = speed;
+                        s_dal.Config.AvgSpeedFoot = speed;
                     }
                     ,
                     12 => () =>
                     {
                         Console.WriteLine("Enter new Max Delivery Time (in minutes): ");
                         int minutes = GetIntInput();
-                        s_dalConfig.MaxDeliveryTime = TimeSpan.FromMinutes(minutes);
+                        s_dal.Config.MaxDeliveryTime = TimeSpan.FromMinutes(minutes);
                     }
                     ,
                     13 => () =>
                     {
                         Console.WriteLine("Enter new Risk Range (in minutes): ");
                         int minutes = GetIntInput();
-                        s_dalConfig.RiskRange = TimeSpan.FromMinutes(minutes);
+                        s_dal.Config.RiskRange = TimeSpan.FromMinutes(minutes);
                     }
                     ,
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
@@ -468,7 +458,7 @@ namespace DalTest
         /// </summary>
         private static void ReadSetting()
         {
-            if (s_dalConfig == null)
+            if (s_dal.Config == null)
             {
                 Console.WriteLine("Configuration DAL is not initialized.");
                 return;
@@ -496,19 +486,19 @@ namespace DalTest
                 choiche = GetIntInput();
                 Action action = choiche switch
                 {
-                    1 => () => Console.WriteLine($"Manager ID: {s_dalConfig.ManagerId}"),
-                    2 => () => Console.WriteLine($"Menu Password: {s_dalConfig.PasswordManager}"),
-                    3 => () => Console.WriteLine($"Store Address: {s_dalConfig.storeAddress}"),
-                    5 => () => Console.WriteLine($"Delivery Latitude: {s_dalConfig.Latitude}"),
-                    6 => () => Console.WriteLine($"Delivery Longitude: {s_dalConfig.Longitude}"),
-                    7 => () => Console.WriteLine($"Max Delivery Range (in km): {s_dalConfig.MaxDeliveryRange}"),
-                    8 => () => Console.WriteLine($"Average Speed for Car (in km/h): {s_dalConfig.AvgSpeedCar}"),
-                    9 => () => Console.WriteLine($"Average Speed for Motorcycle (in km/h): {s_dalConfig.AvgSpeedMotorcycle}"),
-                    10 => () => Console.WriteLine($"Average Speed for Bike (in km/h): {s_dalConfig.AvgSpeedBike}"),
-                    11 => () => Console.WriteLine($"Average Speed for Foot (in km/h): {s_dalConfig.AvgSpeedFoot}"),
-                    12 => () => Console.WriteLine($"Max Delivery Time (in minutes): {s_dalConfig.MaxDeliveryTime.TotalMinutes}"),
-                    13 => () => Console.WriteLine($"Risk Range (in minutes): {s_dalConfig.RiskRange.TotalMinutes}"),
-                    14 => () => Console.WriteLine($"Max Time Inactivity (in minutes): {s_dalConfig.MaxTimeInactivity.TotalMinutes}"),
+                    1 => () => Console.WriteLine($"Manager ID: {s_dal.Config.ManagerId}"),
+                    2 => () => Console.WriteLine($"Menu Password: {s_dal.Config.PasswordManager}"),
+                    3 => () => Console.WriteLine($"Store Address: {s_dal.Config.storeAddress}"),
+                    5 => () => Console.WriteLine($"Delivery Latitude: {s_dal.Config.Latitude}"),
+                    6 => () => Console.WriteLine($"Delivery Longitude: {s_dal.Config.Longitude}"),
+                    7 => () => Console.WriteLine($"Max Delivery Range (in km): {s_dal.Config.MaxDeliveryRange}"),
+                    8 => () => Console.WriteLine($"Average Speed for Car (in km/h): {s_dal.Config.AvgSpeedCar}"),
+                    9 => () => Console.WriteLine($"Average Speed for Motorcycle (in km/h): {s_dal.Config.AvgSpeedMotorcycle}"),
+                    10 => () => Console.WriteLine($"Average Speed for Bike (in km/h): {s_dal.Config.AvgSpeedBike}"),
+                    11 => () => Console.WriteLine($"Average Speed for Foot (in km/h): {s_dal.Config.AvgSpeedFoot}"),
+                    12 => () => Console.WriteLine($"Max Delivery Time (in minutes): {s_dal.Config.MaxDeliveryTime.TotalMinutes}"),
+                    13 => () => Console.WriteLine($"Risk Range (in minutes): {s_dal.Config.RiskRange.TotalMinutes}"),
+                    14 => () => Console.WriteLine($"Max Time Inactivity (in minutes): {s_dal.Config.MaxTimeInactivity.TotalMinutes}"),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 }; action();
 
@@ -526,7 +516,7 @@ namespace DalTest
         {
             Console.WriteLine("Creating a new delivery...");
 
-            var matchedOrders = s_dalOrder?.ReadAll() ??
+            var matchedOrders = s_dal.Order?.ReadAll() ??
                 throw new Exception("No orders available to create a delivery.");
 
             matchedOrders = matchedOrders.Where(o => o.OrderStatus == OrderStatus.OPEN).ToList();
@@ -555,7 +545,7 @@ namespace DalTest
 
             Console.WriteLine($"Selected order: {selectedOrder.Id}");
 
-            var matchedCouriers = s_dalCourier?.ReadAll() ??
+            var matchedCouriers = s_dal.Courier?.ReadAll() ??
                 throw new Exception("No couriers available to create a delivery.");
 
             matchedCouriers = matchedCouriers.Where(courier =>
@@ -595,7 +585,7 @@ namespace DalTest
                 OrderId = orderid,
                 CourierId = courierId,
                 TypeOfOrder = selectedOrder.TypeOfOrder,
-                OrderDate = s_dalConfig?.Clock ?? DateTime.Now,
+                OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
                 ActualDistance = actualDistance,
                 TimeEndDelivery = null
             };
@@ -764,9 +754,9 @@ Set {typeName} method called.
                     {
                         Console.WriteLine("Enter number of minutes to move forward: ");
                         int minutes = GetIntInput();
-                        if (s_dalConfig != null)
+                        if (s_dal.Config != null)
                         {
-                            s_dalConfig.Clock = s_dalConfig.Clock.AddMinutes(minutes);
+                            s_dal.Config.Clock = s_dal.Config.Clock.AddMinutes(minutes);
                             Console.WriteLine($"System clock moved forward by {minutes} minutes.");
                         }
                     }
@@ -775,9 +765,9 @@ Set {typeName} method called.
                     {
                         Console.WriteLine("Enter number of hours to move forward: ");
                         int hours = GetIntInput();
-                        if (s_dalConfig != null)
+                        if (s_dal?.Config != null)
                         {
-                            s_dalConfig.Clock = s_dalConfig.Clock.AddHours(hours);
+                            s_dal!.Config.Clock = s_dal!.Config.Clock.AddHours(hours);
                             Console.WriteLine($"System clock moved forward by {hours} hours.");
                         }
                     }
@@ -786,18 +776,18 @@ Set {typeName} method called.
                     {
                         Console.WriteLine("Enter number of days to move forward: ");
                         int days = GetIntInput();
-                        if (s_dalConfig != null)
+                        if (s_dal?.Config != null)
                         {
-                            s_dalConfig.Clock = s_dalConfig.Clock.AddDays(days);
+                            s_dal!.Config.Clock = s_dal!.Config.Clock.AddDays(days);
                             Console.WriteLine($"System clock moved forward by {days} days.");
                         }
                     }
                     ,
                     4 => () =>
                     {
-                        if (s_dalConfig != null)
+                        if (s_dal!.Config != null)
                         {
-                            Console.WriteLine($"Current system date and time: {s_dalConfig.Clock}");
+                            Console.WriteLine($"Current system date and time: {s_dal!.Config.Clock}");
                         }
                     }
                     ,
@@ -811,7 +801,7 @@ Set {typeName} method called.
                         ReadSetting();
                     }
                     ,
-                    7 => () => s_dalConfig?.Reset(),
+                    7 => () => s_dal!.Config?.Reset(),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 }; action();
 
@@ -851,31 +841,32 @@ Set {typeName} method called.
                             Console.WriteLine("good bye");
                             break;
                         case 1:
-                            DataMenu(s_dalCourier!);
+                            DataMenu(s_dal!.Courier!);
                             break;
                         case 2:
-                            DataMenu(s_dalOrder!);
+                            DataMenu(s_dal!.Order!);
                             break;
                         case 3:
-                            DataMenu(s_dalDelivery!);
+                            DataMenu(s_dal!.Delivery!);
                             break;
                         case 5:
-                            Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);
+                            //Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);
+                            Initialization.Do(s_dal); //stage 2
                             break;
                         case 6:
-                            s_dalCourier?.ReadAll().ForEach(courier => Console.WriteLine(courier));
-                            s_dalOrder?.ReadAll().ForEach(order => Console.WriteLine(order));
-                            s_dalDelivery?.ReadAll().ForEach(delivery => Console.WriteLine(delivery));
+                            s_dal!.Courier?.ReadAll().ForEach(courier => Console.WriteLine(courier));
+                            s_dal!.Order?.ReadAll().ForEach(order => Console.WriteLine(order));
+                            s_dal!.Delivery?.ReadAll().ForEach(delivery => Console.WriteLine(delivery));
                             break;
                         case 7:
                             SettingMenu();
                             break;
                         case 8:
                             Console.WriteLine("Delete all data.");
-                            s_dalConfig?.Reset();
-                            s_dalDelivery?.DeleteAll();
-                            s_dalOrder?.DeleteAll();
-                            s_dalCourier?.DeleteAll();
+                            s_dal!.Config?.Reset();
+                            s_dal!.Delivery?.DeleteAll();
+                            s_dal!.Order?.DeleteAll();
+                            s_dal!.Courier?.DeleteAll();
                             break;
 
                         default:
