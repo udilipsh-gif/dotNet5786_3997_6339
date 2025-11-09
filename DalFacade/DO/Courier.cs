@@ -27,5 +27,17 @@ public record Courier
     public double? MaxDistanceDelivery { get; set; }
     public required TheTypeShipment TypeShipment { get; set; }
     public required DateTime WorkingSince { get; init; }
+
+    public override string ToString() => (@$"
+    Courier Details:
+        ID: {this.Id}
+        Name: {this.Name}
+        Phone: {this.Phone}
+        Email: {this.Email}
+        Active: {this.Active}
+        Max Distance Delivery: {this.MaxDistanceDelivery:F1}
+        Type Shipment: {this.TypeShipment}
+        Working Since: {this.WorkingSince}
+    ");
 }
 

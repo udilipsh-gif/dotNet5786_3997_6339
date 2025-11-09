@@ -23,6 +23,17 @@ public record Delivery
     public required DateTime OrderDate { get; init; }
     public double? ActualDistance { get; init; }
     public EndDelivery? EndDelivery { get; init; } = null;
-    public DateTime TimeEndDelivery { get; init; }
+    public DateTime? TimeEndDelivery { get; init; } = null;
+
+    public override string ToString() => ($@"
+    Delivery Details:
+        Delivery ID: {Id}
+        Order ID: {OrderId}
+        Courier ID: {CourierId}
+        Type of Order: {TypeOfOrder}
+        Order Date: {OrderDate}
+        Actual Distance: {ActualDistance}
+        End Delivery: {EndDelivery}
+        Time End Delivery: {TimeEndDelivery}
+    ");
 }
-    
