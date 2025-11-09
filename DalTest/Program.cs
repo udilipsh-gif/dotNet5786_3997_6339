@@ -3,6 +3,7 @@ using DalApi;
 using DO;
 using System.Data;
 using System.Diagnostics.Metrics;
+using System.Numerics;
 
 namespace DalTest
 {
@@ -41,679 +42,414 @@ namespace DalTest
             };
         }
 
-        private static void PrintCourierDetails(Courier courier)
+        private class DalWrapper
         {
-            Console.WriteLine($"Courier Details: " +
-                $"ID: {courier.Id} " +
-                $"Name: {courier.Name} " +
-                $"Phone: {courier.Phone} " +
-                $"Email: {courier.Email} " +
-                $"Active: {courier.Active} " +
-                $"Max Distance Delivery: {courier.MaxDistanceDelivery} " +
-                $"Type Shipment: {courier.TypeShipment} " +
-                $"Working Since: {courier.WorkingSince}");
-        }
-        private static void PrintOrderDetails(Order order)
-        {
-            Console.WriteLine($"Order Details: " +
-                $"ID: {order.Id} " +
-                $"Type of order: {order.TypeOfOrder} " +
-                $"Details: {order.Details} " +
-                $"Address: {order.Addres} " +
-                $"Name: {order.Name} " +
-                $"Phone: {order.Phone} " +
-                $"Weight: {order.Weight} " +
-                $"OrderDate: {order.OrderDate} " +
-                $"OrderStatus: {order.OrderStatus} " +
-                $"Distance Km: {order.DistanceKm}");
-        }
-        private static void PrintDeliveryDetails(Delivery delivery)
-        {
-            Console.WriteLine($"Delivery Details: " +
-                $"ID: {delivery.Id} " +
-                $"Order ID: {delivery.OrderId} " +
-                $"Courier ID: {delivery.CourierId} " +
-                $"Type of Order: {delivery.TypeOfOrder} " +
-                $"Order Date: {delivery.OrderDate} " +
-                $"Actual Distance: {delivery.ActualDistance} " +
-                $"End Delivery: {delivery.EndDelivery} " +
-                $"Time End Delivery: {delivery.TimeEndDelivery}");
-        }
-        private static object DataReception(string action, string type)
-        {
-            if (type == "delivery")
+            private readonly object _dal;
+            private readonly string _typeName;
+
+            public DalWrapper(ICourier dal) { _dal = dal; _typeName = "courier"; }
+            public DalWrapper(IOrder dal) { _dal = dal; _typeName = "order"; }
+            public DalWrapper(IDelivery dal) { _dal = dal; _typeName = "delivery"; }
+
+            public string TypeName => _typeName;
+            public void Create()
             {
-                Console.WriteLine("     Enter Order ID: ");
-                int orderId = int.Parse(Console.ReadLine());
-                Console.WriteLine("     Enter Courier ID: ");
-                int courierId = int.Parse(Console.ReadLine());
-
-
-                Console.WriteLine("     Enter End Delivery Status (0=PENDING, 1=IN_PROGRESS, 2=DELIVERED): ");
-                DO.EndDelivery endDelivery = (DO.EndDelivery)int.Parse(Console.ReadLine());
-                Console.WriteLine("     Enter Time End Delivery (yyyy-MM-dd HH:mm:ss): ");
-                DateTime timeEndDelivery = DateTime.Parse(Console.ReadLine());
-                if (MatchTypeShipmentAndOrder(s_dalCourier.Read(courierId).TypeShipment, s_dalOrder.Read(orderId).TypeOfOrder) is false)
+                // Implementation for Create can be added here
+                Console.WriteLine($"Create method for {_typeName} called.");
+                switch (_dal)
                 {
-                    throw new Exception("The courier's shipment type does not match the order type.");
-                }
-                if (s_dalOrder.Read(orderId).OrderStatus != OrderStatus.OPEN)
-                {
-                    throw new Exception("Order status must be IN_PROGRESS to create a delivery.");
-                }
-                if (s_dalCourier.Read(courierId).Active is false)
-                {
-                    throw new Exception("Courier must be active to create a delivery.");
-                }
-                if (s_dalCourier.Read(courierId).MaxDistanceDelivery < s_dalOrder.Read(orderId).DistanceKm)
-                {
-                    throw new Exception("Courier's maximum delivery distance is less than the order distance.");
-                }
-                double? actualDistance;
-                if (s_dalCourier.Read(courierId).TypeShipment == TheTypeShipment.CAR || s_dalCourier.Read(courierId).TypeShipment == TheTypeShipment.MOTORCYCLE)
-                {
-                    actualDistance = s_dalOrder.Read(orderId).DistanceKmRoad;
-                }
-                else
-                {
-                    actualDistance = s_dalOrder.Read(orderId).DistanceKmWalk;
-                }
-                Delivery newDelivery = new DO.Delivery
-                {
-                    Id = 0, // ID will be set by DAL
-                    OrderId = orderId,
-                    CourierId = courierId,
-                    TypeOfOrder = s_dalOrder.Read(orderId).TypeOfOrder,
-                    OrderDate = DateTime.Now,
-                    ActualDistance = actualDistance,
-                    EndDelivery = endDelivery,
-                    TimeEndDelivery = timeEndDelivery
-                };
-                return newDelivery;
-            }
-
-            //פרטים עבור שליח והזמנה, משותפים לשניהם, לא רלוונטי למשלוח שכבר טופל והחזיר ולא יגיע לכאן
-            Console.Write("     Enter Name: ");
-            string name = Console.ReadLine();
-
-            Console.Write("     Enter Phone: ");
-            string phone = Console.ReadLine();
-
-
-            if (type == "order")
-            {
-                Console.Write("     Enter Customer Address: ");
-                string address = Console.ReadLine();
-                Console.Write("     Enter datails of yor order");
-                string? datails = Console.ReadLine();
-                Console.Write("     enter Weight of order");
-                int Weight = int.Parse(Console.ReadLine());
-                Console.Write("     Enter Type Shipment (0=STANDART, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
-                DO.TypeOfOrder typeOfOrder = (DO.TypeOfOrder)int.Parse(Console.ReadLine());
-
-                Order newOrder = new DO.Order
-                {
-                    Id = 0, // ID will be set by DAL
-                    Name = name,
-                    Phone = phone,
-                    Addres = address,
-                    Details = datails,
-                    Weight = Weight,
-                    TypeOfOrder = typeOfOrder,
-                    OrderStatus = 0,
-                    Latitude = 0.0, // Placeholder, should be set appropriately
-                    Longitude = 0.0, // Placeholder, should be set appropriately
-                    OrderDate = DateTime.Now
-                };
-                return newOrder;
-
-            }
-
-            if (type == "courier")
-            {
-                int id = 0;//במקרה עדכון בין כך לא נשתמש במשתנה הזה, ובמקרה יצירה ניקח את הערך שהוזן ע"י המשתמש
-                if (action is "create")
-                {
-                    Console.Write("     Enter ID: ");
-                    id = int.Parse(Console.ReadLine());
-                }
-
-                Console.Write("     Enter Email: ");
-                string email = Console.ReadLine();
-
-                Console.Write("     Enter Password: ");
-                string password = Console.ReadLine();
-
-                Console.Write("     Enter Max Distance Delivery (in km): ");
-                double maxDistanceDelivery = double.Parse(Console.ReadLine());
-
-                Console.Write("     Enter Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
-                DO.TheTypeShipment typeShipment = (DO.TheTypeShipment)int.Parse(Console.ReadLine());
-
-                Courier newCourier = new DO.Courier
-                {
-                    Id = id,
-                    Name = name,
-                    Phone = phone,
-                    Email = email,
-                    Password = password,
-                    Active = true,
-                    MaxDistanceDelivery = maxDistanceDelivery,
-                    TypeShipment = typeShipment,
-                    WorkingSince = DateTime.Now
-
-                };
-                return newCourier;
-
-            }
-
-            else
-                return null;
-
-        }
-
-
-        private static void SetCourier()
-        {
-            Console.WriteLine("SetCourier method called.");
-            int choiche;
-            do
-            {
-                Console.WriteLine(
-                "   to exit press 0\n" +
-                "   to create courier press 1\n" +
-                "   to read courier press 2\n" +
-                "   to read all couriers press 3\n" +
-                "   to update press 4\n" +
-                "   to delete courier press 5\n" +
-                "   to delete all couriers press 6\n");
-
-
-                choiche = int.Parse(Console.ReadLine());
-                switch (choiche)
-                {
-                    case 0:
-                        break;
-                    case 1:
-                        Console.WriteLine("Create Courier selected.");
-
-                        try
+                    case ICourier courier:
                         {
-                            object a = DataReception("create", "courier");
-                            Courier temp = (Courier)a;
-
-                            Courier newCourier = new DO.Courier
-
+                            Console.WriteLine("Creating a new courier...");
+                            Console.Write(" Enter ID: ");
+                            Console.WriteLine(" Enter Name: ");
+                            string name = Console.ReadLine() ?? string.Empty;
+                            Console.WriteLine(" Enter Phone: ");
+                            string phone = Console.ReadLine() ?? string.Empty;
+                            int id = GetIntInput();
+                            Console.WriteLine(" Enter Email: ");
+                            string email = Console.ReadLine() ?? string.Empty;
+                            string password = string.Empty;
+                            while (password == string.Empty)
                             {
-                                Id = temp.Id,
-                                Name = temp.Name,
-                                Phone = temp.Phone,
-                                Email = temp.Email,
-                                Password = temp.Password,
+                                Console.WriteLine(" Enter Password: ");
+                                password = Console.ReadLine() ?? string.Empty;
+                            }
+                            Console.WriteLine(" Enter Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
+                            int typeShipmentInput = GetIntInput();
+                            Console.WriteLine(" Enter Max Distance Delivery (in km): ");
+                            string maxDistanceInput = Console.ReadLine() ?? "0";
+                            double maxDistanceDelivery = double.Parse(maxDistanceInput);
+                            Courier newCourier = new DO.Courier
+                            {
+                                Id = id,
+                                Name = name,
+                                Phone = phone,
+                                Email = email,
+                                Password = password,
                                 Active = true,
-                                MaxDistanceDelivery = temp.MaxDistanceDelivery,
-                                TypeShipment = temp.TypeShipment,
+                                MaxDistanceDelivery = maxDistanceDelivery,
+                                TypeShipment = (TheTypeShipment)typeShipmentInput,
                                 WorkingSince = DateTime.Now
                             };
-
-                            s_dalCourier.Create(newCourier);
-
-                            Console.WriteLine("Courier created successfully!");
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("Invalid input format. Please enter numbers where required.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}");
-                        }
-                        break;
-
-                    case 2:
-                        Console.WriteLine("Read Courier selected.\n enter id of courior");
-                        int idRead = int.Parse(Console.ReadLine());
-                        Courier? courier = s_dalCourier?.Read(idRead);
-                        if (courier is not null)
-                        {
-                            PrintCourierDetails(courier);
+                            s_dalCourier?.Create(newCourier);
                             break;
                         }
-
-
-                        Console.WriteLine("Courier not found.");
-
-
-                        break;
-                    case 3:
-                        Console.WriteLine("Read All Couriers selected.");
-
-                        s_dalCourier?.ReadAll().ForEach(courier =>
+                    case IOrder order:
                         {
-                            PrintCourierDetails(courier);
-                        });
+                            Console.WriteLine("Creating a new order...");
+                            Console.Write(" Enter Name: ");
+                            string name = Console.ReadLine() ?? string.Empty;
+                            Console.Write(" Enter Phone: ");
+                            string phone = Console.ReadLine() ?? string.Empty;
+                            Console.Write(" Enter Customer Address: ");
+                            string address = Console.ReadLine() ?? string.Empty;
+                            Console.Write(" Enter datails of yor order");
+                            string? datails = Console.ReadLine();
+                            Console.Write(" enter Weight of order: ");
+                            int Weight = GetIntInput();
+                            Console.Write(" Enter Type Shipment (0=STANDART, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
+                            var typeOfOrder = (TypeOfOrder)GetIntInput();
 
-                        break;
-                    case 4:
-                        Console.WriteLine("Update Courier selected.\nenter id of courior to update");
-                        int idUpdate = int.Parse(Console.ReadLine());//בקשת תז
-                        Courier courierUpdate = s_dalCourier?.Read(idUpdate);//הדפסה של פרטי השליח
-                        if (courierUpdate == null)//*****לא ברור לי למה המתודה של עדכון בודקת גם אם קיים כזה שליח הרי אני בודק את זה כאן כבר*****
-                        {
-                            Console.WriteLine("Courier not found.");
-                            break;
-                        }
-                        else
-                        {
-                            PrintCourierDetails(courierUpdate);
-                        }
-
-                        try
-                        {
-                            //בקשת פרטים חדשים לעדכון לא כולל תז
-
-
-                            object a = DataReception("update", "courier");
-                            Courier temp = (Courier)a;
-
-
-
-                            Courier newCourier = new DO.Courier
+                            Order newOrder = new DO.Order
                             {
-                                Id = courierUpdate.Id,
-                                Name = temp.Name,
-                                Phone = temp.Phone,
-                                Email = temp.Email,
-                                Password = temp.Password,
-                                Active = true,
-                                MaxDistanceDelivery = temp.MaxDistanceDelivery,
-                                TypeShipment = temp.TypeShipment,
-                                WorkingSince = courierUpdate.WorkingSince
+                                Id = 0, // ID will be set by DAL
+                                Name = name,
+                                Phone = phone,
+                                Addres = address,
+                                Details = datails,
+                                Weight = Weight,
+                                TypeOfOrder = typeOfOrder,
+                                OrderStatus = 0,
+                                Latitude = 0.0, // Placeholder, should be set appropriately
+                                Longitude = 0.0, // Placeholder, should be set appropriately
+                                OrderDate = s_dalConfig?.Clock ?? DateTime.Now,
                             };
-                            s_dalCourier.Update(newCourier);
-                            Console.WriteLine("Courier updated successfully!");
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("Invalid input format. Please enter numbers where required.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}");
-                        }
-
-                        break;
-                    case 5:
-                        Console.WriteLine("Delete Courier selected.");
-
-                        try
-                        {
-                            Console.Write("Enter ID to delete: ");
-                            int idToDelete = int.Parse(Console.ReadLine());
-                            s_dalCourier?.Delete(idToDelete);
-                            Console.WriteLine("Courier deleted successfully!");
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("Invalid input format. Please enter a valid number for ID.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}");
-                        }
-
-                        break;
-                    case 6:
-                        Console.WriteLine("Delete All Couriers selected.");
-                        s_dalCourier?.DeleteAll();
-                        break;
-                    default:
-                        Console.WriteLine("Invalid choice, please try again.");
-                        break;
-                }
-            } while (choiche != 0);
-
-
-        }
-        private static void SetOrder()
-        {
-            Console.WriteLine("SetOrder method called.");
-            int choiche;
-            do
-            {
-                Console.WriteLine(
-                "   to exit press 0\n" +
-                "   to create order press 1\n" +
-                "   to read order press 2\n" +
-                "   to read all orders press 3\n" +
-                "   to update press 4\n" +
-                "   to delete order press 5\n" +
-                "   to delete all orders press 6\n");
-                choiche = int.Parse(Console.ReadLine());
-                switch (choiche)
-                {
-                    case 0:
-                        break;
-                    case 1:
-                        object a = DataReception("create", "order");
-                        Order temp = (Order)a;
-
-                        Order newOrder = new DO.Order
-                        {
-                            Id = 0, // ID will be set by DAL
-                            Name = temp.Name,
-                            Phone = temp.Phone,
-                            Addres = temp.Addres,
-                            Details = temp.Details,
-                            Weight = temp.Weight,
-                            TypeOfOrder = temp.TypeOfOrder,
-                            OrderStatus = 0,
-                            Latitude = 0.0, // Placeholder, should be set appropriately
-                            Longitude = 0.0, // Placeholder, should be set appropriately
-                            OrderDate = DateTime.Now
-                        };
-                        s_dalOrder.Create(newOrder);
-                        Console.WriteLine("Order created successfully!");
-                        break;
-                    case 2:
-                        Console.WriteLine("Read Order selected.");
-                        Console.WriteLine(" enter id of order");
-                        int idRead = int.Parse(Console.ReadLine());
-                        Order order = s_dalOrder?.Read(idRead);
-                        if (order is not null)
-                        {
-                            PrintOrderDetails(order);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Order not found.");
-                        }
-
-                        break;
-                    case 3:
-                        Console.WriteLine("Read All Orders selected.");
-                        s_dalOrder?.ReadAll().ForEach(order =>
-                        {
-                            PrintOrderDetails(order);
-                        });
-
-                        break;
-                    case 4:
-                        Console.WriteLine("Update Order selected.");
-                        int idUpdate = int.Parse(Console.ReadLine());//בקשת תז
-                        Order orderUpdate = s_dalOrder?.Read(idUpdate);
-                        if (orderUpdate is null)//*****לא ברור לי למה המתודה של עדכון בודקת גם אם קיים כזה שליח הרי אני בודק את זה כאן כבר*****
-                        {
-                            Console.WriteLine("Order not found.");
+                            s_dalOrder?.Create(newOrder);
                             break;
                         }
-                        else
+                    case IDelivery delivery:
                         {
-                            PrintOrderDetails(orderUpdate);
-                        }
-                        try
-                        {
-                            a = DataReception("update", "order");
-                            Order temp1 = (Order)a;
+                            Console.WriteLine("Creating a new delivery...");
+                            var matchedOrders = s_dalOrder?.ReadAll() ??
+                                throw new Exception("No orders available to create a delivery.");
 
-                            Order newOrder1 = new DO.Order
+                            // סינון הזמנות פתוחות
+                            matchedOrders = matchedOrders.Where(o => o.OrderStatus == OrderStatus.OPEN).ToList();
+
+                            if (matchedOrders.Count == 0)
                             {
-                                Id = orderUpdate.Id,
-                                Name = temp1.Name,
-                                Phone = temp1.Phone,
-                                Addres = temp1.Addres,
-                                Details = temp1.Details,
-                                Weight = temp1.Weight,
-                                TypeOfOrder = temp1.TypeOfOrder,
-                                OrderStatus = orderUpdate.OrderStatus,//נדרש טיפול בחלק הזה
-                                Latitude = orderUpdate.Latitude,
-                                Longitude = orderUpdate.Longitude,
-                                OrderDate = orderUpdate.OrderDate,
-                            };
+                                Console.WriteLine("No open orders available.");
+                                break;
+                            }
 
+                            Console.WriteLine($"Available open orders: {string.Join(", ", matchedOrders.Select(o => o.Id))}");
 
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}");
-                        }
-                        break;
-                    case 5:
-                        Console.WriteLine("Delete Order selected.");
+                            int orderid;
+                            Order? selectedOrder = null;
+                            do
+                            {
+                                Console.WriteLine("Enter open Order ID: ");
+                                orderid = GetIntInput();
+                                selectedOrder = matchedOrders.Find(o => o.Id == orderid);
 
-                        try
-                        {
-                            Console.Write("Enter ID to delete: ");
-                            int idToDelete = int.Parse(Console.ReadLine());
-                            s_dalOrder?.Delete(idToDelete);
-                            Console.WriteLine("Order deleted successfully!");
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("Invalid input format. Please enter a valid number for ID.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}");
-                        }
-                        break;
-                    case 6:
-                        Console.WriteLine("Delete All Orders selected.");
-                        s_dalOrder?.DeleteAll();
-                        break;
-                    default:
-                        Console.WriteLine("Invalid choice, please try again.");
-                        break;
-                }
-            } while (choiche != 0);
-        }
+                                if (selectedOrder == null)
+                                {
+                                    Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
+                                }
+                            }
+                            while (selectedOrder == null); // ממשיך כל עוד לא מצאנו!
 
-        private static void SetDelivery()
-        {
-            Console.WriteLine("SetDelivery method called.");
-            int choiche;
-            do
-            {
-                Console.WriteLine(
-                "   to exit press 0\n" +
-                "   to create delivery press 1\n" +
-                "   to read delivery press 2\n" +
-                "   to read all deliveries press 3\n" +
-                "   to update press 4\n" +
-                "   to delete delivery press 5\n" +
-                "   to delete all deliveries press 6\n");
-                choiche = int.Parse(Console.ReadLine());
-                switch (choiche)
-                {
-                    case 0:
-                        break;
-                    case 1:
-                        Console.WriteLine("Create Delivery selected.");
-                        try
-                        {
-                            object a = DataReception("create", "delivery");
-                            Delivery temp = (Delivery)a;
+                            Console.WriteLine($"Selected order: {selectedOrder.Id}");
+
+                            // עכשיו מסננים שליחים מתאימים
+                            var matchedCouriers = s_dalCourier?.ReadAll() ??
+                                throw new Exception("No couriers available to create a delivery.");
+
+                            matchedCouriers = matchedCouriers.Where(courier =>
+                                courier.Active &&
+                                MatchTypeShipmentAndOrder(courier.TypeShipment, selectedOrder.TypeOfOrder) &&
+                                courier.MaxDistanceDelivery >= selectedOrder.DistanceKm
+                            ).ToList();
+
+                            if (matchedCouriers.Count == 0)
+                            {
+                                Console.WriteLine("No suitable couriers available for this order.");
+                                break;
+                            }
+
+                            Console.WriteLine($"Available couriers: {string.Join(", ", matchedCouriers.Select(c => c.Id))}");
+
+                            int courierId;
+                            Courier? selectedCourier = null;
+                            do
+                            {
+                                Console.WriteLine("Enter Courier ID: ");
+                                courierId = GetIntInput();
+                                selectedCourier = matchedCouriers.Find(c => c.Id == courierId);
+
+                                if (selectedCourier == null)
+                                {
+                                    Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
+                                }
+                            }
+                            while (selectedCourier == null);
+
+                            Console.WriteLine("Enter Actual Distance: ");
+                            double actualDistance = double.Parse(Console.ReadLine() ?? "0");
+
                             Delivery newDelivery = new DO.Delivery
                             {
                                 Id = 0, // ID will be set by DAL
-                                OrderId = temp.OrderId,
-                                CourierId = temp.CourierId,
-                                TypeOfOrder = temp.TypeOfOrder,
-                                OrderDate = DateTime.Now,
-                                ActualDistance = temp.ActualDistance,
-                                EndDelivery = temp.EndDelivery,
-                                TimeEndDelivery = temp.TimeEndDelivery
+                                OrderId = orderid,
+                                CourierId = courierId,
+                                TypeOfOrder = selectedOrder.TypeOfOrder,
+                                OrderDate = s_dalConfig?.Clock ?? DateTime.Now,
+                                ActualDistance = actualDistance,
+                                TimeEndDelivery = null
                             };
-                            s_dalDelivery.Create(newDelivery);
+
+                            s_dalDelivery?.Create(newDelivery);
                             Console.WriteLine("Delivery created successfully!");
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("Invalid input format. Please enter numbers where required.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}");
-                        }
-                        break;
-                    case 2:
-                        Console.WriteLine("Read Delivery selected.");
-                        Console.WriteLine(" enter id of delivery");
-                        int idRead = int.Parse(Console.ReadLine());
-                        Delivery delivery = s_dalDelivery?.Read(idRead);
-                        if (delivery is not null)
-                        {
-                            PrintDeliveryDetails(delivery);
                             break;
                         }
 
-                        Console.WriteLine("Delivery not found.");
+                }
+            }
 
-                        break;
-                    case 3:
-                        Console.WriteLine("Read All Deliveries selected.");
+            public object? Read(int id)
+            {
+                return _dal switch
+                {
+                    ICourier courier => courier.Read(id),
+                    IOrder order => order.Read(id),
+                    IDelivery delivery => delivery.Read(id),
+                    _ => null
+                };
+            }
 
-                        s_dalDelivery?.ReadAll().ForEach(delivery =>
-                        {
-                            PrintDeliveryDetails(delivery);
-                        });
+            public void Update(object item)
+            {
+                switch (_dal)
+                {
+                    case ICourier courier:
+                        courier.Update((Courier)item);
                         break;
-                    case 4:
-                        Console.WriteLine("Update Delivery selected.");
-                        int idUpdate = int.Parse(Console.ReadLine());//בקשת תז
-                        Delivery deliveryUpdate = s_dalDelivery?.Read(idUpdate);
-                        if (deliveryUpdate is null)//*****לא ברור לי למה המתודה של עדכון בודקת גם אם קיים כזה שליח הרי אני בודק את זה כאן כבר*****
+                    case IOrder order:
+                        order.Update((Order)item);
+                        break;
+                    case IDelivery delivery:
+                        delivery.Update((Delivery)item);
+                        break;
+                }
+            }
+            public List<object> ReadAll()
+            {
+                return _dal switch
+                {
+                    ICourier courier => courier.ReadAll().Cast<object>().ToList(),
+                    IOrder order => order.ReadAll().Cast<object>().ToList(),
+                    IDelivery delivery => delivery.ReadAll().Cast<object>().ToList(),
+                    _ => new List<object>()
+                };
+            }
+
+            public void Delete(int id)
+            {
+                switch (_dal)
+                {
+                    case ICourier courier:
+                        courier.Delete(id);
+                        break;
+                    case IOrder order:
+                        order.Delete(id);
+                        break;
+                    case IDelivery delivery:
+                        delivery.Delete(id);
+                        break;
+                }
+            }
+
+            public void DeleteAll()
+            {
+                switch (_dal)
+                {
+                    case ICourier courier:
+                        courier.DeleteAll();
+                        break;
+                    case IOrder order:
+                        order.DeleteAll();
+                        break;
+                    case IDelivery delivery:
+                        delivery.DeleteAll();
+                        break;
+                }
+            }
+        }
+
+
+        public static int GetIntInput()
+        {
+            int result;
+            while (true)
+            {
+                string? input = Console.ReadLine();
+                if (int.TryParse(input, out result))
+                {
+                    return result;
+                }
+                Console.WriteLine("Invalid input. Please enter a valid integer.");
+            }
+        }
+        private static void setObject(DalWrapper dal)
+        {
+            Console.WriteLine("setObject method called.");
+        }
+
+        private static void DataMenu(DalWrapper dal)  // הוסף static!
+        {
+            string typeName = dal.TypeName;
+            Console.WriteLine($"Set {typeName} method called.");
+            int choiche;
+            do
+            {
+                Console.WriteLine(@$"
+Set {typeName} method called.
+    to exit press 0
+    to create {typeName} press 1
+    to read {typeName} press 2
+    to read all {typeName}s press 3
+    to update press 4
+    to delete {typeName} press 5
+    to delete all {typeName}s press 6
+        ");
+
+                choiche = GetIntInput();
+                try
+                {
+                    Action action = choiche switch
+                    {
+                        0 => () => Console.WriteLine("good bye"),
+                        1 => () => dal.Create(),
+                        2 => () =>
                         {
-                            Console.WriteLine("Delivery not found.");
-                            break;
+                            Console.WriteLine($"Enter {typeName} id: ");
+                            int id = GetIntInput();
+                            var result = dal.Read(id);
+                            if (result == null)
+                                Console.WriteLine($"No {typeName} found with id {id}");
+                            else
+                                Console.WriteLine(result);
                         }
-                        else
+                        ,
+                        3 => () =>
                         {
-                            PrintDeliveryDetails(deliveryUpdate);
+                            var items = dal.ReadAll();
+                            if (items.Count == 0)
+                                Console.WriteLine($"No {typeName}s found.");
+                            else
+                                items.ForEach(item => Console.WriteLine(item));
                         }
-                        try
+                        ,
+                        4 => () => { Console.WriteLine($"Update {typeName} - Not yet implemented"); }
+                        ,
+                        5 => () =>
                         {
-                            object a1 = DataReception("update", "delivery");
-                            Delivery temp1 = (Delivery)a1;
-                            Delivery newDelivery1 = new DO.Delivery
+                            Console.WriteLine($"Enter {typeName} id: ");
+                            int id = GetIntInput();
+                            try
                             {
-                                Id = deliveryUpdate.Id,
-                                OrderId = temp1.OrderId,
-                                CourierId = temp1.CourierId,
-                                TypeOfOrder = temp1.TypeOfOrder,
-                                OrderDate = deliveryUpdate.OrderDate,
-                                ActualDistance = temp1.ActualDistance,
-                                EndDelivery = temp1.EndDelivery,
-                                TimeEndDelivery = temp1.TimeEndDelivery
-                            };
-                            s_dalDelivery.Update(newDelivery1);
-                            Console.WriteLine("Delivery updated successfully!");
+                                dal.Delete(id);
+                                Console.WriteLine($"{typeName} deleted successfully!");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error deleting: {ex.Message}");
+                            }
                         }
-                        catch (Exception ex)
+                        ,
+                        6 => () =>
                         {
-                            Console.WriteLine($"Error: {ex.Message}");
+                            dal.DeleteAll();
+                            Console.WriteLine($"All {typeName}s deleted successfully!");
                         }
-                        break;
-                    case 5:
-                        Console.WriteLine("Delete Delivery selected.");
+                        ,
+                        _ => () => Console.WriteLine("Invalid choice, please try again.")
+                    };
 
-
-                        try
-                        {
-                            Console.Write("Enter ID to delete: ");
-                            int idToDelete = int.Parse(Console.ReadLine());
-                            s_dalDelivery?.Delete(idToDelete);
-                            Console.WriteLine("Delivery deleted successfully!");
-                        }
-                        catch (FormatException)
-                        {
-                            Console.WriteLine("Invalid input format. Please enter a valid number for ID.");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error: {ex.Message}");
-                        }
-                        break;
-                    case 6:
-                        Console.WriteLine("Delete All Deliveries selected.");
-                        s_dalDelivery?.DeleteAll();
-                        break;
-                    default:
-                        Console.WriteLine("Invalid choice, please try again.");
-                        break;
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
                 }
             } while (choiche != 0);
         }
-
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Console.WriteLine("Hello, Book Soop!");
             try
             {
-                Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);
+                int choice;
+                do
+                {
+
+                    Console.WriteLine("" +
+                        "Main Menu \n" +
+                        "   to exit press 0\n" +
+                        "   to set courier press 1\n" +
+                        "   to set order press 2\n" +
+                        "   to set delivery press 3\n" +
+                        "   to install rendom data press 5\n" +
+                        "   to print all data press 6\n" +
+                        "   to edit setings press 7\n" +
+                        "   to remove all data press 8\n" +
+                        "       enter your choice: ");
+                    choice = GetIntInput();
+                    switch (choice)
+                    {
+                        case 0:
+                            Console.WriteLine("good bye");
+                            break;
+                        case 1:
+                            DataMenu(new DalWrapper(s_dalCourier!));
+                            break;
+                        case 2:
+                            DataMenu(new DalWrapper(s_dalOrder!));
+                            break;
+                        case 3:
+                            DataMenu(new DalWrapper(s_dalDelivery!));
+                            break;
+                        case 5:
+                            Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);
+                            break;
+                        case 6:
+                            s_dalCourier?.ReadAll().ForEach(courier => Console.WriteLine(courier));
+                            s_dalOrder?.ReadAll().ForEach(oreder => Console.WriteLine(oreder));
+                            s_dalDelivery?.ReadAll().ForEach(delivery => Console.WriteLine(delivery));
+                            break;
+                        case 7:
+                            // s_dalConfig?.Read();
+                            break;
+                        case 8:
+                            s_dalConfig?.Reset();
+                            s_dalDelivery?.DeleteAll();
+                            s_dalOrder?.DeleteAll();
+                            s_dalCourier?.DeleteAll();
+                            break;
+
+                        default:
+                            Console.WriteLine("Please enter one of the following options: ");
+                            break;
+                    }
+
+                } while (choice != 0);
 
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"An error occurred during initialization: {ex.Message}");
             }
-            MainMenu();
         }
-        static void MainMenu()
-        {
-            int choice;
-            do
-            {
-
-                Console.WriteLine("Main Menu \n" +
-                    " to exit press 0\n" +
-                    "   to set courier press 1\n" +
-                    "  to set order press 2\n" +
-                    "  to set delivery press 3\n" +
-                    "       enter your choice: ");
-
-                //string? input = Console.ReadLine();
-                choice = int.Parse(Console.ReadLine());
-
-                // מנסה להמיר את הקלט למספר
-                //if (!int.TryParse(input, out choice))
-                //{
-                //    Console.WriteLine("Invalid input! Please enter a number.");
-                //}
-                if (choice < 0 || choice > 3)
-                {
-                    Console.WriteLine("Invalid choice! Please enter number beetwin 0-3.");
-                }
-                //else
-                //{
-                //    Console.WriteLine($"You chose option {choice}");
-                //}
-
-
-                // פעולה לפי הבחירה
-                switch (choice)
-                {
-                    case 0:
-                        Console.WriteLine("good bay");
-                        break;
-                    case 1:
-                        SetCourier();
-                        break;
-                    case 2:
-                        SetOrder();
-                        break;
-                    case 3:
-                        SetDelivery();
-                        break;
-                   
-                    default:
-                        Console.WriteLine("error");
-                        break;
-                }
-
-            } while (choice != 0);
-        }
-
-
     }
 }

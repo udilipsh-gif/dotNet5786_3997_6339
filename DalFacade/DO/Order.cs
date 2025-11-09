@@ -21,18 +21,31 @@
 
 public record Order
 {
-    public required int Id { get; init; } 
+    public required int Id { get; init; }
     public required TypeOfOrder TypeOfOrder { get; set; }
     public string? Details { get; set; }
-    public  required string Addres { get; set; }
+    public required string Addres { get; set; }
     public required double Latitude { get; init; }
-    public  required double Longitude { get; init; }
-    public  required string Name { get; set; }
-    public  required string Phone { get; set; }
-    public  required int Weight { get; set; }
-    public  required DateTime OrderDate { get; init;}
+    public required double Longitude { get; init; }
+    public required string Name { get; set; }
+    public required string Phone { get; set; }
+    public required int Weight { get; set; }
+    public required DateTime OrderDate { get; init; }
     public OrderStatus OrderStatus { get; set; } = OrderStatus.OPEN;
     public double? DistanceKm { get; init; } = null;
     public double? DistanceKmRoad { get; init; } = null;
     public double? DistanceKmWalk { get; init; } = null;
+    public override string ToString() => ($@"
+    Order Details:
+        ID: {Id}
+        Type of order: {TypeOfOrder}
+        Details: {Details}
+        Address: {Addres}
+        Name: {Name}
+        Phone: {Phone}
+        Weight: {Weight}    
+        OrderDate: {OrderDate}
+        OrderStatus: {OrderStatus}
+        Distance Km: {DistanceKm:F1}
+    ");
 }

@@ -155,17 +155,17 @@ public static class Initialization
                 TheTypeShipment.CAR => s_rand.Next(10, 100), // 10 to 100 km
                 TheTypeShipment.MOTORCYCLE => s_rand.Next(2, 25), // 2 to 25 km
                 TheTypeShipment.BIKE => s_rand.Next(1, 5), // 1 to 5 km
-                TheTypeShipment.FOOT => s_rand.NextDouble() * 2, // up to 2 km
+                TheTypeShipment.FOOT => s_rand.NextDouble() * (3.5 - 0.5) + 0.5, // up to 3.5 km
                 _ => null
             };
             return distans > 100 ? null : distans;
         }
         ;
 
-        var typeShipment = (TheTypeShipment)s_rand.Next(0, 4); // 0..3 עבור 4 ערכים
-
         foreach (var name in courierNames)
         {
+            var typeShipment = (TheTypeShipment)s_rand.Next(0, 4); // 0..3 עבור 4 ערכים
+
             s_dalCourier!.Create(new()
             {
                 Id = getUniqueId(),
