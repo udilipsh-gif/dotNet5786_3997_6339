@@ -38,12 +38,13 @@ public static class Initialization
     ///// </summary>
     //private static IConfig? s_dalConfig; // Stage1
 
-    private static IDal? s_dal; //stage 2
-
     /// <summary>
     /// Random number generator for creating randomized test data.
     /// </summary>
     private static readonly Random s_rand = new();
+
+    private static IDal? s_dal; //stage 2
+
 
     /// <summary>
     /// Represents a collection of predefined addresses with associated geographic coordinates and distance metrics.
@@ -176,12 +177,12 @@ public static class Initialization
         /// Generates a unique courier ID that doesn't already exist in the system.
         /// </summary>
         /// <returns>A unique integer ID between MIN_ID and MAX_ID.</returns>
-        static int getUniqueId()
+        int getUniqueId()
         {
             int id;
             do
                 id = s_rand.Next(MIN_ID, MAX_ID);
-            while (s_dal?.Courier.Read(id) != null);
+            while (s_dal!.Courier.Read(id) != null);
             return id;
         }
 
