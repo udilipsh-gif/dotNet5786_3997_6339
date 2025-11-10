@@ -56,6 +56,13 @@ internal class DeliveryImplementation : IDelivery
         //return null;
         return DataSource.Deliveries.FirstOrDefault(item => item.Id == id);
     }
+    public Delivery? Read(Func<Delivery, bool> filter)
+    {
+        var delivery = (from item in DataSource.Deliveries
+                     where filter(item)
+                     select item).FirstOrDefault();
+        return delivery;
+    }
 
     /// <summary>
     /// Reads and retrieves all deliveries from the data source.

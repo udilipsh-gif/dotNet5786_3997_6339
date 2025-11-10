@@ -60,6 +60,14 @@ internal class CourierImplementation : ICourier
 
        // return null;
     }
+    public Courier? Read(Func<Courier, bool> filter)
+    {
+        var courier = (from item in DataSource.Couriers
+                       where filter(item)
+                       select item).FirstOrDefault();
+        return courier;
+    }
+
 
     /// <summary>
     /// Reads and retrieves all couriers from the data source.
@@ -92,4 +100,6 @@ internal class CourierImplementation : ICourier
         else
             throw new Exception($"Courier with ID={item.Id} does not exists");
     }
+
+   
 }

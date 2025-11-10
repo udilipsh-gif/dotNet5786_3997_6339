@@ -55,6 +55,13 @@ internal class OrderImplementation : IOrder
         //return null;
         return DataSource.Orders.FirstOrDefault(item => item.Id == id);
     }
+    public Order? Read(Func<Order, bool> filter)
+    {
+        var order = (from item in DataSource.Orders
+                       where filter(item)
+                       select item).FirstOrDefault();
+        return order;
+    }
 
     /// <summary>
     /// Reads and retrieves all orders from the data source.
