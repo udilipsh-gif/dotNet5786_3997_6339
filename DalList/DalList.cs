@@ -10,7 +10,7 @@ sealed public class DalList : IDal
     /// <summary>
     /// Gets the data access interface for courier operations.
     /// </summary>
-    public ICourier Courier { get; } = new CourierImplementation();
+    ICourier Courier { get; } = new CourierImplementation();
 
     /// <summary>
     /// Gets the data access interface for order operations.
