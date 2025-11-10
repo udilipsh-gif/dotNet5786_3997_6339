@@ -10,7 +10,7 @@ sealed public class DalList : IDal
     /// <summary>
     /// Gets the data access interface for courier operations.
     /// </summary>
-    ICourier Courier { get; } = new CourierImplementation();
+   public ICourier Courier { get; } = new CourierImplementation();
 
     /// <summary>
     /// Gets the data access interface for order operations.
@@ -43,8 +43,8 @@ sealed public class DalList : IDal
         Config.Reset();
     }
 
-    void IDal.ResetDB()
-    {
-        throw new NotImplementedException();
-    }
+    //void IDal.ResetDB()
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

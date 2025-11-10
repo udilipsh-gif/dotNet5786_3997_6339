@@ -50,20 +50,31 @@ internal class CourierImplementation : ICourier
     /// <returns>The courier object if found; otherwise, null.</returns>
     public Courier? Read(int id)
     {
-        foreach (var courier in DataSource.Couriers)
-        {
-            if (courier.Id == id)
-                return courier; 
-        }
+        //foreach (var courier in DataSource.Couriers)//המימוש שלנו בשלב 1, למטה מופיע המימוש שלו בשלב 1
+        //{
+        //    if (courier.Id == id)
+        //        return courier; 
+        //}
+        //return DataSource.Couriers.Find(item => item.Id == id); //stage 1
+        return DataSource.Couriers.FirstOrDefault(item => item.Id == id); //stage 2
 
-       return null;
+       // return null;
     }
-    
+
     /// <summary>
     /// Reads and retrieves all couriers from the data source.
     /// </summary>
     /// <returns>A list containing all courier objects.</returns>
-    public List<Courier> ReadAll() => new List<Courier>(DataSource.Couriers);
+    //public List<Courier> ReadAll() => new List<Courier>(DataSource.Couriers);//stage 1
+    public IEnumerable<Courier> ReadAll(Func<Courier, bool>? filter = null) //stage 2
+        => filter != null
+            ? from item in DataSource.Couriers
+              where filter(item)
+              select item
+            : from item in DataSource.Couriers
+              select item;
+    
+   
 
     /// <summary>
     /// Updates an existing courier in the data source.

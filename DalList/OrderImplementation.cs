@@ -46,20 +46,28 @@ internal class OrderImplementation : IOrder
     /// <returns>The order object if found; otherwise, null.</returns>
     public Order? Read(int id)
     {
-        foreach (var order in DataSource.Orders)
-        {
-            if (order.Id == id)
-                return order;
-        }
+        //foreach (var order in DataSource.Orders)
+        //{
+        //    if (order.Id == id)
+        //        return order;
+        //}
 
-        return null;
+        //return null;
+        return DataSource.Orders.FirstOrDefault(item => item.Id == id);
     }
 
     /// <summary>
     /// Reads and retrieves all orders from the data source.
     /// </summary>
     /// <returns>A list containing all order objects.</returns>
-    public List<Order> ReadAll() => new List<Order>(DataSource.Orders);
+   // public List<Order> ReadAll() => new List<Order>(DataSource.Orders);//stage 1
+    public IEnumerable<Order> ReadAll(Func<Order, bool>? filter = null) //stage 2
+        => filter != null
+            ? from item in DataSource.Orders
+              where filter(item)
+              select item
+            : from item in DataSource.Orders
+              select item;
 
     /// <summary>
     /// Updates an existing order in the data source.

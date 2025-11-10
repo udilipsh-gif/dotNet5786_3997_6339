@@ -516,17 +516,25 @@ namespace DalTest
         {
             Console.WriteLine("Creating a new delivery...");
 
-            var matchedOrders = s_dal.Order?.ReadAll() ??
-                throw new Exception("No orders available to create a delivery.");
+            //var matchedOrders = s_dal.Order?.ReadAll() ??
+            //    throw new Exception("No orders available to create a delivery.");
 
-            matchedOrders = matchedOrders.Where(o => o.OrderStatus == OrderStatus.OPEN).ToList();
+            var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
+             ?.ToList()
+            ?? throw new Exception("No orders available");
+            //ככה בדקנו בשלב 1, בשלב 2 לא צריך לבדוק נבדק כבר בשורה למעלה
+            //matchedOrders = matchedOrders.Where(o => o.OrderStatus == OrderStatus.OPEN).ToList();
 
-            if (matchedOrders.Count == 0)
-            {
-                throw new Exception("No open orders available.");
-            }
+            //if (matchedOrders.Count == 0)
+            //{
+            //    throw new Exception("No open orders available.");
+            //}
 
-            Console.WriteLine($"Available open orders: {string.Join(", ", matchedOrders.Select(o => o.Id))}");
+            //Console.WriteLine($"Available open orders: {string.Join(", ", matchedOrders.Select(o => o.Id))}");
+
+            Console.WriteLine(list_order.Any()
+    ? $"Available open orders: {string.Join(", ", list_order.Select(o => o.Id))}"
+    : "No available open orders.");
 
             int orderid;
             Order? selectedOrder = null;
@@ -534,32 +542,57 @@ namespace DalTest
             {
                 Console.Write("Enter open Order ID: ");
                 orderid = GetIntInput();
-                selectedOrder = matchedOrders.FirstOrDefault(o => o.Id == orderid);
+                selectedOrder = list_order.FirstOrDefault(o => o.Id == orderid);
 
-                if (selectedOrder == null)
+                if (selectedOrder != null)
+                {
+                    Console.WriteLine($"Selected Order ID: {selectedOrder.Id}");
+                    
+                }
+                else
                 {
                     Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
                 }
+
+                
+                //selectedOrder = matchedOrders.FirstOrDefault(o => o.Id == orderid);
+
+                //if (selectedOrder == null)
+                //{
+                //    Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
+                //}
             }
             while (selectedOrder == null);
 
             Console.WriteLine($"Selected order: {selectedOrder.Id}");
 
-            var matchedCouriers = s_dal.Courier?.ReadAll() ??
-                throw new Exception("No couriers available to create a delivery.");
+            //var matchedCouriers = s_dal.Courier?.ReadAll() ??
+            //    throw new Exception("No couriers available to create a delivery.");
 
-            matchedCouriers = matchedCouriers.Where(courier =>
-                courier.Active &&
-                MatchTypeShipmentAndOrder(courier.TypeShipment, selectedOrder.TypeOfOrder) &&
-                courier.MaxDistanceDelivery >= selectedOrder.DistanceKm
-            ).ToList();
+           
 
-            if (matchedCouriers.Count == 0)
-            {
-                throw new Exception("No suitable couriers available for this order.");
-            }
+            var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
+            MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
+            Courier.MaxDistanceDelivery >= selectedOrder.DistanceKm)
+                 ?.ToList()
+                 ?? throw new Exception("No couriers available");
 
-            Console.WriteLine($"Available couriers: {string.Join(", ", matchedCouriers.Select(c => c.Id))}");
+            Console.WriteLine(list_courier.Any()
+    ? $"Available open orders: {string.Join(", ", list_courier.Select(o => o.Id))}"
+    : "No available open orders.");
+
+            //matchedCouriers = matchedCouriers.Where(courier =>
+            //    courier.Active &&
+            //    MatchTypeShipmentAndOrder(courier.TypeShipment, selectedOrder.TypeOfOrder) &&
+            //    courier.MaxDistanceDelivery >= selectedOrder.DistanceKm
+            //).ToList();
+
+            //if (matchedCouriers.Count == 0)
+            //{
+            //    throw new Exception("No suitable couriers available for this order.");
+            //}
+
+           // Console.WriteLine($"Available couriers: {string.Join(", ", matchedCouriers.Select(c => c.Id))}");
 
             int courierId;
             Courier? selectedCourier = null;
@@ -567,12 +600,22 @@ namespace DalTest
             {
                 Console.Write("Enter Courier ID: ");
                 courierId = GetIntInput();
-                selectedCourier = matchedCouriers.FirstOrDefault(c => c.Id == courierId);
-
-                if (selectedCourier == null)
+                selectedCourier = list_courier.FirstOrDefault(c => c.Id == courierId);
+                if (selectedCourier != null)
+                {
+                    Console.WriteLine($"Selected Courier ID: {selectedCourier.Id}");
+                }
+                else
                 {
                     Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
                 }
+
+                //selectedCourier = matchedCouriers.FirstOrDefault(c => c.Id == courierId);
+
+                //if (selectedCourier == null)
+                //{
+                //    Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
+                //}
             }
             while (selectedCourier == null);
 
@@ -670,11 +713,22 @@ Set {typeName} method called.
                         ,
                         3 => () =>
                         {
+                            //var items = dal?.ReadAll();
+                            //if (items?.Count == 0 || items is null)
+                            //    Console.WriteLine($"No {typeName}s found.");
+                            //else
+                            //    items.ForEach(item => Console.WriteLine(item));
                             var items = dal?.ReadAll();
-                            if (items?.Count == 0 || items is null)
+
+                            if (items == null || !items.Any())
+                            {
                                 Console.WriteLine($"No {typeName}s found.");
+                            }
                             else
-                                items.ForEach(item => Console.WriteLine(item));
+                            {
+                                items.ToList().ForEach(item => Console.WriteLine(item));
+                            }
+
                         }
                         ,
                         4 => () =>
@@ -856,9 +910,30 @@ Set {typeName} method called.
                             Initialization.Do(s_dal); //stage 2
                             break;
                         case 6:
-                            s_dal!.Courier?.ReadAll().ForEach(courier => Console.WriteLine(courier));
-                            s_dal!.Order?.ReadAll().ForEach(order => Console.WriteLine(order));
-                            s_dal!.Delivery?.ReadAll().ForEach(delivery => Console.WriteLine(delivery));
+                            //s_dal!.Courier?.ReadAll(). ForEach(courier => Console.WriteLine(courier));
+                            //s_dal!.Order?.ReadAll().ForEach(order => Console.WriteLine(order));
+                            //s_dal!.Delivery?.ReadAll().ForEach(delivery => Console.WriteLine(delivery));
+                            var couriers = s_dal!.Courier?.ReadAll();
+                            if (couriers != null)
+                            {
+                                foreach (var courier in couriers)
+                                    Console.WriteLine(courier);
+                            }
+                            var orders = s_dal!.Order?.ReadAll();
+                            if (orders != null)
+                            {
+                                foreach (var order in orders)
+                                    Console.WriteLine(order);
+                            }
+                            var deliveries = s_dal!.Delivery?.ReadAll();
+                            if (deliveries != null)
+                            {
+                                foreach (var delivery in deliveries)
+                                    Console.WriteLine(delivery);
+                            }
+
+
+
                             break;
                         case 7:
                             SettingMenu();

@@ -341,39 +341,55 @@ public static class Initialization
             };
         }
 
-        var list_order = s_dal?.Order?.ReadAll() ??
-            throw new Exception("No orders available");
+        var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
+             ?.ToList()
+            ?? throw new Exception("No orders available");
 
-        foreach (var order in list_order.ToList())
-        {
-            if (order.OrderStatus != OrderStatus.OPEN)
-                list_order.Remove(order);
-        }
+        //var list_order = s_dal?.Order?.ReadAll() ??//פונקציה לקלבת ההזמנות הפתוחות בלבד, רשימה שלב 1
+        //    throw new Exception("No orders available");
+
+        //foreach (var order in list_order.ToList())
+        //{
+        //    if (order.OrderStatus != OrderStatus.OPEN)
+        //        list_order.Remove(order);
+        //}
 
         for (int i = 0; i < 50; i++)
         {
-            var randomOrder = list_order[s_rand.Next(list_order.Count)];
+            //var randomOrder = list_order[s_rand.Next(list_order.Count)];//הגרלת הזמנה אקראית מתוך הרשימה שלב 1
+            var randomOrder = list_order[s_rand.Next(list_order.Count)];//הגרלת הזמנה אקראית מתוך הרשימה שלב 2
 
-            var matchedCouriers = s_dal?.Courier?.ReadAll() ??
-                    throw new Exception("No couriers available");
+            //סינון שליחים לפי שלב 2 באמצעות תנאי מסנן אחד
+            var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
+            MatchTypeShipmentAndOrder(Courier.TypeShipment, randomOrder.TypeOfOrder) &&
+            Courier.MaxDistanceDelivery >= randomOrder.DistanceKm)
+                 ?.ToList()
+                 ?? throw new Exception("No couriers available");
 
-            foreach (var courier in matchedCouriers.ToList())
-            {
-                if (courier.Active == false)
-                    matchedCouriers.Remove(courier);
+            //סינון שליחים לפי שלב 1 על ידי הסרתם מרשימה לפי תנאים נפרדים
+            //var matchedCouriers = s_dal?.Courier?.ReadAll() ??
+            //        throw new Exception("No couriers available");
 
-                if (!MatchTypeShipmentAndOrder(courier.TypeShipment, randomOrder.TypeOfOrder))
-                    matchedCouriers.Remove(courier);
+            //foreach (var courier in matchedCouriers.ToList())
+            //{
+            //    if (courier.Active == false)
+            //        matchedCouriers.Remove(courier);
 
-                if (courier.MaxDistanceDelivery < randomOrder.DistanceKm)
-                    matchedCouriers.Remove(courier);
-            }
+            //    if (!MatchTypeShipmentAndOrder(courier.TypeShipment, randomOrder.TypeOfOrder))
+            //        matchedCouriers.Remove(courier);
 
-            if (matchedCouriers.Count == 0)
-                throw new Exception("No matched couriers available for the order");
+            //    if (courier.MaxDistanceDelivery < randomOrder.DistanceKm)
+            //        matchedCouriers.Remove(courier);
+            //}
 
-            var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)];
-            randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };
+            //if (matchedCouriers.Count == 0)
+            //    throw new Exception("No matched couriers available for the order");
+
+            //var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)];
+
+            var randomCourier = list_courier[s_rand.Next(list_courier.Count)];//בחירת שליח אקראי מתוך רשימת השליחים המסוננת
+            var selectedCourier = randomCourier;
+            randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה 
             s_dal?.Order.Update(randomOrder);
             list_order.Remove(randomOrder);
 
@@ -393,7 +409,7 @@ public static class Initialization
                 TheTypeShipment.FOOT => s_dal!.Config!.AvgSpeedFoot,
                 _ => 1.0
             }))
-    :       TimeSpan.FromHours(1);
+    : TimeSpan.FromHours(1);
 
             DateTime orderData = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
 

@@ -47,20 +47,28 @@ internal class DeliveryImplementation : IDelivery
     /// <returns>The delivery object if found; otherwise, null.</returns>
     public Delivery? Read(int id)
     {
-        foreach (var delivery in DataSource.Deliveries)
-        {
-            if (delivery.Id == id)
-                return delivery;
-        }
+        //foreach (var delivery in DataSource.Deliveries)
+        //{
+        //    if (delivery.Id == id)
+        //        return delivery;
+        //}
 
-        return null;
+        //return null;
+        return DataSource.Deliveries.FirstOrDefault(item => item.Id == id);
     }
 
     /// <summary>
     /// Reads and retrieves all deliveries from the data source.
     /// </summary>
     /// <returns>A list containing all delivery objects.</returns>
-    public List<Delivery> ReadAll() => new List<Delivery>(DataSource.Deliveries);
+    // public List<Delivery> ReadAll() => new List<Delivery>(DataSource.Deliveries);//stage 1
+    public IEnumerable<Delivery> ReadAll(Func<Delivery, bool>? filter = null) //stage 2
+         => filter != null
+             ? from item in DataSource.Deliveries
+               where filter(item)
+               select item
+             : from item in DataSource.Deliveries
+               select item;
 
     /// <summary>
     /// Updates an existing delivery in the data source.
