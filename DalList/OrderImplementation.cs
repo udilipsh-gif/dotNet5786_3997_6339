@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// Implementation of the IOrder interface for managing order data in the data access layer.
 /// Provides CRUD operations for order entities stored in memory.
 /// </summary>
-public class OrderImplementation : IOrder
+internal class OrderImplementation : IOrder
 {
     /// <summary>
     /// Creates a new order in the data source with an auto-generated unique ID.

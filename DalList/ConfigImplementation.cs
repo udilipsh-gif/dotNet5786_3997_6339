@@ -6,7 +6,7 @@ using System.Data;
 /// Implementation of the IConfig interface that provides access to system configuration settings.
 /// Acts as a facade to the internal Config class.
 /// </summary>
-public class ConfigImplementation : IConfig
+internal class ConfigImplementation : IConfig
 {
     /// <summary>
     /// Gets or sets the current system clock time.
