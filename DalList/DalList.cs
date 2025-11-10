@@ -27,14 +27,6 @@ sealed public class DalList : IDal
     /// </summary>
     public IConfig Config { get; } = new ConfigImplementation();
 
-    ICourier IDal.Courier => throw new NotImplementedException();
-
-    IOrder IDal.Order => throw new NotImplementedException();
-
-    IDelivery IDal.Delivery => throw new NotImplementedException();
-
-    IConfig IDal.Config => throw new NotImplementedException();
-
     /// <summary>
     /// Resets the entire database to its initial state.
     /// Clears all deliveries, couriers, orders, and resets configuration settings.
