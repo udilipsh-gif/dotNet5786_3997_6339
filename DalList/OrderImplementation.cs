@@ -29,7 +29,7 @@ internal class OrderImplementation : IOrder
     {
         var order = Read(id);
         if (order is null)
-            throw new Exception($"Order with ID={id} does not exists");
+            throw new DalDoesNotExistException(id);
         else
             DataSource.Orders.Remove(order!);
     }
@@ -85,7 +85,7 @@ internal class OrderImplementation : IOrder
     {
         var order = Read(item.Id);
         if (order is null)
-            throw new Exception($"Order with ID={item.Id} does not exists");
+            throw new DalDoesNotExistException(item.Id);
         else
         {
             DataSource.Orders.Remove(order);

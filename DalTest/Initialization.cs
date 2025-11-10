@@ -344,16 +344,7 @@ public static class Initialization
 
         var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
              ?.ToList()
-            ?? throw new Exception("No orders available");
-
-        //var list_order = s_dal?.Order?.ReadAll() ??//פונקציה לקלבת ההזמנות הפתוחות בלבד, רשימה שלב 1
-        //    throw new Exception("No orders available");
-
-        //foreach (var order in list_order.ToList())
-        //{
-        //    if (order.OrderStatus != OrderStatus.OPEN)
-        //        list_order.Remove(order);
-        //}
+            ?? throw new DalisNotAvailable("Order");
 
         for (int i = 0; i < 50; i++)
         {
@@ -365,7 +356,7 @@ public static class Initialization
             MatchTypeShipmentAndOrder(Courier.TypeShipment, randomOrder.TypeOfOrder) &&
             Courier.MaxDistanceDelivery >= randomOrder.DistanceKm)
                  ?.ToList()
-                 ?? throw new Exception("No couriers available");
+                 ?? throw new DalisNotAvailable("Courier");
 
             //סינון שליחים לפי שלב 1 על ידי הסרתם מרשימה לפי תנאים נפרדים
             //var matchedCouriers = s_dal?.Courier?.ReadAll() ??
@@ -462,7 +453,7 @@ public static class Initialization
         //s_dalOrder = dalOrder ?? throw new NullReferenceException("DAL object can not be null!");
         //s_dalDelivery = dalDelivery ?? throw new NullReferenceException("DAL object can not be null!");
         //s_dalConfig = dalConfig ?? throw new NullReferenceException("DAL object can not be null!");
-        s_dal = dal ?? throw new NullReferenceException("DAL object can not be null!"); // stage 2
+        s_dal = dal ?? throw new DalErrorConfig("DAL object can not be null!"); // stage 2
 
 
         Console.WriteLine("Reset Configuration values and List values...");

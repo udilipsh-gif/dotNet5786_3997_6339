@@ -1,4 +1,6 @@
-﻿namespace Dal;
+﻿using DO;
+
+namespace Dal;
 
 /// <summary>
 /// Internal configuration class for managing system-wide settings, IDs, and constants.
@@ -60,7 +62,7 @@ internal static class Config
         set
         {
             if (!ValidId(value))
-                throw new ArgumentException("id is not valid");
+                throw new DalValueIsNotValid(value.ToString());
             manager_id = value;
         }
     }

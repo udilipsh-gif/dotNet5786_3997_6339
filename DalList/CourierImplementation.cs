@@ -18,8 +18,8 @@ internal class CourierImplementation : ICourier
     /// <exception cref="Exception">Thrown when a courier with the same ID already exists.</exception>
     public void Create(Courier item)
     {
-        if(Read(item.Id)is not null)
-            throw new Exception($"Courier with ID={item.Id} already exists");
+        if (Read(item.Id) is not null)
+            throw new DalAlreadyExistsException(item.Id);
         else
             DataSource.Couriers.Add(item);
     }
@@ -35,7 +35,7 @@ internal class CourierImplementation : ICourier
         if(courier is not null)
             DataSource.Couriers.Remove(courier);
         else
-            throw new Exception($"Courier with ID={id} does not exists");
+            throw new DalDoesNotExistException(id);
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ internal class CourierImplementation : ICourier
             DataSource.Couriers.Add(item);
         }
         else
-            throw new Exception($"Courier with ID={item.Id} does not exists");
+            throw new DalDoesNotExistException(item.Id);
     }
 
    

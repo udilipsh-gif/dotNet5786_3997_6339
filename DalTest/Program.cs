@@ -521,7 +521,7 @@ namespace DalTest
 
             var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
              ?.ToList()
-            ?? throw new Exception("No orders available");
+            ?? throw new DalisNotAvailable("orders");
             //ככה בדקנו בשלב 1, בשלב 2 לא צריך לבדוק נבדק כבר בשורה למעלה
             //matchedOrders = matchedOrders.Where(o => o.OrderStatus == OrderStatus.OPEN).ToList();
 
@@ -575,7 +575,7 @@ namespace DalTest
             MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
             Courier.MaxDistanceDelivery >= selectedOrder.DistanceKm)
                  ?.ToList()
-                 ?? throw new Exception("No couriers available");
+                 ?? throw new DalisNotAvailable("Couriers");
 
             Console.WriteLine(list_courier.Any()
     ? $"Available open orders: {string.Join(", ", list_courier.Select(o => o.Id))}"
@@ -690,7 +690,7 @@ Set {typeName} method called.
                                 nameof(Courier) => CreateCourier() as T,
                                 nameof(Order) => CreateOrder() as T,
                                 nameof(Delivery) => CreateDelivery() as T,
-                                _ => throw new InvalidOperationException($"Unknown type: {typeof(T).Name}")
+                                _ => throw new DalErrorConfig($"Unknown type: {typeof(T).Name}")
                             };
 
                             if (newItem != null)
@@ -744,7 +744,7 @@ Set {typeName} method called.
                                     UpdateOrder(id);
                                     break;
                                 default:
-                                    throw new InvalidOperationException($"Update not supported for type: {typeof(T).Name}");
+                                    throw new DalErrorConfig($"Update not supported for type: {typeof(T).Name}");
                             }
                         }
                         ,
@@ -759,7 +759,7 @@ Set {typeName} method called.
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine($"Error deleting: {ex.Message}");
+                                Console.Error.WriteLine(ex);
                             }
                         }
                         ,
@@ -776,7 +776,7 @@ Set {typeName} method called.
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error: {ex.Message}");
+                    Console.Error.WriteLine(ex);
                 }
             } while (choiche != 0);
         }
@@ -953,7 +953,7 @@ Set {typeName} method called.
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"An error occurred during initialization: {ex.Message}");
+                    Console.Error.WriteLine(ex);
                 }
             } while (choice != 0);
 

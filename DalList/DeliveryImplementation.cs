@@ -28,7 +28,7 @@ internal class DeliveryImplementation : IDelivery
     {
         var delivery = Read(id);
         if (delivery is null)
-            throw new Exception($"Delivery with ID={id} does not exists");
+            throw new DalDoesNotExistException(id);
         else
         {
             DataSource.Deliveries.Remove(delivery!);
@@ -91,6 +91,6 @@ internal class DeliveryImplementation : IDelivery
             DataSource.Deliveries.Add(item);
         }
         else
-            throw new Exception($"Delivery with ID={item.Id} does not exists");
+            throw new DalDoesNotExistException(item.Id);
     }
 }
