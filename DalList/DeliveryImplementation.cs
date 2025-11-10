@@ -6,7 +6,7 @@ using DO;
 /// Implementation of the IDelivery interface for managing delivery data in the data access layer.
 /// Provides CRUD operations for delivery entities stored in memory.
 /// </summary>
-public class DeliveryImplementation : IDelivery
+internal class DeliveryImplementation : IDelivery
 {
     /// <summary>
     /// Creates a new delivery in the data source with an auto-generated unique ID.

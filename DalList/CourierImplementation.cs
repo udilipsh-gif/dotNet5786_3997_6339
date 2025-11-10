@@ -9,7 +9,7 @@ using System.Reflection.Metadata.Ecma335;
 /// Implementation of the ICourier interface for managing courier data in the data access layer.
 /// Provides CRUD operations for courier entities stored in memory.
 /// </summary>
-public class CourierImplementation : ICourier
+internal class CourierImplementation : ICourier
 {
     /// <summary>
     /// Creates a new courier in the data source.

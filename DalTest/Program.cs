@@ -16,22 +16,22 @@ namespace DalTest
         ///// <summary>
         ///// Data access layer interface for courier operations.
         ///// </summary>
-        //private static ICourier? s_dalCourier;
+        //private static ICourier? s_dalCourier;//stage 1
 
         ///// <summary>
         ///// Data access layer interface for order operations.
         ///// </summary>
-        //private static IOrder? s_dalOrder;
+        //private static IOrder? s_dalOrder;//stage 1
 
         ///// <summary>
         ///// Data access layer interface for delivery operations.
         ///// </summary>
-        //private static IDelivery? s_dalDelivery;
+        //private static IDelivery? s_dalDelivery;//stage 1
 
         ///// <summary>
         ///// Data access layer interface for configuration operations.
         ///// </summary>
-        //private static IConfig? s_dalConfig;
+        //private static IConfig? s_dalConfig;//stage 1
 
         static readonly IDal s_dal = new DalList(); //stage 2
 
@@ -40,7 +40,7 @@ namespace DalTest
         /// Static constructor that initializes all DAL implementations.
         /// Runs once before any static member access or before Main method execution.
         /// </summary>
-        static readonly IDal s_dal = DalList.Instance; //stage 2 - using singleton
+        //static readonly IDal s_dal = DalList.Instance; //stage 2 - using singleton//כרגע בהערה, לא הבנתי מה זה ליפשיץ
 
         /// <summary>
         /// Validates whether the courier's shipment type is compatible with the order type.
@@ -197,7 +197,7 @@ namespace DalTest
             }
             while (choiche != 0);
         }
-        
+
         /// <summary>
         /// Prompts the user for order information and creates a new order object.
         /// </summary>
@@ -505,7 +505,7 @@ namespace DalTest
             }
             while (choiche != 0);
         }
-        
+
         /// <summary>
         /// Prompts the user to select an open order and a suitable courier, then creates a new delivery object.
         /// Filters orders by OPEN status and couriers by active status, shipment type compatibility, and distance capability.
@@ -590,7 +590,7 @@ namespace DalTest
                 TimeEndDelivery = null
             };
         }
-        
+
         /// <summary>
         /// Prompts the user for integer input and validates it.
         /// Continues prompting until valid integer input is received.
@@ -808,7 +808,7 @@ Set {typeName} method called.
             }
             while (choiche != 0);
         }
-        
+
         /// <summary>
         /// Main entry point of the application.
         /// Displays the main menu and handles user navigation between different entity management menus.
@@ -817,24 +817,26 @@ Set {typeName} method called.
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, Book Soop!");
-            try
-            {
-                int choice;
-                do
-                {
 
-                    Console.WriteLine("" +
-                        "Main Menu \n" +
-                        "   to exit press 0\n" +
-                        "   to set courier press 1\n" +
-                        "   to set order press 2\n" +
-                        "   to set delivery press 3\n" +
-                        "   to install rendom data press 5\n" +
-                        "   to print all data press 6\n" +
-                        "   to edit setings press 7\n" +
-                        "   to remove all data press 8\n" +
-                        "       enter your choice: ");
-                    choice = GetIntInput();
+            int choice;
+            do
+            {
+
+
+                Console.WriteLine("" +
+                    "Main Menu \n" +
+                    "   to exit press 0\n" +
+                    "   to set courier press 1\n" +
+                    "   to set order press 2\n" +
+                    "   to set delivery press 3\n" +
+                    "   to install rendom data press 5\n" +
+                    "   to print all data press 6\n" +
+                    "   to edit setings press 7\n" +
+                    "   to remove all data press 8\n" +
+                    "       enter your choice: ");
+                choice = GetIntInput();
+                try
+                {
                     switch (choice)
                     {
                         case 0:
@@ -850,7 +852,7 @@ Set {typeName} method called.
                             DataMenu(s_dal!.Delivery!);
                             break;
                         case 5:
-                            //Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);
+                            //Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);//stage 1
                             Initialization.Do(s_dal); //stage 2
                             break;
                         case 6:
@@ -873,14 +875,14 @@ Set {typeName} method called.
                             Console.WriteLine("Please enter one of the following options: ");
                             break;
                     }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"An error occurred during initialization: {ex.Message}");
+                }
+            } while (choice != 0);
 
-                } while (choice != 0);
 
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"An error occurred during initialization: {ex.Message}");
-            }
         }
     }
 }
