@@ -40,7 +40,7 @@ namespace DalTest
         /// Static constructor that initializes all DAL implementations.
         /// Runs once before any static member access or before Main method execution.
         /// </summary>
-        static readonly IDal s_dal = DalList.Instance; //stage 2 - using singleton
+        //static readonly IDal s_dal = DalList.Instance; //stage 2 - using singleton
 
         /// <summary>
         /// Validates whether the courier's shipment type is compatible with the order type.
