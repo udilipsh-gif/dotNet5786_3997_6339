@@ -682,7 +682,7 @@ Set {typeName} method called.
                 {
                     Action action = choiche switch
                     {
-                        0 => () => Console.WriteLine("good bye"),
+                        0 => () => Console.WriteLine($"exit from set {typeof(T).Name}"),
                         1 => () =>
                         {
                             T? newItem = typeof(T).Name switch
