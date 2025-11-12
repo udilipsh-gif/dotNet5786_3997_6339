@@ -11,12 +11,12 @@ internal static class Config
     /// The starting ID value for orders.
     /// </summary>
     internal const int StartOrderId = 100001;
-    
+
     /// <summary>
     /// Private field for tracking the current order ID.
     /// </summary>
     private static int order_id = StartOrderId;
-    
+
     /// <summary>
     /// Gets the next available order ID and increments the counter.
     /// </summary>
@@ -26,12 +26,12 @@ internal static class Config
     /// The starting ID value for deliveries.
     /// </summary>
     internal const int StartDeliveryId = 200001;
-    
+
     /// <summary>
     /// Private field for tracking the current delivery ID.
     /// </summary>
     private static int delivery_id = StartDeliveryId;
-    
+
     /// <summary>
     /// Gets the next available delivery ID and increments the counter.
     /// </summary>
@@ -46,12 +46,12 @@ internal static class Config
     /// The starting ID value for managers.
     /// </summary>
     internal static int StartManagerId = 100000000;
-    
+
     /// <summary>
     /// Private field for tracking the current manager ID.
     /// </summary>
     private static int manager_id = StartManagerId;
-    
+
     /// <summary>
     /// Gets or sets the manager ID. Validates the ID using Israeli ID validation algorithm.
     /// </summary>
@@ -66,22 +66,25 @@ internal static class Config
             manager_id = value;
         }
     }
-    
+
     /// <summary>
     /// Validates an Israeli ID number using the Luhn-like algorithm.
     /// </summary>
     /// <param name="id">The ID number to validate.</param>
     /// <returns>True if the ID is valid, false otherwise.</returns>
+   
     static bool ValidId(int id)
     {
         int tempId = id;
         int sum = 0;
-
+        tempId = tempId / 10;
         for (int i = 1; i < 9; i++)
         {
             int temp = tempId % 10;
-            if (i % 2 != 0)
+            if (i % 2 == 0)
+            {
                 sum = sum + temp;
+            }
             else
             {
                 temp = temp * 2;
@@ -89,86 +92,70 @@ internal static class Config
             }
             tempId = tempId / 10;
         }
-        return (tempId == (10 - (sum % 10)));
+
+        return (id % 10 == (10 - (sum % 10)));
     }
-
-    /* private static bool s_isValidIsraeliId(int id)
-     {
-         string idStr = id.ToString().PadLeft(9, '0');
-         if (!System.Text.RegularExpressions.Regex.IsMatch(idStr, @"^\d{9}$"))
-             return false;
-
-         int sum = 0;
-         for (int i = 0; i < 9; i++)
-         {
-             int digit = idStr[i] - '0';
-             int incNum = digit * ((i % 2) + 1);
-             sum += (incNum > 9) ? incNum - 9 : incNum;
-         }
-
-         return sum % 10 == 0;
-     }*/
 
     /// <summary>
     /// Gets or sets the manager's password.
     /// </summary>
     internal static string PasswordManager { get; set; } = "Admin1234$";
-    
+
     /// <summary>
     /// Gets or sets the store address.
     /// </summary>
-    internal static string? StoreAddress {  get; set; } = null;
+    internal static string? StoreAddress { get; set; } = null;
 
     /// <summary>
     /// Gets or sets the latitude coordinate of the store location.
     /// </summary>
     internal static double? Latitude { get; set; } = null;
-    
+
     /// <summary>
     /// Gets or sets the longitude coordinate of the store location.
     /// </summary>
     internal static double? Longitude { get; set; } = null;
-    
+
     /// <summary>
     /// Gets or sets the maximum delivery range in distance units.
     /// </summary>
     internal static double? MaxDeliveryRange { get; set; } = null;
-    
+
     /// <summary>
     /// Gets or sets the average speed for car deliveries.
     /// </summary>
-    internal static double AvgSpeedCar { get; set; } =00.0;
-    
+    internal static double AvgSpeedCar { get; set; } = 00.0;
+
     /// <summary>
     /// Gets or sets the average speed for motorcycle deliveries.
     /// </summary>
     internal static double AvgSpeedMotorcycle { get; set; } = 00.0;
-    
+
     /// <summary>
     /// Gets or sets the average speed for bike deliveries.
     /// </summary>
     internal static double AvgSpeedBike { get; set; } = 00.0;
-    
+
     /// <summary>
     /// Gets or sets the average speed for foot deliveries.
     /// </summary>
     internal static double AvgSpeedFoot { get; set; } = 00.0;
-    
+
     /// <summary>
     /// Gets or sets the maximum time allowed for a delivery.
     /// </summary>
     internal static TimeSpan MaxDeliveryTime { get; set; } = TimeSpan.FromDays(0);
-    
+
     /// <summary>
     /// Gets or sets the time range that indicates a delivery is at risk of being late.
     /// </summary>
     internal static TimeSpan RiskRange { get; set; } = TimeSpan.FromDays(0);
-    
+
     /// <summary>
     /// Gets or sets the maximum time of inactivity allowed.
     /// </summary>
     internal static TimeSpan MaxTimeInactivity { get; set; } = TimeSpan.FromDays(0);
-    
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
@@ -177,18 +164,18 @@ internal static class Config
         order_id = StartOrderId;
         delivery_id = StartDeliveryId;
         Clock = DateTime.Now;
-        manager_id= StartManagerId;
-        PasswordManager= "Admin1234$";
-        StoreAddress= null;
-        Latitude= null;
+        manager_id = StartManagerId;
+        PasswordManager = "Admin1234$";
+        StoreAddress = null;
+        Latitude = null;
         Longitude = null;
-        MaxDeliveryRange= null;
-        AvgSpeedCar= 00.0;
-        AvgSpeedMotorcycle= 00.0;
-        AvgSpeedBike= 00.0;
-        AvgSpeedFoot= 00.0;
-        MaxDeliveryTime= TimeSpan.FromDays(0);
-        RiskRange= TimeSpan.FromDays(0);
-        MaxTimeInactivity= TimeSpan.FromDays(0);    
+        MaxDeliveryRange = null;
+        AvgSpeedCar = 00.0;
+        AvgSpeedMotorcycle = 00.0;
+        AvgSpeedBike = 00.0;
+        AvgSpeedFoot = 00.0;
+        MaxDeliveryTime = TimeSpan.FromDays(0);
+        RiskRange = TimeSpan.FromDays(0);
+        MaxTimeInactivity = TimeSpan.FromDays(0);
     }
 }
