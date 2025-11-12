@@ -18,25 +18,6 @@ public static class Initialization
     /// </summary>
     const int MAX_ID = 400000000;
 
-    ///// <summary>
-    ///// Data access layer interface for courier operations.
-    ///// </summary>
-    //private static ICourier? s_dalCourier; // Stage1
-
-    ///// <summary>
-    ///// Data access layer interface for order operations.
-    ///// </summary>
-    //private static IOrder? s_dalOrder; // Stage1
-
-    ///// <summary>
-    ///// Data access layer interface for delivery operations.
-    ///// </summary>
-    //private static IDelivery? s_dalDelivery; // Stage1
-
-    ///// <summary>
-    ///// Data access layer interface for configuration operations.
-    ///// </summary>
-    //private static IConfig? s_dalConfig; // Stage1
 
     /// <summary>
     /// Random number generator for creating randomized test data.
@@ -358,27 +339,7 @@ public static class Initialization
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
 
-            //סינון שליחים לפי שלב 1 על ידי הסרתם מרשימה לפי תנאים נפרדים
-            //var matchedCouriers = s_dal?.Courier?.ReadAll() ??
-            //        throw new Exception("No couriers available");
-
-            //foreach (var courier in matchedCouriers.ToList())
-            //{
-            //    if (courier.Active == false)
-            //        matchedCouriers.Remove(courier);
-
-            //    if (!MatchTypeShipmentAndOrder(courier.TypeShipment, randomOrder.TypeOfOrder))
-            //        matchedCouriers.Remove(courier);
-
-            //    if (courier.MaxDistanceDelivery < randomOrder.DistanceKm)
-            //        matchedCouriers.Remove(courier);
-            //}
-
-            //if (matchedCouriers.Count == 0)
-            //    throw new Exception("No matched couriers available for the order");
-
-            //var selectedCourier = matchedCouriers[s_rand.Next(matchedCouriers.Count)];
-
+           
             var randomCourier = list_courier[s_rand.Next(list_courier.Count)];//בחירת שליח אקראי מתוך רשימת השליחים המסוננת
             var selectedCourier = randomCourier;
             randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה 
@@ -394,7 +355,6 @@ public static class Initialization
             ? TimeSpan.FromHours(getActualDistance.Value /
             (selectedCourier.TypeShipment switch
             {
-                // תקן: השתמש ב-s_dal. במקום s_dal?.
                 TheTypeShipment.CAR => s_dal!.Config!.AvgSpeedCar,
                 TheTypeShipment.MOTORCYCLE => s_dal!.Config!.AvgSpeedMotorcycle,
                 TheTypeShipment.BIKE => s_dal!.Config!.AvgSpeedBike,
@@ -449,10 +409,7 @@ public static class Initialization
     /// <exception cref="NullReferenceException">Thrown if any of the DAL parameters are null.</exception>
     public static void Do(IDal dal) //stage 2
     {
-        //s_dalCourier = dalCourier ?? throw new NullReferenceException("DAL object can not be null!");
-        //s_dalOrder = dalOrder ?? throw new NullReferenceException("DAL object can not be null!");
-        //s_dalDelivery = dalDelivery ?? throw new NullReferenceException("DAL object can not be null!");
-        //s_dalConfig = dalConfig ?? throw new NullReferenceException("DAL object can not be null!");
+        
         s_dal = dal ?? throw new DalErrorConfig("DAL object can not be null!"); // stage 2
 
 

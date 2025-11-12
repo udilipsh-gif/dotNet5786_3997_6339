@@ -9,7 +9,4 @@ using DO;
 /// It inherits from <see cref="ICrud{T}"/> to provide standard create, read, update, and delete functionality
 /// for <see cref="Delivery"/> objects.
 /// </remarks>
-public interface IDelivery: ICrud<Delivery>
-{
-   
-}
+public interface IDelivery: ICrud<Delivery>{}

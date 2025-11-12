@@ -13,34 +13,9 @@ namespace DalTest
     /// </summary>
     internal class Program
     {
-        ///// <summary>
-        ///// Data access layer interface for courier operations.
-        ///// </summary>
-        //private static ICourier? s_dalCourier;//stage 1
-
-        ///// <summary>
-        ///// Data access layer interface for order operations.
-        ///// </summary>
-        //private static IOrder? s_dalOrder;//stage 1
-
-        ///// <summary>
-        ///// Data access layer interface for delivery operations.
-        ///// </summary>
-        //private static IDelivery? s_dalDelivery;//stage 1
-
-        ///// <summary>
-        ///// Data access layer interface for configuration operations.
-        ///// </summary>
-        //private static IConfig? s_dalConfig;//stage 1
+       
 
         static readonly IDal s_dal = new DalList(); //stage 2
-
-
-        /// <summary>
-        /// Static constructor that initializes all DAL implementations.
-        /// Runs once before any static member access or before Main method execution.
-        /// </summary>
-        //static readonly IDal s_dal = DalList.Instance; //stage 2 - using singleton
 
         /// <summary>
         /// Validates whether the courier's shipment type is compatible with the order type.
@@ -516,21 +491,10 @@ namespace DalTest
         {
             Console.WriteLine("Creating a new delivery...");
 
-            //var matchedOrders = s_dal.Order?.ReadAll() ??
-            //    throw new Exception("No orders available to create a delivery.");
-
             var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
              ?.ToList()
             ?? throw new DalisNotAvailable("orders");
-            //ככה בדקנו בשלב 1, בשלב 2 לא צריך לבדוק נבדק כבר בשורה למעלה
-            //matchedOrders = matchedOrders.Where(o => o.OrderStatus == OrderStatus.OPEN).ToList();
-
-            //if (matchedOrders.Count == 0)
-            //{
-            //    throw new Exception("No open orders available.");
-            //}
-
-            //Console.WriteLine($"Available open orders: {string.Join(", ", matchedOrders.Select(o => o.Id))}");
+          
 
             Console.WriteLine(list_order.Any()
     ? $"Available open orders: {string.Join(", ", list_order.Select(o => o.Id))}"
@@ -554,20 +518,11 @@ namespace DalTest
                     Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
                 }
 
-                
-                //selectedOrder = matchedOrders.FirstOrDefault(o => o.Id == orderid);
-
-                //if (selectedOrder == null)
-                //{
-                //    Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
-                //}
+               
             }
             while (selectedOrder == null);
 
             Console.WriteLine($"Selected order: {selectedOrder.Id}");
-
-            //var matchedCouriers = s_dal.Courier?.ReadAll() ??
-            //    throw new Exception("No couriers available to create a delivery.");
 
            
 
@@ -581,18 +536,7 @@ namespace DalTest
     ? $"Available open orders: {string.Join(", ", list_courier.Select(o => o.Id))}"
     : "No available open orders.");
 
-            //matchedCouriers = matchedCouriers.Where(courier =>
-            //    courier.Active &&
-            //    MatchTypeShipmentAndOrder(courier.TypeShipment, selectedOrder.TypeOfOrder) &&
-            //    courier.MaxDistanceDelivery >= selectedOrder.DistanceKm
-            //).ToList();
-
-            //if (matchedCouriers.Count == 0)
-            //{
-            //    throw new Exception("No suitable couriers available for this order.");
-            //}
-
-           // Console.WriteLine($"Available couriers: {string.Join(", ", matchedCouriers.Select(c => c.Id))}");
+           
 
             int courierId;
             Courier? selectedCourier = null;
@@ -610,12 +554,7 @@ namespace DalTest
                     Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
                 }
 
-                //selectedCourier = matchedCouriers.FirstOrDefault(c => c.Id == courierId);
-
-                //if (selectedCourier == null)
-                //{
-                //    Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
-                //}
+               
             }
             while (selectedCourier == null);
 
@@ -682,7 +621,7 @@ namespace DalTest
                 {
                     Action action = choiche switch
                     {
-                        0 => () => Console.WriteLine("good bye"),
+                        0 => () => Console.WriteLine($"exit from set {typeof(T).Name}"),
                         1 => () =>
                         {
                             T? newItem = typeof(T).Name switch
@@ -713,11 +652,6 @@ namespace DalTest
                         ,
                         3 => () =>
                         {
-                            //var items = dal?.ReadAll();
-                            //if (items?.Count == 0 || items is null)
-                            //    Console.WriteLine($"No {typeName}s found.");
-                            //else
-                            //    items.ForEach(item => Console.WriteLine(item));
                             var items = dal?.ReadAll();
 
                             if (items == null || !items.Any())
@@ -906,13 +840,10 @@ namespace DalTest
                             DataMenu(s_dal!.Delivery!);
                             break;
                         case 5:
-                            //Initialization.Do(s_dalCourier, s_dalOrder, s_dalDelivery, s_dalConfig);//stage 1
                             Initialization.Do(s_dal); //stage 2
                             break;
                         case 6:
-                            //s_dal!.Courier?.ReadAll(). ForEach(courier => Console.WriteLine(courier));
-                            //s_dal!.Order?.ReadAll().ForEach(order => Console.WriteLine(order));
-                            //s_dal!.Delivery?.ReadAll().ForEach(delivery => Console.WriteLine(delivery));
+                            
                             var couriers = s_dal!.Courier?.ReadAll();
                             if (couriers != null)
                             {

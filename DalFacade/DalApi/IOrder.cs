@@ -12,7 +12,4 @@ namespace DalApi;
 /// Implementations of this interface handle the persistence and retrieval
 /// of order data in the underlying data store.
 /// </remarks>
-public interface IOrder : ICrud<Order>
-{
-
-}
+public interface IOrder : ICrud<Order>{}
