@@ -666,14 +666,14 @@ namespace DalTest
             do
             {
                 Console.WriteLine(@$"
-Set {typeName} method called.
-    to exit press 0
-    to create {typeName} press 1
-    to read {typeName} press 2
-    to read all {typeName}s press 3
-    to update press 4
-    to delete {typeName} press 5
-    to delete all {typeName}s press 6
+    Set {typeName} menu.
+        to exit press 0
+        to create {typeName} press 1
+        to read {typeName} press 2
+        to read all {typeName}s press 3
+        to update press 4
+        to delete {typeName} press 5
+        to delete all {typeName}s press 6
         ");
 
                 choiche = GetIntInput();

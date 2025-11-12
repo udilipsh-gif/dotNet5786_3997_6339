@@ -98,3 +98,16 @@ public class DalErrorConfig : Exception
     public override string ToString() =>
         $"DalErrorConfig: {Message}\n";
 }
+
+[Serializable]
+public class DalXMLFileLoadCreateException : Exception
+{
+    public DalXMLFileLoadCreateException() : base() { }
+
+    public DalXMLFileLoadCreateException(string message) : base(message) { }
+
+    public DalXMLFileLoadCreateException(string message, Exception inner) : base(message, inner) { }
+
+    public override string ToString() =>
+        $"DalXMLFileLoadCreateException: {Message}\n";
+}
