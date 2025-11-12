@@ -1,3 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
+	<NextOrderId>100001</NextOrderId>
+	<NextDeliveryId>200001</NextDeliveryId>
+	<Clock>2023-10-01T12:00:00</Clock>
+	<manager_id>344045810</manager_id>
+	<PasswordManager>"Admin1234$"</PasswordManager>
+	<StoreAddress></StoreAddress>
+	<Latitude></Latitude>
+	<Longitude></Longitude>
+	<MaxDeliveryRange></MaxDeliveryRange>
+	<AvgSpeedCar></AvgSpeedCar>
+	<AvgSpeedMotorcycle></AvgSpeedMotorcycle>
+	<AvgSpeedBike></AvgSpeedBike>
+	<AvgSpeedFoot></AvgSpeedFoot>
+	<MaxDeliveryTime></MaxDeliveryTime>
+	<RiskRange></RiskRange>
+	<MaxTimeInactivity></MaxTimeInactivity>
 </config>

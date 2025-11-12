@@ -1,6 +1,7 @@
 ﻿namespace Dal;
 
 using DO;
+using System.Globalization;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -111,6 +112,41 @@ static class XMLTools
     {
         XElement root = XMLTools.LoadListFromXMLElement(xmlFileName);
         root.Element(elemName)?.SetValue((elemVal).ToString());
+        XMLTools.SaveListToXMLElement(root, xmlFileName);
+    }
+    public static T GetConfigGenericVal<T>(string xmlFileName, string elemName) where T : IParsable<T>
+    {
+        XElement root = XMLTools.LoadListFromXMLElement(xmlFileName);
+        XElement elementValue = root.Element(elemName) ?? throw new DalDoesNotExistException($"Element {elemName} not found");
+        string val = elementValue.Value;
+        if (T.TryParse(val, CultureInfo.InvariantCulture, out var result))
+        {
+            return result;
+        }
+        else
+        {
+            throw new FormatException($"Cannot convert '{val}' to {typeof(T)} in {xmlFileName}, element {elemName}");
+        }
+    }
+    public static void SetConfigGenericVal<T>(string xmlFileName, string elemName, T elemVal)
+    {
+        XElement root = XMLTools.LoadListFromXMLElement(xmlFileName);
+
+        XElement? elementToSet = root.Element(elemName);
+        if (elementToSet == null)
+        {
+            elementToSet = new XElement(elemName);
+            root.Add(elementToSet);
+        }
+
+        string valueToSet = elemVal switch
+        {
+            null => string.Empty,
+            IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+            _ => elemVal.ToString() ?? string.Empty
+        };
+
+        elementToSet.SetValue(valueToSet);
         XMLTools.SaveListToXMLElement(root, xmlFileName);
     }
     #endregion
