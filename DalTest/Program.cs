@@ -583,8 +583,7 @@ namespace DalTest
             int result;
             while (true)
             {
-                string? input = Console.ReadLine();
-                if (int.TryParse(input, out result))
+                if (int.TryParse(Console.ReadLine(), out result))
                 {
                     return result;
                 }
@@ -773,9 +772,9 @@ namespace DalTest
                     ,
                     4 => () =>
                     {
-                        if (s_dal!.Config != null)
+                        if (s_dal.Config != null)
                         {
-                            Console.WriteLine($"Current system date and time: {s_dal!.Config.Clock}");
+                            Console.WriteLine($"Current system date and time: {s_dal.Config.Clock}");
                         }
                     }
                     ,
