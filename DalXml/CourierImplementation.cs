@@ -7,7 +7,7 @@ public class CourierImplementation : ICourier
 {
     static Courier getCourier(XElement s)
     {
-        return new DO.Courier()
+        return new Courier()
         {
             Id = s.ToIntNullable("Id") ?? throw new FormatException("can't convert id"),
             Name = (string?)s.Element("Name") ?? "",
@@ -45,7 +45,9 @@ public class CourierImplementation : ICourier
 
     public Courier? Read(Func<Courier, bool> filter)
     {
-        return XMLTools.LoadListFromXMLElement(Config.s_couriers_xml).Elements().Select(s => getCourier(s)).FirstOrDefault(filter);
+        return XMLTools.LoadListFromXMLElement(Config.s_couriers_xml).Elements()
+            .Select(s => getCourier(s))
+            .FirstOrDefault(filter);
     }
 
     public void Update(Courier item)
@@ -64,6 +66,9 @@ public class CourierImplementation : ICourier
     public void Create(Courier item)
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
+
+        if (couriersRootElem.Elements().Any(c => (int?)c.Element("Id") == item.Id))
+            throw new DalAlreadyExistsException($"Courier with ID={item.Id} already exists");
 
         couriersRootElem.Add(createCourierElement(item));
 
