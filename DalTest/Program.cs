@@ -321,6 +321,7 @@ namespace DalTest
             {
                 Console.WriteLine(@$"
     Updating settings...
+        to exit press 0
         to set manager id press 1
         to set menu password press 2
         to set store address press 3
