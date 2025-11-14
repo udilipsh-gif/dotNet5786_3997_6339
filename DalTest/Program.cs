@@ -14,10 +14,13 @@ namespace DalTest
     /// </summary>
     internal class Program
     {
+        static readonly IDal s_dal = new DalList();
 
-
-        static readonly IDal s_dal = new DalList(); //stage 2
-
+        /// <summary>
+        /// Retrieves all orders with OPEN status from the data layer.
+        /// </summary>
+        /// <returns>A list of open orders.</returns>
+        /// <exception cref="DalisNotAvailable">Thrown when orders are not available.</exception>
         static List<Order> GetOpenOrders()
         {
             return s_dal?.Order?
@@ -25,6 +28,12 @@ namespace DalTest
                 ?.ToList()
             ?? throw new DalisNotAvailable("orders");
         }
+
+        /// <summary>
+        /// Retrieves all active couriers from the data layer.
+        /// </summary>
+        /// <returns>A list of active couriers.</returns>
+        /// <exception cref="DalisNotAvailable">Thrown when couriers are not available.</exception>
         static List<Courier> GetActiveCourier()
         {
             return s_dal?.Courier?
@@ -32,32 +41,13 @@ namespace DalTest
                 ?.ToList()
                 ?? throw new DalisNotAvailable("courier");
         }
-        static Order GetSelectedOrder(List<Order> list_order)
-        {
-            int orderid;
-            Order? selectedOrder = null;
-            do
-            {
-                Console.Write("Enter open order ID: ");
-                orderid = GetIntInput();
-                selectedOrder = list_order.FirstOrDefault(o => o.Id == orderid);
 
-                if (selectedOrder != null)
-                {
-                    Console.WriteLine($"Selected Order ID: {selectedOrder.Id}");
-
-                }
-                else
-                {
-                    Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
-                }
-
-
-            }
-            while (selectedOrder is null);
-            return selectedOrder;
-        }
-
+        /// <summary>
+        /// Prompts the user to select a courier from the provided list by entering the courier ID.
+        /// Continues prompting until a valid courier is selected.
+        /// </summary>
+        /// <param name="list_courier">The list of available couriers to choose from.</param>
+        /// <returns>The selected courier object.</returns>
         static Courier GetSelectedCourier(List<Courier> list_courier)
         {
             int courierId;
@@ -70,16 +60,44 @@ namespace DalTest
                 if (selectedCourier != null)
                 {
                     Console.WriteLine($"Selected Courier ID: {selectedCourier.Id}");
+                    break;
                 }
                 else
                 {
                     Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
                 }
-
-
             }
-            while (selectedCourier is null);
+            while (true);
             return selectedCourier;
+        }
+
+        /// <summary>
+        /// Prompts the user to select an order from the provided list by entering the order ID.
+        /// Continues prompting until a valid order is selected.
+        /// </summary>
+        /// <param name="list_Order">The list of available orders to choose from.</param>
+        /// <returns>The selected order object.</returns>
+        static Order GetSelectedOrder(List<Order> list_Order)
+        {
+            int orderId;
+            Order? selectedOrder = null;
+            do
+            {
+                Console.Write("Enter Order ID: ");
+                orderId = GetIntInput();
+                selectedOrder = list_Order.FirstOrDefault(c => c.Id == orderId);
+                if (selectedOrder != null)
+                {
+                    Console.WriteLine($"Selected Order ID: {selectedOrder.Id}");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine($"Order ID {orderId} not found or not suitable. Please try again.");
+                }
+            }
+            while (true);
+            return selectedOrder;
         }
 
         /// <summary>
@@ -98,7 +116,6 @@ namespace DalTest
                 _ => false
             };
         }
-
 
         /// <summary>
         /// Prompts the user for courier information and creates a new courier object.
@@ -173,6 +190,7 @@ namespace DalTest
         to set max Distance press 6
         to set Type Shipment press 7
             ");
+                choiche = GetIntInput();
                 Action action = choiche switch
                 {
                     0 => () => Console.WriteLine("good bye"),
@@ -182,59 +200,52 @@ namespace DalTest
                         string name = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Name = name;
                         s_dal.Courier?.Update(courierToUpdate);
-
-                    }
-                    ,
+                    },
                     2 => () =>
                     {
                         Console.WriteLine("Enter new Phone: ");
                         string phone = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Phone = phone;
                         s_dal.Courier?.Update(courierToUpdate);
-                    }
-                    ,
+                    },
                     3 => () =>
                     {
                         Console.WriteLine("Enter new Email: ");
                         string email = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Email = email;
                         s_dal.Courier?.Update(courierToUpdate);
-                    }
-                    ,
+                    },
                     4 => () =>
                     {
                         Console.WriteLine("Enter new Password: ");
                         string password = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Password = password;
                         s_dal.Courier?.Update(courierToUpdate);
-                    }
-                    ,
+                    },
                     5 => () =>
                     {
                         Console.WriteLine("Enter new Active status (true/false): ");
                         bool isActive = bool.Parse(Console.ReadLine() ?? "true");
                         courierToUpdate.Active = isActive;
                         s_dal.Courier?.Update(courierToUpdate);
-                    }
-                    ,
+                    },
                     6 => () =>
                     {
                         Console.WriteLine("Enter new Max Distance Delivery (in km): ");
                         double maxDistance = double.Parse(Console.ReadLine() ?? "0");
                         courierToUpdate.MaxDistanceDelivery = maxDistance;
                         s_dal.Courier?.Update(courierToUpdate);
-                    }
-                    ,
+                    },
                     7 => () =>
                     {
                         Console.WriteLine("Enter new Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
                         int typeShipmentInput = GetIntInput();
                         courierToUpdate.TypeShipment = (TheTypeShipment)typeShipmentInput;
                         s_dal.Courier?.Update(courierToUpdate);
-                    }
-                    ,
+                    },
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
-                }; action();
+                };
+                action();
             }
             while (choiche != 0);
         }
@@ -307,6 +318,7 @@ namespace DalTest
         to set Type of Order press 6
         to set Order Status press 7
             ");
+                choiche = GetIntInput();
                 Action action = choiche switch
                 {
                     0 => () => Console.WriteLine("good bye"),
@@ -316,58 +328,52 @@ namespace DalTest
                         string name = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Name = name;
                         s_dal.Order?.Update(orderToUpdate);
-                    }
-                    ,
+                    },
                     2 => () =>
                     {
                         Console.WriteLine("Enter new Phone: ");
                         string phone = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Phone = phone;
                         s_dal.Order?.Update(orderToUpdate);
-                    }
-                    ,
+                    },
                     3 => () =>
                     {
                         Console.WriteLine("Enter new Address: ");
                         string address = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Addres = address;
                         s_dal.Order?.Update(orderToUpdate);
-                    }
-                    ,
+                    },
                     4 => () =>
                     {
                         Console.WriteLine("Enter new Details: ");
                         string details = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Details = details;
                         s_dal.Order?.Update(orderToUpdate);
-                    }
-                    ,
+                    },
                     5 => () =>
                     {
                         Console.WriteLine("Enter new Weight: ");
                         int weight = GetIntInput();
                         orderToUpdate.Weight = weight;
                         s_dal.Order?.Update(orderToUpdate);
-                    }
-                    ,
+                    },
                     6 => () =>
                     {
                         Console.WriteLine("Enter new Type of Order (0=STANDARD, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
                         int typeOfOrderInput = GetIntInput();
                         orderToUpdate.TypeOfOrder = (TypeOfOrder)typeOfOrderInput;
                         s_dal.Order?.Update(orderToUpdate);
-                    }
-                    ,
+                    },
                     7 => () =>
                     {
                         Console.WriteLine("Enter new Order Status (0=OPEN, 1=IN PROGRESS, 2=DELIVERED): ");
                         int orderStatusInput = GetIntInput();
                         orderToUpdate.OrderStatus = (OrderStatus)orderStatusInput;
                         s_dal.Order?.Update(orderToUpdate);
-                    }
-                    ,
+                    },
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
-                }; action();
+                };
+                action();
             }
             while (choiche != 0);
         }
@@ -410,87 +416,76 @@ namespace DalTest
                         Console.WriteLine("Enter new Manager ID: ");
                         int id = GetIntInput();
                         s_dal.Config.ManagerId = id;
-                    }
-                    ,
+                    },
                     2 => () =>
                     {
                         Console.WriteLine("Enter new Menu Password: ");
                         string password = Console.ReadLine() ?? string.Empty;
                         s_dal.Config.PasswordManager = password;
-                    }
-                    ,
+                    },
                     3 => () =>
                     {
                         Console.WriteLine("Enter new Store Address: ");
                         string address = Console.ReadLine() ?? string.Empty;
                         s_dal.Config.storeAddress = address;
-                    }
-                    ,
+                    },
                     5 => () =>
                     {
                         Console.WriteLine("Enter new Delivery Latitude: ");
                         double latitude = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.Latitude = latitude;
-                    }
-                    ,
+                    },
                     6 => () =>
                     {
                         Console.WriteLine("Enter new Delivery Longitude: ");
                         double longitude = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.Longitude = longitude;
-                    }
-                    ,
+                    },
                     7 => () =>
                     {
                         Console.WriteLine("Enter new Max Delivery Range (in km): ");
                         double maxRange = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.MaxDeliveryRange = maxRange;
-                    }
-                    ,
+                    },
                     8 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Car (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedCar = speed;
-                    }
-                    ,
+                    },
                     9 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Motorcycle (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedMotorcycle = speed;
-                    }
-                    ,
+                    },
                     10 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Bike (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedBike = speed;
-                    }
-                    ,
+                    },
                     11 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Foot (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedFoot = speed;
-                    }
-                    ,
+                    },
                     12 => () =>
                     {
                         Console.WriteLine("Enter new Max Delivery Time (in minutes): ");
                         int minutes = GetIntInput();
                         s_dal.Config.MaxDeliveryTime = TimeSpan.FromMinutes(minutes);
-                    }
-                    ,
+                    },
                     13 => () =>
                     {
                         Console.WriteLine("Enter new Risk Range (in minutes): ");
                         int minutes = GetIntInput();
                         s_dal.Config.RiskRange = TimeSpan.FromMinutes(minutes);
-                    }
-                    ,
+                    },
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
-                }; action();
+                };
+                action();
             }
             while (choiche != 0);
         }
@@ -542,126 +537,86 @@ namespace DalTest
                     13 => () => Console.WriteLine($"Risk Range (in minutes): {s_dal.Config.RiskRange.TotalMinutes}"),
                     14 => () => Console.WriteLine($"Max Time Inactivity (in minutes): {s_dal.Config.MaxTimeInactivity.TotalMinutes}"),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
-                }; action();
-
+                };
+                action();
             }
             while (choiche != 0);
         }
 
         /// <summary>
-        /// Prompts the user to select an open order and a suitable courier, then creates a new delivery object.
-        /// Filters orders by OPEN status and couriers by active status, shipment type compatibility, and distance capability.
+        /// Prompts the user to create a new delivery by selecting either an order first or a courier first.
+        /// Filters available couriers based on order requirements or vice versa.
+        /// Updates the selected order status to DELIVERING.
         /// </summary>
         /// <returns>A new Delivery instance with user-selected order and courier.</returns>
-        /// <exception cref="Exception">Thrown when no orders, couriers, or suitable matches are available.</exception>
+        /// <exception cref="DalisNotAvailable">Thrown when orders or couriers are not available.</exception>
         private static Delivery CreateDelivery()
         {
-            Console.WriteLine("Creating a new delivery\nenter 1 for create by order, 2 by courier");
+            Console.WriteLine($"        Creating a new delivery\n" +
+                $"          enter 1 for create by order, 2 by courier");
             int choise = GetIntInput();
+            Order? selectedOrder;
+            Courier? selectedCourier;
+
             if (choise == 1)
             {
-                var list_order = GetOpenOrders();// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
+                var list_order = GetOpenOrders();
 
-                //הדפסה של ההזמנות הפתוחות
                 Console.WriteLine(list_order.Any()
-        ? $"Available open orders: {string.Join(", ", list_order.Select(o => o.Id))}"
-        : "No available open orders.");
-                //// בחירת הזמנה של המשתמש
-                Order? selectedOrder = GetSelectedOrder(list_order);
+                    ? $"Available open orders: {string.Join(", ", list_order.Select(o => o.Id))}"
+                    : "No available open orders.");
 
-            int orderid;
-            Order? selectedOrder = null;
-            do
-            {
-                Console.Write("Enter open Order ID: ");
-                orderid = GetIntInput();
-                selectedOrder = list_order.FirstOrDefault(o => o.Id == orderid);
+                selectedOrder = GetSelectedOrder(list_order);
 
-                if (selectedOrder != null)
-                {
-                    Console.WriteLine($"Selected Order ID: {selectedOrder.Id}");
-                    
-                }
-                else
-                {
-                    Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
-                }
+                var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
+                    MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
+                    Courier.MaxDistanceDelivery >= selectedOrder.DistanceKm)
+                    ?.ToList()
+                    ?? throw new DalisNotAvailable("Couriers");
 
-               
-            }
-            while (selectedOrder == null);
+                Console.WriteLine(list_courier.Any()
+                    ? $"Available couriers: {string.Join(", ", list_courier.Select(c => c.Id))}"
+                    : "No available couriers.");
 
-            Console.WriteLine($"Selected order: {selectedOrder.Id}");
-
-           
-
-            var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
-            MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
-            Courier.MaxDistanceDelivery >= selectedOrder.DistanceKm)
-                 ?.ToList()
-                 ?? throw new DalisNotAvailable("Couriers");
-
-            Console.WriteLine(list_courier.Any()
-    ? $"Available open orders: {string.Join(", ", list_courier.Select(o => o.Id))}"
-    : "No available open orders.");
-
-           
-
-                Console.Write("Enter Actual Distance: ");
-                double actualDistance = double.Parse(Console.ReadLine() ?? "0");
-                //אתחול המשלוח
-                return new Delivery
-                {
-                    Id = 0,
-                    OrderId = selectedOrder.Id,
-                    CourierId = selectedCourier.Id,
-                    TypeOfOrder = selectedOrder.TypeOfOrder,
-                    OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
-                    ActualDistance = actualDistance,
-                    TimeEndDelivery = null
-                };
+                selectedCourier = GetSelectedCourier(list_courier);
             }
             else
             {
                 var list_courier = GetActiveCourier();
-                //הדפסה של השליחים הפעילים
+
                 Console.WriteLine(list_courier.Any()
-        ? $"Available active couriers: {string.Join(", ", list_courier.Select(c => c.Id))}"
-        : "No available open orders.");
+                    ? $"Available active couriers: {string.Join(", ", list_courier.Select(c => c.Id))}"
+                    : "No available active couriers.");
 
-                //// בחירת  שליח על ידי המשתמש
-                Courier? selectedCourier = GetSelectedCourier(list_courier);
+                selectedCourier = GetSelectedCourier(list_courier);
 
-                //שליפת רק ההזמנות המתאימות לשליח שנבחר
                 var list_order = s_dal?.Order?.ReadAll(Order => Order.OrderStatus == OrderStatus.OPEN &&
-                MatchTypeShipmentAndOrder(selectedCourier.TypeShipment, Order.TypeOfOrder) &&
-                selectedCourier.MaxDistanceDelivery >= Order.DistanceKm)
-                     ?.ToList()
-                     ?? throw new DalisNotAvailable("orders");
+                    MatchTypeShipmentAndOrder(selectedCourier.TypeShipment, Order.TypeOfOrder) &&
+                    selectedCourier.MaxDistanceDelivery >= Order.DistanceKm)
+                    ?.ToList()
+                    ?? throw new DalisNotAvailable("orders");
 
-                //הדפסה של ההזמנות המתאימות
                 Console.WriteLine(list_order.Any()
-        ? $"Available appropriate orders: {string.Join(", ", list_order.Select(o => o.Id))}"
-        : "No available appropriate orders.");
-                //בחירת הזמנה על ידי המשתמש
-                Order? selectedOrder = GetSelectedOrder(list_order);
+                    ? $"Available appropriate orders: {string.Join(", ", list_order.Select(o => o.Id))}"
+                    : "No available appropriate orders.");
 
-                Console.Write("Enter Actual Distance: ");
-                double actualDistance = double.Parse(Console.ReadLine() ?? "0");
-
-                //אתחול המשלוח
-                return new Delivery
-                {
-                    Id = 0,
-                    OrderId = selectedOrder.Id,
-                    CourierId = selectedCourier.Id,
-                    TypeOfOrder = selectedOrder.TypeOfOrder,
-                    OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
-                    ActualDistance = actualDistance,
-                    TimeEndDelivery = null
-                };
+                selectedOrder = GetSelectedOrder(list_order);
             }
 
+            Console.Write("Enter Actual Distance: ");
+            double actualDistance = double.Parse(Console.ReadLine() ?? "0");
+            s_dal.Order?.Update(selectedOrder with { OrderStatus = OrderStatus.DELIVERING });
+
+            return new Delivery
+            {
+                Id = 0,
+                OrderId = selectedOrder.Id,
+                CourierId = selectedCourier.Id,
+                TypeOfOrder = selectedOrder.TypeOfOrder,
+                OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
+                ActualDistance = actualDistance,
+                TimeEndDelivery = null
+            };
         }
 
         /// <summary>
@@ -727,8 +682,7 @@ namespace DalTest
                                 dal?.Create(newItem);
                                 Console.WriteLine($"{typeName} created successfully!");
                             }
-                        }
-                        ,
+                        },
                         2 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id: ");
@@ -738,8 +692,7 @@ namespace DalTest
                                 Console.WriteLine($"No {typeName} found with id {id}");
                             else
                                 Console.WriteLine(result);
-                        }
-                        ,
+                        },
                         3 => () =>
                         {
                             var items = dal?.ReadAll();
@@ -752,9 +705,7 @@ namespace DalTest
                             {
                                 items.ToList().ForEach(item => Console.WriteLine(item));
                             }
-
-                        }
-                        ,
+                        },
                         4 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id to update: ");
@@ -770,8 +721,7 @@ namespace DalTest
                                 default:
                                     throw new DalErrorConfig($"Update not supported for type: {typeof(T).Name}");
                             }
-                        }
-                        ,
+                        },
                         5 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id: ");
@@ -785,14 +735,12 @@ namespace DalTest
                             {
                                 Console.Error.WriteLine(ex);
                             }
-                        }
-                        ,
+                        },
                         6 => () =>
                         {
                             dal?.DeleteAll();
                             Console.WriteLine($"All {typeName}s deleted successfully!");
-                        }
-                        ,
+                        },
                         _ => () => Console.WriteLine("Invalid choice, please try again.")
                     };
 
@@ -837,8 +785,7 @@ namespace DalTest
                             s_dal.Config.Clock = s_dal.Config.Clock.AddMinutes(minutes);
                             Console.WriteLine($"System clock moved forward by {minutes} minutes.");
                         }
-                    }
-                    ,
+                    },
                     2 => () =>
                     {
                         Console.WriteLine("Enter number of hours to move forward: ");
@@ -848,8 +795,7 @@ namespace DalTest
                             s_dal!.Config.Clock = s_dal!.Config.Clock.AddHours(hours);
                             Console.WriteLine($"System clock moved forward by {hours} hours.");
                         }
-                    }
-                    ,
+                    },
                     3 => () =>
                     {
                         Console.WriteLine("Enter number of days to move forward: ");
@@ -859,30 +805,26 @@ namespace DalTest
                             s_dal!.Config.Clock = s_dal!.Config.Clock.AddDays(days);
                             Console.WriteLine($"System clock moved forward by {days} days.");
                         }
-                    }
-                    ,
+                    },
                     4 => () =>
                     {
                         if (s_dal.Config != null)
                         {
                             Console.WriteLine($"Current system date and time: {s_dal.Config.Clock}");
                         }
-                    }
-                    ,
+                    },
                     5 => () =>
                     {
                         UpdateSetting();
-                    }
-                    ,
+                    },
                     6 => () =>
                     {
                         ReadSetting();
-                    }
-                    ,
+                    },
                     7 => () => s_dal?.Config?.Reset(),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
-                }; action();
-
+                };
+                action();
             }
             while (choiche != 0);
         }
@@ -899,8 +841,6 @@ namespace DalTest
             int choice;
             do
             {
-
-
                 Console.WriteLine("" +
                     "Main Menu \n" +
                     "   to exit press 0\n" +
@@ -930,10 +870,9 @@ namespace DalTest
                             DataMenu(s_dal!.Delivery!);
                             break;
                         case 5:
-                            Initialization.Do(s_dal); //stage 2
+                            Initialization.Do(s_dal);
                             break;
                         case 6:
-
                             var couriers = s_dal!.Courier?.ReadAll();
                             if (couriers != null)
                             {
@@ -952,9 +891,6 @@ namespace DalTest
                                 foreach (var delivery in deliveries)
                                     Console.WriteLine(delivery);
                             }
-
-
-
                             break;
                         case 7:
                             SettingMenu();
@@ -966,7 +902,6 @@ namespace DalTest
                             s_dal!.Order?.DeleteAll();
                             s_dal!.Courier?.DeleteAll();
                             break;
-
                         default:
                             Console.WriteLine("Please enter one of the following options: ");
                             break;
@@ -977,8 +912,6 @@ namespace DalTest
                     Console.Error.WriteLine(ex);
                 }
             } while (choice != 0);
-
-
         }
     }
 }
