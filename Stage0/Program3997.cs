@@ -7,6 +7,8 @@ namespace stage0
         {
             Welcome3997();
             Welcome6339();
+            
+
 
         }
         static partial void Welcome6339();
@@ -15,6 +17,7 @@ namespace stage0
             Console.Write("Enter your name: ");
             string? name = Console.ReadLine();
             Console.WriteLine("{0}, welcome to the first console application!", name);
+
         }
     }
 }
