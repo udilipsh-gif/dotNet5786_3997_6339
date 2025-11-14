@@ -4,6 +4,7 @@ using DO;
 using System.Data;
 using System.Diagnostics.Metrics;
 using System.Numerics;
+using System.Reflection;
 
 namespace DalTest
 {
@@ -522,10 +523,8 @@ namespace DalTest
                
             }
             while (selectedOrder == null);
-
+            
             Console.WriteLine($"Selected order: {selectedOrder.Id}");
-
-           
 
             var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
             MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
@@ -789,7 +788,7 @@ namespace DalTest
                         ReadSetting();
                     }
                     ,
-                    7 => () => s_dal!.Config?.Reset(),
+                    7 => () => s_dal?.Config?.Reset(),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 }; action();
 
