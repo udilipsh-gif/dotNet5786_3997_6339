@@ -13,9 +13,73 @@ namespace DalTest
     /// </summary>
     internal class Program
     {
-       
+
 
         static readonly IDal s_dal = new DalList(); //stage 2
+
+        static List<Order> GetOpenOrders()
+        {
+            return s_dal?.Order?
+                .ReadAll(o => o.OrderStatus == OrderStatus.OPEN)
+                ?.ToList()
+            ?? throw new DalisNotAvailable("orders");
+        }
+        static List<Courier> GetActiveCourier()
+        {
+            return s_dal?.Courier?
+                .ReadAll(c => c.Active == true)
+                ?.ToList()
+                ?? throw new DalisNotAvailable("courier");
+        }
+        static Order GetSelectedOrder(List<Order> list_order)
+        {
+            int orderid;
+            Order? selectedOrder = null;
+            do
+            {
+                Console.Write("Enter open order ID: ");
+                orderid = GetIntInput();
+                selectedOrder = list_order.FirstOrDefault(o => o.Id == orderid);
+
+                if (selectedOrder != null)
+                {
+                    Console.WriteLine($"Selected Order ID: {selectedOrder.Id}");
+
+                }
+                else
+                {
+                    Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
+                }
+
+
+            }
+            while (selectedOrder is null);
+            return selectedOrder;
+        }
+
+        static Courier GetSelectedCourier(List<Courier> list_courier)
+        {
+            int courierId;
+            Courier? selectedCourier = null;
+            do
+            {
+                Console.Write("Enter Courier ID: ");
+                courierId = GetIntInput();
+                selectedCourier = list_courier.FirstOrDefault(c => c.Id == courierId);
+                if (selectedCourier != null)
+                {
+                    Console.WriteLine($"Selected Courier ID: {selectedCourier.Id}");
+                }
+                else
+                {
+                    Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
+                }
+
+
+            }
+            while (selectedCourier is null);
+            return selectedCourier;
+        }
 
         /// <summary>
         /// Validates whether the courier's shipment type is compatible with the order type.
@@ -33,6 +97,7 @@ namespace DalTest
                 _ => false
             };
         }
+
 
         /// <summary>
         /// Prompts the user for courier information and creates a new courier object.
@@ -489,88 +554,88 @@ namespace DalTest
         /// <exception cref="Exception">Thrown when no orders, couriers, or suitable matches are available.</exception>
         private static Delivery CreateDelivery()
         {
-            Console.WriteLine("Creating a new delivery...");
-
-            var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
-             ?.ToList()
-            ?? throw new DalisNotAvailable("orders");
-          
-
-            Console.WriteLine(list_order.Any()
-    ? $"Available open orders: {string.Join(", ", list_order.Select(o => o.Id))}"
-    : "No available open orders.");
-
-            int orderid;
-            Order? selectedOrder = null;
-            do
+            Console.WriteLine("Creating a new delivery\nenter 1 for create by order, 2 by courier");
+            int choise = GetIntInput();
+            if (choise == 1)
             {
-                Console.Write("Enter open Order ID: ");
-                orderid = GetIntInput();
-                selectedOrder = list_order.FirstOrDefault(o => o.Id == orderid);
+                var list_order = GetOpenOrders();// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
 
-                if (selectedOrder != null)
-                {
-                    Console.WriteLine($"Selected Order ID: {selectedOrder.Id}");
-                    
-                }
-                else
-                {
-                    Console.WriteLine($"Order ID {orderid} not found or not open. Please try again.");
-                }
+                //הדפסה של ההזמנות הפתוחות
+                Console.WriteLine(list_order.Any()
+        ? $"Available open orders: {string.Join(", ", list_order.Select(o => o.Id))}"
+        : "No available open orders.");
+                //// בחירת הזמנה של המשתמש
+                Order? selectedOrder = GetSelectedOrder(list_order);
 
-               
+                //שליפת רק השליחים המתאימים להזמנה שנבחרה
+                var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
+                MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
+                Courier.MaxDistanceDelivery >= selectedOrder.DistanceKm)
+                     ?.ToList()
+                     ?? throw new DalisNotAvailable("Couriers");
+                //הדפסה של השליחים המתאימים
+                Console.WriteLine(list_courier.Any()
+        ? $"Available appropriate couriers: {string.Join(", ", list_courier.Select(o => o.Id))}"
+        : "No available appropriate couriers.");
+
+                //בחירת שליח על ידי המשתמש
+                Courier? selectedCourier = GetSelectedCourier(list_courier);
+
+                Console.Write("Enter Actual Distance: ");
+                double actualDistance = double.Parse(Console.ReadLine() ?? "0");
+                //אתחול המשלוח
+                return new Delivery
+                {
+                    Id = 0,
+                    OrderId = selectedOrder.Id,
+                    CourierId = selectedCourier.Id,
+                    TypeOfOrder = selectedOrder.TypeOfOrder,
+                    OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
+                    ActualDistance = actualDistance,
+                    TimeEndDelivery = null
+                };
             }
-            while (selectedOrder == null);
-
-            Console.WriteLine($"Selected order: {selectedOrder.Id}");
-
-           
-
-            var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
-            MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
-            Courier.MaxDistanceDelivery >= selectedOrder.DistanceKm)
-                 ?.ToList()
-                 ?? throw new DalisNotAvailable("Couriers");
-
-            Console.WriteLine(list_courier.Any()
-    ? $"Available open orders: {string.Join(", ", list_courier.Select(o => o.Id))}"
-    : "No available open orders.");
-
-           
-
-            int courierId;
-            Courier? selectedCourier = null;
-            do
+            else
             {
-                Console.Write("Enter Courier ID: ");
-                courierId = GetIntInput();
-                selectedCourier = list_courier.FirstOrDefault(c => c.Id == courierId);
-                if (selectedCourier != null)
-                {
-                    Console.WriteLine($"Selected Courier ID: {selectedCourier.Id}");
-                }
-                else
-                {
-                    Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
-                }
+                var list_courier = GetActiveCourier();
+                //הדפסה של השליחים הפעילים
+                Console.WriteLine(list_courier.Any()
+        ? $"Available active couriers: {string.Join(", ", list_courier.Select(c => c.Id))}"
+        : "No available open orders.");
 
-               
+                //// בחירת  שליח על ידי המשתמש
+                Courier? selectedCourier = GetSelectedCourier(list_courier);
+
+                //שליפת רק ההזמנות המתאימות לשליח שנבחר
+                var list_order = s_dal?.Order?.ReadAll(Order => Order.OrderStatus == OrderStatus.OPEN &&
+                MatchTypeShipmentAndOrder(selectedCourier.TypeShipment, Order.TypeOfOrder) &&
+                selectedCourier.MaxDistanceDelivery >= Order.DistanceKm)
+                     ?.ToList()
+                     ?? throw new DalisNotAvailable("orders");
+
+                //הדפסה של ההזמנות המתאימות
+                Console.WriteLine(list_order.Any()
+        ? $"Available appropriate orders: {string.Join(", ", list_order.Select(o => o.Id))}"
+        : "No available appropriate orders.");
+                //בחירת הזמנה על ידי המשתמש
+                Order? selectedOrder = GetSelectedOrder(list_order);
+
+                Console.Write("Enter Actual Distance: ");
+                double actualDistance = double.Parse(Console.ReadLine() ?? "0");
+
+                //אתחול המשלוח
+                return new Delivery
+                {
+                    Id = 0,
+                    OrderId = selectedOrder.Id,
+                    CourierId = selectedCourier.Id,
+                    TypeOfOrder = selectedOrder.TypeOfOrder,
+                    OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
+                    ActualDistance = actualDistance,
+                    TimeEndDelivery = null
+                };
             }
-            while (selectedCourier == null);
 
-            Console.Write("Enter Actual Distance: ");
-            double actualDistance = double.Parse(Console.ReadLine() ?? "0");
-
-            return new Delivery
-            {
-                Id = 0,
-                OrderId = orderid,
-                CourierId = courierId,
-                TypeOfOrder = selectedOrder.TypeOfOrder,
-                OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
-                ActualDistance = actualDistance,
-                TimeEndDelivery = null
-            };
         }
 
         /// <summary>
@@ -737,7 +802,7 @@ namespace DalTest
                 choiche = GetIntInput();
                 Action action = choiche switch
                 {
-                    0 => () => Console.WriteLine("good bye"),
+                    0 => () => Console.WriteLine("exit from settings menu"),
                     1 => () =>
                     {
                         Console.WriteLine("Enter number of minutes to move forward: ");
@@ -843,7 +908,7 @@ namespace DalTest
                             Initialization.Do(s_dal); //stage 2
                             break;
                         case 6:
-                            
+
                             var couriers = s_dal!.Courier?.ReadAll();
                             if (couriers != null)
                             {
