@@ -17,87 +17,39 @@ namespace DalTest
         static readonly IDal s_dal = new DalList();
 
         /// <summary>
-        /// Retrieves all orders with OPEN status from the data layer.
-        /// </summary>
-        /// <returns>A list of open orders.</returns>
-        /// <exception cref="DalisNotAvailable">Thrown when orders are not available.</exception>
-        static List<Order> GetOpenOrders()
-        {
-            return s_dal?.Order?
-                .ReadAll(o => o.OrderStatus == OrderStatus.OPEN)
-                ?.ToList()
-            ?? throw new DalisNotAvailable("orders");
-        }
-
-        /// <summary>
-        /// Retrieves all active couriers from the data layer.
-        /// </summary>
-        /// <returns>A list of active couriers.</returns>
-        /// <exception cref="DalisNotAvailable">Thrown when couriers are not available.</exception>
-        static List<Courier> GetActiveCourier()
-        {
-            return s_dal?.Courier?
-                .ReadAll(c => c.Active == true)
-                ?.ToList()
-                ?? throw new DalisNotAvailable("courier");
-        }
-
-        /// <summary>
-        /// Prompts the user to select a courier from the provided list by entering the courier ID.
-        /// Continues prompting until a valid courier is selected.
-        /// </summary>
-        /// <param name="list_courier">The list of available couriers to choose from.</param>
-        /// <returns>The selected courier object.</returns>
-        static Courier GetSelectedCourier(List<Courier> list_courier)
-        {
-            int courierId;
-            Courier? selectedCourier = null;
-            do
-            {
-                Console.Write("Enter Courier ID: ");
-                courierId = GetIntInput();
-                selectedCourier = list_courier.FirstOrDefault(c => c.Id == courierId);
-                if (selectedCourier != null)
-                {
-                    Console.WriteLine($"Selected Courier ID: {selectedCourier.Id}");
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine($"Courier ID {courierId} not found or not suitable. Please try again.");
-                }
-            }
-            while (true);
-            return selectedCourier;
-        }
-
-        /// <summary>
         /// Prompts the user to select an order from the provided list by entering the order ID.
         /// Continues prompting until a valid order is selected.
         /// </summary>
         /// <param name="list_Order">The list of available orders to choose from.</param>
         /// <returns>The selected order object.</returns>
-        static Order GetSelectedOrder(List<Order> list_Order)
+        static T GetItemFromListById<T>(List<T> list, Predicate<T> condition, Func<T, int> idSelector)
         {
-            int orderId;
-            Order? selectedOrder = null;
-            do
+            int itemId;
+            var availableItems = list.Where(item => condition(item));
+            if (availableItems.Any() && typeof(T).GetProperties().Any(p => p.Name == "Id"))
             {
-                Console.Write("Enter Order ID: ");
-                orderId = GetIntInput();
-                selectedOrder = list_Order.FirstOrDefault(c => c.Id == orderId);
-                if (selectedOrder != null)
+                T? selectedItem = default(T);
+                Console.WriteLine(availableItems.Any()
+                        ? $"Available items: {string.Join(", ", availableItems.Select(item => idSelector(item)))}"
+                        : "No available items.");
+                while (true)
                 {
-                    Console.WriteLine($"Selected Order ID: {selectedOrder.Id}");
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine($"Order ID {orderId} not found or not suitable. Please try again.");
+                    Console.Write($"Enter {typeof(T).Name} ID: ");
+                    itemId = GetIntInput();
+                    selectedItem = list.FirstOrDefault(c => idSelector(c) == itemId);
+                    if (selectedItem != null)
+                    {
+                        Console.WriteLine($"Selected {typeof(T).Name} ID: {idSelector(selectedItem)}");
+                        return selectedItem;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{typeof(T).Name} ID {itemId} not found or not suitable. Please try again.");
+                    }
                 }
             }
-            while (true);
-            return selectedOrder;
+            else
+                 throw new DalisNotAvailable($"{typeof(T).Name}s");
         }
 
         /// <summary>
@@ -560,47 +512,27 @@ namespace DalTest
 
             if (choise == 1)
             {
-                var list_order = GetOpenOrders();
+                selectedOrder = GetItemFromListById<Order>(s_dal.Order.ReadAll().ToList(),
+                    o => o.OrderStatus == OrderStatus.OPEN,
+                    o => o.Id);
 
-                Console.WriteLine(list_order.Any()
-                    ? $"Available open orders: {string.Join(", ", list_order.Select(o => o.Id))}"
-                    : "No available open orders.");
-
-                selectedOrder = GetSelectedOrder(list_order);
-
-                var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
-                    MatchTypeShipmentAndOrder(Courier.TypeShipment, selectedOrder.TypeOfOrder) &&
-                    Courier.MaxDistanceDelivery >= selectedOrder.DistanceKm)
-                    ?.ToList()
-                    ?? throw new DalisNotAvailable("Couriers");
-
-                Console.WriteLine(list_courier.Any()
-                    ? $"Available couriers: {string.Join(", ", list_courier.Select(c => c.Id))}"
-                    : "No available couriers.");
-
-                selectedCourier = GetSelectedCourier(list_courier);
+                selectedCourier = GetItemFromListById<Courier>(s_dal.Courier.ReadAll().ToList(),
+                    c => c.Active == true &&
+                    MatchTypeShipmentAndOrder(c.TypeShipment, selectedOrder.TypeOfOrder) &&
+                    c.MaxDistanceDelivery >= selectedOrder.DistanceKm,
+                    c => c.Id);
             }
             else
             {
-                var list_courier = GetActiveCourier();
+                selectedCourier = GetItemFromListById<Courier>(s_dal.Courier.ReadAll().ToList(),
+                    c => c.Active == true,
+                    c => c.Id);
 
-                Console.WriteLine(list_courier.Any()
-                    ? $"Available active couriers: {string.Join(", ", list_courier.Select(c => c.Id))}"
-                    : "No available active couriers.");
-
-                selectedCourier = GetSelectedCourier(list_courier);
-
-                var list_order = s_dal?.Order?.ReadAll(Order => Order.OrderStatus == OrderStatus.OPEN &&
-                    MatchTypeShipmentAndOrder(selectedCourier.TypeShipment, Order.TypeOfOrder) &&
-                    selectedCourier.MaxDistanceDelivery >= Order.DistanceKm)
-                    ?.ToList()
-                    ?? throw new DalisNotAvailable("orders");
-
-                Console.WriteLine(list_order.Any()
-                    ? $"Available appropriate orders: {string.Join(", ", list_order.Select(o => o.Id))}"
-                    : "No available appropriate orders.");
-
-                selectedOrder = GetSelectedOrder(list_order);
+                selectedOrder = GetItemFromListById<Order>(s_dal.Order.ReadAll().ToList(),
+                    o => o.OrderStatus == OrderStatus.OPEN &&
+                    MatchTypeShipmentAndOrder(selectedCourier.TypeShipment, o.TypeOfOrder) &&
+                    selectedCourier.MaxDistanceDelivery >= o.DistanceKm,
+                    o => o.Id);
             }
 
             Console.Write("Enter Actual Distance: ");
