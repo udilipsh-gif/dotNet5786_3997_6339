@@ -17,8 +17,8 @@ namespace DalTest
         static readonly IDal s_dal = new DalList();
 
         /// <summary>
-        /// Prompts the user to select an order from the provided list by entering the order ID.
-        /// Continues prompting until a valid order is selected.
+        /// Generic method to retrieve an item from a list by prompting the user for an ID.
+        /// Filters the list based on the provided condition and continues prompting until a valid item is selected.
         /// </summary>
         /// <param name="list_Order">The list of available orders to choose from.</param>
         /// <returns>The selected order object.</returns>
