@@ -1,6 +1,7 @@
 ﻿using Dal;
 using DalApi;
 using DO;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.Metrics;
 using System.Numerics;
@@ -200,49 +201,56 @@ namespace DalTest
                         string name = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Name = name;
                         s_dal.Courier?.Update(courierToUpdate);
-                    },
+                    }
+                    ,
                     2 => () =>
                     {
                         Console.WriteLine("Enter new Phone: ");
                         string phone = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Phone = phone;
                         s_dal.Courier?.Update(courierToUpdate);
-                    },
+                    }
+                    ,
                     3 => () =>
                     {
                         Console.WriteLine("Enter new Email: ");
                         string email = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Email = email;
                         s_dal.Courier?.Update(courierToUpdate);
-                    },
+                    }
+                    ,
                     4 => () =>
                     {
                         Console.WriteLine("Enter new Password: ");
                         string password = Console.ReadLine() ?? string.Empty;
                         courierToUpdate.Password = password;
                         s_dal.Courier?.Update(courierToUpdate);
-                    },
+                    }
+                    ,
                     5 => () =>
                     {
                         Console.WriteLine("Enter new Active status (true/false): ");
                         bool isActive = bool.Parse(Console.ReadLine() ?? "true");
                         courierToUpdate.Active = isActive;
                         s_dal.Courier?.Update(courierToUpdate);
-                    },
+                    }
+                    ,
                     6 => () =>
                     {
                         Console.WriteLine("Enter new Max Distance Delivery (in km): ");
                         double maxDistance = double.Parse(Console.ReadLine() ?? "0");
                         courierToUpdate.MaxDistanceDelivery = maxDistance;
                         s_dal.Courier?.Update(courierToUpdate);
-                    },
+                    }
+                    ,
                     7 => () =>
                     {
                         Console.WriteLine("Enter new Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
                         int typeShipmentInput = GetIntInput();
                         courierToUpdate.TypeShipment = (TheTypeShipment)typeShipmentInput;
                         s_dal.Courier?.Update(courierToUpdate);
-                    },
+                    }
+                    ,
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 };
                 action();
@@ -328,49 +336,56 @@ namespace DalTest
                         string name = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Name = name;
                         s_dal.Order?.Update(orderToUpdate);
-                    },
+                    }
+                    ,
                     2 => () =>
                     {
                         Console.WriteLine("Enter new Phone: ");
                         string phone = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Phone = phone;
                         s_dal.Order?.Update(orderToUpdate);
-                    },
+                    }
+                    ,
                     3 => () =>
                     {
                         Console.WriteLine("Enter new Address: ");
                         string address = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Addres = address;
                         s_dal.Order?.Update(orderToUpdate);
-                    },
+                    }
+                    ,
                     4 => () =>
                     {
                         Console.WriteLine("Enter new Details: ");
                         string details = Console.ReadLine() ?? string.Empty;
                         orderToUpdate.Details = details;
                         s_dal.Order?.Update(orderToUpdate);
-                    },
+                    }
+                    ,
                     5 => () =>
                     {
                         Console.WriteLine("Enter new Weight: ");
                         int weight = GetIntInput();
                         orderToUpdate.Weight = weight;
                         s_dal.Order?.Update(orderToUpdate);
-                    },
+                    }
+                    ,
                     6 => () =>
                     {
                         Console.WriteLine("Enter new Type of Order (0=STANDARD, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
                         int typeOfOrderInput = GetIntInput();
                         orderToUpdate.TypeOfOrder = (TypeOfOrder)typeOfOrderInput;
                         s_dal.Order?.Update(orderToUpdate);
-                    },
+                    }
+                    ,
                     7 => () =>
                     {
                         Console.WriteLine("Enter new Order Status (0=OPEN, 1=IN PROGRESS, 2=DELIVERED): ");
                         int orderStatusInput = GetIntInput();
                         orderToUpdate.OrderStatus = (OrderStatus)orderStatusInput;
                         s_dal.Order?.Update(orderToUpdate);
-                    },
+                    }
+                    ,
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 };
                 action();
@@ -416,73 +431,85 @@ namespace DalTest
                         Console.WriteLine("Enter new Manager ID: ");
                         int id = GetIntInput();
                         s_dal.Config.ManagerId = id;
-                    },
+                    }
+                    ,
                     2 => () =>
                     {
                         Console.WriteLine("Enter new Menu Password: ");
                         string password = Console.ReadLine() ?? string.Empty;
                         s_dal.Config.PasswordManager = password;
-                    },
+                    }
+                    ,
                     3 => () =>
                     {
                         Console.WriteLine("Enter new Store Address: ");
                         string address = Console.ReadLine() ?? string.Empty;
                         s_dal.Config.storeAddress = address;
-                    },
+                    }
+                    ,
                     5 => () =>
                     {
                         Console.WriteLine("Enter new Delivery Latitude: ");
                         double latitude = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.Latitude = latitude;
-                    },
+                    }
+                    ,
                     6 => () =>
                     {
                         Console.WriteLine("Enter new Delivery Longitude: ");
                         double longitude = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.Longitude = longitude;
-                    },
+                    }
+                    ,
                     7 => () =>
                     {
                         Console.WriteLine("Enter new Max Delivery Range (in km): ");
                         double maxRange = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.MaxDeliveryRange = maxRange;
-                    },
+                    }
+                    ,
                     8 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Car (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedCar = speed;
-                    },
+                    }
+                    ,
                     9 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Motorcycle (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedMotorcycle = speed;
-                    },
+                    }
+                    ,
                     10 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Bike (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedBike = speed;
-                    },
+                    }
+                    ,
                     11 => () =>
                     {
                         Console.WriteLine("Enter new Average Speed for Foot (in km/h): ");
                         double speed = double.Parse(Console.ReadLine() ?? "0");
                         s_dal.Config.AvgSpeedFoot = speed;
-                    },
+                    }
+                    ,
                     12 => () =>
                     {
                         Console.WriteLine("Enter new Max Delivery Time (in minutes): ");
                         int minutes = GetIntInput();
                         s_dal.Config.MaxDeliveryTime = TimeSpan.FromMinutes(minutes);
-                    },
+                    }
+                    ,
                     13 => () =>
                     {
                         Console.WriteLine("Enter new Risk Range (in minutes): ");
                         int minutes = GetIntInput();
                         s_dal.Config.RiskRange = TimeSpan.FromMinutes(minutes);
-                    },
+                    }
+                    ,
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 };
                 action();
@@ -682,7 +709,8 @@ namespace DalTest
                                 dal?.Create(newItem);
                                 Console.WriteLine($"{typeName} created successfully!");
                             }
-                        },
+                        }
+                        ,
                         2 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id: ");
@@ -692,7 +720,8 @@ namespace DalTest
                                 Console.WriteLine($"No {typeName} found with id {id}");
                             else
                                 Console.WriteLine(result);
-                        },
+                        }
+                        ,
                         3 => () =>
                         {
                             var items = dal?.ReadAll();
@@ -705,7 +734,8 @@ namespace DalTest
                             {
                                 items.ToList().ForEach(item => Console.WriteLine(item));
                             }
-                        },
+                        }
+                        ,
                         4 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id to update: ");
@@ -721,7 +751,8 @@ namespace DalTest
                                 default:
                                     throw new DalErrorConfig($"Update not supported for type: {typeof(T).Name}");
                             }
-                        },
+                        }
+                        ,
                         5 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id: ");
@@ -735,12 +766,14 @@ namespace DalTest
                             {
                                 Console.Error.WriteLine(ex);
                             }
-                        },
+                        }
+                        ,
                         6 => () =>
                         {
                             dal?.DeleteAll();
                             Console.WriteLine($"All {typeName}s deleted successfully!");
-                        },
+                        }
+                        ,
                         _ => () => Console.WriteLine("Invalid choice, please try again.")
                     };
 
@@ -785,7 +818,8 @@ namespace DalTest
                             s_dal.Config.Clock = s_dal.Config.Clock.AddMinutes(minutes);
                             Console.WriteLine($"System clock moved forward by {minutes} minutes.");
                         }
-                    },
+                    }
+                    ,
                     2 => () =>
                     {
                         Console.WriteLine("Enter number of hours to move forward: ");
@@ -795,7 +829,8 @@ namespace DalTest
                             s_dal!.Config.Clock = s_dal!.Config.Clock.AddHours(hours);
                             Console.WriteLine($"System clock moved forward by {hours} hours.");
                         }
-                    },
+                    }
+                    ,
                     3 => () =>
                     {
                         Console.WriteLine("Enter number of days to move forward: ");
@@ -805,22 +840,26 @@ namespace DalTest
                             s_dal!.Config.Clock = s_dal!.Config.Clock.AddDays(days);
                             Console.WriteLine($"System clock moved forward by {days} days.");
                         }
-                    },
+                    }
+                    ,
                     4 => () =>
                     {
                         if (s_dal.Config != null)
                         {
                             Console.WriteLine($"Current system date and time: {s_dal.Config.Clock}");
                         }
-                    },
+                    }
+                    ,
                     5 => () =>
                     {
                         UpdateSetting();
-                    },
+                    }
+                    ,
                     6 => () =>
                     {
                         ReadSetting();
-                    },
+                    }
+                    ,
                     7 => () => s_dal?.Config?.Reset(),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 };
@@ -874,23 +913,32 @@ namespace DalTest
                             break;
                         case 6:
                             var couriers = s_dal!.Courier?.ReadAll();
-                            if (couriers != null)
-                            {
-                                foreach (var courier in couriers)
+                            if (!couriers!.Any())
+                                Console.WriteLine("No couriers found.");
+
+                            else
+                                foreach (var courier in couriers!)
                                     Console.WriteLine(courier);
-                            }
+
+
+
                             var orders = s_dal!.Order?.ReadAll();
-                            if (orders != null)
-                            {
-                                foreach (var order in orders)
+                            if (!orders !.Any())
+                                Console.WriteLine("No orders found");
+                            else
+                                foreach (var order in orders!)
                                     Console.WriteLine(order);
-                            }
+                            
+                           
                             var deliveries = s_dal!.Delivery?.ReadAll();
-                            if (deliveries != null)
-                            {
-                                foreach (var delivery in deliveries)
+                            if (!deliveries !.Any())
+                                Console.WriteLine("No deliveries found");
+                            else 
+
+                                foreach (var delivery in deliveries!)
                                     Console.WriteLine(delivery);
-                            }
+                            
+                           
                             break;
                         case 7:
                             SettingMenu();
