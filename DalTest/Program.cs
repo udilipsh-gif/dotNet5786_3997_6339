@@ -12,17 +12,34 @@ namespace DalTest
     /// Main program class for testing the Data Access Layer (DAL) functionality.
     /// Provides interactive console menus for CRUD operations on couriers, orders, and deliveries.
     /// </summary>
+    /// <remarks>
+    /// This test program serves as a comprehensive testing interface for the delivery management system.
+    /// It allows testing of all CRUD operations, system configuration management, and clock simulation
+    /// for time-based delivery scenarios.
+    /// </remarks>
     internal class Program
     {
+        /// <summary>
+        /// Static instance of the Data Access Layer interface used throughout the program.
+        /// Initialized with <see cref="DalList"/> implementation.
+        /// </summary>
         static readonly IDal s_dal = new DalList();
 
         /// <summary>
         /// Generic method to retrieve an item from a list by prompting the user for an ID.
         /// Filters the list based on the provided condition and continues prompting until a valid item is selected.
         /// </summary>
-        /// <param name="list_Order">The list of available orders to choose from.</param>
-        /// <returns>The selected order object.</returns>
-        static T GetItemFromListById<T>(List<T> list, Predicate<T> condition, Func<T, int> idSelector)
+        /// <typeparam name="T">The type of items in the list.</typeparam>
+        /// <param name="list">The list of items to select from.</param>
+        /// <param name="condition">A predicate to filter available items.</param>
+        /// <param name="idSelector">A function to extract the ID from each item.</param>
+        /// <returns>The selected item that matches the user-entered ID.</returns>
+        /// <exception cref="DalisNotAvailable">Thrown when no items are available that match the condition.</exception>
+        /// <remarks>
+        /// This method displays available item IDs, prompts the user to enter an ID,
+        /// and validates that the selected item exists and meets the specified condition.
+        /// </remarks>
+        static T getItemFromListById<T>(List<T> list, Predicate<T> condition, Func<T, int> idSelector)
         {
             int itemId;
             var availableItems = list.Where(item => condition(item));
@@ -58,7 +75,13 @@ namespace DalTest
         /// <param name="courierType">The type of shipment the courier uses.</param>
         /// <param name="order">The type of order to be delivered.</param>
         /// <returns>True if the courier can handle the order type; otherwise, false.</returns>
-        static bool MatchTypeShipmentAndOrder(TheTypeShipment courierType, TypeOfOrder order)
+        /// <remarks>
+        /// Compatibility rules:
+        /// - STANDART orders: All courier types can deliver
+        /// - FAST_DELIVERY orders: Only MOTORCYCLE or CAR couriers
+        /// - DELIVER_IMMEDIATELY orders: Only MOTORCYCLE couriers
+        /// </remarks>
+        static bool matchTypeShipmentAndOrder(TheTypeShipment courierType, TypeOfOrder order)
         {
             return order switch
             {
@@ -73,7 +96,12 @@ namespace DalTest
         /// Prompts the user for courier information and creates a new courier object.
         /// </summary>
         /// <returns>A new Courier instance with user-provided data.</returns>
-        private static Courier CreateCourier()
+        /// <remarks>
+        /// This method collects all required courier information from the console:
+        /// ID, Name, Phone, Email, Password, Type of Shipment, and Maximum Delivery Distance.
+        /// The courier is created as active by default with the working start date set to the current system clock.
+        /// </remarks>
+        private static Courier createCourier()
         {
             Console.WriteLine("Creating a new courier...");
             Console.Write("Enter ID: ");
@@ -120,9 +148,15 @@ namespace DalTest
         /// Provides an interactive menu for updating courier properties.
         /// </summary>
         /// <param name="id">The ID of the courier to update.</param>
-        private static void UpdateCourier(int id)
+        /// <remarks>
+        /// Allows updating the following courier properties:
+        /// Name, Phone, Email, Password, Active status, Maximum Distance, and Type of Shipment.
+        /// Each update is immediately persisted to the DAL.
+        /// The menu loops until the user chooses to exit (option 0).
+        /// </remarks>
+        private static void updateCourier(int id)
         {
-            int choiche = 0;
+            int choice = 0;
             do
             {
                 Courier? courierToUpdate = s_dal.Courier?.Read(id);
@@ -142,8 +176,8 @@ namespace DalTest
         to set max Distance press 6
         to set Type Shipment press 7
             ");
-                choiche = GetIntInput();
-                Action action = choiche switch
+                choice = GetIntInput();
+                Action action = choice switch
                 {
                     0 => () => Console.WriteLine("good bye"),
                     1 => () =>
@@ -199,14 +233,19 @@ namespace DalTest
                 };
                 action();
             }
-            while (choiche != 0);
+            while (choice != 0);
         }
 
         /// <summary>
         /// Prompts the user for order information and creates a new order object.
         /// </summary>
         /// <returns>A new Order instance with user-provided data.</returns>
-        private static Order CreateOrder()
+        /// <remarks>
+        /// Collects customer information (name, phone, address), order details, weight, and type.
+        /// The order is created with OPEN status and the order date is set to the current system clock.
+        /// Latitude and Longitude are initialized to 0.0 and should be set by the system later.
+        /// </remarks>
+        private static Order createOrder()
         {
             Console.WriteLine("Creating a new order...");
 
@@ -248,9 +287,15 @@ namespace DalTest
         /// Provides an interactive menu for updating order properties.
         /// </summary>
         /// <param name="id">The ID of the order to update.</param>
-        private static void UpdateOrder(int id)
+        /// <remarks>
+        /// Allows updating the following order properties:
+        /// Name, Phone, Address, Details, Weight, Type of Order, and Order Status.
+        /// Each update is immediately persisted to the DAL.
+        /// The menu loops until the user chooses to exit (option 0).
+        /// </remarks>
+        private static void updateOrder(int id)
         {
-            int choiche = 0;
+            int choice = 0;
             do
             {
                 Order? orderToUpdate = s_dal.Order?.Read(id);
@@ -270,8 +315,8 @@ namespace DalTest
         to set Type of Order press 6
         to set Order Status press 7
             ");
-                choiche = GetIntInput();
-                Action action = choiche switch
+                choice = GetIntInput();
+                Action action = choice switch
                 {
                     0 => () => Console.WriteLine("good bye"),
                     1 => () =>
@@ -327,20 +372,29 @@ namespace DalTest
                 };
                 action();
             }
-            while (choiche != 0);
+            while (choice != 0);
         }
 
         /// <summary>
         /// Provides an interactive menu for updating system configuration settings.
         /// </summary>
-        private static void UpdateSetting()
+        /// <remarks>
+        /// Allows updating various system settings including:
+        /// - Manager credentials (ID and password)
+        /// - Store location (address, latitude, longitude)
+        /// - Delivery constraints (max delivery range)
+        /// - Average speeds for different vehicle types
+        /// - Time constraints (max delivery time, risk range, max inactivity time)
+        /// The menu loops until the user chooses to exit (option 0).
+        /// </remarks>
+        private static void updateSetting()
         {
             if (s_dal.Config == null)
             {
                 Console.WriteLine("Configuration DAL is not initialized.");
                 return;
             }
-            int choiche = 0;
+            int choice = 0;
             do
             {
                 Console.WriteLine(@$"
@@ -360,8 +414,8 @@ namespace DalTest
         to set risk range press 13
         to set max time inactivity press 14
                 ");
-                choiche = GetIntInput();
-                Action action = choiche switch
+                choice = GetIntInput();
+                Action action = choice switch
                 {
                     1 => () =>
                     {
@@ -439,20 +493,29 @@ namespace DalTest
                 };
                 action();
             }
-            while (choiche != 0);
+            while (choice != 0);
         }
 
         /// <summary>
         /// Provides an interactive menu for reading and displaying system configuration settings.
         /// </summary>
-        private static void ReadSetting()
+        /// <remarks>
+        /// Displays various system settings including:
+        /// - Manager credentials
+        /// - Store location details
+        /// - Delivery constraints
+        /// - Average speeds for different vehicle types
+        /// - Time constraints
+        /// The menu loops until the user chooses to exit (option 0).
+        /// </remarks>
+        private static void readSetting()
         {
             if (s_dal.Config == null)
             {
                 Console.WriteLine("Configuration DAL is not initialized.");
                 return;
             }
-            int choiche = 0;
+            int choice = 0;
             do
             {
                 Console.WriteLine(@$"
@@ -472,8 +535,8 @@ namespace DalTest
         to get risk range press 13
         to get max time inactivity press 14
                 ");
-                choiche = GetIntInput();
-                Action action = choiche switch
+                choice = GetIntInput();
+                Action action = choice switch
                 {
                     1 => () => Console.WriteLine($"Manager ID: {s_dal.Config.ManagerId}"),
                     2 => () => Console.WriteLine($"Menu Password: {s_dal.Config.PasswordManager}"),
@@ -492,7 +555,7 @@ namespace DalTest
                 };
                 action();
             }
-            while (choiche != 0);
+            while (choice != 0);
         }
 
         /// <summary>
@@ -502,35 +565,41 @@ namespace DalTest
         /// </summary>
         /// <returns>A new Delivery instance with user-selected order and courier.</returns>
         /// <exception cref="DalisNotAvailable">Thrown when orders or couriers are not available.</exception>
-        private static Delivery CreateDelivery()
+        /// <remarks>
+        /// The method offers two workflows:
+        /// 1. Select order first - then filters couriers compatible with the order
+        /// 2. Select courier first - then filters orders compatible with the courier
+        /// Compatibility is based on shipment type, delivery distance, and order status.
+        /// </remarks>
+        private static Delivery createDelivery()
         {
             Console.WriteLine($"        Creating a new delivery\n" +
                 $"          enter 1 for create by order, 2 by courier");
-            int choise = GetIntInput();
+            int choice = GetIntInput();
             Order? selectedOrder;
             Courier? selectedCourier;
 
-            if (choise == 1)
+            if (choice == 1)
             {
-                selectedOrder = GetItemFromListById<Order>(s_dal.Order.ReadAll().ToList(),
+                selectedOrder = getItemFromListById<Order>(s_dal.Order.ReadAll().ToList(),
                     o => o.OrderStatus == OrderStatus.OPEN,
                     o => o.Id);
 
-                selectedCourier = GetItemFromListById<Courier>(s_dal.Courier.ReadAll().ToList(),
+                selectedCourier = getItemFromListById<Courier>(s_dal.Courier.ReadAll().ToList(),
                     c => c.Active == true &&
-                    MatchTypeShipmentAndOrder(c.TypeShipment, selectedOrder.TypeOfOrder) &&
+                    matchTypeShipmentAndOrder(c.TypeShipment, selectedOrder.TypeOfOrder) &&
                     c.MaxDistanceDelivery >= selectedOrder.DistanceKm,
                     c => c.Id);
             }
             else
             {
-                selectedCourier = GetItemFromListById<Courier>(s_dal.Courier.ReadAll().ToList(),
+                selectedCourier = getItemFromListById<Courier>(s_dal.Courier.ReadAll().ToList(),
                     c => c.Active == true,
                     c => c.Id);
 
-                selectedOrder = GetItemFromListById<Order>(s_dal.Order.ReadAll().ToList(),
+                selectedOrder = getItemFromListById<Order>(s_dal.Order.ReadAll().ToList(),
                     o => o.OrderStatus == OrderStatus.OPEN &&
-                    MatchTypeShipmentAndOrder(selectedCourier.TypeShipment, o.TypeOfOrder) &&
+                    matchTypeShipmentAndOrder(selectedCourier.TypeShipment, o.TypeOfOrder) &&
                     selectedCourier.MaxDistanceDelivery >= o.DistanceKm,
                     o => o.Id);
             }
@@ -556,6 +625,10 @@ namespace DalTest
         /// Continues prompting until valid integer input is received.
         /// </summary>
         /// <returns>A valid integer entered by the user.</returns>
+        /// <remarks>
+        /// This helper method ensures that all integer inputs in the application are properly validated.
+        /// It handles invalid input gracefully by displaying an error message and re-prompting the user.
+        /// </remarks>
         public static int GetIntInput()
         {
             int result;
@@ -574,11 +647,21 @@ namespace DalTest
         /// </summary>
         /// <typeparam name="T">The entity type (must be a class).</typeparam>
         /// <param name="dal">The data access layer interface for the entity type.</param>
-        private static void DataMenu<T>(ICrud<T>? dal) where T : class
+        /// <remarks>
+        /// This generic menu handles:
+        /// - Create: Creates a new entity using type-specific creation methods
+        /// - Read: Retrieves and displays a single entity by ID
+        /// - ReadAll: Retrieves and displays all entities of the type
+        /// - Update: Updates an entity using type-specific update methods
+        /// - Delete: Deletes a single entity by ID
+        /// - DeleteAll: Removes all entities of the type
+        /// Supports Courier, Order, and Delivery entity types.
+        /// </remarks>
+        private static void dataMenu<T>(ICrud<T>? dal) where T : class
         {
             string typeName = typeof(T).Name.ToLower();
             Console.WriteLine($"Set {typeName} Menu.");
-            int choiche;
+            int choice;
             do
             {
                 Console.WriteLine(@$"
@@ -592,20 +675,20 @@ namespace DalTest
         to delete all {typeName}s press 6
         ");
 
-                choiche = GetIntInput();
+                choice = GetIntInput();
 
                 try
                 {
-                    Action action = choiche switch
+                    Action action = choice switch
                     {
                         0 => () => Console.WriteLine($"exit from set {typeof(T).Name}"),
                         1 => () =>
                         {
                             T? newItem = typeof(T).Name switch
                             {
-                                nameof(Courier) => CreateCourier() as T,
-                                nameof(Order) => CreateOrder() as T,
-                                nameof(Delivery) => CreateDelivery() as T,
+                                nameof(Courier) => createCourier() as T,
+                                nameof(Order) => createOrder() as T,
+                                nameof(Delivery) => createDelivery() as T,
                                 _ => throw new DalErrorConfig($"Unknown type: {typeof(T).Name}")
                             };
 
@@ -645,10 +728,10 @@ namespace DalTest
                             switch (typeof(T).Name)
                             {
                                 case nameof(Courier):
-                                    UpdateCourier(id);
+                                    updateCourier(id);
                                     break;
                                 case nameof(Order):
-                                    UpdateOrder(id);
+                                    updateOrder(id);
                                     break;
                                 default:
                                     throw new DalErrorConfig($"Update not supported for type: {typeof(T).Name}");
@@ -682,15 +765,23 @@ namespace DalTest
                 {
                     Console.Error.WriteLine(ex);
                 }
-            } while (choiche != 0);
+            } while (choice != 0);
         }
 
         /// <summary>
         /// Provides an interactive menu for system settings management, including clock manipulation and configuration updates.
         /// </summary>
-        private static void SettingMenu()
+        /// <remarks>
+        /// This menu allows:
+        /// - Time manipulation: Move system clock forward by minutes, hours, or days
+        /// - Configuration viewing: Display current system date and time
+        /// - Settings management: Update and read configuration values
+        /// - System reset: Reset all settings to defaults
+        /// Useful for testing time-based delivery scenarios without waiting for real time.
+        /// </remarks>
+        private static void settingMenu()
         {
-            int choiche;
+            int choice;
             do
             {
                 Console.WriteLine(@$"
@@ -704,8 +795,8 @@ namespace DalTest
         to read settings value press 6
         reset all settings press 7
         ");
-                choiche = GetIntInput();
-                Action action = choiche switch
+                choice = GetIntInput();
+                Action action = choice switch
                 {
                     0 => () => Console.WriteLine("exit from settings menu"),
                     1 => () =>
@@ -747,18 +838,18 @@ namespace DalTest
                     },
                     5 => () =>
                     {
-                        UpdateSetting();
+                        updateSetting();
                     },
                     6 => () =>
                     {
-                        ReadSetting();
+                        readSetting();
                     },
                     7 => () => s_dal?.Config?.Reset(),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 };
                 action();
             }
-            while (choiche != 0);
+            while (choice != 0);
         }
 
         /// <summary>
@@ -766,6 +857,17 @@ namespace DalTest
         /// Displays the main menu and handles user navigation between different entity management menus.
         /// </summary>
         /// <param name="args">Command line arguments (not used).</param>
+        /// <remarks>
+        /// The main menu provides access to:
+        /// - Courier management (CRUD operations)
+        /// - Order management (CRUD operations)
+        /// - Delivery management (CRUD operations)
+        /// - Random data initialization for testing
+        /// - Display all data across all entity types
+        /// - Settings and configuration management
+        /// - Complete data removal
+        /// All operations are wrapped in exception handling to ensure graceful error recovery.
+        /// </remarks>
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, Book Soop!");
@@ -793,13 +895,13 @@ namespace DalTest
                             Console.WriteLine("good bye");
                             break;
                         case 1:
-                            DataMenu(s_dal!.Courier!);
+                            dataMenu(s_dal!.Courier!);
                             break;
                         case 2:
-                            DataMenu(s_dal!.Order!);
+                            dataMenu(s_dal!.Order!);
                             break;
                         case 3:
-                            DataMenu(s_dal!.Delivery!);
+                            dataMenu(s_dal!.Delivery!);
                             break;
                         case 5:
                             Initialization.Do(s_dal);
@@ -825,7 +927,7 @@ namespace DalTest
                             }
                             break;
                         case 7:
-                            SettingMenu();
+                            settingMenu();
                             break;
                         case 8:
                             Console.WriteLine("Delete all data.");
