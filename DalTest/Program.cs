@@ -1120,23 +1120,32 @@ namespace DalTest
                             break;
                         case 6:
                             var couriers = s_dal!.Courier?.ReadAll();
-                            if (couriers != null)
-                            {
-                                foreach (var courier in couriers)
+                            if (!couriers!.Any())
+                                Console.WriteLine("No couriers found.");
+
+                            else
+                                foreach (var courier in couriers!)
                                     Console.WriteLine(courier);
-                            }
+
+
+
                             var orders = s_dal!.Order?.ReadAll();
-                            if (orders != null)
-                            {
-                                foreach (var order in orders)
+                            if (!orders !.Any())
+                                Console.WriteLine("No orders found");
+                            else
+                                foreach (var order in orders!)
                                     Console.WriteLine(order);
-                            }
+                            
+                           
                             var deliveries = s_dal!.Delivery?.ReadAll();
-                            if (deliveries != null)
-                            {
-                                foreach (var delivery in deliveries)
+                            if (!deliveries !.Any())
+                                Console.WriteLine("No deliveries found");
+                            else 
+
+                                foreach (var delivery in deliveries!)
                                     Console.WriteLine(delivery);
-                            }
+                            
+                           
                             break;
                         case 7:
                             settingMenu();
