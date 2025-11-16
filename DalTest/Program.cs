@@ -66,14 +66,14 @@ namespace DalTest
         });
 
         /// <summary>
-        /// Email update option - updates the Email property for Courier or Address for Order entities.
+        /// Email/Address update option - updates the Email property for Courier entities or Address property for Order entities.
+        /// Note: Order entities don't have an Email field, so this updates the Address field instead.
         /// </summary>
         public static readonly dalEnum Email = new dalEnum("Email", (obj, dal) =>
         {
             Console.WriteLine("Enter new Email: ");
             string email = Console.ReadLine() ?? string.Empty;
             if (obj is DO.Courier c) { c.Email = email; dal.Courier?.Update(c); }
-            if (obj is DO.Order o) { o.Addres = email; dal.Order?.Update(o); }
         });
 
         /// <summary>
