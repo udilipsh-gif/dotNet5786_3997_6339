@@ -1,13 +1,346 @@
 ﻿using Dal;
 using DalApi;
 using DO;
+using System;
 using System.Data;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.Intrinsics.X86;
+using System.Xml.Linq;
+using static System.Formats.Asn1.AsnWriter;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DalTest
 {
+    /// <summary>
+    /// Represents a custom enumeration type that associates menu options with update operations.
+    /// This class implements a type-safe enumeration pattern with embedded business logic for updating different entity types.
+    /// </summary>
+    /// <remarks>
+    /// Each instance of dalEnum represents a menu option that can execute specific update logic on various entity types
+    /// (Courier, Order, or Config). The enumeration automatically assigns sequential values and maintains a registry
+    /// of all instances for iteration and conversion operations.
+    /// </remarks>
+    internal class dalEnum
+    {
+        private static readonly List<dalEnum> allInstances_ = new List<dalEnum>();
+        private readonly int value_;
+        private readonly string name_;
+        private readonly Action<object, IDal>? updateLogic_;
+
+        /// <summary>
+        /// Private constructor for creating dalEnum instances.
+        /// </summary>
+        /// <param name="name">The display name for this enumeration value.</param>
+        /// <param name="logic">Optional action delegate that defines the update logic for this menu option.</param>
+        /// <remarks>
+        /// The constructor automatically assigns a sequential integer value based on the count of existing instances
+        /// and registers the new instance in the static collection.
+        /// </remarks>
+        private dalEnum(string name, Action<object, IDal>? logic = null)
+        {
+            this.name_ = name;
+            this.value_ = allInstances_.Count;
+            this.updateLogic_ = logic;
+            allInstances_.Add(this);
+        }
+
+        /// <summary>
+        /// Exit menu option - no update logic.
+        /// </summary>
+        public static readonly dalEnum Exit = new dalEnum("Exit");
+
+        /// <summary>
+        /// Name update option - updates the Name property for Courier or Order entities.
+        /// </summary>
+        public static readonly dalEnum Name = new dalEnum("Name", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Name: ");
+            string name = Console.ReadLine() ?? string.Empty;
+
+            if (obj is DO.Courier c) { c.Name = name; dal.Courier?.Update(c); }
+            if (obj is DO.Order o) { o.Name = name; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Phone update option - updates the Phone property for Courier or Order entities.
+        /// </summary>
+        public static readonly dalEnum Phone = new dalEnum("Phone", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Phone: ");
+            string phone = Console.ReadLine() ?? string.Empty;
+            if (obj is DO.Courier c) { c.Phone = phone; dal.Courier?.Update(c); }
+            if (obj is DO.Order o) { o.Phone = phone; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Email update option - updates the Email property for Courier or Address for Order entities.
+        /// </summary>
+        public static readonly dalEnum Email = new dalEnum("Email", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Email: ");
+            string email = Console.ReadLine() ?? string.Empty;
+            if (obj is DO.Courier c) { c.Email = email; dal.Courier?.Update(c); }
+            if (obj is DO.Order o) { o.Addres = email; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Address update option - updates the Address property for Order entities.
+        /// </summary>
+        public static readonly dalEnum Address = new dalEnum("Address", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Address: ");
+            string address = Console.ReadLine() ?? string.Empty;
+            if (obj is DO.Order o) { o.Addres = address; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Details update option - updates the Details property for Order entities.
+        /// </summary>
+        public static readonly dalEnum Details = new dalEnum("Details", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Details: ");
+            string details = Console.ReadLine() ?? string.Empty;
+            if (obj is DO.Order o) { o.Details = details; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Password update option - updates the Password property for Courier entities.
+        /// </summary>
+        public static readonly dalEnum Password = new dalEnum("Password", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Password: ");
+            string password = Console.ReadLine() ?? string.Empty;
+            if (obj is DO.Courier c) { c.Password = password; dal.Courier?.Update(c); }
+        });
+
+        /// <summary>
+        /// Active status update option - updates the Active property for Courier entities.
+        /// </summary>
+        public static readonly dalEnum isActive = new dalEnum("isActive", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Active status (true = 1/false = 0): ");
+            bool isActive = Program.GetIntInput() == 1;
+            if (obj is DO.Courier c) { c.Active = isActive; dal.Courier?.Update(c); }
+        });
+
+        /// <summary>
+        /// Maximum distance update option - updates the MaxDistanceDelivery property for Courier entities.
+        /// </summary>
+        public static readonly dalEnum maxDistance = new dalEnum("max Distance", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Max Distance Delivery (in km): ");
+            double maxDistance = (double)Program.GetIntInput();
+            if (obj is DO.Courier c) { c.MaxDistanceDelivery = maxDistance; dal.Courier?.Update(c); }
+        });
+
+        /// <summary>
+        /// Shipment type update option - updates the TypeShipment property for Courier entities.
+        /// </summary>
+        public static readonly dalEnum TypeShipment = new dalEnum("Type Shipment", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
+            int typeShipmentInput = Program.GetIntInput();
+            if (obj is DO.Courier c) { c.TypeShipment = (TheTypeShipment)typeShipmentInput; dal.Courier?.Update(c); }
+        });
+
+        /// <summary>
+        /// Weight update option - updates the Weight property for Order entities.
+        /// </summary>
+        public static readonly dalEnum Weight = new dalEnum("Weight", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Weight: ");
+            int weight = Program.GetIntInput();
+            if (obj is DO.Order o) { o.Weight = weight; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Order type update option - updates the TypeOfOrder property for Order entities.
+        /// </summary>
+        public static readonly dalEnum TypeofOrder = new dalEnum("Type of Order", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Type of Order (0=STANDARD, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
+            int typeOfOrderInput = Program.GetIntInput();
+            if (obj is DO.Order o) { o.TypeOfOrder = (TypeOfOrder)typeOfOrderInput; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Order status update option - updates the OrderStatus property for Order entities.
+        /// </summary>
+        public static readonly dalEnum Status = new dalEnum("Status", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Order Status (0=OPEN, 1=IN PROGRESS, 2=DELIVERED): ");
+            int orderStatusInput = Program.GetIntInput();
+            if (obj is DO.Order o) { o.OrderStatus = (OrderStatus)orderStatusInput; dal.Order?.Update(o); }
+        });
+
+        /// <summary>
+        /// Manager ID update option - updates the ManagerId in system configuration.
+        /// </summary>
+        public static readonly dalEnum ManagerId = new dalEnum("manager id", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new id for manager: ");
+            string detailsDelivery = Console.ReadLine() ?? string.Empty;
+            if (dal.Config != null) { dal.Config.ManagerId = int.Parse(detailsDelivery); }
+        });
+
+        /// <summary>
+        /// Manager password update option - updates the PasswordManager in system configuration.
+        /// </summary>
+        public static readonly dalEnum ManagerPassword = new dalEnum("Manager password", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new password for manager: ");
+            string detailsDelivery = Console.ReadLine() ?? string.Empty;
+            if (dal.Config != null) { dal.Config.PasswordManager = detailsDelivery; }
+        });
+
+        /// <summary>
+        /// Store address update option - updates the storeAddress in system configuration.
+        /// </summary>
+        public static readonly dalEnum StoreAddress = new dalEnum("Store address", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new address for store: ");
+            string storeAddress = Console.ReadLine() ?? string.Empty;
+            if (dal.Config != null) { dal.Config.storeAddress = storeAddress; }
+        });
+
+        /// <summary>
+        /// Store latitude update option - updates the Latitude in system configuration.
+        /// </summary>
+        public static readonly dalEnum StoreLatitude = new dalEnum("Store Latitude", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Latitude for store: ");
+            double latitude = double.Parse(Console.ReadLine() ?? "0");
+            if (dal.Config != null) { dal.Config.Latitude = latitude; }
+        });
+
+        /// <summary>
+        /// Store longitude update option - updates the Longitude in system configuration.
+        /// </summary>
+        public static readonly dalEnum StoreLongitude = new dalEnum("Store Longitude", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Longitude for store: ");
+            double longitude = double.Parse(Console.ReadLine() ?? "0");
+            if (dal.Config != null) { dal.Config.Longitude = longitude; }
+        });
+
+        /// <summary>
+        /// Maximum delivery range update option - updates the MaxDeliveryRange in system configuration.
+        /// </summary>
+        public static readonly dalEnum MaxDeliveryRange = new dalEnum("Max Delivery Range", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Max Delivery Range (in km): ");
+            double maxRange = double.Parse(Console.ReadLine() ?? "0");
+            if (dal.Config != null) { dal.Config.MaxDeliveryRange = maxRange; }
+        });
+
+        /// <summary>
+        /// Average car speed update option - updates the AvgSpeedCar in system configuration.
+        /// </summary>
+        public static readonly dalEnum AvgSpeedCar = new dalEnum("Avg Speed Car", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Average Speed for Car (in km/h): ");
+            double speed = double.Parse(Console.ReadLine() ?? "0");
+            if (dal.Config != null) { dal.Config.AvgSpeedCar = speed; }
+        });
+
+        /// <summary>
+        /// Average motorcycle speed update option - updates the AvgSpeedMotorcycle in system configuration.
+        /// </summary>
+        public static readonly dalEnum AvgSpeedMotorcycle = new dalEnum("Avg Speed Motorcycle", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Average Speed for Motorcycle (in km/h): ");
+            double speed = double.Parse(Console.ReadLine() ?? "0");
+            if (dal.Config != null) { dal.Config.AvgSpeedMotorcycle = speed; }
+        });
+
+        /// <summary>
+        /// Average bike speed update option - updates the AvgSpeedBike in system configuration.
+        /// </summary>
+        public static readonly dalEnum AvgSpeedBike = new dalEnum("Avg Speed Bike", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Average Speed for Bike (in km/h): ");
+            double speed = double.Parse(Console.ReadLine() ?? "0");
+            if (dal.Config != null) { dal.Config.AvgSpeedBike = speed; }
+        });
+
+        /// <summary>
+        /// Average foot speed update option - updates the AvgSpeedFoot in system configuration.
+        /// </summary>
+        public static readonly dalEnum AvgSpeedFoot = new dalEnum("Avg Speed Foot", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Average Speed for Foot (in km/h): ");
+            double speed = double.Parse(Console.ReadLine() ?? "0");
+            if (dal.Config != null) { dal.Config.AvgSpeedFoot = speed; }
+        });
+
+        /// <summary>
+        /// Maximum delivery time update option - updates the MaxDeliveryTime in system configuration.
+        /// </summary>
+        public static readonly dalEnum MaxDeliveryTime = new dalEnum("Max Delivery Time", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Max Delivery Time (in Days): ");
+            int time = Program.GetIntInput();
+            if (dal.Config != null) { dal.Config.MaxDeliveryTime = TimeSpan.FromDays(time); }
+        });
+
+        /// <summary>
+        /// Risk range update option - updates the RiskRange in system configuration.
+        /// </summary>
+        public static readonly dalEnum RiskRange = new dalEnum("Risk Range", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Risk Range (in Days): ");
+            int range = Program.GetIntInput();
+            if (dal.Config != null) { dal.Config.RiskRange = TimeSpan.FromDays(range); }
+        });
+
+        /// <summary>
+        /// Maximum inactivity time update option - updates the MaxTimeInactivity in system configuration.
+        /// </summary>
+        public static readonly dalEnum MaxTimeInactivity = new dalEnum("Max Time Inactivity", (obj, dal) =>
+        {
+            Console.WriteLine("Enter new Max Time Inactivity (in Days): ");
+            int time = Program.GetIntInput();
+            if (dal.Config != null) { dal.Config.MaxTimeInactivity = TimeSpan.FromDays(time); }
+        });
+
+        /// <summary>
+        /// Executes the update logic associated with this enumeration value.
+        /// </summary>
+        /// <param name="itemToUpdate">The entity object to update (Courier, Order, or Config).</param>
+        /// <param name="dal">The DAL interface for accessing data operations.</param>
+        public void ExecuteUpdate(object itemToUpdate, IDal dal) => this.updateLogic_?.Invoke(itemToUpdate, dal);
+
+        /// <summary>
+        /// Returns the display name of this enumeration value.
+        /// </summary>
+        /// <returns>The name string.</returns>
+        public override string ToString() => this.name_;
+
+        /// <summary>
+        /// Implicit conversion from dalEnum to int.
+        /// </summary>
+        /// <param name="op">The dalEnum instance to convert.</param>
+        /// <returns>The integer value of the enumeration.</returns>
+        public static implicit operator int(dalEnum op) => op.value_;
+
+        /// <summary>
+        /// Implicit conversion from int to dalEnum.
+        /// </summary>
+        /// <param name="index">The integer index to convert.</param>
+        /// <returns>The dalEnum instance at the specified index.</returns>
+        public static implicit operator dalEnum(int index) => allInstances_[index];
+
+        /// <summary>
+        /// Gets all dalEnum instances as an array.
+        /// </summary>
+        /// <returns>An array containing all registered dalEnum instances.</returns>
+        public static dalEnum[] GetAll() => allInstances_.ToArray();
+    }
+
     /// <summary>
     /// Main program class for testing the Data Access Layer (DAL) functionality.
     /// Provides interactive console menus for CRUD operations on couriers, orders, and deliveries.
@@ -24,6 +357,8 @@ namespace DalTest
         /// Initialized with <see cref="DalList"/> implementation.
         /// </summary>
         static readonly IDal s_dal = new DalList();
+
+        private static int choice;
 
         /// <summary>
         /// Generic method to retrieve an item from a list by prompting the user for an ID.
@@ -52,7 +387,7 @@ namespace DalTest
                 while (true)
                 {
                     Console.Write($"Enter {typeof(T).Name} ID: ");
-                    itemId = GetIntInput();
+                    itemId = Program.GetIntInput();
                     selectedItem = list.FirstOrDefault(c => idSelector(c) == itemId);
                     if (selectedItem != null)
                     {
@@ -66,7 +401,7 @@ namespace DalTest
                 }
             }
             else
-                 throw new DalisNotAvailable($"{typeof(T).Name}s");
+                throw new DalisNotAvailable($"{typeof(T).Name}s");
         }
 
         /// <summary>
@@ -93,6 +428,69 @@ namespace DalTest
         }
 
         /// <summary>
+        /// Displays a dynamic update menu that handles user input and executes update logic.
+        /// </summary>
+        /// <param name="menuTitle">The title displayed at the top of the menu.</param>
+        /// <param name="menuOptions">List of menu options from dalEnum (including Exit at index 0).</param>
+        /// <param name="getItemFunc">Function that returns the object to update.</param>
+        /// <param name="notFoundMessage">Message displayed if the object is null.</param>
+        /// <remarks>
+        /// This method creates an interactive menu loop that:
+        /// 1. Retrieves the item to update using the provided function
+        /// 2. Displays the menu with numbered options
+        /// 3. Processes user choice and executes the corresponding update operation
+        /// 4. Continues until user selects exit (option 0)
+        /// </remarks>
+        private static void displayUpdateMenu(string menuTitle,
+                                            List<dalEnum> menuOptions,
+                                            Func<object?> getItemFunc,
+                                            string notFoundMessage)
+        {
+            int choice = -1;
+            do
+            {
+                // Retrieve the item to update (runs fresh on each loop iteration)
+                object? itemToUpdate = getItemFunc();
+                if (itemToUpdate == null)
+                {
+                    Console.WriteLine(notFoundMessage);
+                    return; // Exit if object doesn't exist
+                }
+
+                // Display the menu
+                Console.WriteLine(menuTitle);
+                Console.WriteLine("     to exit press 0");
+
+                // Display menu options (starting from 1 since 0 is exit)
+                for (int i = 1; i < menuOptions.Count; i++)
+                {
+                    Console.WriteLine($"     to set {menuOptions[i]} press {i}");
+                }
+
+                // Get user choice
+                choice = Program.GetIntInput();
+
+                if (choice == 0)
+                {
+                    Console.WriteLine("good bye");
+                    break;
+                }
+
+                // Execute the selected operation
+                if (choice < menuOptions.Count)
+                {
+                    dalEnum selectedOperation = menuOptions[choice];
+                    selectedOperation.ExecuteUpdate(itemToUpdate, s_dal);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice, please try again.");
+                }
+            }
+            while (choice != 0);
+        }
+
+        /// <summary>
         /// Prompts the user for courier information and creates a new courier object.
         /// </summary>
         /// <returns>A new Courier instance with user-provided data.</returns>
@@ -105,7 +503,7 @@ namespace DalTest
         {
             Console.WriteLine("Creating a new courier...");
             Console.Write("Enter ID: ");
-            int id = GetIntInput();
+            int id = Program.GetIntInput();
 
             Console.Write("Enter Name: ");
             string name = Console.ReadLine() ?? string.Empty;
@@ -124,7 +522,7 @@ namespace DalTest
             }
 
             Console.Write("Enter Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
-            int typeShipmentInput = GetIntInput();
+            int typeShipmentInput = Program.GetIntInput();
 
             Console.Write("Enter Max Distance Delivery (in km): ");
             string maxDistanceInput = Console.ReadLine() ?? "0";
@@ -156,84 +554,24 @@ namespace DalTest
         /// </remarks>
         private static void updateCourier(int id)
         {
-            int choice = 0;
-            do
+            var menuOptions = new List<dalEnum>
             {
-                Courier? courierToUpdate = s_dal.Courier?.Read(id);
-                if (courierToUpdate == null)
-                {
-                    Console.WriteLine($"not found courier with ID: {id}");
-                    return;
-                }
-                Console.WriteLine($@"
-    Updating courier with ID: {id}
-        to exit press 0
-        to set Name press 1
-        to set Phone press 2
-        to set Email press 3
-        to set Password press 4
-        to set isActive press 5
-        to set max Distance press 6
-        to set Type Shipment press 7
-            ");
-                choice = GetIntInput();
-                Action action = choice switch
-                {
-                    0 => () => Console.WriteLine("good bye"),
-                    1 => () =>
-                    {
-                        Console.WriteLine("Enter new Name: ");
-                        string name = Console.ReadLine() ?? string.Empty;
-                        courierToUpdate.Name = name;
-                        s_dal.Courier?.Update(courierToUpdate);
-                    },
-                    2 => () =>
-                    {
-                        Console.WriteLine("Enter new Phone: ");
-                        string phone = Console.ReadLine() ?? string.Empty;
-                        courierToUpdate.Phone = phone;
-                        s_dal.Courier?.Update(courierToUpdate);
-                    },
-                    3 => () =>
-                    {
-                        Console.WriteLine("Enter new Email: ");
-                        string email = Console.ReadLine() ?? string.Empty;
-                        courierToUpdate.Email = email;
-                        s_dal.Courier?.Update(courierToUpdate);
-                    },
-                    4 => () =>
-                    {
-                        Console.WriteLine("Enter new Password: ");
-                        string password = Console.ReadLine() ?? string.Empty;
-                        courierToUpdate.Password = password;
-                        s_dal.Courier?.Update(courierToUpdate);
-                    },
-                    5 => () =>
-                    {
-                        Console.WriteLine("Enter new Active status (true/false): ");
-                        bool isActive = bool.Parse(Console.ReadLine() ?? "true");
-                        courierToUpdate.Active = isActive;
-                        s_dal.Courier?.Update(courierToUpdate);
-                    },
-                    6 => () =>
-                    {
-                        Console.WriteLine("Enter new Max Distance Delivery (in km): ");
-                        double maxDistance = double.Parse(Console.ReadLine() ?? "0");
-                        courierToUpdate.MaxDistanceDelivery = maxDistance;
-                        s_dal.Courier?.Update(courierToUpdate);
-                    },
-                    7 => () =>
-                    {
-                        Console.WriteLine("Enter new Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
-                        int typeShipmentInput = GetIntInput();
-                        courierToUpdate.TypeShipment = (TheTypeShipment)typeShipmentInput;
-                        s_dal.Courier?.Update(courierToUpdate);
-                    },
-                    _ => () => Console.WriteLine("Invalid choice, please try again.")
-                };
-                action();
-            }
-            while (choice != 0);
+                dalEnum.Exit,
+                dalEnum.Name,
+                dalEnum.Phone,
+                dalEnum.Email,
+                dalEnum.Password,
+                dalEnum.isActive,
+                dalEnum.maxDistance,
+                dalEnum.TypeShipment
+            };
+
+            displayUpdateMenu(
+                menuTitle: $"   Updating courier with ID: {id}",
+                menuOptions: menuOptions,
+                getItemFunc: () => s_dal.Courier?.Read(id),
+                notFoundMessage: $"not found courier with ID: {id}"
+            );
         }
 
         /// <summary>
@@ -262,7 +600,7 @@ namespace DalTest
             string? details = Console.ReadLine();
 
             Console.Write("Enter Weight of order: ");
-            int weight = GetIntInput();
+            int weight = Program.GetIntInput();
 
             Console.Write("Enter Type Shipment (0=STANDARD, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
             var typeOfOrder = (TypeOfOrder)GetIntInput();
@@ -295,84 +633,23 @@ namespace DalTest
         /// </remarks>
         private static void updateOrder(int id)
         {
-            int choice = 0;
-            do
+            var menuOptions = new List<dalEnum>
             {
-                Order? orderToUpdate = s_dal.Order?.Read(id);
-                if (orderToUpdate == null)
-                {
-                    Console.WriteLine($"not found order with ID: {id}");
-                    return;
-                }
-                Console.WriteLine($@"
-    Updating order with ID: {id}
-        to exit press 0
-        to set Name press 1
-        to set Phone press 2
-        to set Address press 3
-        to set Details press 4
-        to set Weight press 5
-        to set Type of Order press 6
-        to set Order Status press 7
-            ");
-                choice = GetIntInput();
-                Action action = choice switch
-                {
-                    0 => () => Console.WriteLine("good bye"),
-                    1 => () =>
-                    {
-                        Console.WriteLine("Enter new Name: ");
-                        string name = Console.ReadLine() ?? string.Empty;
-                        orderToUpdate.Name = name;
-                        s_dal.Order?.Update(orderToUpdate);
-                    },
-                    2 => () =>
-                    {
-                        Console.WriteLine("Enter new Phone: ");
-                        string phone = Console.ReadLine() ?? string.Empty;
-                        orderToUpdate.Phone = phone;
-                        s_dal.Order?.Update(orderToUpdate);
-                    },
-                    3 => () =>
-                    {
-                        Console.WriteLine("Enter new Address: ");
-                        string address = Console.ReadLine() ?? string.Empty;
-                        orderToUpdate.Addres = address;
-                        s_dal.Order?.Update(orderToUpdate);
-                    },
-                    4 => () =>
-                    {
-                        Console.WriteLine("Enter new Details: ");
-                        string details = Console.ReadLine() ?? string.Empty;
-                        orderToUpdate.Details = details;
-                        s_dal.Order?.Update(orderToUpdate);
-                    },
-                    5 => () =>
-                    {
-                        Console.WriteLine("Enter new Weight: ");
-                        int weight = GetIntInput();
-                        orderToUpdate.Weight = weight;
-                        s_dal.Order?.Update(orderToUpdate);
-                    },
-                    6 => () =>
-                    {
-                        Console.WriteLine("Enter new Type of Order (0=STANDARD, 1=FAST DELIVERY, 2=DELIVER IMMEDIATELY): ");
-                        int typeOfOrderInput = GetIntInput();
-                        orderToUpdate.TypeOfOrder = (TypeOfOrder)typeOfOrderInput;
-                        s_dal.Order?.Update(orderToUpdate);
-                    },
-                    7 => () =>
-                    {
-                        Console.WriteLine("Enter new Order Status (0=OPEN, 1=IN PROGRESS, 2=DELIVERED): ");
-                        int orderStatusInput = GetIntInput();
-                        orderToUpdate.OrderStatus = (OrderStatus)orderStatusInput;
-                        s_dal.Order?.Update(orderToUpdate);
-                    },
-                    _ => () => Console.WriteLine("Invalid choice, please try again.")
-                };
-                action();
-            }
-            while (choice != 0);
+                dalEnum.Exit,
+                dalEnum.Name,
+                dalEnum.Phone,
+                dalEnum.Address,
+                dalEnum.Details,
+                dalEnum.Weight,
+                dalEnum.TypeofOrder,
+                dalEnum.Status
+            };
+            displayUpdateMenu(
+                menuTitle: $"   Updating order with ID: {id}",
+                menuOptions: menuOptions,
+                getItemFunc: () => s_dal.Order?.Read(id),
+                notFoundMessage: $"not found order with ID: {id}"
+            );
         }
 
         /// <summary>
@@ -394,106 +671,29 @@ namespace DalTest
                 Console.WriteLine("Configuration DAL is not initialized.");
                 return;
             }
-            int choice = 0;
-            do
+            var menuOptions = new List<dalEnum>
             {
-                Console.WriteLine(@$"
-    Updating settings...
-        to exit press 0
-        to set manager id press 1
-        to set menu password press 2
-        to set store address press 3
-        to set delivery Latitude press 5
-        to set delivery Longitude press 6
-        to set Max Delivery Range press 7
-        to set avg speed car press 8
-        to set avg speed motorcycle press 9
-        to set avg speed bike press 10
-        to set avg speed foot press 11
-        to set max delivery time press 12
-        to set risk range press 13
-        to set max time inactivity press 14
-                ");
-                choice = GetIntInput();
-                Action action = choice switch
-                {
-                    1 => () =>
-                    {
-                        Console.WriteLine("Enter new Manager ID: ");
-                        int id = GetIntInput();
-                        s_dal.Config.ManagerId = id;
-                    },
-                    2 => () =>
-                    {
-                        Console.WriteLine("Enter new Menu Password: ");
-                        string password = Console.ReadLine() ?? string.Empty;
-                        s_dal.Config.PasswordManager = password;
-                    },
-                    3 => () =>
-                    {
-                        Console.WriteLine("Enter new Store Address: ");
-                        string address = Console.ReadLine() ?? string.Empty;
-                        s_dal.Config.storeAddress = address;
-                    },
-                    5 => () =>
-                    {
-                        Console.WriteLine("Enter new Delivery Latitude: ");
-                        double latitude = double.Parse(Console.ReadLine() ?? "0");
-                        s_dal.Config.Latitude = latitude;
-                    },
-                    6 => () =>
-                    {
-                        Console.WriteLine("Enter new Delivery Longitude: ");
-                        double longitude = double.Parse(Console.ReadLine() ?? "0");
-                        s_dal.Config.Longitude = longitude;
-                    },
-                    7 => () =>
-                    {
-                        Console.WriteLine("Enter new Max Delivery Range (in km): ");
-                        double maxRange = double.Parse(Console.ReadLine() ?? "0");
-                        s_dal.Config.MaxDeliveryRange = maxRange;
-                    },
-                    8 => () =>
-                    {
-                        Console.WriteLine("Enter new Average Speed for Car (in km/h): ");
-                        double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dal.Config.AvgSpeedCar = speed;
-                    },
-                    9 => () =>
-                    {
-                        Console.WriteLine("Enter new Average Speed for Motorcycle (in km/h): ");
-                        double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dal.Config.AvgSpeedMotorcycle = speed;
-                    },
-                    10 => () =>
-                    {
-                        Console.WriteLine("Enter new Average Speed for Bike (in km/h): ");
-                        double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dal.Config.AvgSpeedBike = speed;
-                    },
-                    11 => () =>
-                    {
-                        Console.WriteLine("Enter new Average Speed for Foot (in km/h): ");
-                        double speed = double.Parse(Console.ReadLine() ?? "0");
-                        s_dal.Config.AvgSpeedFoot = speed;
-                    },
-                    12 => () =>
-                    {
-                        Console.WriteLine("Enter new Max Delivery Time (in minutes): ");
-                        int minutes = GetIntInput();
-                        s_dal.Config.MaxDeliveryTime = TimeSpan.FromMinutes(minutes);
-                    },
-                    13 => () =>
-                    {
-                        Console.WriteLine("Enter new Risk Range (in minutes): ");
-                        int minutes = GetIntInput();
-                        s_dal.Config.RiskRange = TimeSpan.FromMinutes(minutes);
-                    },
-                    _ => () => Console.WriteLine("Invalid choice, please try again.")
-                };
-                action();
-            }
-            while (choice != 0);
+                dalEnum.Exit,
+                dalEnum.ManagerId,
+                dalEnum.ManagerPassword,
+                dalEnum.StoreAddress,
+                dalEnum.StoreLongitude,
+                dalEnum.StoreLatitude,
+                dalEnum.MaxDeliveryRange,
+                dalEnum.AvgSpeedCar,
+                dalEnum.AvgSpeedMotorcycle,
+                dalEnum.AvgSpeedBike,
+                dalEnum.AvgSpeedFoot,
+                dalEnum.MaxDeliveryTime,
+                dalEnum.RiskRange,
+                dalEnum.MaxTimeInactivity
+            };
+            displayUpdateMenu(
+                menuTitle: "   Updating settings... ",
+                menuOptions: menuOptions,
+                getItemFunc: () => s_dal.Config,
+                notFoundMessage: "Configuration DAL is not initialized."
+            );
         }
 
         /// <summary>
@@ -697,7 +897,8 @@ namespace DalTest
                                 dal?.Create(newItem);
                                 Console.WriteLine($"{typeName} created successfully!");
                             }
-                        },
+                        }
+                        ,
                         2 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id: ");
@@ -707,7 +908,8 @@ namespace DalTest
                                 Console.WriteLine($"No {typeName} found with id {id}");
                             else
                                 Console.WriteLine(result);
-                        },
+                        }
+                        ,
                         3 => () =>
                         {
                             var items = dal?.ReadAll();
@@ -720,7 +922,8 @@ namespace DalTest
                             {
                                 items.ToList().ForEach(item => Console.WriteLine(item));
                             }
-                        },
+                        }
+                        ,
                         4 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id to update: ");
@@ -736,7 +939,8 @@ namespace DalTest
                                 default:
                                     throw new DalErrorConfig($"Update not supported for type: {typeof(T).Name}");
                             }
-                        },
+                        }
+                        ,
                         5 => () =>
                         {
                             Console.WriteLine($"Enter {typeName} id: ");
@@ -750,12 +954,14 @@ namespace DalTest
                             {
                                 Console.Error.WriteLine(ex);
                             }
-                        },
+                        }
+                        ,
                         6 => () =>
                         {
                             dal?.DeleteAll();
                             Console.WriteLine($"All {typeName}s deleted successfully!");
-                        },
+                        }
+                        ,
                         _ => () => Console.WriteLine("Invalid choice, please try again.")
                     };
 
@@ -808,7 +1014,8 @@ namespace DalTest
                             s_dal.Config.Clock = s_dal.Config.Clock.AddMinutes(minutes);
                             Console.WriteLine($"System clock moved forward by {minutes} minutes.");
                         }
-                    },
+                    }
+                    ,
                     2 => () =>
                     {
                         Console.WriteLine("Enter number of hours to move forward: ");
@@ -818,7 +1025,8 @@ namespace DalTest
                             s_dal!.Config.Clock = s_dal!.Config.Clock.AddHours(hours);
                             Console.WriteLine($"System clock moved forward by {hours} hours.");
                         }
-                    },
+                    }
+                    ,
                     3 => () =>
                     {
                         Console.WriteLine("Enter number of days to move forward: ");
@@ -828,22 +1036,26 @@ namespace DalTest
                             s_dal!.Config.Clock = s_dal!.Config.Clock.AddDays(days);
                             Console.WriteLine($"System clock moved forward by {days} days.");
                         }
-                    },
+                    }
+                    ,
                     4 => () =>
                     {
                         if (s_dal.Config != null)
                         {
                             Console.WriteLine($"Current system date and time: {s_dal.Config.Clock}");
                         }
-                    },
+                    }
+                    ,
                     5 => () =>
                     {
                         updateSetting();
-                    },
+                    }
+                    ,
                     6 => () =>
                     {
                         readSetting();
-                    },
+                    }
+                    ,
                     7 => () => s_dal?.Config?.Reset(),
                     _ => () => Console.WriteLine("Invalid choice, please try again.")
                 };
