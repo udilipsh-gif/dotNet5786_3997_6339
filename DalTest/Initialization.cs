@@ -339,7 +339,7 @@ public static class Initialization
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
 
-           
+
             var randomCourier = list_courier[s_rand.Next(list_courier.Count)];//בחירת שליח אקראי מתוך רשימת השליחים המסוננת
             var selectedCourier = randomCourier;
             randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה 
@@ -409,7 +409,7 @@ public static class Initialization
     /// <exception cref="NullReferenceException">Thrown if any of the DAL parameters are null.</exception>
     public static void Do(IDal dal) //stage 2
     {
-        
+
         s_dal = dal ?? throw new DalErrorConfig("DAL object can not be null!"); // stage 2
 
 

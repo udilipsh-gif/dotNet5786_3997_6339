@@ -54,9 +54,10 @@ public class CourierImplementation : ICourier
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
 
-        (couriersRootElem.Elements().Elements().FirstOrDefault(c => (int?)c.Element("Id") == item.Id) ??
-            throw new DO.DalDoesNotExistException($"Student with ID={item.Id} does Not exist"))
-            .Remove();
+        var courierElem = couriersRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == item.Id);
+        if (courierElem == null)
+            throw new DalDoesNotExistException($"Courier with ID={item.Id} does Not exist");
+        courierElem.Remove();
 
         couriersRootElem.Add(createCourierElement(item));
 
@@ -67,8 +68,9 @@ public class CourierImplementation : ICourier
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
 
-        if (couriersRootElem.Elements().Any(c => (int?)c.Element("Id") == item.Id))
-            throw new DalAlreadyExistsException($"Courier with ID={item.Id} already exists");
+        var courierElem = couriersRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == item.Id);
+        if (courierElem != null)
+            throw new DalDoesNotExistException($"Courier with ID={item.Id} does Not exist");
 
         couriersRootElem.Add(createCourierElement(item));
 
@@ -79,9 +81,11 @@ public class CourierImplementation : ICourier
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
 
-        (couriersRootElem.Elements().Elements().FirstOrDefault(c => (int?)c.Element("Id") == item.Id) ??
-            throw new DO.DalDoesNotExistException($"Student with ID={item.Id} does Not exist"))
-            .Remove();
+        var courierElem = couriersRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == id);
+        if (courierElem == null)
+            throw new DalDoesNotExistException($"Courier with ID={id} does Not exist");
+
+        courierElem.Remove();
         XMLTools.SaveListToXMLElement(couriersRootElem, Config.s_couriers_xml);
     }
 

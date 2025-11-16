@@ -43,7 +43,7 @@ internal class ConfigImplementation : IConfig
     public string? storeAddress
     {
         get => Config.StoreAddress;
-        set => Config.StoreAddress = value;
+        set => Config.StoreAddress = value ?? string.Empty;
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ internal class ConfigImplementation : IConfig
     public double? Latitude
     {
         get => Config.Latitude;
-        set => Config.Latitude = value;
+        set => Config.Latitude = value ?? 0.0;
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ internal class ConfigImplementation : IConfig
     public double? Longitude
     {
         get => Config.Longitude;
-        set => Config.Longitude = value;
+        set => Config.Longitude = value ?? 0.0;
     }
 
     /// <summary>
@@ -70,7 +70,7 @@ internal class ConfigImplementation : IConfig
     public double? MaxDeliveryRange
     {
         get => Config.MaxDeliveryRange;
-        set => Config.MaxDeliveryRange = value;
+        set => Config.MaxDeliveryRange = value ?? 0.0;
     }
 
     /// <summary>

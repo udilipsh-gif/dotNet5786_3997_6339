@@ -83,7 +83,7 @@ internal class OrderImplementation : IOrder
     /// <exception cref="Exception">Thrown when an order with the specified ID does not exist.</exception>
     public void Update(Order item)
     {
-        var order = Read(item.Id);
+        Order? order = Read(item.Id);
         if (order is null)
             throw new DalDoesNotExistException(item.Id);
         else

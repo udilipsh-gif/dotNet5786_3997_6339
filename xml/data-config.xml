@@ -1,19 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
-	<NextOrderId>100001</NextOrderId>
-	<NextDeliveryId>200001</NextDeliveryId>
-	<Clock>2023-10-01T12:00:00</Clock>
-	<manager_id>344045810</manager_id>
-	<PasswordManager>"Admin1234$"</PasswordManager>
-	<StoreAddress></StoreAddress>
-	<Latitude></Latitude>
-	<Longitude></Longitude>
-	<MaxDeliveryRange></MaxDeliveryRange>
-	<AvgSpeedCar></AvgSpeedCar>
-	<AvgSpeedMotorcycle></AvgSpeedMotorcycle>
-	<AvgSpeedBike></AvgSpeedBike>
-	<AvgSpeedFoot></AvgSpeedFoot>
-	<MaxDeliveryTime></MaxDeliveryTime>
-	<RiskRange></RiskRange>
-	<MaxTimeInactivity></MaxTimeInactivity>
+  <NextOrderId>100051</NextOrderId>
+  <NextDeliveryId>200051</NextDeliveryId>
+  <Clock>16/11/2025 05:10:40</Clock>
+  <manager_id>344045810</manager_id>
+  <PasswordManager>Admin1234$</PasswordManager>
+  <StoreAddress>bar cochva, 21, Bney Braq</StoreAddress>
+  <Latitude>32.0936195</Latitude>
+  <Longitude>34.8229463</Longitude>
+  <MaxDeliveryRange>50</MaxDeliveryRange>
+  <AvgSpeedCar>60</AvgSpeedCar>
+  <AvgSpeedMotorcycle>40</AvgSpeedMotorcycle>
+  <AvgSpeedBike>15</AvgSpeedBike>
+  <AvgSpeedFoot>5</AvgSpeedFoot>
+  <MaxDeliveryTime>5.00:00:00</MaxDeliveryTime>
+  <RiskRange>4.00:00:00</RiskRange>
+  <MaxTimeInactivity>14.00:00:00</MaxTimeInactivity>
+  <ManagerId>203383997</ManagerId>
 </config>

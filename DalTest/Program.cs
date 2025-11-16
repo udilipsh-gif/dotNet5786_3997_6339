@@ -1,17 +1,6 @@
 ﻿using Dal;
 using DalApi;
 using DO;
-using System;
-using System.Data;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.Intrinsics.X86;
-using System.Xml.Linq;
-using static System.Formats.Asn1.AsnWriter;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace DalTest
 {
@@ -356,7 +345,8 @@ namespace DalTest
         /// Static instance of the Data Access Layer interface used throughout the program.
         /// Initialized with <see cref="DalList"/> implementation.
         /// </summary>
-        static readonly IDal s_dal = new DalList();
+        //static readonly IDal s_dal = new DalList(); //stage 2
+        static readonly IDal s_dal = new DalXml(); //stage 3
 
         private static int choice;
 
@@ -805,8 +795,10 @@ namespace DalTest
             }
 
             Console.Write("Enter Actual Distance: ");
-            double actualDistance = double.Parse(Console.ReadLine() ?? "0");
-            s_dal.Order?.Update(selectedOrder with { OrderStatus = OrderStatus.DELIVERING });
+            double actualDistance = double.Parse(Console.ReadLine() ?? "0.0");
+            Order orderToUpdate = selectedOrder with { OrderStatus = OrderStatus.DELIVERING };
+            s_dal.Order?.Update(orderToUpdate);
+            //s_dal.Order?.Update(selectedOrder with { OrderStatus = OrderStatus.DELIVERING });
 
             return new Delivery
             {

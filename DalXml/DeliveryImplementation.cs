@@ -36,44 +36,44 @@ internal class DeliveryImplementation : IDelivery
 
     public void Create(Delivery item)
     {
-        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliveries_xml);
-        if (deliveriesRootElem.Elements().Any(d => (int?)d.Element("Id") == item.Id))
-            throw new DalAlreadyExistsException($"Delivery with ID={item.Id} already exists");
+        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
+ 
         item = item with { Id = Config.NextDeliveryId };
 
         deliveriesRootElem.Add(createDeliveryElement(item));
 
-        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliveries_xml);
+        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliverys_xml);
     }
 
     public Delivery? Read(int id)
     {
         XElement? deliveryElem =
-            XMLTools.LoadListFromXMLElement(Config.s_deliveries_xml).Elements().
+            XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml).Elements().
             FirstOrDefault(d => (int?)d.Element("Id") == id);
         return deliveryElem is null ? null : getDelivery(deliveryElem);
     }
 
     public Delivery? Read(Func<Delivery, bool> filter)
     {
-        return XMLTools.LoadListFromXMLElement(Config.s_deliveries_xml).Elements()
+        return XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml).Elements()
             .Select(d => getDelivery(d))
             .FirstOrDefault(filter);
     }
 
     public void Update(Delivery item)
     {
-        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliveries_xml);
-        (deliveriesRootElem.Elements().Elements().FirstOrDefault(d => (int?)d.Element("Id") == item.Id) ??
-            throw new DO.DalDoesNotExistException($"Delivery with ID={item.Id} does Not exist"))
-            .Remove();
+        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
+        var deliveryElem = deliveriesRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == item.Id);
+        if (deliveryElem == null)
+            throw new DalDoesNotExistException($"Delivery with ID={item.Id} does Not exist");
+        deliveryElem.Remove();
         deliveriesRootElem.Add(createDeliveryElement(item));
-        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliveries_xml);
+        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliverys_xml);
     }
 
     public IEnumerable<Delivery> ReadAll(Func<Delivery, bool>? filter = null)
     {
-        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliveries_xml);
+        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
         if (filter is null)
             return deliveriesRootElem.Elements().Select(o => getDelivery(o));
         else
@@ -82,19 +82,20 @@ internal class DeliveryImplementation : IDelivery
 
     public void Delete(int id)
     {
-        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliveries_xml);
-        (deliveriesRootElem.Elements().FirstOrDefault(d => (int?)d.Element("Id") == id) ??
-            throw new DO.DalDoesNotExistException($"Delivery with ID={id} does Not exist"))
-            .Remove();
-        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliveries_xml);
+        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
+        var deliveryElem = deliveriesRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == id);
+        if (deliveryElem == null)
+            throw new DalDoesNotExistException($"Delivery with ID={id} does Not exist");
+        deliveryElem.Remove();
+        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliverys_xml);
     }
 
     public void DeleteAll()
     {
-        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliveries_xml);
+        XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
 
         deliveriesRootElem.RemoveAll();
 
-        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliveries_xml);
+        XMLTools.SaveListToXMLElement(deliveriesRootElem, Config.s_deliverys_xml);
     }
 }

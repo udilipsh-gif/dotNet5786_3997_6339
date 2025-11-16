@@ -26,9 +26,9 @@ internal class OrderImplementation : IOrder
         };
     }
 
-    private static XElement createCourierElement(Order order)
+    private static XElement createOrderElement(Order order)
     {
-        return new XElement("Courier",
+        return new XElement("Order",
             new XElement("Id", order.Id),
             new XElement("TypeOfOrder", order.TypeOfOrder.ToString()),
             new XElement("Details", order.Details),
@@ -49,12 +49,10 @@ internal class OrderImplementation : IOrder
     public void Create(Order item)
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);
-        if (ordersRootElem.Elements().Any(o => (int?)o.Element("Id") == item.Id))
-            throw new DalAlreadyExistsException($"Order with ID={item.Id} already exists");
 
         item = item with { Id = Config.NextOrderId }; 
 
-        ordersRootElem.Add(createCourierElement(item));
+        ordersRootElem.Add(createOrderElement(item));
 
         XMLTools.SaveListToXMLElement(ordersRootElem, Config.s_orders_xml);
     }
@@ -79,11 +77,12 @@ internal class OrderImplementation : IOrder
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);
 
-        (ordersRootElem.Elements().Elements().FirstOrDefault(o => (int?)o.Element("Id") == item.Id) ??
-            throw new DalDoesNotExistException($"Order with ID={item.Id} does Not exist"))
-            .Remove();
+        var orderElem = ordersRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == item.Id);
+        if (ordersRootElem == null)
+            throw new DalDoesNotExistException($"Order with ID={item.Id} does Not exist");
+        orderElem?.Remove();
 
-        ordersRootElem.Add(createCourierElement(item));
+        ordersRootElem.Add(createOrderElement(item));
 
         XMLTools.SaveListToXMLElement(ordersRootElem, Config.s_orders_xml);
 
@@ -105,10 +104,11 @@ internal class OrderImplementation : IOrder
     public void Delete(int id)
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);
-        (ordersRootElem.Elements().FirstOrDefault(o => (int?)o.Element("Id") == id) ??
-            throw new DalDoesNotExistException($"Order with ID={id} does Not exist"))
-            .Remove();
-
+        var orderElem = ordersRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == id);
+        if (ordersRootElem == null)
+            throw new DalDoesNotExistException($"Order with ID={id} does Not exist");
+        orderElem?.Remove();
+        
         XMLTools.SaveListToXMLElement(ordersRootElem, Config.s_orders_xml);
     }
 
