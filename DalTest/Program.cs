@@ -16,8 +16,14 @@ namespace DalTest
     internal class dalEnum
     {
         private static readonly List<dalEnum> allInstances_ = new List<dalEnum>();
-        private readonly int value_;
-        private readonly string name_;
+        private readonly int _value;
+
+        public dalEnum(int value)
+        {
+            _value = value;
+        }
+
+        private readonly string _name;
         private readonly Action<object, IDal>? updateLogic_;
 
         /// <summary>
@@ -31,8 +37,8 @@ namespace DalTest
         /// </remarks>
         private dalEnum(string name, Action<object, IDal>? logic = null)
         {
-            this.name_ = name;
-            this.value_ = allInstances_.Count;
+            this._name = name;
+            this._value = allInstances_.Count;
             this.updateLogic_ = logic;
             allInstances_.Add(this);
         }
@@ -307,14 +313,14 @@ namespace DalTest
         /// Returns the display name of this enumeration value.
         /// </summary>
         /// <returns>The name string.</returns>
-        public override string ToString() => this.name_;
+        public override string ToString() => this._name;
 
         /// <summary>
         /// Implicit conversion from dalEnum to int.
         /// </summary>
         /// <param name="op">The dalEnum instance to convert.</param>
         /// <returns>The integer value of the enumeration.</returns>
-        public static implicit operator int(dalEnum op) => op.value_;
+        public static implicit operator int(dalEnum op) => op._value;
 
         /// <summary>
         /// Implicit conversion from int to dalEnum.

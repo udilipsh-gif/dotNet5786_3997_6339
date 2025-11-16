@@ -11,5 +11,5 @@ namespace DalApi;
 /// </remarks>
 public interface ICourier : ICrud<Courier>
 {
-    IEnumerable<Courier> ReadAll(Func<Courier, bool>? filter = null);
+   // IEnumerable<Courier> ReadAll(Func<Courier, bool>? filter = null);
 }
