@@ -351,8 +351,9 @@ namespace DalTest
         /// Static instance of the Data Access Layer interface used throughout the program.
         /// Initialized with <see cref="DalList"/> implementation.
         /// </summary>
-        static readonly IDal s_dal = new DalList(); //stage 2
-        //static readonly IDal s_dal = new DalXml(); //stage 3
+        // static readonly IDal s_dal = new DalList(); //stage 2
+        // static readonly IDal s_dal = new DalXml(); //stage 3
+        static readonly IDal s_dal = Factory.Get;//stage 4
 
         private static int choice;
 
@@ -1082,6 +1083,12 @@ namespace DalTest
         {
             Console.WriteLine("Hello, Book Soop!");
 
+           if( s_dal== null)
+                 {
+                Console.WriteLine("DAL is not initialized. Exiting application.");
+                return;
+            }
+
             int choice;
             do
             {
@@ -1128,22 +1135,22 @@ namespace DalTest
 
 
                             var orders = s_dal!.Order?.ReadAll();
-                            if (!orders !.Any())
+                            if (!orders!.Any())
                                 Console.WriteLine("No orders found");
                             else
                                 foreach (var order in orders!)
                                     Console.WriteLine(order);
-                            
-                           
+
+
                             var deliveries = s_dal!.Delivery?.ReadAll();
-                            if (!deliveries !.Any())
+                            if (!deliveries!.Any())
                                 Console.WriteLine("No deliveries found");
-                            else 
+                            else
 
                                 foreach (var delivery in deliveries!)
                                     Console.WriteLine(delivery);
-                            
-                           
+
+
                             break;
                         case 7:
                             settingMenu();
