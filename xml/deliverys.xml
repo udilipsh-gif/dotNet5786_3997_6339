@@ -2,502 +2,502 @@
 <ArrayOfDeliverys>
   <Delivery>
     <Id>200001</Id>
-    <OrderId>100034</OrderId>
-    <CourierId>368936103</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>8.0685</ActualDistance>
+    <OrderId>100036</OrderId>
+    <CourierId>299756146</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>7.854</ActualDistance>
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200002</Id>
-    <OrderId>100040</OrderId>
-    <CourierId>203526251</CourierId>
+    <OrderId>100027</OrderId>
+    <CourierId>202318912</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>2.871</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:15:10.3900000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>9.339</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200003</Id>
-    <OrderId>100009</OrderId>
-    <CourierId>280847455</CourierId>
+    <OrderId>100022</OrderId>
+    <CourierId>399209320</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:38:06.8200000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>0.8085</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:26:27.5099999</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200004</Id>
-    <OrderId>100009</OrderId>
-    <CourierId>290962026</CourierId>
+    <OrderId>100004</OrderId>
+    <CourierId>203557258</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:46:06.8200000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>0.8085</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:56:51.7650000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200005</Id>
-    <OrderId>100046</OrderId>
-    <CourierId>237449951</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>2.425</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:09:58.0000000</TimeEndDelivery>
+    <OrderId>100017</OrderId>
+    <CourierId>203557258</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>6.4515</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T22:01:19.6350000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200006</Id>
-    <OrderId>100050</OrderId>
-    <CourierId>368936103</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.722</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:48:35.3200000</TimeEndDelivery>
+    <OrderId>100036</OrderId>
+    <CourierId>314978629</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>7.854</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:42:30.2400000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200007</Id>
-    <OrderId>100023</OrderId>
-    <CourierId>322609026</CourierId>
+    <OrderId>100038</OrderId>
+    <CourierId>202318912</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.095</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>7.458</ActualDistance>
     <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:01:30.5500000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T21:50:06.4800000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200008</Id>
-    <OrderId>100001</OrderId>
-    <CourierId>280847455</CourierId>
+    <OrderId>100003</OrderId>
+    <CourierId>316877660</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.986</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.8315</ActualDistance>
     <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:37:50.7400000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T22:06:23.8349999</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200009</Id>
-    <OrderId>100040</OrderId>
-    <CourierId>203526251</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>2.871</ActualDistance>
+    <OrderId>100041</OrderId>
+    <CourierId>353953641</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.425</ActualDistance>
     <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:51:10.3900000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T21:49:21.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200010</Id>
-    <OrderId>100050</OrderId>
-    <CourierId>322609026</CourierId>
+    <OrderId>100017</OrderId>
+    <CourierId>314978629</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.722</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:58:26.9800000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>6.4515</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-11-16T22:03:06.0900000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200011</Id>
-    <OrderId>100025</OrderId>
-    <CourierId>322609026</CourierId>
+    <OrderId>100047</OrderId>
+    <CourierId>314978629</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>6.4515</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:50:32.6350000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.547</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-11-16T22:04:11.8200000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200012</Id>
-    <OrderId>100038</OrderId>
-    <CourierId>330359710</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>12.1605</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:12:06.4450000</TimeEndDelivery>
+    <OrderId>100050</OrderId>
+    <CourierId>399209320</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>9.966</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:55:36.9600000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200013</Id>
-    <OrderId>100021</OrderId>
-    <CourierId>280847455</CourierId>
+    <OrderId>100030</OrderId>
+    <CourierId>314978629</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
     <ActualDistance>3.498</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:55:06.8200000</TimeEndDelivery>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200014</Id>
-    <OrderId>100027</OrderId>
-    <CourierId>330359710</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.692</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:25:54.2800000</TimeEndDelivery>
+    <OrderId>100013</OrderId>
+    <CourierId>203557258</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>0.7425</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:48:45.8250000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200015</Id>
-    <OrderId>100005</OrderId>
-    <CourierId>313630624</CourierId>
+    <OrderId>100025</OrderId>
+    <CourierId>314978629</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>2.343</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:59:12.5800000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>10.2465</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200016</Id>
-    <OrderId>100048</OrderId>
-    <CourierId>368936103</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.692</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:07:33.5200000</TimeEndDelivery>
+    <OrderId>100024</OrderId>
+    <CourierId>316877660</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>2.1615</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200017</Id>
-    <OrderId>100045</OrderId>
-    <CourierId>368936103</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.692</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:51:33.5200000</TimeEndDelivery>
+    <OrderId>100005</OrderId>
+    <CourierId>299756146</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.32</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200018</Id>
-    <OrderId>100021</OrderId>
-    <CourierId>313630624</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:44:21.8800000</TimeEndDelivery>
+    <OrderId>100014</OrderId>
+    <CourierId>301376181</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.1625</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-11-16T22:19:18.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200019</Id>
-    <OrderId>100032</OrderId>
-    <CourierId>316269397</CourierId>
+    <OrderId>100014</OrderId>
+    <CourierId>301376181</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>1.425</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.1625</ActualDistance>
     <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:46:34.0000000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T21:30:18.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200020</Id>
-    <OrderId>100012</OrderId>
-    <CourierId>313630624</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.0785</ActualDistance>
-    <EndDelivery>CONCELLED</EndDelivery>
-    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+    <OrderId>100017</OrderId>
+    <CourierId>314978629</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>6.4515</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:32:06.0900000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200021</Id>
-    <OrderId>100007</OrderId>
-    <CourierId>313630624</CourierId>
+    <OrderId>100008</OrderId>
+    <CourierId>314978629</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.989</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.2665</ActualDistance>
     <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:33:51.3400000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T21:52:54.9900000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200022</Id>
-    <OrderId>100038</OrderId>
-    <CourierId>368936103</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>12.1605</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:00:01.6300000</TimeEndDelivery>
+    <OrderId>100011</OrderId>
+    <CourierId>316877660</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>3.894</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200023</Id>
-    <OrderId>100050</OrderId>
-    <CourierId>203526251</CourierId>
+    <OrderId>100034</OrderId>
+    <CourierId>253743114</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.722</ActualDistance>
-    <EndDelivery>CONCELLED</EndDelivery>
-    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.419</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:42:46.7100000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200024</Id>
-    <OrderId>100021</OrderId>
-    <CourierId>330359710</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
+    <OrderId>100011</OrderId>
+    <CourierId>316877660</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>3.894</ActualDistance>
     <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:46:06.8200000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T21:31:29.4600000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200025</Id>
-    <OrderId>100009</OrderId>
-    <CourierId>322609026</CourierId>
+    <OrderId>100023</OrderId>
+    <CourierId>253743114</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:15:06.8200000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>7.9365</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200026</Id>
-    <OrderId>100007</OrderId>
-    <CourierId>330359710</CourierId>
+    <OrderId>100028</OrderId>
+    <CourierId>392044227</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.989</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:19:21.0100000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>3.1845</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200027</Id>
-    <OrderId>100040</OrderId>
-    <CourierId>313630624</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>2.871</ActualDistance>
+    <OrderId>100047</OrderId>
+    <CourierId>202318912</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.547</ActualDistance>
     <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:23:44.2600000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T22:30:11.8200000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200028</Id>
-    <OrderId>100025</OrderId>
-    <CourierId>290962026</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>6.4515</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:38:32.6350000</TimeEndDelivery>
+    <OrderId>100032</OrderId>
+    <CourierId>316877660</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>2.343</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200029</Id>
-    <OrderId>100033</OrderId>
-    <CourierId>330359710</CourierId>
+    <OrderId>100044</OrderId>
+    <CourierId>299756146</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.854</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>2.2275</ActualDistance>
     <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:57:38.8600000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T21:40:59.4750000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200030</Id>
-    <OrderId>100031</OrderId>
-    <CourierId>368936103</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>2.112</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:01:58.7200000</TimeEndDelivery>
+    <OrderId>100008</OrderId>
+    <CourierId>202318912</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.2665</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-11-16T22:00:54.9900000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200031</Id>
-    <OrderId>100021</OrderId>
-    <CourierId>280847455</CourierId>
+    <OrderId>100023</OrderId>
+    <CourierId>202318912</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
-    <EndDelivery>CONCELLED</EndDelivery>
-    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>7.9365</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:33:35.1900000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200032</Id>
-    <OrderId>100016</OrderId>
-    <CourierId>330359710</CourierId>
+    <OrderId>100048</OrderId>
+    <CourierId>253743114</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:54:06.8200000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>6.4515</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-11-16T22:26:19.6350000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200033</Id>
-    <OrderId>100023</OrderId>
-    <CourierId>322609026</CourierId>
+    <OrderId>100045</OrderId>
+    <CourierId>314978629</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.095</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:17:30.5500000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>10.2465</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:43:53.7899999</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200034</Id>
-    <OrderId>100014</OrderId>
-    <CourierId>280847455</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>11.154</ActualDistance>
+    <OrderId>100049</OrderId>
+    <CourierId>399209320</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>7.458</ActualDistance>
     <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:12:35.8600000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T22:02:06.4800000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200035</Id>
-    <OrderId>100005</OrderId>
-    <CourierId>224497872</CourierId>
+    <OrderId>100011</OrderId>
+    <CourierId>299756146</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>1.775</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:43:10.0000000</TimeEndDelivery>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>3.894</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:42:29.4600000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200036</Id>
-    <OrderId>100027</OrderId>
-    <CourierId>322609026</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.692</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:56:54.2800000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200037</Id>
-    <OrderId>100012</OrderId>
-    <CourierId>322609026</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.0785</ActualDistance>
-    <EndDelivery>REFUSED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:10:29.0650000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200038</Id>
-    <OrderId>100030</OrderId>
-    <CourierId>322609026</CourierId>
+    <OrderId>100037</OrderId>
+    <CourierId>392044227</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>11.6655</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:22:21.8950000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200039</Id>
-    <OrderId>100007</OrderId>
-    <CourierId>280847455</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.989</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:31:21.0100000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200040</Id>
-    <OrderId>100046</OrderId>
-    <CourierId>237449951</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>2.425</ActualDistance>
-    <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:21:58.0000000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200041</Id>
-    <OrderId>100025</OrderId>
-    <CourierId>330359710</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>6.4515</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:50:32.6350000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200042</Id>
-    <OrderId>100009</OrderId>
-    <CourierId>290962026</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>3.4485</ActualDistance>
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
-    <Id>200043</Id>
-    <OrderId>100045</OrderId>
-    <CourierId>290962026</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>10.692</ActualDistance>
+    <Id>200037</Id>
+    <OrderId>100040</OrderId>
+    <CourierId>392044227</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>7.458</ActualDistance>
     <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:56:54.2800000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T21:33:06.4800000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200038</Id>
+    <OrderId>100003</OrderId>
+    <CourierId>203557258</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.8315</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:40:23.8349999</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200039</Id>
+    <OrderId>100010</OrderId>
+    <CourierId>299756146</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.8315</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:46:23.8349999</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200040</Id>
+    <OrderId>100039</OrderId>
+    <CourierId>392044227</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.547</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:34:11.8200000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200041</Id>
+    <OrderId>100042</OrderId>
+    <CourierId>203557258</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>3.8445</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-11-16T22:03:25.0050000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200042</Id>
+    <OrderId>100001</OrderId>
+    <CourierId>392044227</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.5345</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:27:11.0700000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200043</Id>
+    <OrderId>100043</OrderId>
+    <CourierId>399209320</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.2665</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:33:54.9900000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200044</Id>
-    <OrderId>100030</OrderId>
-    <CourierId>203526251</CourierId>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>11.6655</ActualDistance>
+    <OrderId>100047</OrderId>
+    <CourierId>202318912</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.547</ActualDistance>
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200045</Id>
     <OrderId>100016</OrderId>
-    <CourierId>330359710</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.498</ActualDistance>
+    <CourierId>399209320</CourierId>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>5.115</ActualDistance>
     <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:07:06.8200000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T22:16:45.9000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200046</Id>
-    <OrderId>100039</OrderId>
-    <CourierId>290962026</CourierId>
+    <OrderId>100033</OrderId>
+    <CourierId>202318912</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>3.894</ActualDistance>
-    <EndDelivery>DELIVERED</EndDelivery>
-    <TimeEndDelivery>2025-11-16T09:46:42.4600000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200047</Id>
-    <OrderId>100003</OrderId>
-    <CourierId>237449951</CourierId>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>1.075</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>5.5935</ActualDistance>
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
-    <Id>200048</Id>
-    <OrderId>100026</OrderId>
-    <CourierId>322609026</CourierId>
+    <Id>200047</Id>
+    <OrderId>100012</OrderId>
+    <CourierId>316877660</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>8.0685</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>0.8085</ActualDistance>
     <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:48:58.1650000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T22:08:51.7650000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200048</Id>
+    <OrderId>100009</OrderId>
+    <CourierId>248162410</CourierId>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>0.8125</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-11-16T21:58:54.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200049</Id>
-    <OrderId>100001</OrderId>
-    <CourierId>313630624</CourierId>
+    <OrderId>100031</OrderId>
+    <CourierId>314978629</CourierId>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.986</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>8.0685</ActualDistance>
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200050</Id>
-    <OrderId>100033</OrderId>
-    <CourierId>322609026</CourierId>
+    <OrderId>100006</OrderId>
+    <CourierId>248162410</CourierId>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <OrderDate>2025-11-16T09:40:52.0000000</OrderDate>
-    <ActualDistance>7.854</ActualDistance>
+    <OrderDate>2025-11-16T21:25:39.0000000</OrderDate>
+    <ActualDistance>1.1625</ActualDistance>
     <EndDelivery>NOTFOUND</EndDelivery>
-    <TimeEndDelivery>2025-11-16T10:41:38.8600000</TimeEndDelivery>
+    <TimeEndDelivery>2025-11-16T22:02:18.0000000</TimeEndDelivery>
   </Delivery>
 </ArrayOfDeliverys>

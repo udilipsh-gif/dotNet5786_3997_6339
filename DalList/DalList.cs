@@ -5,8 +5,11 @@ using DalApi;
 /// Sealed singleton class implementing the IDal interface.
 /// Provides a unified access point to all data access layer operations.
 /// </summary>
-sealed public class DalList : IDal
+sealed internal class DalList : IDal
 {
+    public static IDal Instance { get; } = new DalList();
+    private DalList() { }
+
     /// <summary>
     /// Gets the data access interface for courier operations.
     /// </summary>

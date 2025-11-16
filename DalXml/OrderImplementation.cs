@@ -17,7 +17,7 @@ internal class OrderImplementation : IOrder
     /// <exception cref="FormatException">Thrown when required fields cannot be converted.</exception>
     private static Order getOrder(XElement order)
     {
-        return new DO.Order()
+        return new Order()
         {
             Id = order.ToIntNullable("Id") ?? throw new FormatException("can't convert id"),
             TypeOfOrder = order.ToEnumNullable<TypeOfOrder>("TypeOfOrder") ?? TypeOfOrder.STANDART,

@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using System.Diagnostics;
 
 namespace Dal;
 
@@ -11,15 +12,17 @@ namespace Dal;
 /// courier, order, delivery, and configuration data stored in XML files.
 /// All data operations are performed through XML serialization/deserialization.
 /// </remarks>
-sealed public class DalXml : IDal
+sealed internal class DalXml : IDal
 {
+    public static IDal Instance { get; } = new DalXml();
+    private DalXml() { }
     /// <summary>
     /// Gets the data access interface for courier operations.
     /// </summary>
     /// <value>
     /// A new instance of CourierImplementation for each access.
     /// </value>
-    public ICourier Courier => new CourierImplementation();
+    public ICourier Courier { get; } = new CourierImplementation();
 
     /// <summary>
     /// Gets the data access interface for order operations.
@@ -27,7 +30,7 @@ sealed public class DalXml : IDal
     /// <value>
     /// A new instance of OrderImplementation for each access.
     /// </value>
-    public IOrder Order => new OrderImplementation();
+    public IOrder Order { get; } = new OrderImplementation();
 
     /// <summary>
     /// Gets the data access interface for delivery operations.
@@ -35,7 +38,7 @@ sealed public class DalXml : IDal
     /// <value>
     /// A new instance of DeliveryImplementation for each access.
     /// </value>
-    public IDelivery Delivery => new DeliveryImplementation();
+    public IDelivery Delivery { get; } = new DeliveryImplementation();
 
     /// <summary>
     /// Gets the data access interface for system configuration operations.
@@ -43,7 +46,7 @@ sealed public class DalXml : IDal
     /// <value>
     /// A new instance of ConfigImplementation for each access.
     /// </value>
-    public IConfig Config => new ConfigImplementation();
+    public IConfig Config { get; } = new ConfigImplementation();
 
     /// <summary>
     /// Resets the entire database to its initial state.
