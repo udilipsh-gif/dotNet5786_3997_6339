@@ -1,5 +1,6 @@
 ﻿namespace Dal;
 using DalApi;
+using System.Data.SqlTypes;
 
 /// <summary>
 /// Sealed singleton class implementing the IDal interface.
@@ -7,7 +8,9 @@ using DalApi;
 /// </summary>
 sealed internal class DalList : IDal
 {
-    public static IDal Instance { get; } = new DalList();
+    private static readonly Lazy<DalList> lazyInstance =
+        new Lazy<DalList>(() => new DalList());
+    public static IDal Instance { get; } = lazyInstance.Value;
     private DalList() { }
 
     /// <summary>

@@ -14,7 +14,9 @@ namespace Dal;
 /// </remarks>
 sealed internal class DalXml : IDal
 {
-    public static IDal Instance { get; } = new DalXml();
+    private static readonly Lazy<DalXml> lazyInstance =
+        new Lazy<DalXml>(() => new DalXml());
+    public static IDal Instance { get; } = lazyInstance.Value;
     private DalXml() { }
     /// <summary>
     /// Gets the data access interface for courier operations.
