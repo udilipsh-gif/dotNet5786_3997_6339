@@ -1,6 +1,7 @@
 ﻿namespace Dal;
 using DalApi;
 using DO;
+using System.ComponentModel;
 using System.Xml.Linq;
 
 /// <summary>
@@ -104,8 +105,7 @@ public class CourierImplementation : ICourier
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
 
-        var courierElem = couriersRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == item.Id);
-        if (courierElem != null)
+        if (couriersRootElem.Elements().Any(c => (int?)c.Element("Id") == item.Id))
             throw new DalAlreadyExistsException($"Courier with ID={item.Id} already exists");
 
         couriersRootElem.Add(createCourierElement(item));
@@ -123,11 +123,12 @@ public class CourierImplementation : ICourier
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
 
         var courierElem = couriersRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == id);
-        if (courierElem == null)
+        if (courierElem == default)
             throw new DalDoesNotExistException($"Courier with ID={id} does Not exist");
 
         courierElem.Remove();
         XMLTools.SaveListToXMLElement(couriersRootElem, Config.s_couriers_xml);
+
     }
 
     /// <summary>
