@@ -23,7 +23,7 @@ namespace DalTest
             _value = value;
         }
 
-        private readonly string _name;
+        private readonly string? _name;
         private readonly Action<object, IDal>? updateLogic_;
 
         /// <summary>
@@ -1121,7 +1121,7 @@ namespace DalTest
                             dataMenu(s_dal!.Delivery!);
                             break;
                         case 5:
-                            Initialization.Do(s_dal);
+                            Initialization.Do();
                             break;
                         case 6:
                             var couriers = s_dal!.Courier?.ReadAll();

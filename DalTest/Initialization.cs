@@ -407,11 +407,11 @@ public static class Initialization
     /// </list>
     /// </remarks>
     /// <exception cref="NullReferenceException">Thrown if any of the DAL parameters are null.</exception>
-    public static void Do(IDal dal) //stage 2
+    public static void Do() //stage 2
     {
 
-        s_dal = dal ?? throw new DalErrorConfig("DAL object can not be null!"); // stage 2
-
+        //s_dal = dal ?? throw new DalErrorConfig("DAL object can not be null!"); // stage 2
+        s_dal = Factory.Get; //stage 4
 
         Console.WriteLine("Reset Configuration values and List values...");
         s_dal.ResetDB(); // stage 2
