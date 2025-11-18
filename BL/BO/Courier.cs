@@ -62,7 +62,13 @@ internal class Courier
     /// </summary>
     /// <value>A DateTime representing when the courier began their employment.</value>
     public DateTime WorkingSince { get; init; }
-    
+
+    public int DeliveryOnTime { get; set; } = 0;
+
+    public int DeliveryLate { get; set; } = 0;
+
+    public OrderInProgress? OrderInProgress { get; set; }
+
     /// <summary>
     /// Returns a string representation of the courier's details.
     /// </summary>

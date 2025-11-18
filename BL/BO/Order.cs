@@ -114,6 +114,4 @@ public class Order
     /// Initialized to an empty list by default.
     /// </remarks>
     public List<DeliveryPerOrderInList> DeliveryPerOrderInLists { get; set; } = new List<DeliveryPerOrderInList>();//= new List<Delivery>();
-
-    public List<OrderInList> OrderInLists { get; set; } = new List<OrderInList>();
 }
