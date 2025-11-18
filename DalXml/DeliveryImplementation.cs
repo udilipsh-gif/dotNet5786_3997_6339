@@ -133,7 +133,7 @@ internal class DeliveryImplementation : IDelivery
         XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
         
         var deliveryElem = deliveriesRootElem.Elements().FirstOrDefault(c => (int?)c.Element("Id") == id);
-        if (deliveryElem == null)
+        if (deliveryElem == default)
             throw new DalDoesNotExistException($"Delivery with ID={id} does Not exist");
         
         deliveryElem.Remove();
