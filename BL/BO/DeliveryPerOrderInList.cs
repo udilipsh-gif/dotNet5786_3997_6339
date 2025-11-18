@@ -2,7 +2,7 @@
 
 namespace BO
 {
-    public class DeliveryPerInList
+    public class DeliveryPerOrderInList
     {
         public required int DeliveryId { get; init; }
         public int? CourierId { get; init; }

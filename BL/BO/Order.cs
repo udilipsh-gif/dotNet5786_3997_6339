@@ -104,7 +104,7 @@ public class Order
     /// </summary>
     /// <value>A TimeSpan representing how much time is left before the order becomes late.</value>
     public required TimeSpan TimeLeftForDelivery { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the list of delivery attempts associated with this order.
     /// </summary>
@@ -113,5 +113,7 @@ public class Order
     /// This collection tracks the history of delivery assignments and attempts for the order.
     /// Initialized to an empty list by default.
     /// </remarks>
-    public List<DeliveryPerInList> DeliveryPer { get; set; } = new List<Delivery>();
+    public List<DeliveryPerOrderInList> DeliveryPerOrderInLists { get; set; } = new List<DeliveryPerOrderInList>();//= new List<Delivery>();
+
+    public List<OrderInList> OrderInLists { get; set; } = new List<OrderInList>();
 }
