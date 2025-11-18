@@ -95,3 +95,30 @@ public enum ScheduleStatus
     /// </summary>
     LATE
 }
+public enum EndDelivery
+{
+    /// <summary>
+    /// The delivery was successfully completed.
+    /// </summary>
+    DELIVERED,
+
+    /// <summary>
+    /// The delivery was refused by the recipient.
+    /// </summary>
+    REFUSED,
+
+    /// <summary>
+    /// The delivery was cancelled.
+    /// </summary>
+    CONCELLED,
+
+    /// <summary>
+    /// The delivery address or recipient was not found.
+    /// </summary>
+    NOTFOUND,
+
+    /// <summary>
+    /// The delivery failed for other reasons.
+    /// </summary>
+    FAILED
+}
