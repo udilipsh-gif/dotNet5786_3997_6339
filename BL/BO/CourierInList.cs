@@ -16,7 +16,7 @@ namespace BO
 
         public int DeliveryLate { get; init; }
 
-        public int? DeliveryId { get; init; } = null;
+        public int? DeliveryId { get; init; }
 
     }
 }
