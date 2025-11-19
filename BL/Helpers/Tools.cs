@@ -7,6 +7,6 @@ internal static class Tools
 
     public static string ToStringProperty<T>(this T t)
     {
-        return null;
+        return "hi";
     }
 }
