@@ -14,58 +14,58 @@ internal class Courier
     /// </summary>
     /// <value>A unique integer ID that is assigned once and cannot be changed.</value>
     public int Id { get; init; }
-    
+
     /// <summary>
     /// Gets or sets the courier's full name.
     /// </summary>
     /// <value>The courier's name, or null if not set.</value>
-    public string? Name { get; set; }
-    
+    public required string Name { get; set; }
+
     /// <summary>
     /// Gets or sets the courier's phone number.
     /// </summary>
     /// <value>The courier's contact phone number, or null if not set.</value>
-    public string? Phone { get; set; }
-    
+    public required string Phone { get; set; }
+
     /// <summary>
     /// Gets or sets the courier's email address.
     /// </summary>
     /// <value>The courier's email address for electronic communication, or null if not set.</value>
-    public string? Email { get; set; }
-    
+    public required string Email { get; set; }
+
     /// <summary>
     /// Gets or sets the courier's password for authentication.
     /// </summary>
     /// <value>The courier's password, or null if not set.</value>
-    public string? Password { get; set; }
-    
+    public required string Password { get; set; }
+
     /// <summary>
     /// Gets or sets a value indicating whether the courier is currently active and available for deliveries.
     /// </summary>
     /// <value>true if the courier is active; otherwise, false.</value>
     public bool Active { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the maximum distance (in kilometers) that the courier can travel for a delivery.
     /// </summary>
     /// <value>The maximum delivery distance in kilometers, or null if not specified.</value>
     public double? MaxDistanceDelivery { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the type of transportation method used by the courier for deliveries.
     /// </summary>
     /// <value>A <see cref="TheTypeShipment"/> value indicating the shipment method (CAR, MOTORCYCLE, BIKE, or FOOT).</value>
     public TheTypeShipment TypeShipment { get; set; }
-    
+
     /// <summary>
     /// Gets the date and time when the courier started working.
     /// </summary>
     /// <value>A DateTime representing when the courier began their employment.</value>
     public DateTime WorkingSince { get; init; }
 
-    public int DeliveryOnTime { get; set; } = 0;
+    public int DeliveryOnTime { get; init; } = 0;
 
-    public int DeliveryLate { get; set; } = 0;
+    public int DeliveryLate { get; init; } = 0;
 
     public OrderInProgress? OrderInProgress { get; set; }
 
@@ -84,4 +84,6 @@ internal class Courier
         Type Shipment: {this.TypeShipment}
         Working Since: {this.WorkingSince}
     ");
+
+    public List<CourierInList> CourierInLists { get; set; } = new List<CourierInList>();
 }
