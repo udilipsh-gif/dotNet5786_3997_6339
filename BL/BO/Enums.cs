@@ -1,5 +1,46 @@
 ﻿namespace BO;
+public enum CourierFieldSort
+{
+    Name,
+    Id,
+    Phone,
+    AvailableDeliveries
+}
+public enum CourierFieldFilter
+{
+    ById,
+    ByName,
+    ByAvailable,
+    ByActiveStatus
+}
+public enum TimeUnit
+{
+    /// <summary>
+    /// Time unit in minutes.
+    /// </summary>
+    MINUTE,
+    /// <summary>
+    /// Time unit in hours.
+    /// </summary>
+    HOUR,
+    /// <summary>
+    /// Time unit in days.
+    /// </summary>
+    DAY,
+    /// <summary>
+    ///     Time unit in weeks.
+    /// </summary>
+    WEEK,
+    /// <summary>
+    ///   Time unit in months.  
+    /// </summary>
+    MONTH,
+    /// <summary>
+    /// Time unit in years.
+    /// </summary>
+    YEAR
 
+}
 public enum TheTypeShipment
 {
     /// <summary>

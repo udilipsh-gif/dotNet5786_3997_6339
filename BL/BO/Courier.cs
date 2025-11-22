@@ -7,7 +7,7 @@
 /// This class contains all the information about a courier including their contact details,
 /// delivery capabilities, and work status.
 /// </remarks>
-internal class Courier
+public class Courier
 {
     /// <summary>
     /// Gets the unique identifier for the courier.

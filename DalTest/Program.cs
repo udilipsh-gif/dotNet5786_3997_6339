@@ -199,7 +199,7 @@ namespace DalTest
         {
             Console.WriteLine("Enter new address for store: ");
             string storeAddress = Console.ReadLine() ?? string.Empty;
-            if (dal.Config != null) { dal.Config.storeAddress = storeAddress; }
+            if (dal.Config != null) { dal.Config.StoreAddress = storeAddress; }
         });
 
         /// <summary>
@@ -737,7 +737,7 @@ namespace DalTest
                 {
                     1 => () => Console.WriteLine($"Manager ID: {s_dal.Config.ManagerId}"),
                     2 => () => Console.WriteLine($"Menu Password: {s_dal.Config.PasswordManager}"),
-                    3 => () => Console.WriteLine($"Store Address: {s_dal.Config.storeAddress}"),
+                    3 => () => Console.WriteLine($"Store Address: {s_dal.Config.StoreAddress}"),
                     5 => () => Console.WriteLine($"Delivery Latitude: {s_dal.Config.Latitude}"),
                     6 => () => Console.WriteLine($"Delivery Longitude: {s_dal.Config.Longitude}"),
                     7 => () => Console.WriteLine($"Max Delivery Range (in km): {s_dal.Config.MaxDeliveryRange}"),

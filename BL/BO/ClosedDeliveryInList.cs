@@ -8,7 +8,7 @@
 /// including the final status, actual distance traveled, and total delivery time.
 /// Used for historical tracking, reporting, and performance analysis.
 /// </remarks>
-internal class ClosedDeliveryInList
+public class ClosedDeliveryInList
 {
     /// <summary>
     /// Gets the unique identifier for the delivery.

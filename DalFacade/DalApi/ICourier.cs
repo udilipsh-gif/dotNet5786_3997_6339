@@ -9,7 +9,4 @@ namespace DalApi;
 /// Extends <see cref="ICrud{T}"/> with type parameter <see cref="DO.Courier"/>.
 /// Does not add any courier-specific methods.
 /// </remarks>
-public interface ICourier : ICrud<Courier>
-{
-   // IEnumerable<Courier> ReadAll(Func<Courier, bool>? filter = null);
-}
+public interface ICourier : ICrud<Courier>{}

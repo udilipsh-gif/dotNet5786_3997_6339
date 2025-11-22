@@ -115,7 +115,7 @@ public static class Initialization
         s_dal!.Config!.Clock = DateTime.Now;
         s_dal!.Config.ManagerId = 203383997;
         s_dal!.Config.PasswordManager = "Admin1234$";
-        s_dal!.Config.storeAddress = "bar cochva, 21, Bney Braq";
+        s_dal!.Config.StoreAddress = "bar cochva, 21, Bney Braq";
         s_dal!.Config.Latitude = 32.0936195;
         s_dal!.Config.Longitude = 34.8229463;
         s_dal!.Config.MaxDeliveryRange = 50.0;

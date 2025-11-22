@@ -11,7 +11,7 @@ namespace BO;
 /// location information, timing metrics, and status tracking. It is used to monitor and manage
 /// deliveries that are currently in progress.
 /// </remarks>
-internal class OrderInProgress
+public class OrderInProgress
 {
     /// <summary>
     /// Gets the unique identifier for the delivery.

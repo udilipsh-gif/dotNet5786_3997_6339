@@ -8,7 +8,7 @@
 /// including distance calculations, time constraints, and delivery feasibility metrics.
 /// Used primarily for matching orders with available couriers.
 /// </remarks>
-internal class OpenOrderInList
+public class OpenOrderInList
 {
     /// <summary>
     /// Gets the unique identifier of the courier assigned to this order.
