@@ -22,7 +22,7 @@ public interface IConfig
     /// <summary>
     /// Gets or sets the address of the store.
     /// </summary>
-    string? storeAddress { get; set; }
+    string? StoreAddress { get; set; }
     /// <summary>
     /// Gets or sets the latitude coordinate of the location.
     /// </summary>

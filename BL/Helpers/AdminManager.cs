@@ -10,7 +10,7 @@ internal static class AdminManager //stage 4
 {
     #region Stage 4-7
     private static readonly DalApi.IDal s_dal = DalApi.Factory.Get; //stage 4
-    
+
     /// <summary>
     /// Property for providing current application's clock value for any BL class that may need it
     /// </summary>
@@ -29,7 +29,7 @@ internal static class AdminManager //stage 4
     {
         var oldClock = s_dal.Config.Clock; //stage 4
         s_dal.Config.Clock = newClock; //stage 4
-        
+
         //Add calls here to any logic method that should be called periodically,
         //after each clock update
         //for example, Periodic students' updates:
@@ -37,7 +37,11 @@ internal static class AdminManager //stage 4
         // - (students become not active after 5 years etc.)
 
         //TO_DO: //stage 4
-        StudentManager.PeriodicStudentsUpdates(oldClock, newClock); //stage 4. to be removed in stage 7 and replaced as below
+
+
+      ////  StudentManager.PeriodicStudentsUpdates(oldClock, newClock); //stage 4. to be removed in stage 7 and replaced as below
+
+
         //...
 
         //TO_DO: //stage 7
@@ -53,27 +57,22 @@ internal static class AdminManager //stage 4
     /// Method for providing current configuration variables values for any BL class that may need it
     /// </summary>
     [MethodImpl(MethodImplOptions.Synchronized)] //stage 7
-    internal static BO.Config GetConfig() //stage 4
+    internal static BO.Config GetConfig() //stage 4//i did, yuda
     => new BO.Config()
     {
-        
-        //TO_DO: //stage 4
-        //add an assignment for each configuration property
-        //...
-        ManagerId=s_dal.Config.ManagerId,
-        PasswordManager=s_dal.Config.PasswordManager,
-        StoreAddress=s_dal.Config.PasswordManager,
-        Latitude=s_dal.Config.Latitude,
-        Longitude=s_dal.Config.Longitude,
-        MaxDeliveryRange=s_dal.Config.MaxDeliveryRange,
-        AvgSpeedBike=s_dal.Config.AvgSpeedBike,
-        AvgSpeedCar=s_dal.Config.AvgSpeedCar,
-        AvgSpeedFoot=s_dal.Config.AvgSpeedFoot,
-        AvgSpeedMotorcycle=s_dal.Config.AvgSpeedMotorcycle,
-        MaxDeliveryTime=s_dal.Config.MaxDeliveryTime,
-        RiskRange=s_dal.Config.RiskRange,
-        MaxTimeInactivity=s_dal.Config.MaxTimeInactivity,
-
+        ManagerId = s_dal.Config.ManagerId,
+        PasswordManager = s_dal.Config.PasswordManager,
+        StoreAddress = s_dal.Config.StoreAddress,
+        Latitude = s_dal.Config.Latitude,
+        Longitude = s_dal.Config.Longitude,
+        MaxDeliveryRange = s_dal.Config.MaxDeliveryRange,
+        AvgSpeedBike = s_dal.Config.AvgSpeedBike,
+        AvgSpeedCar = s_dal.Config.AvgSpeedCar,
+        AvgSpeedFoot = s_dal.Config.AvgSpeedFoot,
+        AvgSpeedMotorcycle = s_dal.Config.AvgSpeedMotorcycle,
+        MaxDeliveryTime = s_dal.Config.MaxDeliveryTime,
+        RiskRange = s_dal.Config.RiskRange,
+        MaxTimeInactivity = s_dal.Config.MaxTimeInactivity,
     };
 
     /// <summary>
@@ -84,14 +83,79 @@ internal static class AdminManager //stage 4
     {
         bool configChanged = false; // stage 5
 
-        if (s_dal.Config.MaxRange != configuration.MaxRange) //stage 4
-        {
-            s_dal.Config.MaxRange = configuration.MaxRange;
-            configChanged = true;
-        }
-        //TO_DO: //stage 4
+                                    //if (s_dal.Config.MaxRange != configuration.MaxRange) //stage 4
+                                    //{
+                                    //    s_dal.Config.MaxRange = configuration.MaxRange;
+                                    //    configChanged = true;
+                                    //}
+        //TO_DO: //stage 4//i did, yuda
         //add a condition+assignment for each configuration property
         //...
+        if (s_dal.Config.ManagerId != configuration.ManagerId)
+        {
+            s_dal.Config.ManagerId = configuration.ManagerId;
+            configChanged = true;
+        }
+        if (s_dal.Config.PasswordManager != configuration.PasswordManager)
+        {
+            s_dal.Config.PasswordManager = configuration.PasswordManager;
+            configChanged = true;
+        }
+        if (s_dal.Config.StoreAddress != configuration.StoreAddress)
+        {
+            s_dal.Config.StoreAddress = configuration.StoreAddress;
+            configChanged = true;
+        }
+        if (s_dal.Config.Latitude != configuration.Latitude)
+        {
+            s_dal.Config.Latitude = configuration.Latitude;
+            configChanged = true;
+        }
+        if (s_dal.Config.Longitude != configuration.Longitude)
+        {
+            s_dal.Config.Longitude = configuration.Longitude;
+            configChanged = true;
+        }
+        if (s_dal.Config.MaxDeliveryRange != configuration.MaxDeliveryRange)
+        {
+            s_dal.Config.MaxDeliveryRange = configuration.MaxDeliveryRange;
+            configChanged = true;
+        }
+        if (s_dal.Config.AvgSpeedCar != configuration.AvgSpeedCar)
+        {
+            s_dal.Config.AvgSpeedCar = configuration.AvgSpeedCar;
+            configChanged = true;
+        }
+        if (s_dal.Config.AvgSpeedMotorcycle != configuration.AvgSpeedMotorcycle)
+        {
+            s_dal.Config.AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
+            configChanged = true;
+        }
+        if (s_dal.Config.AvgSpeedBike != configuration.AvgSpeedBike)
+        {
+            s_dal.Config.AvgSpeedBike = configuration.AvgSpeedBike;
+            configChanged = true;
+        }
+        if (s_dal.Config.AvgSpeedFoot != configuration.AvgSpeedFoot)
+        {
+            s_dal.Config.AvgSpeedFoot = configuration.AvgSpeedFoot;
+            configChanged = true;
+        }
+        if (s_dal.Config.MaxDeliveryTime != configuration.MaxDeliveryTime)
+        {
+            s_dal.Config.MaxDeliveryTime = configuration.MaxDeliveryTime;
+            configChanged = true;
+        }
+        if (s_dal.Config.RiskRange != configuration.RiskRange)
+        {
+            s_dal.Config.RiskRange = configuration.RiskRange;
+            configChanged = true;
+        }
+        if (s_dal.Config.MaxTimeInactivity != configuration.MaxTimeInactivity)
+        {
+            s_dal.Config.MaxTimeInactivity = configuration.MaxTimeInactivity;
+            configChanged = true;
+        }
 
         //Calling all the observers of configuration update
         if (configChanged) // stage 5
@@ -143,8 +207,8 @@ internal static class AdminManager //stage 4
     [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
     public static void ThrowOnSimulatorIsRunning()
     {
-        if (s_thread is not null)
-            throw new BO.BLTemporaryNotAvailableException("Cannot perform the operation since Simulator is running");
+      //  if (s_thread is not null)
+         //   throw new BO.BLTemporaryNotAvailableException("Cannot perform the operation since Simulator is running");
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
@@ -182,8 +246,10 @@ internal static class AdminManager //stage 4
             //TO_DO: //stage 7
             //Add calls here to any logic simulation that was required in stage 7
             //for example: course registration simulation
-            if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
-                _simulateTask = Task.Run(() => StudentManager.SimulateCourseRegistrationAndGrade());
+
+
+           // if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
+             //   _simulateTask = Task.Run(() => StudentManager.SimulateCourseRegistrationAndGrade());
 
             //etc...
 

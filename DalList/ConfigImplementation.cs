@@ -37,7 +37,7 @@ internal class ConfigImplementation : IConfig
     /// <summary>
     /// Gets or sets the physical address of the store.
     /// </summary>
-    public string? storeAddress {
+    public string? StoreAddress {
         get => Config.StoreAddress;
         set => Config.StoreAddress = value;
     }
