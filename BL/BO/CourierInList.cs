@@ -6,6 +6,7 @@ namespace BO
     {
         public required int Id { get; init; }
         public required string Name { get; init; }
+        public required string Phone { get; init; }
 
         public required bool Active { get; init; }
         public required TheTypeShipment TypeShipment { get; init; }

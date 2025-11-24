@@ -15,12 +15,12 @@ internal static class Config
     /// <summary>
     /// Private field for tracking the current order ID.
     /// </summary>
-    private static int order_id = StartOrderId;
+    private static int s_orderId = StartOrderId;
 
     /// <summary>
     /// Gets the next available order ID and increments the counter.
     /// </summary>
-    internal static int NextOrderId { get => order_id++; }
+    internal static int NextOrderId { get => s_orderId++; }
 
     /// <summary>
     /// The starting ID value for deliveries.
@@ -161,7 +161,7 @@ internal static class Config
     /// </summary>
     internal static void Reset()
     {
-        order_id = StartOrderId;
+        s_orderId = StartOrderId;
         delivery_id = StartDeliveryId;
         Clock = DateTime.Now;
         manager_id = StartManagerId;

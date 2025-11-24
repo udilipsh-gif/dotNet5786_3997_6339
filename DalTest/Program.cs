@@ -313,7 +313,7 @@ namespace DalTest
         /// Returns the display name of this enumeration value.
         /// </summary>
         /// <returns>The name string.</returns>
-        public override string ToString() => this._name;
+        public override string? ToString() => this._name;
 
         /// <summary>
         /// Implicit conversion from dalEnum to int.
@@ -537,6 +537,7 @@ namespace DalTest
                 TypeShipment = (TheTypeShipment)typeShipmentInput,
                 WorkingSince = s_dal.Config?.Clock ?? DateTime.Now
             };
+
         }
 
         /// <summary>
