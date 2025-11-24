@@ -32,7 +32,12 @@ public class Order
     /// </summary>
     /// <value>The street address where the order should be delivered.</value>
     public required string Addres { get; set; }
-    
+
+    /// <summary>
+    /// Gets or sets the weight value.
+    /// </summary>
+    public required int Weight { get; set; }
+
     /// <summary>
     /// Gets or sets the latitude coordinate of the delivery location.
     /// </summary>
@@ -67,7 +72,7 @@ public class Order
     /// Gets or sets the weight of the order.
     /// </summary>
     /// <value>The weight in kilograms, or null if not specified.</value>
-    public double? Weight { get; set; }
+   
     
     /// <summary>
     /// Gets the date and time when the order was placed.
@@ -91,7 +96,7 @@ public class Order
     /// Gets or sets the current status of the order in the delivery process.
     /// </summary>
     /// <value>An <see cref="OrderStatus"/> value indicating whether the order is open, delivering, completed, refused, or cancelled.</value>
-    public required OrderStatus Status { get; set; } 
+    public required OrderStatus OrderStatus { get; set; } 
 
     /// <summary>
     /// Gets or sets the schedule status indicating if the delivery is on time, at risk, or late.

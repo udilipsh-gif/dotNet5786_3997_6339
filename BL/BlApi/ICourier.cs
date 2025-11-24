@@ -3,7 +3,17 @@ namespace BlApi;
 
 public interface ICourier//כרגע מכיל צפייה עדכון יצירה ומחיקה של שליחים
 {
+    /// <summary>
+    /// Creates a new courier entry in the system.
+    /// </summary>
+    /// <param name="boCourier">The courier object containing the details to be added. Cannot be null.</param>
     void Create(BO.Courier boCourier);
+    /// <summary>
+    /// Retrieves the courier details for the specified identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the courier to retrieve.</param>
+    /// <returns>A <see cref="BO.Courier"/> object containing the details of the courier if found; otherwise, <see
+    /// langword="null"/>.</returns>
     BO.Courier? Read(int id);
     /// <summary>
     /// Retrieves a collection of all couriers, optionally sorted and filtered based on specified criteria.
@@ -17,17 +27,18 @@ public interface ICourier//כרגע מכיל צפייה עדכון יצירה ו
         BO.CourierFieldSort? sort = null,
         BO.CourierFieldFilter? filter = null,
         object? value = null);
-
+    /// <summary>
+    /// Updates the specified courier's information in the system.
+    /// </summary>
+    /// <param name="boCourier">The courier object containing updated information. Cannot be null.</param>
     void Update(BO.Courier boCourier);
+    /// <summary>
+    /// Deletes the entity with the specified identifier.
+    /// </summary>
+    /// <remarks>This method removes the entity from the data store. Ensure that the entity exists before
+    /// calling this method to avoid exceptions.</remarks>
+    /// <param name="id">The unique identifier of the entity to be deleted. Must be a positive integer.</param>
     void Delete(int id);
 
-   // void RegisterStudentToCourse(int studentId, int courseId);
-   // void UnRegisterStudentFromCourse(int studentId, int courseId);
-
-   // IEnumerable<BO.CourseInList> GetRegisteredCoursesForStudent(int studentId, BO.Year year = BO.Year.None);
-  //  IEnumerable<BO.CourseInList> GetUnRegisteredCoursesForStudent(int studentId, BO.Year year = BO.Year.None);
-
-   // BO.StudentGradeSheet GetGradeSheetPerStudent(int studentId, BO.Year year = BO.Year.None);
-   // void UpdateGrade(int studentId, int courseId, double grade);
 
 }

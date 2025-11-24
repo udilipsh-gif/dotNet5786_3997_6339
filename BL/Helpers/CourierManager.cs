@@ -7,17 +7,17 @@ internal static class CourierManager
 {
     private static readonly IDal s_dal = Factory.Get; //stage 4
 
-    public static void Create(BO.Courier boCourier)
+    public static void Create(BO.Courier boCourier)//יצירת שליח בדאטה בייס בסגנון ישות DO
     {
         DO.Courier doCourier = new DO.Courier
         {
-            Id = boCourier.Id,
+            Id = boCourier.Id,//בדיקת תקינות תז
             Name = boCourier.Name,
-            Phone = boCourier.Phone,
-            Email = boCourier.Email,
-            Password = boCourier.Password,
+            Phone = boCourier.Phone,//בדיקת תקינות טלפון
+            Email = boCourier.Email,//בדיקת תקינות אימייל
+            Password = boCourier.Password,//בדיקת תקינות סיסמה חזקה וכו
             Active = boCourier.Active,
-            MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
+            MaxDistanceDelivery = boCourier.MaxDistanceDelivery,//חישוב אווירי כלשהוא
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
             WorkingSince = boCourier.WorkingSince
         };
@@ -39,9 +39,13 @@ internal static class CourierManager
             Active = doCourier.Active,
             MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
-            WorkingSince = doCourier.WorkingSince
+            WorkingSince = doCourier.WorkingSince,
+            DeliveryOnTime = 0, // יש למלא בהתאם ללוגיקה העסקית
+            DeliveryLate = 0  // יש למלא בהתאם ללוגיקה העסקית
+
+
         };
-        return boCourier;
+        return boCourier;//מחזירים שליח מומר
     }
     public static IEnumerable<BO.CourierInList> ReadAll(
         BO.CourierFieldSort? sort = null,
@@ -65,11 +69,11 @@ internal static class CourierManager
     {
         DO.Courier doCourier = new DO.Courier
         {
-            Id = boCourier.Id,
+            Id = boCourier.Id,//בדיקת תקינות תז
             Name = boCourier.Name,
-            Phone = boCourier.Phone,
-            Email = boCourier.Email,
-            Password = boCourier.Password,
+            Phone = boCourier.Phone,//בדיקת תקינות טלפון
+            Email = boCourier.Email,//בדיקת תקינות אימייל
+            Password = boCourier.Password,//בדיקת תקינות סיסמה חזקה וכו
             Active = boCourier.Active,
             MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,

@@ -59,6 +59,9 @@ public record Order
     /// <summary>
     /// Gets or sets the distance to the order location in kilometers.
     /// </summary>
+   
+    ///
+    
     public double? DistanceKm { get; init; } = null;
     /// <summary>
     /// Gets or sets the road distance to the order location in kilometers.

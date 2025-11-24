@@ -61,11 +61,11 @@ public class Courier
     /// Gets the date and time when the courier started working.
     /// </summary>
     /// <value>A DateTime representing when the courier began their employment.</value>
-    public DateTime WorkingSince { get; init; }
+    public required DateTime WorkingSince { get; init; }
 
-    public int DeliveryOnTime { get; init; } = 0;
+    public required int DeliveryOnTime { get; init; } = 0;
 
-    public int DeliveryLate { get; init; } = 0;
+    public required int DeliveryLate { get; init; } = 0;
 
     public OrderInProgress? OrderInProgress { get; set; }
 
