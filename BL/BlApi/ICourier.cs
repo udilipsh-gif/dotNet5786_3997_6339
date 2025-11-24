@@ -15,18 +15,7 @@ public interface ICourier//כרגע מכיל צפייה עדכון יצירה ו
     /// <returns>A <see cref="BO.Courier"/> object containing the details of the courier if found; otherwise, <see
     /// langword="null"/>.</returns>
     BO.Courier? Read(int id);
-    /// <summary>
-    /// Retrieves a collection of all couriers, optionally sorted and filtered based on specified criteria.
-    /// </summary>
-    /// <param name="sort">The field by which to sort the couriers. If <see langword="null"/>, no sorting is applied.</param>
-    /// <param name="filter">The field by which to filter the couriers. If <see langword="null"/>, no filtering is applied.</param>
-    /// <param name="value">The value to use for filtering. This parameter is used only if <paramref name="filter"/> is specified.</param>
-    /// <returns>An enumerable collection of <see cref="BO.CourierInList"/> representing the couriers. The collection may be
-    /// empty if no couriers match the criteria.</returns>
-    IEnumerable<BO.CourierInList> ReadAll(//מתודה של צפייה בכל השליחים עם אפשרות למיין ולסנן על פי קריטריונים שנבחרו
-        BO.CourierFieldSort? sort = null,
-        BO.CourierFieldFilter? filter = null,
-        object? value = null);
+    
     /// <summary>
     /// Updates the specified courier's information in the system.
     /// </summary>
@@ -39,6 +28,21 @@ public interface ICourier//כרגע מכיל צפייה עדכון יצירה ו
     /// calling this method to avoid exceptions.</remarks>
     /// <param name="id">The unique identifier of the entity to be deleted. Must be a positive integer.</param>
     void Delete(int id);
+
+    string? Login(int id, string password);
+
+    /// <summary>
+    /// Reads all couriers, with optional filtering by active status and sorting.
+    /// </summary>
+    /// <param name="requesterId"></param>
+    /// <param name="isActive"></param>
+    /// <param name="sort"></param>
+    /// <returns></returns>
+    IEnumerable<BO.CourierInList> ReadAll(
+    int requesterId,
+    bool? isActive,
+    BO.CourierFieldSort? sort);
+
 
 
 }
