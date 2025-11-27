@@ -7,6 +7,25 @@ internal static class CourierManager
 {
     private static readonly IDal s_dal = Factory.Get; //stage 4
 
+    public static string? Login(int id, string password)
+    {
+        if (id == s_dal.Config.ManagerId)
+        {
+
+            if (password == s_dal.Config.PasswordManager)
+                return "Manager";
+            else
+                throw new BO.InvalidLoginException();
+        }
+
+        DO.Courier? doCourier = s_dal.Courier.Read(id) ??  throw new BO.InvalidLoginException(); ;
+
+        if (doCourier.Password == password)
+            return "Courier";
+        else
+            throw new BO.InvalidLoginException();
+
+    }
     public static void Create(BO.Courier boCourier)//יצירת שליח בדאטה בייס בסגנון ישות DO
     {
         DO.Courier doCourier = new DO.Courier
@@ -85,32 +104,15 @@ internal static class CourierManager
     {
         s_dal.Courier.Delete(id); // שולחים ל-DAL
     }
-    public static string? Login(int id, string password)
-    {
-        if (id == s_dal.Config.ManagerId)
-        {
 
-            if (password == s_dal.Config.PasswordManager)
-                return "Manager";
-            else
-                throw new BO.InvalidLoginException("Password is not correct.");
-        }
-
-
-        var doCourier = s_dal.Courier.Read(id);
-        if (doCourier is null)
-            throw new BO.InvalidLoginException("Courier or manager ID not found.");
-        if (doCourier.Password == password)
-            return "Courier";
-        else
-            throw new BO.InvalidLoginException("Password is not correct.");
-       
-    }
     public static IEnumerable<BO.CourierInList> ReadAll(
         int requesterId,
         bool? isActive,
         BO.CourierFieldSort? sort)
     {
+        if(requesterId != s_dal.Config.ManagerId)
+            throw new BO.UnauthorizedAccessException("Only manager can access the list of couriers.");
+        
         var doCouriers = s_dal.Courier.ReadAll();
         var boCouriers = doCouriers.Select(doCourier => new BO.CourierInList
         {
