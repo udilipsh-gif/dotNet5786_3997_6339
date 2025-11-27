@@ -7,16 +7,10 @@ using System.Reflection.Metadata.Ecma335;
 internal class CourierImplementation : ICourier
 {
 
-    public void Create(BO.Courier boCourier)
-    {
-        CourierManager.Create(boCourier);
-    }
+    public void Create(int id, BO.Courier boCourier) => CourierManager.Create(boCourier);
 
-    public BO.Courier? Read(int id)
-    {
-        return CourierManager.Read(id);
-
-    }
+    public BO.Courier? Read(int id, int OrderId) => CourierManager.Read(OrderId);
+    
     //public IEnumerable<BO.CourierInList> ReadAll(
     //     BO.CourierFieldSort? sort = null,
     //     BO.CourierFieldFilter? filter = null,
@@ -25,16 +19,10 @@ internal class CourierImplementation : ICourier
     //     return CourierManager.ReadAll(sort, filter, value);
     //     //throw new NotImplementedException();
     // }
-    public void Update(BO.Courier boCourier)
-    {
-        CourierManager.Update(boCourier);
-        //throw new NotImplementedException();
-    }
-    public void Delete(int id)
-    {
-        CourierManager.Delete(id);
-
-    }
+    public void Update(BO.Courier boCourier) => CourierManager.Update(boCourier);
+    
+    public void Delete(int id, int orderId) => CourierManager.Delete(id);
+    
     public string? Login(int id, string password)
     {
         return CourierManager.Login(id, password);

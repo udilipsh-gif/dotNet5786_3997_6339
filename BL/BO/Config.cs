@@ -18,7 +18,7 @@ public class Config
     /// <summary>
     /// Gets or sets the manager's password.
     /// </summary>
-    public string PasswordManager { get; set; }
+    public required string PasswordManager { get; set; }
 
     /// <summary>
     /// Gets or sets the store address.
