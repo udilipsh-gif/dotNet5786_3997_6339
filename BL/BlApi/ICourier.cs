@@ -20,7 +20,7 @@ public interface ICourier//כרגע מכיל צפייה עדכון יצירה ו
     /// Updates the specified courier's information in the system.
     /// </summary>
     /// <param name="boCourier">The courier object containing updated information. Cannot be null.</param>
-    void Update(BO.Courier boCourier);
+    void Update(int id, BO.Courier boCourier);
     /// <summary>
     /// Deletes the entity with the specified identifier.
     /// </summary>
@@ -28,6 +28,8 @@ public interface ICourier//כרגע מכיל צפייה עדכון יצירה ו
     /// calling this method to avoid exceptions.</remarks>
     /// <param name="id">The unique identifier of the entity to be deleted. Must be a positive integer.</param>
     void Delete(int id);
+
+    void AddCourier(int id, BO.Courier boCourier);
 
     string? Login(int id, string password);
 

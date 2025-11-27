@@ -13,6 +13,46 @@ public enum CourierFieldFilter
     ByAvailable,
     ByActiveStatus
 }
+public enum OrderInListField
+{
+    DeliveryId,
+    OrderId,
+    TypeOfOrder,
+    DistanceKm,
+    OrderStatus,
+    ScheduleStatus,
+    TimeLeftForDelivery,
+    TimeRightForDelivery,
+    TotalTimeOfDelivery
+}
+
+public enum OpenOrderInListField
+{
+    CourierId,
+    OrderId,
+    TypeOfOrder,
+    Weight,
+    Address,
+    DistanceKm,
+    ActualDistance,
+    EstimatedDeliveryTime,
+    ScheduleStatus,
+    TimeLeftForDelivery,
+    MaxDeliveryTime
+}
+
+public enum ClosedDeliveryInListField
+{
+    DeliveryId,
+    OrderId,
+    TypeOfOrder,
+    Address,
+    ShipmentType,
+    AqualDistens,
+    DelyveryTime,
+    EndDelivery
+}
+
 public enum TimeUnit
 {
     /// <summary>
