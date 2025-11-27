@@ -1,0 +1,100 @@
+﻿#include <iostream>
+#include "HashTable.h"
+#include "IntHash.h"
+using namespace std;
+
+int main()
+{
+    try {
+        cout << "Creating table size 10...\n";
+        IntHash<string> table(10);
+
+        cout << "\nInserting items...\n";
+        table.insert(12, "Twelve");
+        table.insert(25, "Twenty-five");
+        table.insert(37, "Thirty-seven");
+        table.insert(49, "Forty-nine");
+        table.insert(12 + table.search(12).length(), "Another");
+        // בדיקה שגם התנגשות מטופלת
+
+        cout << "\nTable after inserts:\n";
+        table.print();
+
+        cout << "\nSearching keys...\n";
+        cout << "search(12) = " << table.search(12) << endl;
+        cout << "search(25) = " << table.search(25) << endl;
+
+        cout << "\nRemoving key 25...\n";
+        table.remove(25);
+        cout << "after delete\n";
+		table.print();
+
+        cout << "Trying search(25) again...\n";
+        try {
+            table.search(25);
+        }
+        catch (const char* msg) {
+            cout << "Expected error: " << msg << endl;
+        }
+
+        cout << "\nInserting 25 again after deletion...\n";
+        table.insert(25, "Twenty-five NEW");
+
+        cout << "\nFinal table:\n";
+        table.print();
+
+        cout << "\nAll tests completed.\n";
+    }
+    catch (const char* msg) {
+        cout << "Error: " << msg << endl;
+    }
+
+    return 0;
+}
+
+#include <iostream>
+#include "HashTable.h"
+#include "StringHash.h"
+using namespace std;
+
+int main() {
+    try {
+        cout << "Creating StringHash table...\n";
+        StringHash<int> ht(10);
+
+        cout << "\nInserting keys...\n";
+        ht.insert("Hello", 1);
+        ht.insert("World", 2);
+        ht.insert("Test", 3);
+        ht.insert("Apple", 4);
+
+        cout << "\nPrinting table:\n";
+        ht.print();
+
+        cout << "\nSearching:\n";
+        cout << "Hello -> " << ht.search("Hello") << endl;
+        cout << "World -> " << ht.search("World") << endl;
+
+        cout << "\nRemoving \"Test\"...\n";
+        ht.remove("Test");
+		cout << " \nPrinting table after removal:\n";
+		ht.print();
+
+        cout << "Searching Test again:\n";
+        try {
+            ht.search("Test");
+        }
+        catch (const char* msg) {
+            cout << "Expected error: " << msg << endl;
+        }
+
+        cout << "\nFinal table:\n";
+        ht.print();
+    }
+    catch (const char* msg) {
+        cout << "Error: " << msg << endl;
+    }
+
+    return 0;
+}
+
