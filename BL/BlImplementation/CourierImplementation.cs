@@ -24,20 +24,12 @@ internal class CourierImplementation : ICourier
         return CourierManager.Read(courierId);
     }
 
-    //public IEnumerable<BO.CourierInList> ReadAll(
-    //     BO.CourierFieldSort? sort = null,
-    //     BO.CourierFieldFilter? filter = null,
-    //     object? value = null)
-    // {
-    //     return CourierManager.ReadAll(sort, filter, value);
-    //     //throw new NotImplementedException();
-    // }
-    public void Update(int id, BO.Courier boCourier)
+    
+    public void Update(int requesterId, BO.Courier boCourier)
     {
-        if (id != AdminManager.GetConfig().ManagerId)
-            throw new BO.UnauthorizedAccessException();
+        
 
-        CourierManager.Update(boCourier);
+        CourierManager.Update(requesterId, boCourier);
     }
 
     public void Delete(int id, int courierId)

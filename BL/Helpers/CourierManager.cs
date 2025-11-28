@@ -1,5 +1,6 @@
 ﻿
 using DalApi;
+using System.Text.RegularExpressions;
 
 namespace Helpers;
 
@@ -7,7 +8,7 @@ internal static class CourierManager
 {
     private static readonly IDal s_dal = Factory.Get; //stage 4
 
-    public static string? Login(int id, string password)
+    internal static string? Login(int id, string password)
     {
         if (id == s_dal.Config.ManagerId)
         {
@@ -18,7 +19,7 @@ internal static class CourierManager
                 throw new BO.InvalidLoginException();
         }
 
-        DO.Courier? doCourier = s_dal.Courier.Read(id) ??  throw new BO.InvalidLoginException(); ;
+        DO.Courier? doCourier = s_dal.Courier.Read(id) ?? throw new BO.InvalidLoginException(); ;
 
         if (doCourier.Password == password)
             return "Courier";
@@ -26,15 +27,25 @@ internal static class CourierManager
             throw new BO.InvalidLoginException();
 
     }
-    public static void Create(BO.Courier boCourier)//יצירת שליח בדאטה בייס בסגנון ישות DO
+    internal static void Create(BO.Courier boCourier)//יצירת שליח בדאטה בייס בסגנון ישות DO
     {
+        if (!IsValidId(boCourier.Id))
+            throw new BO.InvalidIdException("Invalid ID.");
+        if (!IsValidPhone(boCourier.Phone))
+            throw new BO.InvalidPhoneException("Invalid phone number.");
+        if (!IsValidEmail(boCourier.Email))
+            throw new BO.InvalidEmailException("Invalid email address.");
+        if (!IsStrongPassword(boCourier.Password))
+            throw new BO.WeakPasswordException("Password is not strong enough.");
+
+
         DO.Courier doCourier = new DO.Courier
         {
-            Id = boCourier.Id,//בדיקת תקינות תז
+            Id = boCourier.Id,
             Name = boCourier.Name,
-            Phone = boCourier.Phone,//בדיקת תקינות טלפון
-            Email = boCourier.Email,//בדיקת תקינות אימייל
-            Password = boCourier.Password,//בדיקת תקינות סיסמה חזקה וכו
+            Phone = boCourier.Phone,
+            Email = boCourier.Email,
+            Password = boCourier.Password,
             Active = boCourier.Active,
             MaxDistanceDelivery = boCourier.MaxDistanceDelivery,//חישוב אווירי כלשהוא
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
@@ -43,11 +54,12 @@ internal static class CourierManager
         s_dal.Courier.Create(doCourier); // שולחים ל-DAL
 
     }
-    public static BO.Courier? Read(int id)
+    internal static BO.Courier? Read(int id)
     {
-        var doCourier = s_dal.Courier.Read(id);
-        if (doCourier is null)
-            return null;
+        var doCourier = s_dal.Courier.Read(id)
+            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does Not exist");
+
+
         BO.Courier boCourier = new BO.Courier
         {
             Id = doCourier.Id,
@@ -66,53 +78,61 @@ internal static class CourierManager
         };
         return boCourier;//מחזירים שליח מומר
     }
-    //public static IEnumerable<BO.CourierInList> ReadAll(
-    //    BO.CourierFieldSort? sort = null,
-    //    BO.CourierFieldFilter? filter = null,
-    //    object? value = null)
-    //{
-    //    var doCouriers = s_dal.Courier.ReadAll();
-    //    // Mapping DO.Courier to BO.CourierInList
-    //    var boCouriers = doCouriers.Select(doCourier => new BO.CourierInList
-    //    {
-    //        Id = doCourier.Id,
-    //        Name = doCourier.Name,
-    //        Phone = doCourier.Phone,
-    //        Active = doCourier.Active,
-    //        TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment
-    //    });
-    //    // Apply filtering and sorting here based on 'filter', 'value', and 'sort' parameters
-    //    return boCouriers;
-    //}
-    public static void Update(BO.Courier boCourier)
+    internal static void Update(int requesterId, BO.Courier boCourier)
     {
+        bool manager = requesterId == AdminManager.GetConfig().ManagerId;
+
+        // שליח קיים?
+        DO.Courier courier = s_dal.Courier.Read(boCourier.Id)
+            ?? throw new BO.BlDoesNotExistException(
+                $"Courier with ID={boCourier.Id} does not exist, you can't update");
+
+        // בדיקות תקינות
+        if (!IsValidPhone(boCourier.Phone))
+            throw new BO.InvalidPhoneException("Invalid phone number.");
+
+        if (!IsValidEmail(boCourier.Email))
+            throw new BO.InvalidEmailException("Invalid email address.");
+
+        if (!IsStrongPassword(boCourier.Password))
+            throw new BO.WeakPasswordException("Password is not strong enough.");
+
+        // המרה ל-DO
         DO.Courier doCourier = new DO.Courier
         {
-            Id = boCourier.Id,//בדיקת תקינות תז
+            Id = courier.Id,
             Name = boCourier.Name,
-            Phone = boCourier.Phone,//בדיקת תקינות טלפון
-            Email = boCourier.Email,//בדיקת תקינות אימייל
-            Password = boCourier.Password,//בדיקת תקינות סיסמה חזקה וכו
-            Active = boCourier.Active,
+            Phone = boCourier.Phone,
+            Email = boCourier.Email,
+            Password = boCourier.Password,
+
+            // רק מנהל יכול לשנות Active
+            Active = manager ? boCourier.Active : courier.Active,
+
             MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
-            WorkingSince = boCourier.WorkingSince
+            WorkingSince = courier.WorkingSince
+            //שים לב עדיין לא טיפלנו בכל השדות של שליח, יש עוד שלוש
         };
-        s_dal.Courier.Update(doCourier); // שולחים ל-DAL
+
+        // עדכון ב-DAL
+        s_dal.Courier.Update(doCourier);
     }
-    public static void Delete(int id)
+
+
+    internal static void Delete(int id)
     {
         s_dal.Courier.Delete(id); // שולחים ל-DAL
     }
 
-    public static IEnumerable<BO.CourierInList> ReadAll(
+    internal static IEnumerable<BO.CourierInList> ReadAll(
         int requesterId,
         bool? isActive,
         BO.CourierFieldSort? sort)
     {
-        if(requesterId != s_dal.Config.ManagerId)
+        if (requesterId != s_dal.Config.ManagerId)
             throw new BO.UnauthorizedAccessException("Only manager can access the list of couriers.");
-        
+
         var doCouriers = s_dal.Courier.ReadAll();
         var boCouriers = doCouriers.Select(doCourier => new BO.CourierInList
         {
@@ -141,10 +161,65 @@ internal static class CourierManager
         {
             boCouriers = boCouriers.OrderBy(courier => courier.Id);
         }
-        
+
         return boCouriers;
     }
 
+    //בדיקות תקינות של ערכים
+    private static bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    private static bool IsValidPhone(string phone)
+    {
+        return Regex.IsMatch(phone, @"^0\d{8,9}$") ||
+        Regex.IsMatch(phone, @"^\+?[1-9]\d{1,14}$");
+
+    }
+    private static bool IsStrongPassword(string password)
+    {
+        if (password.Length < 8)
+            return false;
+        bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
+        foreach (char c in password)
+        {
+            if (char.IsUpper(c)) hasUpper = true;
+            else if (char.IsLower(c)) hasLower = true;
+            else if (char.IsDigit(c)) hasDigit = true;
+            else hasSpecial = true;
+        }
+        return hasUpper && hasLower && hasDigit && hasSpecial;
+    }
+    private static bool IsValidId(int id)
+    {
+        int tempId = id;
+        int sum = 0;
+        tempId = tempId / 10;
+        for (int i = 1; i < 9; i++)
+        {
+            int temp = tempId % 10;
+            if (i % 2 == 0)
+            {
+                sum = sum + temp;
+            }
+            else
+            {
+                temp = temp * 2;
+                sum = sum + (temp % 10 + temp / 10);
+            }
+            tempId = tempId / 10;
+        }
+
+        return (id % 10 == (10 - (sum % 10)));
+    }
 
 
 
