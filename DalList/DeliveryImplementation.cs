@@ -47,13 +47,7 @@ internal class DeliveryImplementation : IDelivery
     /// <returns>The delivery object if found; otherwise, null.</returns>
     public Delivery? Read(int id)
     {
-        //foreach (var delivery in DataSource.Deliveries)
-        //{
-        //    if (delivery.Id == id)
-        //        return delivery;
-        //}
-
-        //return null;
+       
         return DataSource.Deliveries.FirstOrDefault(item => item.Id == id);
     }
     public Delivery? Read(Func<Delivery, bool> filter)

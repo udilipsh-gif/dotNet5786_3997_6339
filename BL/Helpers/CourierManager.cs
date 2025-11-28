@@ -1,5 +1,6 @@
 ﻿
 using DalApi;
+using DO;
 using System.Text.RegularExpressions;
 
 namespace Helpers;
@@ -56,7 +57,7 @@ internal static class CourierManager
     }
     internal static BO.Courier? Read(int id)
     {
-        var doCourier = s_dal.Courier.Read(id)
+        DO.Courier doCourier = s_dal.Courier.Read(id)
             ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does Not exist");
 
 
@@ -71,7 +72,7 @@ internal static class CourierManager
             MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
             WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = 0, // יש למלא בהתאם ללוגיקה העסקית
+            DeliveryOnTime = GetDeliveryOnTime(doCourier, s_dal.Config.MaxDeliveryTime), // יש למלא בהתאם ללוגיקה העסקית
             DeliveryLate = 0  // יש למלא בהתאם ללוגיקה העסקית
 
 
@@ -112,7 +113,7 @@ internal static class CourierManager
             MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
             WorkingSince = courier.WorkingSince
-            //שים לב עדיין לא טיפלנו בכל השדות של שליח, יש עוד שלוש
+            
         };
 
         // עדכון ב-DAL
@@ -164,6 +165,20 @@ internal static class CourierManager
 
         return boCouriers;
     }
+
+    //חישוב  משלוחים בזמן
+    private static int GetDeliveryOnTime(DO.Courier doCourier, TimeSpan maxDeliveryTime)
+    {
+        IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
+               d.CourierId == doCourier.Id &&
+               d.EndDelivery ==  EndDelivery.DELIVERED &&
+               d.TimeEndDelivery != null &&
+               d.TimeEndDelivery <= maxDeliveryTime
+        );
+
+        return deliveriesOnTime.Count();
+    }
+
 
     //בדיקות תקינות של ערכים
     private static bool IsValidEmail(string email)
