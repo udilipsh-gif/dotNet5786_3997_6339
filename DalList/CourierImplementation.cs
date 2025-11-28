@@ -50,15 +50,7 @@ internal class CourierImplementation : ICourier
     /// <returns>The courier object if found; otherwise, null.</returns>
     public Courier? Read(int id)
     {
-        //foreach (var courier in DataSource.Couriers)//המימוש שלנו בשלב 1, למטה מופיע המימוש שלו בשלב 1
-        //{
-        //    if (courier.Id == id)
-        //        return courier; 
-        //}
-        //return DataSource.Couriers.Find(item => item.Id == id); //stage 1
         return DataSource.Couriers.FirstOrDefault(item => item.Id == id); //stage 2
-
-       // return null;
     }
     public Courier? Read(Func<Courier, bool> filter)
     {
