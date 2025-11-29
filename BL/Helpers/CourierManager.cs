@@ -72,13 +72,66 @@ internal static class CourierManager
             MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
             WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = GetDeliveryOnTime(doCourier), 
-            DeliveryLate = GetDeliveryLate(doCourier) 
+            DeliveryOnTime = GetDeliveryOnTime(doCourier),
+            DeliveryLate = GetDeliveryLate(doCourier),
+            OrderInProgress = GetOrderInProgres(doCourier.Id)
+
 
 
         };
         return boCourier;//מחזירים שליח מומר
     }
+    private static BO.OrderInProgress GetOrderInProgres(int courierId)
+    {
+       
+        // מקבל אוסף של כל המשלוחים של השליח שעדיין לא הסתיימו
+        IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
+            d.CourierId == courierId &&
+            d.EndDelivery == null
+        );
+
+        // מקבל את המשלוח הפעיל הראשון שהזמנה שלו במצב DELIVERING
+        DO.Delivery? activeDelivery = allDeliveries.FirstOrDefault(d =>
+        {
+            DO.Order? order = s_dal.Order.Read(d.OrderId);
+            return order != null && order.OrderStatus == DO.OrderStatus.DELIVERING;
+        });
+
+        
+        if (activeDelivery == null)
+            return null;
+
+        
+        return CreateOrderInProgress(activeDelivery);
+
+    }
+    private static BO.OrderInProgress CreateOrderInProgress(DO.Delivery delivery)
+    {
+        DO.Order? order = s_dal.Order.Read(delivery.OrderId)
+         ?? throw new Exception("Order not found");
+
+        BO.OrderInProgress orderInProgress = new BO.OrderInProgress
+        {
+           DeliveryId = delivery.Id,
+              OrderId = delivery.OrderId,
+            TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
+            Details = order.Details,
+            Address = order.Addres,
+            Distance= 0,//חישוב מרחק to do
+            ActualDistance =delivery.ActualDistance,
+            CustomerName = order.Name,
+            CustomerPhone = order.Phone,
+            OrderTime = order.OrderDate,
+            StartDeliveryTime = delivery.OrderDate ,
+            EstimatedDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime),//חישוב זמן משוער to do
+            MaxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime),//חישוב זמן מקסימלי to do
+             OrderStatus = (BO.OrderStatus)order.OrderStatus,//מצב הזמנה to do
+             ScheduleStatus = BO.ScheduleStatus.ONTYME,//מצב לוח זמנים to do
+             TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
+        };
+        return orderInProgress;
+    }
+
     internal static void Update(int requesterId, BO.Courier boCourier)
     {
         bool manager = requesterId == AdminManager.GetConfig().ManagerId;
@@ -134,7 +187,7 @@ internal static class CourierManager
         if (requesterId != s_dal.Config.ManagerId)
             throw new BO.UnauthorizedAccessException("Only manager can access the list of couriers.");
 
-        IEnumerable<DO.Courier>doCouriers = s_dal.Courier.ReadAll();
+        IEnumerable<DO.Courier> doCouriers = s_dal.Courier.ReadAll();
         var boCouriers = doCouriers.Select(doCourier => new BO.CourierInList
         {
             Id = doCourier.Id,
@@ -181,7 +234,7 @@ internal static class CourierManager
         return deliveriesOnTime.Count();
     }
     //פונקציה לחישוב משלוחים באיחור
-    private static int GetDeliveryLate (DO.Courier doCourier)
+    private static int GetDeliveryLate(DO.Courier doCourier)
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
