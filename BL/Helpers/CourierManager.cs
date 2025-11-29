@@ -1,8 +1,8 @@
 ﻿
-using BO;
+
 using DalApi;
-using DO;
-using System.Text.RegularExpressions;
+
+
 
 namespace Helpers;
 
@@ -82,28 +82,22 @@ internal static class CourierManager
         };
         return boCourier;//מחזירים שליח מומר
     }
-    private static BO.OrderInProgress GetOrderInProgres(int courierId)
+    private static BO.OrderInProgress? GetOrderInProgres(int courierId)
     {
 
         // מקבל אוסף של כל המשלוחים של השליח שעדיין לא הסתיימו
         IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
             d.CourierId == courierId &&
-            d.EndDelivery == null
+            d.EndDelivery == null &&
+            s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING
         );
 
-        // מקבל את המשלוח הפעיל הראשון שהזמנה שלו במצב DELIVERING
-        DO.Delivery? activeDelivery = allDeliveries.FirstOrDefault(d =>
-        {
-            DO.Order? order = s_dal.Order.Read(d.OrderId);
-            return order != null && order.OrderStatus == DO.OrderStatus.DELIVERING;
-        });
 
-
-        if (activeDelivery == null)
+        if (!allDeliveries.Any())
             return null;
 
 
-        return CreateOrderInProgress(activeDelivery);
+        return CreateOrderInProgress(allDeliveries.First());
 
     }
     private static BO.OrderInProgress CreateOrderInProgress(DO.Delivery delivery)
@@ -118,8 +112,8 @@ internal static class CourierManager
             TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
             Details = order.Details,
             Address = order.Addres,
-            Distance = 0,//חישוב מרחק to do
-            ActualDistance = delivery.ActualDistance,//לפי ההודראות מכאן אני אמור למשוך את הנתון, אלא שהנתון
+            Distance = Tools.GetDistance(order),//חישוב מרחק
+            ActualDistance = delivery.ActualDistance,//לפי ההוראות מכאן אני אמור למשוך את הנתון, אלא שהנתון
                                                      //עדיין לא מחשב מהאינטרנט, כנדרש,
                                                      //אני חושב שבהמשך נבין איפה להכניס את החישוב הזה 
             CustomerName = order.Name,
@@ -158,7 +152,7 @@ internal static class CourierManager
         else
         {
             // אם אין מרחק, נשאיר את זמן ההזמנה
-            estimatedDeliveryTime = delivery.OrderDate;
+            estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
         }
         return estimatedDeliveryTime;
 
@@ -258,9 +252,8 @@ internal static class CourierManager
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
-               d.EndDelivery == EndDelivery.DELIVERED &&
-               d.TimeEndDelivery != null &&
-               d.TimeEndDelivery - d.OrderDate <= s_dal.Config.MaxDeliveryTime
+               d.EndDelivery == DO.EndDelivery.DELIVERED &&
+               d.TimeEndDelivery - d.OrderDate <= AdminManager.GetConfig().MaxDeliveryTime
         );
 
         return deliveriesOnTime.Count();
@@ -270,9 +263,9 @@ internal static class CourierManager
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
-               d.EndDelivery == EndDelivery.DELIVERED &&
-               d.TimeEndDelivery != null &&
-               d.TimeEndDelivery - d.OrderDate > s_dal.Config.MaxDeliveryTime
+               d.EndDelivery == DO.EndDelivery.DELIVERED &&
+
+               d.TimeEndDelivery - d.OrderDate > AdminManager.GetConfig().MaxDeliveryTime
         );
 
         return deliveriesOnTime.Count();
