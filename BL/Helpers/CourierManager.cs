@@ -109,7 +109,7 @@ internal static class CourierManager
             TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
             Details = order.Details,
             Address = order.Addres,
-            Distance = Tools.GetDistance(order),//חישוב מרחק
+            Distance = Tools.GetDistance(order),
             ActualDistance = delivery.ActualDistance,//לפי ההוראות מכאן אני אמור למשוך את הנתון, אלא שהנתון
                                                      //עדיין לא מחשב מהאינטרנט, כנדרש,
                                                      //אני חושב שבהמשך נבין איפה להכניס את החישוב הזה 
@@ -165,13 +165,13 @@ internal static class CourierManager
                 $"Courier with ID={boCourier.Id} does not exist, you can't update");
 
         // בדיקות תקינות
-        if (!IsValidPhone(boCourier.Phone))
+        if (!Tools.IsValidPhone(boCourier.Phone))
             throw new BO.InvalidPhoneException("Invalid phone number.");
 
-        if (!IsValidEmail(boCourier.Email))
+        if (!Tools.IsValidEmail(boCourier.Email))
             throw new BO.InvalidEmailException("Invalid email address.");
 
-        if (!IsStrongPassword(boCourier.Password))
+        if (!Tools.IsStrongPassword(boCourier.Password))
             throw new BO.WeakPasswordException("Password is not strong enough.");
 
         // המרה ל-DO
