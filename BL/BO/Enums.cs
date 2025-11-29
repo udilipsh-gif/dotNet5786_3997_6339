@@ -4,6 +4,7 @@ public enum CourierFieldSort
     Name,
     Id,
     Phone,
+    TypeShipment,
     AvailableDeliveries
 }
 public enum CourierFieldFilter
