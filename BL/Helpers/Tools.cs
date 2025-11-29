@@ -12,11 +12,15 @@ internal static class Tools
         return "hi";
     }
 
-    public static double GetDistance(double lat1, double lon1, double lat2, double lon2) // ישר מגמיני
+    public static double GetDistance(DO.Order order) // ישר מגמיני
     {
         const double R = 6371; // רדיוס כדור הארץ בקילומטרים
 
         // המרה ממעלות לרדיאנים
+        double lat1 = AdminManager.GetConfig().Latitude ?? throw new InvalidOperationException("Latitude is not set in configuration.");
+        double lon1 = AdminManager.GetConfig().Longitude ?? throw new InvalidOperationException("Longitude is not set in configuration.");
+        double lat2 = order.Latitude;
+        double lon2 = order.Longitude;
         double dLat = s_toRadians(lat2 - lat1);
         double dLon = s_toRadians(lon2 - lon1);
 
@@ -26,7 +30,7 @@ internal static class Tools
 
         double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-        return R * c; // התוצאה בקילומטרים
+        return R * c; // Return distance in kilometers
     }
 
     // פונקציית עזר להמרה לרדיאנים
