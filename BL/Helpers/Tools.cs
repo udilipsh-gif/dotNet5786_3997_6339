@@ -12,8 +12,31 @@ internal static class Tools
         return "hi";
     }
 
+    public static double GetDistance(double lat1, double lon1, double lat2, double lon2) // ישר מגמיני
+    {
+        const double R = 6371; // רדיוס כדור הארץ בקילומטרים
+
+        // המרה ממעלות לרדיאנים
+        double dLat = s_toRadians(lat2 - lat1);
+        double dLon = s_toRadians(lon2 - lon1);
+
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                   Math.Cos(s_toRadians(lat1)) * Math.Cos(s_toRadians(lat2)) *
+                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+        return R * c; // התוצאה בקילומטרים
+    }
+
+    // פונקציית עזר להמרה לרדיאנים
+    private static double s_toRadians(double angleIn10thofaDegree)
+    {
+        return (angleIn10thofaDegree * Math.PI) / 180;
+    }
+
     //בדיקות תקינות של ערכים
-    private static bool IsValidEmail(string email)
+    public static bool IsValidEmail(string email)
     {
         try
         {
