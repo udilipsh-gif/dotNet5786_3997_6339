@@ -1,4 +1,5 @@
 ﻿
+using BO;
 using DalApi;
 using DO;
 using System.Text.RegularExpressions;
@@ -83,7 +84,7 @@ internal static class CourierManager
     }
     private static BO.OrderInProgress GetOrderInProgres(int courierId)
     {
-       
+
         // מקבל אוסף של כל המשלוחים של השליח שעדיין לא הסתיימו
         IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
             d.CourierId == courierId &&
@@ -97,11 +98,11 @@ internal static class CourierManager
             return order != null && order.OrderStatus == DO.OrderStatus.DELIVERING;
         });
 
-        
+
         if (activeDelivery == null)
             return null;
 
-        
+
         return CreateOrderInProgress(activeDelivery);
 
     }
@@ -112,24 +113,55 @@ internal static class CourierManager
 
         BO.OrderInProgress orderInProgress = new BO.OrderInProgress
         {
-           DeliveryId = delivery.Id,
-              OrderId = delivery.OrderId,
+            DeliveryId = delivery.Id,
+            OrderId = delivery.OrderId,
             TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
             Details = order.Details,
             Address = order.Addres,
-            Distance= 0,//חישוב מרחק to do
-            ActualDistance =delivery.ActualDistance,
+            Distance = 0,//חישוב מרחק to do
+            ActualDistance = delivery.ActualDistance,//לפי ההודראות מכאן אני אמור למשוך את הנתון, אלא שהנתון
+                                                     //עדיין לא מחשב מהאינטרנט, כנדרש,
+                                                     //אני חושב שבהמשך נבין איפה להכניס את החישוב הזה 
             CustomerName = order.Name,
             CustomerPhone = order.Phone,
             OrderTime = order.OrderDate,
-            StartDeliveryTime = delivery.OrderDate ,
-            EstimatedDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime),//חישוב זמן משוער to do
-            MaxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime),//חישוב זמן מקסימלי to do
-             OrderStatus = (BO.OrderStatus)order.OrderStatus,//מצב הזמנה to do
-             ScheduleStatus = BO.ScheduleStatus.ONTYME,//מצב לוח זמנים to do
-             TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
+            StartDeliveryTime = delivery.OrderDate,
+            EstimatedDeliveryTime = GetEstimatedDeliveryTime(delivery), //חישוב זמן משוער 
+            MaxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime),//חישוב זמן מקסימלי 
+            OrderStatus = (BO.OrderStatus)order.OrderStatus,//מצב הזמנה to do
+            ScheduleStatus = BO.ScheduleStatus.ONTYME,//מצב לוח זמנים to do
+            TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
         };
         return orderInProgress;
+    }
+    private static DateTime GetEstimatedDeliveryTime(DO.Delivery delivery)
+    {
+        DateTime estimatedDeliveryTime;
+        if (delivery.ActualDistance.HasValue)
+        {
+            // שליפת המהירות הממוצעת לפי סוג הרכב
+            DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
+                ?? throw new Exception("Courier not found");
+            double avgSpeed = courier.TypeShipment switch
+            {
+                DO.TheTypeShipment.CAR => s_dal.Config.AvgSpeedCar,
+                DO.TheTypeShipment.MOTORCYCLE => s_dal.Config.AvgSpeedMotorcycle,
+                DO.TheTypeShipment.BIKE => s_dal.Config.AvgSpeedBike,
+                DO.TheTypeShipment.FOOT => s_dal.Config.AvgSpeedFoot,
+                _ => 1.0
+            };
+
+            // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
+            double estimatedHours = delivery.ActualDistance.Value / avgSpeed;
+            estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
+        }
+        else
+        {
+            // אם אין מרחק, נשאיר את זמן ההזמנה
+            estimatedDeliveryTime = delivery.OrderDate;
+        }
+        return estimatedDeliveryTime;
+
     }
 
     internal static void Update(int requesterId, BO.Courier boCourier)
