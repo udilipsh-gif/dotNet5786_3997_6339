@@ -1,8 +1,8 @@
 ﻿
-using BO;
+
 using DalApi;
-using DO;
-using System.Text.RegularExpressions;
+
+
 
 namespace Helpers;
 
@@ -109,8 +109,8 @@ internal static class CourierManager
             TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
             Details = order.Details,
             Address = order.Addres,
-            Distance = 0,//חישוב מרחק to do
-            ActualDistance = delivery.ActualDistance,//לפי ההודראות מכאן אני אמור למשוך את הנתון, אלא שהנתון
+            Distance = Tools.GetDistance(order),//חישוב מרחק
+            ActualDistance = delivery.ActualDistance,//לפי ההוראות מכאן אני אמור למשוך את הנתון, אלא שהנתון
                                                      //עדיין לא מחשב מהאינטרנט, כנדרש,
                                                      //אני חושב שבהמשך נבין איפה להכניס את החישוב הזה 
             CustomerName = order.Name,
@@ -149,7 +149,7 @@ internal static class CourierManager
         else
         {
             // אם אין מרחק, נשאיר את זמן ההזמנה
-            estimatedDeliveryTime = delivery.OrderDate;
+            estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
         }
         return estimatedDeliveryTime;
 
@@ -250,8 +250,7 @@ internal static class CourierManager
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
                d.EndDelivery == DO.EndDelivery.DELIVERED &&
-               d.TimeEndDelivery != null &&
-               d.TimeEndDelivery - d.OrderDate <= s_dal.Config.MaxDeliveryTime
+               d.TimeEndDelivery - d.OrderDate <= AdminManager.GetConfig().MaxDeliveryTime
         );
 
         return deliveriesOnTime.Count();
@@ -261,9 +260,9 @@ internal static class CourierManager
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
-               d.EndDelivery == EndDelivery.DELIVERED &&
-               d.TimeEndDelivery != null &&
-               d.TimeEndDelivery - d.OrderDate > s_dal.Config.MaxDeliveryTime
+               d.EndDelivery == DO.EndDelivery.DELIVERED &&
+
+               d.TimeEndDelivery - d.OrderDate > AdminManager.GetConfig().MaxDeliveryTime
         );
 
         return deliveriesOnTime.Count();
