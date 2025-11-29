@@ -72,8 +72,8 @@ internal static class CourierManager
             MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
             WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = GetDeliveryOnTime(doCourier, s_dal.Config.MaxDeliveryTime), // יש למלא בהתאם ללוגיקה העסקית
-            DeliveryLate = 0  // יש למלא בהתאם ללוגיקה העסקית
+            DeliveryOnTime = GetDeliveryOnTime(doCourier), 
+            DeliveryLate = GetDeliveryLate(doCourier) 
 
 
         };
@@ -113,7 +113,7 @@ internal static class CourierManager
             MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
             WorkingSince = courier.WorkingSince
-            
+
         };
 
         // עדכון ב-DAL
@@ -134,7 +134,7 @@ internal static class CourierManager
         if (requesterId != s_dal.Config.ManagerId)
             throw new BO.UnauthorizedAccessException("Only manager can access the list of couriers.");
 
-        var doCouriers = s_dal.Courier.ReadAll();
+        IEnumerable<DO.Courier>doCouriers = s_dal.Courier.ReadAll();
         var boCouriers = doCouriers.Select(doCourier => new BO.CourierInList
         {
             Id = doCourier.Id,
@@ -166,14 +166,28 @@ internal static class CourierManager
         return boCouriers;
     }
 
-    //חישוב  משלוחים בזמן
-    private static int GetDeliveryOnTime(DO.Courier doCourier, TimeSpan maxDeliveryTime)
+
+
+    //פונקציה לחישוב  משלוחים בזמן
+    private static int GetDeliveryOnTime(DO.Courier doCourier)
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
-               d.EndDelivery ==  EndDelivery.DELIVERED &&
+               d.EndDelivery == EndDelivery.DELIVERED &&
                d.TimeEndDelivery != null &&
-               d.TimeEndDelivery <= maxDeliveryTime
+               d.TimeEndDelivery - d.OrderDate <= s_dal.Config.MaxDeliveryTime
+        );
+
+        return deliveriesOnTime.Count();
+    }
+    //פונקציה לחישוב משלוחים באיחור
+    private static int GetDeliveryLate (DO.Courier doCourier)
+    {
+        IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
+               d.CourierId == doCourier.Id &&
+               d.EndDelivery == EndDelivery.DELIVERED &&
+               d.TimeEndDelivery != null &&
+               d.TimeEndDelivery - d.OrderDate > s_dal.Config.MaxDeliveryTime
         );
 
         return deliveriesOnTime.Count();
