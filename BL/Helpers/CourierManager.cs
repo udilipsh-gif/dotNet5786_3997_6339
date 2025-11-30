@@ -166,7 +166,7 @@ internal static class CourierManager
         }
         else
         {
-            // אם אין מרחק, נשאיר את זמן ההזמנה
+            // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
             estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
         }
         return estimatedDeliveryTime;
@@ -223,24 +223,46 @@ internal static class CourierManager
     internal static IEnumerable<BO.CourierInList> ReadAll(
         int requesterId,
         bool? isActive,
-        BO.CourierFieldSort? sort)
+        BO.CourierFieldSort sort)
     {
-        if (requesterId != s_dal.Config.ManagerId)
+        if (requesterId != AdminManager.GetConfig().ManagerId)
             throw new BO.UnauthorizedAccessException("Only manager can access the list of couriers.");
 
-        IEnumerable<DO.Courier> doCouriers = s_dal.Courier.ReadAll();
-        var boCouriers = doCouriers.Select(doCourier => new BO.CourierInList
+        var doCouriers = s_dal.Courier.ReadAll()
+            .Where(c=> c.Active==isActive)
+            .OrderBy(c => (sort){
+            return sort switch
+            {
+                BO.CourierFieldSort.Id => c.Id,
+                BO.CourierFieldSort.Name => c.Name,
+                BO.CourierFieldSort.Phone => c.Phone,
+                BO.CourierFieldSort.TypeShipment => c.TypeShipment,
+                _ => c.Id
+            }
+        });
+
+
+        if (isActive.HasValue)
+        {
+            doCouriers = doCouriers.Where(courier => courier.Active == isActive.Value);
+        }
+
+
+        IEnumerable<BO.CourierInList> boCouriers = doCouriers.Select(doCourier => new BO.Courier
         {
             Id = doCourier.Id,
             Name = doCourier.Name,
             Phone = doCourier.Phone,
             Active = doCourier.Active,
-            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment
+            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
+            DeliveryOnTime = GetDeliveryOnTime(doCourier),
+            DeliveryLate = GetDeliveryLate(doCourier),
+            WorkingSince = doCourier.WorkingSince,
+            Password = doCourier.Password,
+            Email = doCourier.Email,
+
         });
-        if (isActive.HasValue)
-        {
-            boCouriers = boCouriers.Where(courier => courier.Active == isActive.Value);
-        }
+        
         if (sort.HasValue)
         {
             boCouriers = sort.Value switch

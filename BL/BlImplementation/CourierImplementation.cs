@@ -1,9 +1,8 @@
 ﻿
 namespace BlImplementation;
 using BlApi;
-using BO;
+
 using Helpers;
-using System.Reflection.Metadata.Ecma335;
 
 internal class CourierImplementation : ICourier
 {
@@ -27,7 +26,8 @@ internal class CourierImplementation : ICourier
     
     public void Update(int requesterId, BO.Courier boCourier)
     {
-        
+       if (requesterId != AdminManager.GetConfig().ManagerId)
+            throw new BO.UnauthorizedAccessException();
 
         CourierManager.Update(requesterId, boCourier);
     }
@@ -43,13 +43,7 @@ internal class CourierImplementation : ICourier
     {
         return CourierManager.Login(id, password);
     }
-    //**********יש כאן שגיאה האם צריך שנים?
-    void AddCourier(int id, BO.Courier boCourier) 
-    {
-        if (id != AdminManager.GetConfig().ManagerId)
-            throw new BO.UnauthorizedAccessException();
-        CourierManager.Create(boCourier);
-    }
+    
 
     public IEnumerable<BO.CourierInList> ReadAll(
         int requesterId,
