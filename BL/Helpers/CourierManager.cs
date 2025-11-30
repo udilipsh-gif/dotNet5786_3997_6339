@@ -223,63 +223,30 @@ internal static class CourierManager
     internal static IEnumerable<BO.CourierInList> ReadAll(
         int requesterId,
         bool? isActive,
-        BO.CourierFieldSort sort)
+        BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
         if (requesterId != AdminManager.GetConfig().ManagerId)
             throw new BO.UnauthorizedAccessException("Only manager can access the list of couriers.");
 
-        var doCouriers = s_dal.Courier.ReadAll()
-            .Where(c=> c.Active==isActive)
-            .OrderBy(c => (sort){
-            return sort switch
+        return s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive)
+            .OrderBy(c => sort switch
             {
-                BO.CourierFieldSort.Id => c.Id,
-                BO.CourierFieldSort.Name => c.Name,
-                BO.CourierFieldSort.Phone => c.Phone,
-                BO.CourierFieldSort.TypeShipment => c.TypeShipment,
+                BO.CourierFieldSort.Id => (IComparable)c.Id,
+                BO.CourierFieldSort.Name => (IComparable)c.Name,
+                BO.CourierFieldSort.Phone => (IComparable)c.Phone,
+                BO.CourierFieldSort.TypeShipment => (IComparable)c.TypeShipment,
                 _ => c.Id
-            }
-        });
-
-
-        if (isActive.HasValue)
-        {
-            doCouriers = doCouriers.Where(courier => courier.Active == isActive.Value);
-        }
-
-
-        IEnumerable<BO.CourierInList> boCouriers = doCouriers.Select(doCourier => new BO.Courier
-        {
-            Id = doCourier.Id,
-            Name = doCourier.Name,
-            Phone = doCourier.Phone,
-            Active = doCourier.Active,
-            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
-            DeliveryOnTime = GetDeliveryOnTime(doCourier),
-            DeliveryLate = GetDeliveryLate(doCourier),
-            WorkingSince = doCourier.WorkingSince,
-            Password = doCourier.Password,
-            Email = doCourier.Email,
-
-        });
-        
-        if (sort.HasValue)
-        {
-            boCouriers = sort.Value switch
+            }).Select(c => new BO.CourierInList
             {
-                BO.CourierFieldSort.Id => boCouriers.OrderBy(courier => courier.Id),
-                BO.CourierFieldSort.Name => boCouriers.OrderBy(courier => courier.Name),
-                BO.CourierFieldSort.Phone => boCouriers.OrderBy(courier => courier.Phone),
-                BO.CourierFieldSort.TypeShipment => boCouriers.OrderBy(courier => courier.TypeShipment),//הוספת עוד אפשרות??? TO DO
-                _ => boCouriers
-            };
-        }
-        else
-        {
-            boCouriers = boCouriers.OrderBy(courier => courier.Id);
-        }
-
-        return boCouriers;
+                Id = c.Id,
+                Name = c.Name,
+                Active = c.Active,
+                TypeShipment = (BO.TheTypeShipment)c.TypeShipment,
+                WorkingSince = c.WorkingSince,
+                DeliveryOnTime = GetDeliveryOnTime(c),
+                DeliveryLate = GetDeliveryLate(c),
+                DeliveryId
+            });
     }
 
 
