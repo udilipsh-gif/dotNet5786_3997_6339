@@ -30,7 +30,7 @@ internal static class CourierManager
     internal static void Create(BO.Courier boCourier)//יצירת שליח בדאטה בייס בסגנון ישות DO
     {
         if (!Tools.IsValidId(boCourier.Id))
-            throw new BO.InvalidIdException("Invalid ID.");
+            throw new BO.BlInvalidIdException(boCourier.Id);
         if (!Tools.IsValidPhone(boCourier.Phone))
             throw new BO.InvalidPhoneException("Invalid phone number.");
         if (!Tools.IsValidEmail(boCourier.Email))
@@ -51,7 +51,15 @@ internal static class CourierManager
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
             WorkingSince = boCourier.WorkingSince
         };
-        s_dal.Courier.Create(doCourier); // שולחים ל-DAL
+        try
+        {
+            s_dal.Courier.Create(doCourier); // שולחים ל-DAL
+        }
+        catch (Exception ex)
+        {
+            throw new BO.BlAlreadyExistsException($"courier with id {boCourier.Id} is alredy exists",ex);
+        }
+
 
     }
     internal static BO.Courier? Read(int id)
