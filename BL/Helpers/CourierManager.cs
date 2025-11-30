@@ -151,9 +151,9 @@ internal static class CourierManager
                 Active = c.Active,
                 TypeShipment = (BO.TheTypeShipment)c.TypeShipment,
                 WorkingSince = c.WorkingSince,
-                DeliveryOnTime = GetDeliveryOnTime(c),
-                DeliveryLate = GetDeliveryLate(c),
-                DeliveryId = GetOrderInProgres(c.Id)?.DeliveryId
+                DeliveryOnTime = s_getDeliveryOnTime(c),
+                DeliveryLate = s_getDeliveryLate(c),
+                DeliveryId = s_etOrderInProgres(c.Id)?.DeliveryId
             });
     }
 
@@ -254,10 +254,10 @@ internal static class CourierManager
                 ?? throw new Exception("Courier not found");
             double avgSpeed = courier.TypeShipment switch
             {
-                DO.TheTypeShipment.CAR => s_dal.Config.AvgSpeedCar,
-                DO.TheTypeShipment.MOTORCYCLE => s_dal.Config.AvgSpeedMotorcycle,
-                DO.TheTypeShipment.BIKE => s_dal.Config.AvgSpeedBike,
-                DO.TheTypeShipment.FOOT => s_dal.Config.AvgSpeedFoot,
+                DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
+                DO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
+                DO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
+                DO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
                 _ => 1.0
             };
 
