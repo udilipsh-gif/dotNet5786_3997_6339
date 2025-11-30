@@ -245,7 +245,7 @@ internal static class CourierManager
                 WorkingSince = c.WorkingSince,
                 DeliveryOnTime = GetDeliveryOnTime(c),
                 DeliveryLate = GetDeliveryLate(c),
-                DeliveryId
+                DeliveryId = GetOrderInProgres(c.Id)?.DeliveryId
             });
     }
 
