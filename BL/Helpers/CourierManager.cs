@@ -159,16 +159,16 @@ internal static class CourierManager
                 Active = c.Active,
                 TypeShipment = (BO.TheTypeShipment)c.TypeShipment,
                 WorkingSince = c.WorkingSince,
-                DeliveryOnTime = GetDeliveryOnTime(c),
-                DeliveryLate = GetDeliveryLate(c),
-                DeliveryId=GetOrderInProgres(c.Id)?.DeliveryId
+                DeliveryOnTime = s_getDeliveryOnTime(c),
+                DeliveryLate = s_getDeliveryLate(c),
+                DeliveryId = s_etOrderInProgres(c.Id)?.DeliveryId
             });
     }
 
 
 
     //פונקציה לחישוב  משלוחים בזמן
-    private static int GetDeliveryOnTime(DO.Courier doCourier)
+    private static int s_getDeliveryOnTime(DO.Courier doCourier)
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
@@ -179,7 +179,7 @@ internal static class CourierManager
         return deliveriesOnTime.Count();
     }
     //פונקציה לחישוב משלוחים באיחור
-    private static int GetDeliveryLate(DO.Courier doCourier)
+    private static int s_getDeliveryLate(DO.Courier doCourier)
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
@@ -190,7 +190,7 @@ internal static class CourierManager
 
         return deliveriesOnTime.Count();
     }
-    private static BO.OrderInProgress CreateOrderInProgress(DO.Delivery delivery)
+    private static BO.OrderInProgress s_createOrderInProgress(DO.Delivery delivery)
     {
         DO.Order? order = s_dal.Order.Read(delivery.OrderId)
          ?? throw new Exception("Order not found");
@@ -213,13 +213,13 @@ internal static class CourierManager
             StartDeliveryTime = delivery.OrderDate,
             EstimatedDeliveryTime = estimatedDeliveryTime,
             MaxDeliveryTime = maxDeliveryTime,//חישוב זמן מקסימלי 
-            OrderStatus = (BO.OrderStatus)order.OrderStatus,
+            OrderStatus = BO.OrderStatus.DELIVERING,
             ScheduleStatus = s_getScheduleStatus((BO.OrderStatus)order.OrderStatus, estimatedDeliveryTime, maxDeliveryTime),//מצב לוח זמנים to do
             TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
         };
         return orderInProgress;
     }
-    private static BO.OrderInProgress? GetOrderInProgres(int courierId)
+    private static BO.OrderInProgress? s_etOrderInProgres(int courierId)
     {
 
         // מקבל אוסף של כל המשלוחים של השליח שעדיין לא הסתיימו
@@ -232,7 +232,7 @@ internal static class CourierManager
         if (!allDeliveries.Any())
             return null;
 
-        return CreateOrderInProgress(allDeliveries.First());
+        return s_createOrderInProgress(allDeliveries.First());
     }
 
 
@@ -262,10 +262,10 @@ internal static class CourierManager
                 ?? throw new Exception("Courier not found");
             double avgSpeed = courier.TypeShipment switch
             {
-                DO.TheTypeShipment.CAR => s_dal.Config.AvgSpeedCar,
-                DO.TheTypeShipment.MOTORCYCLE => s_dal.Config.AvgSpeedMotorcycle,
-                DO.TheTypeShipment.BIKE => s_dal.Config.AvgSpeedBike,
-                DO.TheTypeShipment.FOOT => s_dal.Config.AvgSpeedFoot,
+                DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
+                DO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
+                DO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
+                DO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
                 _ => 1.0
             };
 
