@@ -205,7 +205,7 @@ internal static class CourierManager
             StartDeliveryTime = delivery.OrderDate,
             EstimatedDeliveryTime = estimatedDeliveryTime,
             MaxDeliveryTime = maxDeliveryTime,//חישוב זמן מקסימלי 
-            OrderStatus = (BO.OrderStatus)order.OrderStatus,
+            OrderStatus = BO.OrderStatus.DELIVERING,
             ScheduleStatus = s_getScheduleStatus((BO.OrderStatus)order.OrderStatus, estimatedDeliveryTime, maxDeliveryTime),//מצב לוח זמנים to do
             TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
         };
