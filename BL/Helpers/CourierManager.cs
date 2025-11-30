@@ -51,7 +51,14 @@ internal static class CourierManager
             TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
             WorkingSince = boCourier.WorkingSince
         };
-        s_dal.Courier.Create(doCourier); // שולחים ל-DAL
+        try
+        {
+            s_dal.Courier.Create(doCourier); // שולחים ל-DAL
+        }
+        catch (Exception ex)
+        {
+            throw new BO.DalException(ex);
+        }
 
     }
     internal static BO.Courier? Read(int id)
@@ -71,9 +78,9 @@ internal static class CourierManager
             MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
             WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = GetDeliveryOnTime(doCourier),
-            DeliveryLate = GetDeliveryLate(doCourier),
-            OrderInProgress = GetOrderInProgres(doCourier.Id)
+            DeliveryOnTime = s_getDeliveryOnTime(doCourier),
+            DeliveryLate = s_getDeliveryLate(doCourier),
+            OrderInProgress = s_getOrderInProgres(doCourier.Id)
 
 
 
@@ -153,7 +160,7 @@ internal static class CourierManager
                 WorkingSince = c.WorkingSince,
                 DeliveryOnTime = s_getDeliveryOnTime(c),
                 DeliveryLate = s_getDeliveryLate(c),
-                DeliveryId = s_etOrderInProgres(c.Id)?.DeliveryId
+                DeliveryId = s_getOrderInProgres(c.Id)?.DeliveryId
             });
     }
 
@@ -211,7 +218,7 @@ internal static class CourierManager
         };
         return orderInProgress;
     }
-    private static BO.OrderInProgress? s_etOrderInProgres(int courierId)
+    private static BO.OrderInProgress? s_getOrderInProgres(int courierId)
     {
 
         // מקבל אוסף של כל המשלוחים של השליח שעדיין לא הסתיימו
@@ -267,8 +274,8 @@ internal static class CourierManager
         }
         else
         {
-            // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
-            estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
+        // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
+        estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
         }
         return estimatedDeliveryTime;
 
