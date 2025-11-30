@@ -2,8 +2,6 @@
 
 using DalApi;
 
-
-
 namespace Helpers;
 
 internal static class CourierManager
@@ -82,97 +80,7 @@ internal static class CourierManager
         };
         return boCourier;//מחזירים שליח מומר
     }
-    private static BO.OrderInProgress? GetOrderInProgres(int courierId)
-    {
-
-        // מקבל אוסף של כל המשלוחים של השליח שעדיין לא הסתיימו
-        IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
-            d.CourierId == courierId &&
-            d.EndDelivery == null &&
-            s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING
-        );
-
-        if (!allDeliveries.Any())
-            return null;
-
-        return CreateOrderInProgress(allDeliveries.First());
-    }
-    private static BO.OrderInProgress CreateOrderInProgress(DO.Delivery delivery)
-    {
-        DO.Order? order = s_dal.Order.Read(delivery.OrderId)
-         ?? throw new Exception("Order not found");
-
-        var estimatedDeliveryTime = s_getEstimatedDeliveryTime(delivery); // משתנה עזר לחישוב זמן משוער
-        var maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
-
-        BO.OrderInProgress orderInProgress = new BO.OrderInProgress
-        {
-            DeliveryId = delivery.Id,
-            OrderId = delivery.OrderId,
-            TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
-            Details = order.Details,
-            Address = order.Addres,
-            Distance = Tools.GetDistance(order),
-            ActualDistance = delivery.ActualDistance,
-            CustomerName = order.Name,
-            CustomerPhone = order.Phone,
-            OrderTime = order.OrderDate,
-            StartDeliveryTime = delivery.OrderDate,
-            EstimatedDeliveryTime = estimatedDeliveryTime,
-            MaxDeliveryTime = maxDeliveryTime,//חישוב זמן מקסימלי 
-            OrderStatus = (BO.OrderStatus)order.OrderStatus,
-            ScheduleStatus = s_getScheduleStatus((BO.OrderStatus)order.OrderStatus, estimatedDeliveryTime, maxDeliveryTime),//מצב לוח זמנים to do
-            TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
-        };
-        return orderInProgress;
-    }
-
-    private static BO.ScheduleStatus s_getScheduleStatus(BO.OrderStatus orderStatus, DateTime estimatedDeliveryTime, DateTime maxDeliveryTime)
-    {
-        TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ?? throw new Exception("Risk range not configured");
-        // המשלוח וודאי עדיין בתהליך למקרה שנרצה לבדוק משלוח סגור נצטרך להוציא את זה ל TOLLS ולבדוק עוד תנאים
-
-        var timeBuffer = maxDeliveryTime - estimatedDeliveryTime;
-
-        if (timeBuffer > riskRange)
-            return BO.ScheduleStatus.ONTYME;
-
-        if (timeBuffer >= TimeSpan.Zero) // כלומר: בין 0 ל-riskRange
-            return BO.ScheduleStatus.INRISK;
-
-        return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
-
-    }
-    private static DateTime s_getEstimatedDeliveryTime(DO.Delivery delivery)
-    {
-        DateTime estimatedDeliveryTime;
-        if (delivery.ActualDistance.HasValue)
-        {
-            // שליפת המהירות הממוצעת לפי סוג הרכב
-            DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
-                ?? throw new Exception("Courier not found");
-            double avgSpeed = courier.TypeShipment switch
-            {
-                DO.TheTypeShipment.CAR => s_dal.Config.AvgSpeedCar,
-                DO.TheTypeShipment.MOTORCYCLE => s_dal.Config.AvgSpeedMotorcycle,
-                DO.TheTypeShipment.BIKE => s_dal.Config.AvgSpeedBike,
-                DO.TheTypeShipment.FOOT => s_dal.Config.AvgSpeedFoot,
-                _ => 1.0
-            };
-
-            // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
-            double estimatedHours = delivery.ActualDistance.Value / avgSpeed;
-            estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
-        }
-        else
-        {
-            // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
-            estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
-        }
-        return estimatedDeliveryTime;
-
-    }
-
+    
     internal static void Update(int requesterId, BO.Courier boCourier)
     {
         bool manager = requesterId == AdminManager.GetConfig().ManagerId;
@@ -252,7 +160,7 @@ internal static class CourierManager
 
 
     //פונקציה לחישוב  משלוחים בזמן
-    private static int GetDeliveryOnTime(DO.Courier doCourier)
+    private static int s_getDeliveryOnTime(DO.Courier doCourier)
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
@@ -263,7 +171,7 @@ internal static class CourierManager
         return deliveriesOnTime.Count();
     }
     //פונקציה לחישוב משלוחים באיחור
-    private static int GetDeliveryLate(DO.Courier doCourier)
+    private static int s_getDeliveryLate(DO.Courier doCourier)
     {
         IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
                d.CourierId == doCourier.Id &&
@@ -274,4 +182,96 @@ internal static class CourierManager
 
         return deliveriesOnTime.Count();
     }
+    private static BO.OrderInProgress s_createOrderInProgress(DO.Delivery delivery)
+    {
+        DO.Order? order = s_dal.Order.Read(delivery.OrderId)
+         ?? throw new Exception("Order not found");
+
+        var estimatedDeliveryTime = s_getEstimatedDeliveryTime(delivery); // משתנה עזר לחישוב זמן משוער
+        var maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
+
+        BO.OrderInProgress orderInProgress = new BO.OrderInProgress
+        {
+            DeliveryId = delivery.Id,
+            OrderId = delivery.OrderId,
+            TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
+            Details = order.Details,
+            Address = order.Addres,
+            Distance = Tools.GetDistance(order),
+            ActualDistance = delivery.ActualDistance,
+            CustomerName = order.Name,
+            CustomerPhone = order.Phone,
+            OrderTime = order.OrderDate,
+            StartDeliveryTime = delivery.OrderDate,
+            EstimatedDeliveryTime = estimatedDeliveryTime,
+            MaxDeliveryTime = maxDeliveryTime,//חישוב זמן מקסימלי 
+            OrderStatus = (BO.OrderStatus)order.OrderStatus,
+            ScheduleStatus = s_getScheduleStatus((BO.OrderStatus)order.OrderStatus, estimatedDeliveryTime, maxDeliveryTime),//מצב לוח זמנים to do
+            TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
+        };
+        return orderInProgress;
+    }
+    private static BO.OrderInProgress? s_etOrderInProgres(int courierId)
+    {
+
+        // מקבל אוסף של כל המשלוחים של השליח שעדיין לא הסתיימו
+        IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
+            d.CourierId == courierId &&
+            d.EndDelivery == null &&
+            s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING
+        );
+
+        if (!allDeliveries.Any())
+            return null;
+
+        return s_createOrderInProgress(allDeliveries.First());
+    }
+
+
+    private static BO.ScheduleStatus s_getScheduleStatus(BO.OrderStatus orderStatus, DateTime estimatedDeliveryTime, DateTime maxDeliveryTime)
+    {
+        TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ?? throw new Exception("Risk range not configured");
+        // המשלוח וודאי עדיין בתהליך למקרה שנרצה לבדוק משלוח סגור נצטרך להוציא את זה ל TOLLS ולבדוק עוד תנאים
+
+        var timeBuffer = maxDeliveryTime - estimatedDeliveryTime;
+
+        if (timeBuffer > riskRange)
+            return BO.ScheduleStatus.ONTYME;
+
+        if (timeBuffer >= TimeSpan.Zero) // כלומר: בין 0 ל-riskRange
+            return BO.ScheduleStatus.INRISK;
+
+        return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
+
+    }
+    private static DateTime s_getEstimatedDeliveryTime(DO.Delivery delivery)
+    {
+        DateTime estimatedDeliveryTime;
+        if (delivery.ActualDistance.HasValue)
+        {
+            // שליפת המהירות הממוצעת לפי סוג הרכב
+            DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
+                ?? throw new Exception("Courier not found");
+            double avgSpeed = courier.TypeShipment switch
+            {
+                DO.TheTypeShipment.CAR => s_dal.Config.AvgSpeedCar,
+                DO.TheTypeShipment.MOTORCYCLE => s_dal.Config.AvgSpeedMotorcycle,
+                DO.TheTypeShipment.BIKE => s_dal.Config.AvgSpeedBike,
+                DO.TheTypeShipment.FOOT => s_dal.Config.AvgSpeedFoot,
+                _ => 1.0
+            };
+
+            // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
+            double estimatedHours = delivery.ActualDistance.Value / avgSpeed;
+            estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
+        }
+        else
+        {
+            // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
+            estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
+        }
+        return estimatedDeliveryTime;
+
+    }
+
 }
