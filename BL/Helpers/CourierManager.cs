@@ -10,33 +10,33 @@ internal static class CourierManager
 
     internal static string? Login(int id, string password)
     {
-        if (id == s_dal.Config.ManagerId)
+        if (id == AdminManager.GetConfig().ManagerId)
         {
 
-            if (password == s_dal.Config.PasswordManager)
+            if (password == AdminManager.GetConfig().PasswordManager)
                 return "Manager";
             else
-                throw new BO.InvalidLoginException();
+                throw new BO.BlIncorrectPasswordException();
         }
 
-        DO.Courier? doCourier = s_dal.Courier.Read(id) ?? throw new BO.InvalidLoginException(); ;
+        DO.Courier? doCourier = s_dal.Courier.Read(id) ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does Not exist"); ;
 
         if (doCourier.Password == password)
             return "Courier";
         else
-            throw new BO.InvalidLoginException();
+            throw new BO.BlIncorrectPasswordException();
 
     }
     internal static void Create(BO.Courier boCourier)//יצירת שליח בדאטה בייס בסגנון ישות DO
     {
         if (!Tools.IsValidId(boCourier.Id))
-            throw new BO.BlInvalidIdException(boCourier.Id);
+            throw new BO.BlInvalidValueException(boCourier.Id);
         if (!Tools.IsValidPhone(boCourier.Phone))
-            throw new BO.InvalidPhoneException("Invalid phone number.");
+            throw new BO.BlInvalidValueException("Invalid phone number.");
         if (!Tools.IsValidEmail(boCourier.Email))
-            throw new BO.InvalidEmailException("Invalid email address.");
+            throw new BO.BlInvalidValueException("Invalid email address.");
         if (!Tools.IsStrongPassword(boCourier.Password))
-            throw new BO.WeakPasswordException("Password is not strong enough.");
+            throw new BO.BlInvalidValueException("Password is not strong enough.");
 
 
         DO.Courier doCourier = new DO.Courier
@@ -57,7 +57,7 @@ internal static class CourierManager
         }
         catch (Exception ex)
         {
-            throw new BO.BlAlreadyExistsException($"courier with id {boCourier.Id} is alredy exists",ex);
+            throw new BO.BlAlreadyExistsException($"courier with id {boCourier.Id} is alredy exists", ex);
         }
 
 
@@ -88,7 +88,7 @@ internal static class CourierManager
         };
         return boCourier;//מחזירים שליח מומר
     }
-    
+
     internal static void Update(int requesterId, BO.Courier boCourier)
     {
         bool manager = requesterId == AdminManager.GetConfig().ManagerId;
@@ -100,13 +100,13 @@ internal static class CourierManager
 
         // בדיקות תקינות
         if (!Tools.IsValidPhone(boCourier.Phone))
-            throw new BO.InvalidPhoneException("Invalid phone number.");
+            throw new BO.BlInvalidValueException("Invalid phone number.");
 
         if (!Tools.IsValidEmail(boCourier.Email))
-            throw new BO.InvalidEmailException("Invalid email address.");
+            throw new BO.BlInvalidValueException("Invalid email address.");
 
         if (!Tools.IsStrongPassword(boCourier.Password))
-            throw new BO.WeakPasswordException("Password is not strong enough.");
+            throw new BO.BlInvalidValueException("Password is not strong enough.");
 
         // המרה ל-DO
         DO.Courier doCourier = new DO.Courier
@@ -125,15 +125,36 @@ internal static class CourierManager
             WorkingSince = courier.WorkingSince
 
         };
+        try
+        {
+            s_dal.Courier.Update(doCourier); // שולחים ל-DAL
+        }
+        catch (Exception ex)
+        {
+            throw new BO.BlDoesNotExistException($"courier with id {boCourier.Id} is not found", ex);
+        }
 
-        // עדכון ב-DAL
-        s_dal.Courier.Update(doCourier);
     }
 
 
     internal static void Delete(int id)
     {
-        s_dal.Courier.Delete(id); // שולחים ל-DAL
+                
+            // בדיקה אם השליח קיים
+            DO.Courier? courier = s_dal.Courier.Read(id);
+            if (courier == null)
+                throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist, you can't delete");
+            // בדיקה אם יש משלוחים פעילים
+            IEnumerable<DO.Delivery> activeDeliveries = s_dal.Delivery.ReadAll(d =>
+                d.CourierId == id &&
+                (d.EndDelivery == null || d.EndDelivery != DO.EndDelivery.DELIVERED)
+            );
+            if (activeDeliveries.Any())
+                throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
+
+            s_dal.Courier.Delete(id); // שולחים ל-DAL אני לא מפחד מחריגה מלמטה כי כבר ווידאתי שהוא קיים
+       
+       
     }
 
     internal static IEnumerable<BO.CourierInList> ReadAll(
