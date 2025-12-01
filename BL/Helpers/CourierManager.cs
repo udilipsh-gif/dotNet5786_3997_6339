@@ -163,7 +163,7 @@ internal static class CourierManager
         BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
         if (requesterId != AdminManager.GetConfig().ManagerId)
-            throw new BO.UnauthorizedAccessException("Only manager can access the list of couriers.");
+            throw new BO.BlNoAccessException("Only manager can access the list of couriers.");
 
         return s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive)
             .OrderBy(c => sort switch
@@ -280,7 +280,7 @@ internal static class CourierManager
         {
             // שליפת המהירות הממוצעת לפי סוג הרכב
             DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
-                ?? throw new Exception("Courier not found");
+                ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
             double avgSpeed = courier.TypeShipment switch
             {
                 DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,

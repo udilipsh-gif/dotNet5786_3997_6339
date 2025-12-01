@@ -75,28 +75,37 @@ public class BlInvalidOperationException : Exception
         $"BL Exception: Invalid Operation. {Message}\n {InnerException}\n";
 }
 
-
-
-
 [Serializable]
-public class DalException : Exception
+public class BlNoAccessException : Exception
 {
-    string Message { get; }
-    public int EntityId { get; }
-
-    public DalException(string message) : base(message) { }
-
-    public DalException() : base() { }
-    public DalException(DalAlreadyExistsException ex)
-    {
-        Message = ex.ToString();
-    }
-
-    public DalException(Exception ex)
-    {
-        Message = ex.ToString();
-    }
-
-    public override string ToString() => $"DalException: {Message}\n";
-
+    public BlNoAccessException() : base() { }
+    public BlNoAccessException(string message) : base(message) { }
+    public BlNoAccessException(string message, Exception innerException)
+                : base(message, innerException) { }
+    public override string ToString() =>
+        $"BL Exception: No Access. {Message}\n {InnerException}\n";
 }
+
+
+//[Serializable]
+//public class DalException : Exception
+//{
+//    string Message { get; }
+//    public int EntityId { get; }
+
+//    public DalException(string message) : base(message) { }
+
+//    public DalException() : base() { }
+//    public DalException(DalAlreadyExistsException ex)
+//    {
+//        Message = ex.ToString();
+//    }
+
+//    public DalException(Exception ex)
+//    {
+//        Message = ex.ToString();
+//    }
+
+//    public override string ToString() => $"DalException: {Message}\n";
+
+//}
