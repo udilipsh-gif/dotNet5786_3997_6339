@@ -78,7 +78,7 @@ public class BlInvalidOperationException : Exception
 [Serializable]
 public class BlNoAccessException : Exception
 {
-    public BlNoAccessException() : base() { }
+    public BlNoAccessException() : base("You do not have permission to perform this action.") { }
     public BlNoAccessException(string message) : base(message) { }
     public BlNoAccessException(string message, Exception innerException)
                 : base(message, innerException) { }

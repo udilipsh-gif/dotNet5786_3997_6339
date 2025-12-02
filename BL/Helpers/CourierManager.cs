@@ -162,8 +162,7 @@ internal static class CourierManager
         bool? isActive,
         BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
-        if (requesterId != AdminManager.GetConfig().ManagerId)
-            throw new BO.BlNoAccessException("Only manager can access the list of couriers.");
+       
 
         return s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive)
             .OrderBy(c => sort switch
@@ -214,7 +213,7 @@ internal static class CourierManager
     private static BO.OrderInProgress s_createOrderInProgress(DO.Delivery delivery)
     {
         DO.Order? order = s_dal.Order.Read(delivery.OrderId)
-         ?? throw new Exception("Order not found");
+         ?? throw new BO.BlDoesNotExistException("Order not found");
 
         var estimatedDeliveryTime = s_getEstimatedDeliveryTime(delivery); // משתנה עזר לחישוב זמן משוער
         var maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
