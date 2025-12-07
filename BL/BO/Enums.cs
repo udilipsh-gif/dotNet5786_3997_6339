@@ -175,7 +175,12 @@ public enum ScheduleStatus
     /// <summary>
     /// The delivery is late.
     /// </summary>
-    LATE
+    LATE,
+
+    /// <summary>
+    /// The order is conselled.
+    /// </summary>
+    CONCEL
 }
 public enum EndDelivery
 {

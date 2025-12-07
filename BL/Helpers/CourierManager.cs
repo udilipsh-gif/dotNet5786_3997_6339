@@ -82,9 +82,7 @@ internal static class CourierManager
             DeliveryOnTime = s_getDeliveryOnTime(doCourier),
             DeliveryLate = s_getDeliveryLate(doCourier),
             OrderInProgress = s_getOrderInProgres(doCourier.Id)
-
-
-
+s
         };
         return boCourier;//מחזירים שליח מומר
     }
@@ -139,7 +137,6 @@ internal static class CourierManager
 
     internal static void Delete(int id)
     {
-                
             // בדיקה אם השליח קיים
             DO.Courier? courier = s_dal.Courier.Read(id);
             if (courier == null)
@@ -153,8 +150,6 @@ internal static class CourierManager
                 throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
 
             s_dal.Courier.Delete(id); // שולחים ל-DAL אני לא מפחד מחריגה מלמטה כי כבר ווידאתי שהוא קיים
-       
-       
     }
 
     internal static IEnumerable<BO.CourierInList> ReadAll(
@@ -215,7 +210,7 @@ internal static class CourierManager
         DO.Order? order = s_dal.Order.Read(delivery.OrderId)
          ?? throw new BO.BlDoesNotExistException("Order not found");
 
-        var estimatedDeliveryTime = s_getEstimatedDeliveryTime(delivery); // משתנה עזר לחישוב זמן משוער
+        var estimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(delivery); // משתנה עזר לחישוב זמן משוער
         var maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
 
         BO.OrderInProgress orderInProgress = new BO.OrderInProgress
@@ -234,7 +229,7 @@ internal static class CourierManager
             EstimatedDeliveryTime = estimatedDeliveryTime,
             MaxDeliveryTime = maxDeliveryTime,//חישוב זמן מקסימלי 
             OrderStatus = BO.OrderStatus.DELIVERING,
-            ScheduleStatus = s_getScheduleStatus((BO.OrderStatus)order.OrderStatus, estimatedDeliveryTime, maxDeliveryTime),//מצב לוח זמנים to do
+            ScheduleStatus = Tools.GetScheduleStatus(order, delivery),//מצב לוח זמנים to do
             TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)//זמן שנותר to do
         };
         return orderInProgress;
@@ -254,52 +249,4 @@ internal static class CourierManager
 
         return s_createOrderInProgress(allDeliveries.First());
     }
-
-
-    private static BO.ScheduleStatus s_getScheduleStatus(BO.OrderStatus orderStatus, DateTime estimatedDeliveryTime, DateTime maxDeliveryTime)
-    {
-        TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ?? throw new Exception("Risk range not configured");
-        // המשלוח וודאי עדיין בתהליך למקרה שנרצה לבדוק משלוח סגור נצטרך להוציא את זה ל TOLLS ולבדוק עוד תנאים
-
-        var timeBuffer = maxDeliveryTime - estimatedDeliveryTime;
-
-        if (timeBuffer > riskRange)
-            return BO.ScheduleStatus.ONTYME;
-
-        if (timeBuffer >= TimeSpan.Zero) // כלומר: בין 0 ל-riskRange
-            return BO.ScheduleStatus.INRISK;
-
-        return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
-
-    }
-    private static DateTime s_getEstimatedDeliveryTime(DO.Delivery delivery)
-    {
-        DateTime estimatedDeliveryTime;
-        if (delivery.ActualDistance.HasValue)
-        {
-            // שליפת המהירות הממוצעת לפי סוג הרכב
-            DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
-                ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
-            double avgSpeed = courier.TypeShipment switch
-            {
-                DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
-                DO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
-                DO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
-                DO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
-                _ => 1.0
-            };
-
-            // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
-            double estimatedHours = delivery.ActualDistance.Value / avgSpeed;
-            estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
-        }
-        else
-        {
-        // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
-        estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
-        }
-        return estimatedDeliveryTime;
-
-    }
-
 }

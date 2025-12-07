@@ -1,11 +1,12 @@
 ﻿
-
+using DalApi;
 using System.Text.RegularExpressions;
 
 namespace Helpers;
 
 internal static class Tools
 {
+    private static readonly IDal s_dal = Factory.Get; //stage 4
 
     public static string ToStringProperty<T>(this T t)
     {
@@ -30,8 +31,11 @@ internal static class Tools
 
     public static double GetDistance(DO.Order order) //פונקציית העמסה למרחק מהחנות להזמנה
     {
-        double storeLatitude = AdminManager.GetConfig().Latitude ?? throw new InvalidOperationException("Latitude is not set in configuration.");
-        double storeLongitude = AdminManager.GetConfig().Longitude ?? throw new InvalidOperationException("Longitude is not set in configuration.");
+        double storeLatitude = AdminManager.GetConfig().Latitude ??
+            throw new InvalidOperationException("Latitude is not set in configuration.");
+
+        double storeLongitude = AdminManager.GetConfig().Longitude ??
+            throw new InvalidOperationException("Longitude is not set in configuration.");
         
         return GetDistance(order.Latitude, order.Longitude, storeLatitude, storeLongitude);
     }
@@ -40,6 +44,69 @@ internal static class Tools
     private static double s_toRadians(double angleIn10thofaDegree)
     {
         return (angleIn10thofaDegree * Math.PI) / 180;
+    }
+
+    public static BO.ScheduleStatus GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
+    {
+        TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ??
+            throw new Exception("Risk range not configured");
+
+        DateTime maxDeliveryTime = order.OrderDate + AdminManager.GetConfig()?.MaxDeliveryTime ??
+            throw new Exception("Max Delivery Time");
+
+        if (delivery == null)
+        {
+            delivery = (from deliver in DeliveryManager.ReadAll()
+                        where deliver.OrderId == order.Id
+                        select deliver).FirstOrDefault();
+        }
+
+        if (order.OrderStatus is DO.OrderStatus.COMPLETED)
+        {
+            DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
+                throw new Exception("order completed but not fonud delivry");
+
+            if (maxDeliveryTime >= timeEndDelivery)
+            {
+                return BO.ScheduleStatus.ONTYME;
+            }
+            else
+            {
+                return BO.ScheduleStatus.LATE;
+            }
+        }
+
+        if(order.OrderStatus is DO.OrderStatus.DELIVERING)
+        {
+            if(delivery is null)  throw new Exception("order start but not fonud delivry");
+
+            TimeSpan timeBuffer = maxDeliveryTime - GetEstimatedDeliveryTime(delivery);
+
+            if (timeBuffer > riskRange)
+                return BO.ScheduleStatus.ONTYME;
+
+            if (timeBuffer >= TimeSpan.Zero) // כלומר: בין 0 ל-riskRange
+                return BO.ScheduleStatus.INRISK;
+
+            return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
+        }
+
+        if(order.OrderStatus is DO.OrderStatus.OPEN)
+        {
+            TimeSpan timeLaft = maxDeliveryTime - AdminManager.Now;
+            TimeSpan timeBuffer = timeLaft - TimeSpan.FromHours((GetDistance(order) / 4));
+
+            if (timeBuffer > riskRange)
+                return BO.ScheduleStatus.ONTYME;
+
+            if (timeBuffer >= TimeSpan.Zero) // כלומר: בין 0 ל-riskRange
+                return BO.ScheduleStatus.INRISK;
+
+            return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
+        }
+
+        return BO.ScheduleStatus.CONCEL;
+
     }
 
     //בדיקות תקינות של ערכים
@@ -59,7 +126,6 @@ internal static class Tools
     {
         return Regex.IsMatch(phone, @"^0\d{8,9}$") ||
         Regex.IsMatch(phone, @"^\+?[1-9]\d{1,14}$");
-
     }
     public static bool IsStrongPassword(string password)
     {
@@ -96,5 +162,35 @@ internal static class Tools
         }
 
         return (id % 10 == (10 - (sum % 10)));
+    }
+
+    public static DateTime GetEstimatedDeliveryTime(DO.Delivery delivery)
+    {
+        DateTime estimatedDeliveryTime;
+        if (delivery.ActualDistance.HasValue)
+        {
+            // שליפת המהירות הממוצעת לפי סוג הרכב
+            DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
+                ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
+            double avgSpeed = courier.TypeShipment switch
+            {
+                DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
+                DO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
+                DO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
+                DO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
+                _ => 1.0
+            };
+
+            // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
+            double estimatedHours = delivery.ActualDistance.Value / avgSpeed;
+            estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
+        }
+        else
+        {
+            // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
+            estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
+        }
+        return estimatedDeliveryTime;
+
     }
 }

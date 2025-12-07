@@ -7,6 +7,38 @@ internal static class OrderManager
 {
     private static IDal s_dal = Factory.Get; //stage 4
 
+    public static int[] GetOrdersStatistics()
+    {
+        var allOrders = s_dal.Order.ReadAll();
+        int maxStatusVal = (int)Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>().Max();
+        int maxScheduleVal = (int)Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>().Max();
+
+        int[] results = new int[maxStatusVal + 1 + maxScheduleVal + 1];
+
+        var query = (from order in allOrders
+                     group order by order.OrderStatus into g
+                           select new
+                           {
+                               Index = (int)g.Key,
+                               Count = g.Count()
+                           })
+                           .Concat
+                           (from order in allOrders
+                            let timeStatus = Tools.GetScheduleStatus(order)
+                            group order by timeStatus into g
+                            select new
+                            {
+                                Index = (int)g.Key + maxStatusVal + 1,
+                                Count = g.Count()
+                            });
+
+        foreach (var item in query)
+        {
+            results[item.Index] = item.Count;
+        }
+        return results;
+    }
+
     public static void Create( BO.Order boOrder)
     {
         DO.Order doOrder = new DO.Order
