@@ -8,7 +8,7 @@ public interface IBI
     IOrder Order { get; }
     IClosedDeliveryInList ClosedDeliveryInList { get; }
     ICourierInList CourierInList { get; }
-  //  IDelivery Delivery { get; }
+    IDelivery Delivery { get; }
     IDeliveryPerOrderInList DeliveryPerOrderInList { get; }
     IOpenOrderInList OpenOrderInList { get; }
     IOrderInProgress OrderInProgress { get; }

@@ -39,7 +39,9 @@ internal static class AdminManager //stage 4
         //TO_DO: //stage 4
 
 
-      ////  StudentManager.PeriodicStudentsUpdates(oldClock, newClock); //stage 4. to be removed in stage 7 and replaced as below
+        ////  StudentManager.PeriodicStudentsUpdates(oldClock, newClock); //stage 4. to be removed in stage 7 and replaced as below
+        // TO_DO stage 4
+        DeliveryManager.PeriodicOrdersUpdates(oldClock, newClock);
 
 
         //...
