@@ -16,7 +16,6 @@ public enum CourierFieldFilter
 }
 public enum OrderInListField
 {
-    DeliveryId,
     OrderId,
     TypeOfOrder,
     DistanceKm,
