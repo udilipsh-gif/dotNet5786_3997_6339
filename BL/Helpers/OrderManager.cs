@@ -43,7 +43,7 @@ internal static class OrderManager
     {
         DO.Order doOrder = new DO.Order
         {
-            Id = boOrder.Id,
+            Id = boOrder.Id,//צריך לקחת מהקונפיג של השכבה התחתונה מס רץ
             TypeOfOrder = (DO.TypeOfOrder)boOrder.TypeOfOrder,
             Details = boOrder.Details,
             Addres = boOrder.Addres,//חישוב תקינות כתובת

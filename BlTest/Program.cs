@@ -71,7 +71,43 @@ internal class Program
         };
 
     }
-    private static IEnumerable<CourierInList> ReadAllCouriers(int requesterId)
+    private static Order createOrder()
+    {
+        Console.WriteLine("Enter type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
+        int typeOfOrderInput = GetIntInput();
+        Console.WriteLine("Enter datials of order");
+        string? datails= Console.ReadLine();
+        Console.WriteLine("Enter address of order: ");
+        string? address= Console.ReadLine();
+        Console.WriteLine("Enter weight of order (in grams): ");
+        int weight = GetIntInput();
+        Console.WriteLine("Enter name of customer: ");
+        string? name= Console.ReadLine();
+        Console.WriteLine("Enter phone of customer: ");
+        string? phone= Console.ReadLine();
+        return new Order
+        {
+            Id = 0,
+            TypeOfOrder = (TypeOfOrder)typeOfOrderInput,
+            Details = datails ?? string.Empty,
+            Addres = address ?? string.Empty,
+            Weight = weight,
+            Latitude = 0,
+            Longitude = 0,
+            Distance = 0,
+            Name = name ?? string.Empty,
+            Phone = phone ?? string.Empty,
+            OrderDate = s_bl.Admin.GetClock(),
+            EstimatedDeliveryTime = s_bl.Admin.GetClock(),
+            MaxDeliveryTime = s_bl.Admin.GetClock(),
+            OrderStatus = OrderStatus.OPEN,
+            ScheduleStatus = ScheduleStatus.ONTYME,
+            TimeLeftForDelivery = TimeSpan.Zero,
+            DeliveryPerOrderInLists = new List<DeliveryPerOrderInList>(),
+        };
+
+    }
+    private static IEnumerable<CourierInList> readAllCouriers(int requesterId)
     {
         Console.WriteLine($@"
                 Filter couriers:                       
@@ -167,14 +203,15 @@ internal class Program
 
 
     }
-    private static void SetCourier()
+    private static void setCourier()
     {
+        Console.WriteLine("Set Courier Menu.");
         Console.Write("Enter ID of the requester: ");
         int requesterId = GetIntInput();
         do
         {
             Console.WriteLine(@$"
-Set courier Menu.
+
     to exit press 0
     to create courier press 1
     to read courier press 2
@@ -205,7 +242,7 @@ Set courier Menu.
                         break;
 
                     case 3:
-                        IEnumerable<CourierInList> couriers = ReadAllCouriers(requesterId);
+                        IEnumerable<CourierInList> couriers = readAllCouriers(requesterId);
 
                         if (!couriers.Any())
                         {
@@ -225,7 +262,7 @@ Set courier Menu.
                     case 5:
                         Console.WriteLine("Enter courier id: ");
                         int deleteId = GetIntInput();
-                        s_bl.Courier.Delete(requesterId,deleteId);
+                        s_bl.Courier.Delete(requesterId, deleteId);
                         Console.WriteLine("Courier deleted successfully!");
                         break;
                     default:
@@ -238,6 +275,46 @@ Set courier Menu.
                 Console.Error.WriteLine(ex);
             }
         } while (true);
+    }
+    private static void setOrder()
+    {
+        Console.WriteLine("Set Order Menu.");
+        Console.WriteLine("Enter ID of the requester: ");
+        int requesterId = GetIntInput();
+        do
+        {
+            Console.WriteLine(@$"
+    to exit press 0
+    to create order press 1
+    to read courier press 2
+    to read all couriers press 3
+    to update courier press 4
+    to delete courier press 5
+");
+            int choice = GetIntInput();
+            try
+            {
+                switch (choice)
+                {
+                    case 0:
+                        Console.WriteLine("exit from set courier");
+                        break;
+                    case 1:
+                        Order newOrder = createOrder();
+                        s_bl.Order.Create(requesterId, newOrder);
+                        Console.WriteLine("Order created successfully!");
+                        break;
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+        } while (true);
+
+
     }
 
 
@@ -384,9 +461,10 @@ Set courier Menu.
                         Console.WriteLine("good bye");
                         break;
                     case 1:
-                        SetCourier();
+                        setCourier();
                         break;
                     case 2:
+                        setOrder();
                         //dataMenu(s_dal!.Order!);
                         break;
                     case 3:

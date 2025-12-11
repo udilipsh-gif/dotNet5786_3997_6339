@@ -82,7 +82,6 @@ internal static class CourierManager
             DeliveryOnTime = s_getDeliveryOnTime(doCourier),
             DeliveryLate = s_getDeliveryLate(doCourier),
             OrderInProgress = s_getOrderInProgres(doCourier.Id)
-s
         };
         return boCourier;//מחזירים שליח מומר
     }
