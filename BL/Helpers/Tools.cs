@@ -1,6 +1,7 @@
 ﻿
 using DalApi;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Helpers;
 
@@ -36,7 +37,7 @@ internal static class Tools
 
         double storeLongitude = AdminManager.GetConfig().Longitude ??
             throw new InvalidOperationException("Longitude is not set in configuration.");
-        
+
         return GetDistance(order.Latitude, order.Longitude, storeLatitude, storeLongitude);
     }
 
@@ -46,7 +47,7 @@ internal static class Tools
         return (angleIn10thofaDegree * Math.PI) / 180;
     }
 
-    public static BO.OrderStatus GetOrderStatus(DO.Order order , DO.Delivery? delivery)
+    public static BO.OrderStatus GetOrderStatus(DO.Order order, DO.Delivery? delivery)
     {
         if (delivery is null)
         {
@@ -104,9 +105,9 @@ internal static class Tools
             }
         }
 
-        if(order.OrderStatus is DO.OrderStatus.DELIVERING)
+        if (order.OrderStatus is DO.OrderStatus.DELIVERING)
         {
-            if(delivery is null)  throw new Exception("order start but not fonud delivry");
+            if (delivery is null) throw new Exception("order start but not fonud delivry");
 
             TimeSpan timeBuffer = maxDeliveryTime - GetEstimatedDeliveryTime(delivery);
 
@@ -119,7 +120,7 @@ internal static class Tools
             return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
         }
 
-        if(order.OrderStatus is DO.OrderStatus.OPEN)
+        if (order.OrderStatus is DO.OrderStatus.OPEN)
         {
             TimeSpan timeLaft = maxDeliveryTime - AdminManager.Now;
             TimeSpan timeBuffer = timeLaft - TimeSpan.FromHours((GetDistance(order) / 4));
@@ -237,13 +238,13 @@ internal static class Tools
                         where deliver.OrderId == order.Id
                         orderby deliver.Id descending
                         select deliver).FirstOrDefault();
-        
-        return delivery == null ? null : GetEstimatedDeliveryTime(delivery);     
+
+        return delivery == null ? null : GetEstimatedDeliveryTime(delivery);
     }
 
     public static TimeSpan GetTimeLeftForDelivery(DO.Order order, BO.OrderStatus status)
     {
-        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CONCELLED )
+        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CONCELLED)
         {
             return TimeSpan.Zero;
         }
@@ -265,11 +266,58 @@ internal static class Tools
             return delivery!.TimeEndDelivery!.Value - order.OrderDate;
         }
 
-        return  TimeSpan.Zero; ;
+        return TimeSpan.Zero; ;
     }
 
     public static int GetCuntOfDelivery(int orderId)
     {
         return s_dal.Delivery.ReadAll(d => d.OrderId == orderId).Count();
+    }
+
+    public static (double Lat, double Lng)? GetGeocodingSync(string address)
+    {
+        var apiKey = AdminManager.GetConfig().GoogleApiKey;
+        string url = $"https://maps.googleapis.com/maps/api/geocode/xml?address={address}&key={apiKey}";
+        using (HttpClient client = new HttpClient())
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", "dotNet5786_3997_6339");
+            try
+            {
+                HttpResponseMessage response = client.GetAsync(url).GetAwaiter().GetResult();
+                if (response.IsSuccessStatusCode)
+                {
+                    string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    XDocument doc = XDocument.Parse(xmlContent);
+                    string? status = doc.Element("GeocodeResponse")?.Element("status")?.Value;
+                    if (status == "OK")
+                    {
+                        var locationElement = doc.Element("GeocodeResponse")?
+                                             .Element("result")?
+                                             .Element("geometry")?
+                                             .Element("location");
+                        if (locationElement != null)
+                        {
+                            double lat = double.Parse(locationElement.Element("lat")!.Value);
+                            double lng = double.Parse(locationElement.Element("lng")!.Value);
+
+                            return (lat, lng);
+                        }
+                        else
+                        {
+                            throw new Exception("Location element not found in the response.");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to get geocoding data.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Exception: {ex.Message}");
+            }
+        }
+        return null;
     }
 }

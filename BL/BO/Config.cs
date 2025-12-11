@@ -75,6 +75,14 @@ public class Config
     /// </summary>
     public TimeSpan MaxTimeInactivity { get; set; } = TimeSpan.FromDays(0);
 
+
+
+
+    /// <summary>
+    /// gets or sets the Google API key for accessing Google services.
+    /// </summary>
+    public string GoogleApiKey { get; set; } = string.Empty;
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>

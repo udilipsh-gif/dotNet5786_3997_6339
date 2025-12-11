@@ -180,6 +180,12 @@ internal static class Config
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "MaxTimeInactivity", value);
     }
 
+    internal static string GoogleApiKey
+    {
+        get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "GoogleApiKey");
+        set => XMLTools.SetConfigGenericVal(s_data_config_xml, "GoogleApiKey", value);
+    }
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
@@ -222,5 +228,6 @@ internal static class Config
         MaxDeliveryTime = TimeSpan.FromHours(2);
         RiskRange = TimeSpan.FromMinutes(30);
         MaxTimeInactivity = TimeSpan.FromMinutes(15);
+        GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
     }
 }

@@ -1,8 +1,5 @@
-﻿
-using BlApi;
-using BO;
-using DalApi;
-using DO;
+﻿using DalApi;
+
 
 namespace Helpers;
 
@@ -49,13 +46,13 @@ internal static class OrderManager
             Id = 0,
             TypeOfOrder = (DO.TypeOfOrder)boOrder.TypeOfOrder,
             Details = boOrder.Details,
-            Addres = boOrder.Addres,
+            Addres = boOrder.Addres,//חישוב
             Latitude = boOrder.Latitude,
             Longitude = boOrder.Longitude,
             Name = boOrder.Name,
-            Phone = boOrder.Phone,
+            Phone = boOrder.Phone,//חישוב
             Weight = boOrder.Weight,
-            OrderDate = boOrder.OrderDate,
+            OrderDate = AdminManager.Now,
         };
         s_dal.Order.Create(doOrder);
     }
@@ -106,23 +103,26 @@ internal static class OrderManager
     }
     public static void Update(BO.Order boOrder)
     {
+        if (!Tools.IsValidPhone(boOrder.Phone))
+            throw new BO.BlInvalidValueException("Invalid phone number.");
+
+        var adressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
+
         DO.Order doOrder = new DO.Order
         {
             Id = boOrder.Id,
             TypeOfOrder = (DO.TypeOfOrder)boOrder.TypeOfOrder,
             Details = boOrder.Details,
-            Addres = boOrder.Addres,
-            Latitude = boOrder.Latitude,
-            Longitude = boOrder.Longitude,
+            Addres = boOrder.Addres,//חישוב
+            Latitude = adressCoordinates?.Lat ?? boOrder.Latitude,
+            Longitude = adressCoordinates?.Lng ?? boOrder.Longitude,
             Name = boOrder.Name,
             Phone = boOrder.Phone,
             Weight = boOrder.Weight,
             OrderDate = boOrder.OrderDate,
-
         };
         s_dal.Order.Update(doOrder);
     }
-
 
     public static void Delete(int id)
     {
@@ -170,8 +170,6 @@ internal static class OrderManager
             _ => throw new BO.BlInvalidOperationException("Invalid order status.")
         };
     }
-
-   
 
     public static void OrderSelection(int courierId, int orderId)
     {
