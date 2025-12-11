@@ -108,24 +108,3 @@ public enum OrderStatus
     /// </summary>
     CONCELLED
 }
-
-/// <summary>
-/// Represents the schedule status of a delivery relative to its expected timeline.
-/// </summary>
-public enum ScheduleStatus
-{
-    /// <summary>
-    /// The delivery is on time.
-    /// </summary>
-    ONTYME,
-    
-    /// <summary>
-    /// The delivery is at risk of being late.
-    /// </summary>
-    INRISK,
-    
-    /// <summary>
-    /// The delivery is late.
-    /// </summary>
-    LATE
-}
