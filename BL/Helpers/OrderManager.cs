@@ -46,7 +46,7 @@ internal static class OrderManager
     {
         DO.Order doOrder = new DO.Order
         {
-            Id = boOrder.Id,
+            Id = 0,
             TypeOfOrder = (DO.TypeOfOrder)boOrder.TypeOfOrder,
             Details = boOrder.Details,
             Addres = boOrder.Addres,
@@ -122,6 +122,8 @@ internal static class OrderManager
         };
         s_dal.Order.Update(doOrder);
     }
+
+
     public static void Delete(int id)
     {
         throw new BO.BlDoesNotExistException("Order cannot be deleted");
@@ -169,23 +171,7 @@ internal static class OrderManager
         };
     }
 
-    public static void AddOrder(BO.Order boOrder)
-    {
-        DO.Order doOrder = new DO.Order
-        {
-            Id = 0,
-            TypeOfOrder = (DO.TypeOfOrder)boOrder.TypeOfOrder,
-            Details = boOrder.Details,
-            Addres = boOrder.Addres,
-            Latitude = boOrder.Latitude,
-            Longitude = boOrder.Longitude,
-            Name = boOrder.Name,
-            Phone = boOrder.Phone,
-            Weight = boOrder.Weight,
-            OrderDate = boOrder.OrderDate,
-        };
-        s_dal.Order.Create(doOrder);
-    }
+   
 
     public static void OrderSelection(int courierId, int orderId)
     {
