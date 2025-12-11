@@ -46,6 +46,34 @@ internal static class Tools
         return (angleIn10thofaDegree * Math.PI) / 180;
     }
 
+    public static BO.OrderStatus GetOrderStatus(DO.Order order , DO.Delivery? delivery)
+    {
+        if (delivery is null)
+        {
+            return BO.OrderStatus.OPEN;
+        }
+        else
+        {
+            return (delivery.EndDelivery) switch
+            {
+                DO.EndDelivery.DELIVERED => BO.OrderStatus.COMPLETED,
+                DO.EndDelivery.REFUSED => BO.OrderStatus.REFUSED,
+                DO.EndDelivery.CONCELLED => BO.OrderStatus.CONCELLED,
+                DO.EndDelivery.FAILED => BO.OrderStatus.CONCELLED,
+                DO.EndDelivery.NOTFOUND => BO.OrderStatus.OPEN,
+                _ => throw new Exception("Unknown delivery status"),
+            };
+        }
+    }
+    public static BO.OrderStatus GetOrderStatus(DO.Order order)
+    {
+        var delivery = (from deliver in DeliveryManager.ReadAll()
+                        where deliver.OrderId == order.Id
+                        orderby deliver.Id descending
+                        select deliver).FirstOrDefault();
+        return GetOrderStatus(order, delivery);
+    }
+
     public static BO.ScheduleStatus GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
     {
         TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ??
@@ -109,6 +137,15 @@ internal static class Tools
 
     }
 
+    public static BO.ScheduleStatus GetScheduleStatus(DO.Order order)
+    {
+        var delivery = (from deliver in DeliveryManager.ReadAll()
+                        where deliver.OrderId == order.Id
+                        orderby deliver.Id descending
+                        select deliver).FirstOrDefault();
+
+        return GetScheduleStatus(order, delivery);
+    }
     //בדיקות תקינות של ערכים
     public static bool IsValidEmail(string email)
     {
@@ -192,5 +229,47 @@ internal static class Tools
         }
         return estimatedDeliveryTime;
 
+    }
+
+    public static DateTime? GetEstimatedDeliveryTime(DO.Order order)
+    {
+        var delivery = (from deliver in DeliveryManager.ReadAll()
+                        where deliver.OrderId == order.Id
+                        orderby deliver.Id descending
+                        select deliver).FirstOrDefault();
+        
+        return delivery == null ? null : GetEstimatedDeliveryTime(delivery);     
+    }
+
+    public static TimeSpan GetTimeLeftForDelivery(DO.Order order, BO.OrderStatus status)
+    {
+        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CONCELLED )
+        {
+            return TimeSpan.Zero;
+        }
+
+        return (order.OrderDate + AdminManager.GetConfig().MaxDeliveryTime) - AdminManager.Now;
+    }
+
+    public static TimeSpan GetTimeLeftForDelivery(DO.Order order)
+    {
+        BO.OrderStatus status = GetOrderStatus(order);
+        return GetTimeLeftForDelivery(order, status);
+    }
+
+
+    public static TimeSpan GetTotalTimeOfDelivery(DO.Order order, BO.OrderStatus status, DO.Delivery? delivery)
+    {
+        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CONCELLED)
+        {
+            return delivery!.TimeEndDelivery!.Value - order.OrderDate;
+        }
+
+        return  TimeSpan.Zero; ;
+    }
+
+    public static int GetCuntOfDelivery(int orderId)
+    {
+        return s_dal.Delivery.ReadAll(d => d.OrderId == orderId).Count();
     }
 }

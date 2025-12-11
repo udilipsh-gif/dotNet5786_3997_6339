@@ -84,7 +84,7 @@ public class Order
     /// Gets or sets the estimated delivery time for the order.
     /// </summary>
     /// <value>A DateTime representing when the order is expected to be delivered.</value>
-    public required DateTime EstimatedDeliveryTime { get; set; }
+    public DateTime? EstimatedDeliveryTime { get; set; }
     
     /// <summary>
     /// Gets or sets the maximum acceptable delivery time for the order.
@@ -118,5 +118,5 @@ public class Order
     /// This collection tracks the history of delivery assignments and attempts for the order.
     /// Initialized to an empty list by default.
     /// </remarks>
-    public List<DeliveryPerOrderInList> DeliveryPerOrderInLists { get; set; } = new List<DeliveryPerOrderInList>();//= new List<Delivery>();
+    public List<DeliveryPerOrderInList>? DeliveryPerOrderInLists { get; set; }
 }
