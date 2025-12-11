@@ -110,11 +110,11 @@ internal static class OrderManager
             Id = boOrder.Id,
             TypeOfOrder = (DO.TypeOfOrder)boOrder.TypeOfOrder,
             Details = boOrder.Details,
-            Addres = boOrder.Addres,//חישוב תקינות כתובת
+            Addres = boOrder.Addres,
             Latitude = boOrder.Latitude,
             Longitude = boOrder.Longitude,
             Name = boOrder.Name,
-            Phone = boOrder.Phone,//חישוב תקינות טלפון
+            Phone = boOrder.Phone,
             Weight = boOrder.Weight,
             OrderDate = boOrder.OrderDate,
 
@@ -123,7 +123,49 @@ internal static class OrderManager
     }
     public static void Delete(int id)
     {
-        s_dal.Order.Delete(id);
+        throw new BO.BlDoesNotExistException("Order cannot be deleted");
+    }
+
+    public static void ConcelOrder(int orderId)
+    {
+        DO.Order doOrder = s_dal.Order.Read(orderId)
+            ?? throw new BO.BlDoesNotExistException("Order not found");
+        Action action = doOrder.OrderStatus switch
+        {
+            DO.OrderStatus.COMPLETED => throw new BO.BlInvalidOperationException("Cannot cancel a completed order."),
+            DO.OrderStatus.CONCELLED => throw new BO.BlInvalidOperationException("Order is already cancelled."),
+            DO.OrderStatus.OPEN or DO.OrderStatus.REFUSED => () =>
+            {
+                doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
+                s_dal.Delivery.Create(new DO.Delivery
+                {
+                    Id = doOrder.Id,
+                    OrderId = doOrder.Id,
+                    CourierId = 0,
+                    TypeOfOrder = doOrder.TypeOfOrder,
+                    OrderDate = AdminManager.Now,
+                    EndDelivery = DO.EndDelivery.CONCELLED,
+                    TimeEndDelivery = AdminManager.Now,
+                    ActualDistance = 0
+                });
+            }
+            ,
+            DO.OrderStatus.DELIVERING => () =>
+            {
+                var delivery = (from d in s_dal.Delivery?.ReadAll()
+                                where d.OrderId == doOrder.Id
+                                orderby d.Id descending
+                                select d).FirstOrDefault()
+                                ?? throw new BO.BlDoesNotExistException("Delivery not found for the order");
+                s_dal.Delivery?.Update(delivery with
+                {
+                    EndDelivery = DO.EndDelivery.CONCELLED,
+                    TimeEndDelivery = AdminManager.Now
+                });
+            }
+            ,
+            _ => throw new BO.BlInvalidOperationException("Invalid order status.")
+        };
     }
 
     private static BO.OrderInList s_convertToBoOrderInList (DO.Order doOrder)
