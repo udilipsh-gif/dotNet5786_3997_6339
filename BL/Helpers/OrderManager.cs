@@ -1,4 +1,5 @@
 ﻿
+using BlApi;
 using BO;
 using DalApi;
 using DO;
@@ -168,6 +169,33 @@ internal static class OrderManager
         };
     }
 
+    public static void AddOrder(BO.Order boOrder)
+    {
+        DO.Order doOrder = new DO.Order
+        {
+            Id = 0,
+            TypeOfOrder = (DO.TypeOfOrder)boOrder.TypeOfOrder,
+            Details = boOrder.Details,
+            Addres = boOrder.Addres,
+            Latitude = boOrder.Latitude,
+            Longitude = boOrder.Longitude,
+            Name = boOrder.Name,
+            Phone = boOrder.Phone,
+            Weight = boOrder.Weight,
+            OrderDate = boOrder.OrderDate,
+        };
+        s_dal.Order.Create(doOrder);
+    }
+
+    public static void OrderSelection(int courierId, int orderId)
+    {
+        DO.Order doOrder = s_dal.Order.Read(orderId)
+            ?? throw new BO.BlDoesNotExistException("Order not found");
+        BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);   
+        if (boOrderInList.OrderStatus is BO.OrderStatus.OPEN or is BO.OrderStatus.REFUSED )
+            throw new BO.BlInvalidOperationException("Order is not open for selection");
+    }
+
     private static BO.OrderInList s_convertToBoOrderInList (DO.Order doOrder)
     {
         DO.Delivery? delivery = (from d in s_dal.Delivery?.ReadAll()
@@ -190,6 +218,7 @@ internal static class OrderManager
             NumberOfDeliveryAttempts = Tools.GetCuntOfDelivery(doOrder.Id)
         };
     }
+
 
     private static Func<BO.OrderInList, bool> s_getFilterFunc(BO.OrderInListField? filter, Object? filterValue)
     {
