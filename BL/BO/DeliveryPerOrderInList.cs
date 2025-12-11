@@ -32,7 +32,7 @@
         /// Gets the type of order based on delivery speed requirements.
         /// </summary>
         /// <value>A <see cref="TypeOfOrder"/> value indicating whether this is a standard, fast, or immediate delivery.</value>
-        public required TypeOfOrder TypeOfOrder { get; init; }
+        public required TheTypeShipment TypeShipment { get; init; }
         
         /// <summary>
         /// Gets the date and time when the order was placed.

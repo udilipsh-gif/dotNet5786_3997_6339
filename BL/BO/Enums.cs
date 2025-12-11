@@ -22,8 +22,8 @@ public enum OrderInListField
     OrderStatus,
     ScheduleStatus,
     TimeLeftForDelivery,
-    TimeRightForDelivery,
-    TotalTimeOfDelivery
+    TotalTimeOfDelivery,
+    DeliveryAttempts
 }
 
 public enum OpenOrderInListField
