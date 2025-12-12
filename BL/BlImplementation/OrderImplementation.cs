@@ -27,7 +27,11 @@ internal class OrderImplementation : IOrder
     {
         throw new NotImplementedException();
     }
-    public BO.OrderInList ReadAll(int id, BO.OrderInListField? filter, object? value, BO.OrderInListField? sort)
+    public IEnumerable < BO.OrderInList> ReadAll(
+        int id,
+        BO.OrderStatus? filter,
+        object? value,
+        BO.OrderInListField? sort)
     {
         throw new NotImplementedException();
     }
@@ -44,11 +48,11 @@ internal class OrderImplementation : IOrder
     {
         throw new NotImplementedException();
     }
-    public BO.ClosedDeliveryInList GetClosed(int id, int courierId, BO.ClosedDeliveryInListField? filter, BO.ClosedDeliveryInListField sort)
+    public IEnumerable< BO.ClosedDeliveryInList> GetClosed(int id, int courierId, BO.TypeOfOrder? filter, BO.ClosedDeliveryInListField? sort)
     {
         throw new NotImplementedException();
     }
-    public BO.OpenOrderInList GetOpen(int id, int courierId, BO.OpenOrderInListField? filter, BO.OpenOrderInListField sort)
+    public IEnumerable <BO.OpenOrderInList> GetOpen(int id, int courierId, BO.TypeOfOrder? filter, BO.OpenOrderInListField? sort)
     {
         throw new NotImplementedException();
     }
