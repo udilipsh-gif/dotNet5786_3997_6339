@@ -32,6 +32,7 @@ internal static class DeliveryManager
         s_dal.Delivery.Update(delivery);
     }
 
+
     //internal static void PeriodicDeliveriesUpdates(DateTime oldClock, DateTime newClock)
     //{
     //    // קריאת המשלוחים שעדיין לא הסתיימו

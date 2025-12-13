@@ -176,7 +176,7 @@ internal static class OrderManager
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
         BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);   
-        if (boOrderInList.OrderStatus is BO.OrderStatus.OPEN or is BO.OrderStatus.REFUSED )
+        if (boOrderInList.OrderStatus is BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED )
             throw new BO.BlInvalidOperationException("Order is not open for selection");
     }
 

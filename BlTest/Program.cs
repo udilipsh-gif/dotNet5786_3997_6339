@@ -3,6 +3,9 @@
 
 
 
+
+using DalApi;
+
 namespace BO;
 internal class Program
 {
@@ -76,15 +79,15 @@ internal class Program
         Console.WriteLine("Enter type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
         int typeOfOrderInput = GetIntInput();
         Console.WriteLine("Enter datials of order");
-        string? datails= Console.ReadLine();
+        string? datails = Console.ReadLine();
         Console.WriteLine("Enter address of order: ");
-        string? address= Console.ReadLine();
+        string? address = Console.ReadLine();
         Console.WriteLine("Enter weight of order (in grams): ");
         int weight = GetIntInput();
         Console.WriteLine("Enter name of customer: ");
-        string? name= Console.ReadLine();
+        string? name = Console.ReadLine();
         Console.WriteLine("Enter phone of customer: ");
-        string? phone= Console.ReadLine();
+        string? phone = Console.ReadLine();
         return new Order
         {
             Id = 0,
@@ -153,6 +156,63 @@ internal class Program
         return s_bl.Courier.ReadAll(requesterId, isActive, sort);
 
     }
+    private static IEnumerable<OrderInList> readAllOrders(int requesterId)
+    {
+        Console.WriteLine($@"
+                Filter orders:                       
+                    1. OPEN only 
+                    2. IN_PROGRESS only 
+                    3. COMPLETED only
+                    4. CANCELED only
+                    5. All
+                        Choose");
+        int filterChoice = GetIntInput();
+        OrderStatus? orderStatus = filterChoice switch
+        {
+            1 => OrderStatus.OPEN,
+            2 => OrderStatus.DELIVERING,
+            3 => OrderStatus.COMPLETED,
+            4 => OrderStatus.REFUSED,
+            5 => OrderStatus.CONCELLED,
+            6 => null,
+            _ => null
+        };
+        Console.WriteLine($@"
+      Choose a field to filter by value:
+          1. OrderId
+          2. CustomerName
+          3. Distance (km)
+          4. No value filter
+              Choose");
+        int valueChoice = GetIntInput();
+
+
+
+        Console.WriteLine($@"
+                Sort orders by:
+                    1. OrderId
+                    2. TypeOfOrder
+                    3. DistanceKm
+                    4. OrderStatus
+                    5. ScheduleStatus
+                    6. No sorting
+                        Choose");
+        int sortChoice = GetIntInput();
+        OrderInListField? sort = sortChoice switch
+        {
+            1 => OrderInListField.OrderId,
+            2 => OrderInListField.TypeOfOrder,
+            3 => OrderInListField.DistanceKm,
+            4 => OrderInListField.OrderStatus,
+            5 => OrderInListField.ScheduleStatus,
+            6 => null,
+            _ => null
+        };
+
+        return s_bl.Order.ReadAll(requesterId, orderStatus, valueChoice, sort);
+    }
+
+
     private static Courier updateCourier(int requesterId)
     {
 
@@ -201,7 +261,172 @@ internal class Program
 
         };
 
+    }
+    private static Order updateOrder(int requesterId)
+    {
+        Console.WriteLine("Update of order");
+        Console.WriteLine("Enter ID of order to update: ");
+        int id = GetIntInput();
+        Console.WriteLine("Enter type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
+        int typeOfOrderInput = GetIntInput();
+        Console.WriteLine("Enter datials of order");
+        string? datails = Console.ReadLine();
+        Console.WriteLine("Enter address of order: ");
+        string? address = Console.ReadLine();
+        Console.WriteLine("Enter weight of order (in grams): ");
+        int weight = GetIntInput();
+        Console.WriteLine("Enter name of customer: ");
+        string? name = Console.ReadLine();
+        Console.WriteLine("Enter phone of customer: ");
+        string? phone = Console.ReadLine();
+        return new Order
+        {
+            Id = id,
+            TypeOfOrder = (TypeOfOrder)typeOfOrderInput,
+            Details = datails ?? string.Empty,
+            Addres = address ?? string.Empty,
+            Weight = weight,
+            Latitude = 0,
+            Longitude = 0,
+            Distance = 0,
+            Name = name ?? string.Empty,
+            Phone = phone ?? string.Empty,
+            OrderDate = s_bl.Admin.GetClock(),
+            EstimatedDeliveryTime = s_bl.Admin.GetClock(),
+            MaxDeliveryTime = s_bl.Admin.GetClock(),
+            OrderStatus = OrderStatus.OPEN,
+            ScheduleStatus = ScheduleStatus.ONTYME,
+            TimeLeftForDelivery = TimeSpan.Zero,
+            DeliveryPerOrderInLists = new List<DeliveryPerOrderInList>(),
+        };
+    }
+    private static IEnumerable<ClosedDeliveryInList> getlistClosedDeliveries(int requesterId)
+    {
+        Console.WriteLine("Enter courier id");
+        int courierId = GetIntInput();
+        Console.WriteLine($@"
+                Filter type of order:
+                    1. STANDART only
+                    2. FAST_DELIVERY only
+                    3. DELIVER_IMMEDIATELY only
+                        Choose");
+        int filterChoice = GetIntInput();
+        TypeOfOrder? typeOfOrder = filterChoice switch
+        {
+            1 => TypeOfOrder.STANDART,
+            2 => TypeOfOrder.FAST_DELIVERY,
+            3 => TypeOfOrder.DELIVER_IMMEDIATELY,
+            _ => null
+        };
 
+        Console.WriteLine($@"
+                Sort closed deliveries by:
+                    1. DeliveryId
+                    2. OrderId
+                    3. TypeOfOrder
+                    4. Address
+                    5. ShipmentType
+                    6. AqualDistens
+                    7. DelyveryTime
+                    8. EndDelivery
+                    9. No sorting
+                        Choose");
+        int sortChoice = GetIntInput();
+        ClosedDeliveryInListField? sort = sortChoice switch
+        {
+            1 => ClosedDeliveryInListField.DeliveryId,
+            2 => ClosedDeliveryInListField.OrderId,
+            3 => ClosedDeliveryInListField.TypeOfOrder,
+            4 => ClosedDeliveryInListField.Address,
+            5 => ClosedDeliveryInListField.ShipmentType,
+            6 => ClosedDeliveryInListField.AqualDistens,
+            7 => ClosedDeliveryInListField.DelyveryTime,
+            8 => ClosedDeliveryInListField.EndDelivery,
+            9 => null,
+            _ => null
+        };
+        return s_bl.Order.GetClosed(requesterId, courierId, typeOfOrder, sort);
+    }
+    private static IEnumerable<OpenOrderInList> getlistOpenOrders(int requesterId)
+    {
+        Console.WriteLine("Enter courier id");
+        int courierId = GetIntInput();
+        Console.WriteLine($@"
+                Filter type of order:
+                    1. STANDART only
+                    2. FAST_DELIVERY only
+                    3. DELIVER_IMMEDIATELY only
+                        Choose");
+        int filterChoice = GetIntInput();
+        TypeOfOrder? typeOfOrder = filterChoice switch
+        {
+            1 => TypeOfOrder.STANDART,
+            2 => TypeOfOrder.FAST_DELIVERY,
+            3 => TypeOfOrder.DELIVER_IMMEDIATELY,
+            _ => null
+        };
+        Console.WriteLine($@"
+                Sort open orders by:
+                    1. OrderId
+                    2. TypeOfOrder
+                    3. DistanceKm
+                    4. OrderStatus
+                    5. ScheduleStatus
+                    6. No sorting
+                        Choose");
+        int sortChoice = GetIntInput();
+        OpenOrderInListField? sort = sortChoice switch
+        {
+            1 => OpenOrderInListField.OrderId,
+            2 => OpenOrderInListField.TypeOfOrder,
+            3 => OpenOrderInListField.DistanceKm,
+            4 => OpenOrderInListField.Weight,
+            5 => OpenOrderInListField.ScheduleStatus,
+            6 => null,
+            _ => null
+        };
+        return s_bl.Order.GetOpen(requesterId, courierId, typeOfOrder, sort);
+    }
+    private static Config createConfig()
+    {
+        Console.WriteLine("enter new password");
+        string passwordManager = Console.ReadLine() ?? string.Empty;
+        Console.WriteLine("enter new store address");
+        string storeAddress = Console.ReadLine() ?? string.Empty;
+        Console.WriteLine("enter new max delivery range (in km)");
+        double maxDeliveryRange = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed bike (in km/h)");
+        double avgSpeedBike = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed car (in km/h)");
+        double avgSpeedCar = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed foot (in km/h)");
+        double avgSpeedFoot = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed motorcycle (in km/h)");
+        double avgSpeedMotorcycle = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new max delivery time (in hours)");
+        TimeSpan maxDeliveryTime = TimeSpan.FromHours(double.Parse(Console.ReadLine() ?? "0"));
+        Console.WriteLine("enter new risk range (in minutes)");
+        TimeSpan riskRange = TimeSpan.FromMinutes(double.Parse(Console.ReadLine() ?? "0"));
+        Console.WriteLine("enter new max time inactivity (in minutes)");
+        TimeSpan maxTimeInactivity = TimeSpan.FromMinutes(double.Parse(Console.ReadLine() ?? "0"));
+
+
+        return new Config()
+            {
+                ManagerId = 0,
+                PasswordManager =passwordManager,
+                StoreAddress = storeAddress,
+                Latitude = 0,
+                Longitude = 0,
+                MaxDeliveryRange = maxDeliveryRange,
+                AvgSpeedBike = avgSpeedBike,
+                AvgSpeedCar = avgSpeedCar,
+                AvgSpeedFoot = avgSpeedFoot,
+                AvgSpeedMotorcycle = avgSpeedMotorcycle,
+                MaxDeliveryTime =maxDeliveryTime,
+                RiskRange =riskRange,
+                MaxTimeInactivity = maxTimeInactivity,
+            };
     }
     private static void setCourier()
     {
@@ -286,10 +511,15 @@ internal class Program
             Console.WriteLine(@$"
     to exit press 0
     to create order press 1
-    to read courier press 2
-    to read all couriers press 3
-    to update courier press 4
-    to delete courier press 5
+    to read order press 2
+    to read all orders press 3
+    to update order press 4
+    to delete order press 5
+    to cancel order press 6
+    To report a delivery press 7
+    to start delivery press 8
+    to get closed deliveries press 9
+    to get open deliveries press 10
 ");
             int choice = GetIntInput();
             try
@@ -304,6 +534,83 @@ internal class Program
                         s_bl.Order.Create(requesterId, newOrder);
                         Console.WriteLine("Order created successfully!");
                         break;
+                    case 2:
+                        Console.WriteLine("Enter order id: ");
+                        int id = GetIntInput();
+                        Order? result = s_bl.Order.Read(requesterId, id);
+                        //האם צריך חריגה? והאם צריך סימן שאלה, הרי אם הוא נול כבר יש שם חריגה לתפוס
+                        Console.WriteLine(result);
+                        break;
+                    case 3:
+                        IEnumerable<OrderInList> orders = readAllOrders(requesterId);
+                        if (!orders.Any())
+                        {
+                            Console.WriteLine("No orders found.");
+                        }
+                        else
+                        {
+                            foreach (OrderInList order in orders)
+                                Console.WriteLine(order);
+                        }
+                        break;
+                    case 4:
+                        Order updatedOrder = updateOrder(requesterId);
+                        s_bl.Order.Update(requesterId, updatedOrder);
+                        break;
+                    case 5:
+                        Console.WriteLine("Enter order id: ");
+                        int deleteId = GetIntInput();
+                        s_bl.Order.Delete(requesterId, deleteId);
+                        Console.WriteLine("Order deleted successfully!");
+                        break;
+                    case 6:
+                        Console.WriteLine("Enter order id to cancel: ");
+                        int cancelId = GetIntInput();
+                        s_bl.Order.Cancel(requesterId, cancelId);
+                        Console.WriteLine("Order canceled successfully!");
+                        break;
+                    case 7:
+                        Console.WriteLine("Enter order id to report delivery: ");
+                        int orderId = GetIntInput();
+                        Console.WriteLine("Enter courier id");
+                        int courierId = GetIntInput();
+                        s_bl.Order.Deliver(requesterId, courierId, orderId);
+                        Console.WriteLine("Delivery reported successfully!");
+                        break;
+                    case 8:
+                        Console.WriteLine("Enter order id to start delivery: ");
+                        orderId = GetIntInput();
+                        Console.WriteLine("Enter courier id");
+                        courierId = GetIntInput();
+                        s_bl.Order.StartDelivery(requesterId, courierId, orderId);
+                        Console.WriteLine("Delivery started successfully!");
+                        break;
+                    case 9:
+
+                        IEnumerable<ClosedDeliveryInList> closedDeliveryInLists = getlistClosedDeliveries(requesterId);
+                        if (!closedDeliveryInLists.Any())
+                        {
+                            Console.WriteLine("No closed deliveries found.");
+                        }
+                        else
+                        {
+                            foreach (ClosedDeliveryInList closedDelivery in closedDeliveryInLists)
+                                Console.WriteLine(closedDelivery);
+                        }
+                        break;
+                    case 10:
+                        IEnumerable<OpenOrderInList> openOrderInLists = getlistOpenOrders(requesterId);
+                        if (!openOrderInLists.Any())
+                        {
+                            Console.WriteLine("No open orders found.");
+                        }
+                        else
+                        {
+                            foreach (OpenOrderInList openOrder in openOrderInLists)
+                                Console.WriteLine(openOrder);
+                        }
+                        break;
+
 
                 }
 
@@ -315,6 +622,87 @@ internal class Program
         } while (true);
 
 
+    }
+    private static void setAdmin()
+    {
+        Console.WriteLine("Set Admin Menu.");
+        do
+        {
+            Console.WriteLine(@$"
+    to exit press 0
+    to reset all data and settings press 1
+    to initialize all data press 2
+    to get clock press 3
+    to forward clock press 4
+    to get config values press 5
+    to set config press 6
+
+        
+
+");
+            int choice = GetIntInput();
+            try
+            {
+                switch (choice)
+                {
+                    case 0:
+                        Console.WriteLine("exit from set admin");
+                        break;
+                    case 1:
+                        s_bl.Admin.ResetDB();
+                        Console.WriteLine("All data and settings have been reset successfully!");
+                        break;
+                    case 2:
+                        s_bl.Admin.InitializeDB();
+                        Console.WriteLine("All data have been initialized successfully!");
+                        break;
+                    case 3:
+                        DateTime currentTime = s_bl.Admin.GetClock();
+                        Console.WriteLine($"Current system clock time: {currentTime}");
+                        break;
+                    case 4:
+                        Console.WriteLine("Enter unit of time to forward the clock: ");
+                        Console.WriteLine($@"
+                        to forward by minutes press 0
+                        to forward by hours press 1
+                        to forward by days press 2
+                        to forward by weeks press 3
+                        to forward by months press 4
+                        to forward by years press 5
+");
+                        int unitChoice = GetIntInput();
+                        if (!Enum.IsDefined(typeof(TimeUnit), unitChoice))
+                        {
+                            throw new BlInvalidValueException("value to forward time yunit is not valid");
+                        }
+                        TimeUnit unit = (TimeUnit)unitChoice;
+                        s_bl.Admin.ForwardClock(unit);
+                        Console.WriteLine($"System clock has been forwarded by {unit}  successfully!");
+                        break;
+                    case 5:
+                        Config config= s_bl.Admin.GetConfig();
+                        Console.WriteLine("print config");
+                        Console.WriteLine(config);
+                        break;
+                        case 6:
+                        config= createConfig();
+                        s_bl.Admin.SetConfig(config);
+                        Console.WriteLine("Configuration settings have been initialized.");
+                        break ;
+                        
+                        
+
+                    default:
+                        Console.WriteLine("Invalid choice, please try again.");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+
+        } while (true);
     }
 
 
@@ -449,8 +837,8 @@ internal class Program
                 "   to set courier press 1\n" +
                 "   to set order press 2\n" +
                 "   to set delivery press 3\n" +
-                "   to set admin press 5\n" +
-                "   to print all data press 6\n" +
+                "   to set admin settings press 5\n" +
+                "   ***no relevant in stage 4 ***to print all data press 6\n" +
                 "       enter your choice: ");
             choice = GetIntInput();
             try
@@ -471,47 +859,47 @@ internal class Program
                         //dataMenu(s_dal!.Delivery!);
                         break;
                     case 5:
-                        Initialization.Do();
+                        setAdmin();
                         break;
                     case 6:
-                        var couriers = s_dal!.Courier?.ReadAll();
-                        if (!couriers!.Any())
-                            Console.WriteLine("No couriers found.");
+                        //var couriers = s_dal!.Courier?.ReadAll();
+                        //if (!couriers!.Any())
+                        //    Console.WriteLine("No couriers found.");
 
-                        else
-                            foreach (var courier in couriers!)
-                                Console.WriteLine(courier);
-
-
-
-                        var orders = s_dal!.Order?.ReadAll();
-                        if (!orders!.Any())
-                            Console.WriteLine("No orders found");
-                        else
-                            foreach (var order in orders!)
-                                Console.WriteLine(order);
+                        //else
+                        //    foreach (var courier in couriers!)
+                        //        Console.WriteLine(courier);
 
 
-                        var deliveries = s_dal!.Delivery?.ReadAll();
-                        if (!deliveries!.Any())
-                            Console.WriteLine("No deliveries found");
-                        else
 
-                            foreach (var delivery in deliveries!)
-                                Console.WriteLine(delivery);
+                        //var orders = s_dal!.Order?.ReadAll();
+                        //if (!orders!.Any())
+                        //    Console.WriteLine("No orders found");
+                        //else
+                        //    foreach (var order in orders!)
+                        //        Console.WriteLine(order);
+
+
+                        //var deliveries = s_dal!.Delivery?.ReadAll();
+                        //if (!deliveries!.Any())
+                        //    Console.WriteLine("No deliveries found");
+                        //else
+
+                        //    foreach (var delivery in deliveries!)
+                        //        Console.WriteLine(delivery);
 
 
                         break;
-                    case 7:
-                        settingMenu();
-                        break;
-                    case 8:
-                        Console.WriteLine("Delete all data.");
-                        s_dal!.Config?.Reset();
-                        s_dal!.Delivery?.DeleteAll();
-                        s_dal!.Order?.DeleteAll();
-                        s_dal!.Courier?.DeleteAll();
-                        break;
+                    //case 7:
+                    //    settingMenu();
+                    //    break;
+                    //case 8:
+                    //    Console.WriteLine("Delete all data.");
+                    //    s_dal!.Config?.Reset();
+                    //    s_dal!.Delivery?.DeleteAll();
+                    //    s_dal!.Order?.DeleteAll();
+                    //    s_dal!.Courier?.DeleteAll();
+                    //    break;
                     default:
                         Console.WriteLine("Please enter one of the following options: ");
                         break;

@@ -14,7 +14,7 @@ public interface IOrder
     
     int[] GetAllOrderStatistic(int id);
 
-    BO.OrderInList ReadAll(int id, BO.OrderInListField? filter, object? value, BO.OrderInListField? sort);
+    IEnumerable< BO.OrderInList >ReadAll(int id, BO.OrderStatus? filter, object? value, BO.OrderInListField? sort);
 
     void Update(int id, BO.Order boOrder);
 
@@ -26,9 +26,9 @@ public interface IOrder
 
     void Delete(int id, int orderId);
 
-    BO.ClosedDeliveryInList GetClosed(int id, int courierId, ClosedDeliveryInListField? filter, ClosedDeliveryInListField sort);
+    IEnumerable< BO.ClosedDeliveryInList> GetClosed(int id, int courierId, TypeOfOrder? filter, ClosedDeliveryInListField? sort);
 
-    BO.OpenOrderInList GetOpen(int id, int courierId, OpenOrderInListField? filter, OpenOrderInListField sort);
+    IEnumerable <BO.OpenOrderInList> GetOpen(int id, int courierId, TypeOfOrder? filter, OpenOrderInListField? sort);
 
 
 
