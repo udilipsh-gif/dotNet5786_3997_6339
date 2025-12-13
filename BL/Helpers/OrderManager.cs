@@ -175,6 +175,10 @@ internal static class OrderManager
     {
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
+
+        DO.Courier? doCourier = s_dal.Courier.Read(courierId)
+            ?? throw new BO.BlDoesNotExistException("Courier not found");
+
         BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);   
         if (boOrderInList.OrderStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED ))
             throw new BO.BlInvalidOperationException("Order is not open for selection");
@@ -184,7 +188,7 @@ internal static class OrderManager
             Id = 0,
             OrderId = orderId,
             CourierId = courierId,
-            TypeOfOrder = (DO.TypeOfOrder)boOrderInList.TypeOfOrder,
+            TypeShipment = (DO.TheTypeShipment)doCourier.TypeShipment,
             OrderDate = AdminManager.Now,
         });
         s_dal.Order.Update(doOrder with
