@@ -176,8 +176,21 @@ internal static class OrderManager
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
         BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);   
-        if (boOrderInList.OrderStatus is BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED )
+        if (boOrderInList.OrderStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED ))
             throw new BO.BlInvalidOperationException("Order is not open for selection");
+
+        s_dal.Delivery.Create(new DO.Delivery
+            {
+            Id = 0,
+            OrderId = orderId,
+            CourierId = courierId,
+            TypeOfOrder = (DO.TypeOfOrder)boOrderInList.TypeOfOrder,
+            OrderDate = AdminManager.Now,
+        });
+        s_dal.Order.Update(doOrder with
+        {
+            OrderStatus = DO.OrderStatus.DELIVERING
+        });
     }
 
     private static BO.OrderInList s_convertToBoOrderInList (DO.Order doOrder)
@@ -257,43 +270,3 @@ internal static class OrderManager
 
 }
 
-
-//if (filter is not null && filterValue is null)
-//    throw new Exception("not send value for filter");
-//Func<DO.Order, bool>? filterFunc = filter switch
-//{
-//    BO.OrderInListField.OrderId => ((o) => o.Id == (int)filterValue!),
-//    BO.OrderInListField.TypeOfOrder => (o) => o.TypeOfOrder == (DO.TypeOfOrder)filterValue!,
-//    BO.OrderInListField.OrderStatus => (o) => o.OrderStatus == (DO.OrderStatus)filterValue!,
-//    BO.OrderInListField.DistanceKm => (o) => Tools.GetDistance(o) == (double)filterValue!,
-//    BO.OrderInListField.ScheduleStatus => (o) => Tools.GetScheduleStatus(o) == (BO.ScheduleStatus)filterValue!,
-//    BO.OrderInListField.TimeLeftForDelivery => (o) =>
-//    {
-//        TimeSpan timeLeft = TimeSpan.Zero;
-//        if (o.OrderStatus is not DO.OrderStatus.COMPLETED)
-//        {
-//            DateTime maxDeliveryTime = o.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
-//            timeLeft = maxDeliveryTime - AdminManager.Now;
-//        }
-//        return timeLeft <= (TimeSpan)filterValue!;
-//    }
-//    ,
-//    BO.OrderInListField.TotalTimeOfDelivery => (DO.Order order) =>
-//    {
-//        TimeSpan TotalTime = TimeSpan.Zero;
-//        if (order.OrderStatus is DO.OrderStatus.COMPLETED)
-//        {
-//            DateTime endDelivery = (from dlivery in s_dal.Delivery
-//                              .ReadAll(d => d.OrderId == order.Id)
-//                                    orderby dlivery.Id descending
-//                                    select dlivery.TimeEndDelivery)
-//                              .FirstOrDefault() ??
-//                              throw new NotImplementedException("is complet but do not ave date to complet");
-//            TotalTime = endDelivery - order.OrderDate;
-//        }
-
-//        return TotalTime <= (TimeSpan)filterValue!;
-//    }
-//    ,
-//    _ => null
-//};
