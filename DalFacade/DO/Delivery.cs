@@ -21,9 +21,9 @@ public record Delivery
     /// </summary>
     public required int CourierId { get; init; }
     /// <summary>
-    /// Gets or sets the type of order being delivered.
+    /// Gets or sets the type of shipment being delivered.
     /// </summary>
-    public required TypeOfOrder TypeOfOrder { get; init; }
+    public required TheTypeShipment TypeShipment { get; init; }
     /// <summary>
     /// Gets or sets the date and time when the order was placed.
     /// </summary>

@@ -193,6 +193,40 @@ internal static class OrderManager
         });
     }
 
+    public static List<BO.ClosedDeliveryInList> GetClosedOrderInLists(int courierId, BO.TypeOfOrder? filter, BO.ClosedDeliveryInListField sort)
+    {
+        var query = from doDelivery in s_dal.Delivery.ReadAll(d => d.CourierId == courierId && d.EndDelivery != null)
+                    let order = s_dal.Order.Read(doDelivery.OrderId)
+                    where order != null && (filter == null || (BO.TypeOfOrder)order.TypeOfOrder == filter)
+                    select new BO.ClosedDeliveryInList
+                    {
+                        DeliveryId = doDelivery.Id,
+                        OrderId = order.Id,
+                        OrderType = (BO.TypeOfOrder)order.TypeOfOrder,
+                        Address = order.Addres,
+                        ShipmentType = (BO.TheTypeShipment)doDelivery.TypeShipment,
+                        AqualDistens = doDelivery.ActualDistance,
+                        DelyveryTime = (TimeSpan)(doDelivery.TimeEndDelivery! - doDelivery.OrderDate),
+                        EndDelivery = (BO.EndDelivery)doDelivery.EndDelivery!
+                    };
+        var uniqueQuery = query.DistinctBy(x => x.OrderId);
+
+        IEnumerable<BO.ClosedDeliveryInList> sortedQuery = sort switch
+        {
+            BO.ClosedDeliveryInListField.DeliveryId => uniqueQuery.OrderBy(x => x.DeliveryId),
+            BO.ClosedDeliveryInListField.OrderId => uniqueQuery.OrderBy(x => x.OrderId),
+            BO.ClosedDeliveryInListField.TypeOfOrder => uniqueQuery.OrderBy(x => x.OrderType),
+            BO.ClosedDeliveryInListField.Address => uniqueQuery.OrderBy(x => x.Address),
+            BO.ClosedDeliveryInListField.ShipmentType => uniqueQuery.OrderBy(x => x.ShipmentType),
+            BO.ClosedDeliveryInListField.AqualDistens => uniqueQuery.OrderBy(x => x.AqualDistens),
+            BO.ClosedDeliveryInListField.DelyveryTime => uniqueQuery.OrderBy(x => x.DelyveryTime),
+            BO.ClosedDeliveryInListField.EndDelivery => uniqueQuery.OrderBy(x => x.EndDelivery),
+            _ => uniqueQuery.OrderBy(x => x.OrderType) // ברירת מחדל
+        };
+
+        return [.. sortedQuery];
+    }
+
     private static BO.OrderInList s_convertToBoOrderInList (DO.Order doOrder)
     {
         DO.Delivery? delivery = (from d in s_dal.Delivery?.ReadAll()
