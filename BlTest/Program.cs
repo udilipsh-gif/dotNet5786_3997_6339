@@ -4,6 +4,8 @@
 
 
 
+using DalApi;
+
 namespace BO;
 internal class Program
 {
@@ -385,6 +387,47 @@ internal class Program
         };
         return s_bl.Order.GetOpen(requesterId, courierId, typeOfOrder, sort);
     }
+    private static Config createConfig()
+    {
+        Console.WriteLine("enter new password");
+        string passwordManager = Console.ReadLine() ?? string.Empty;
+        Console.WriteLine("enter new store address");
+        string storeAddress = Console.ReadLine() ?? string.Empty;
+        Console.WriteLine("enter new max delivery range (in km)");
+        double maxDeliveryRange = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed bike (in km/h)");
+        double avgSpeedBike = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed car (in km/h)");
+        double avgSpeedCar = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed foot (in km/h)");
+        double avgSpeedFoot = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new average speed motorcycle (in km/h)");
+        double avgSpeedMotorcycle = double.Parse(Console.ReadLine() ?? "0");
+        Console.WriteLine("enter new max delivery time (in hours)");
+        TimeSpan maxDeliveryTime = TimeSpan.FromHours(double.Parse(Console.ReadLine() ?? "0"));
+        Console.WriteLine("enter new risk range (in minutes)");
+        TimeSpan riskRange = TimeSpan.FromMinutes(double.Parse(Console.ReadLine() ?? "0"));
+        Console.WriteLine("enter new max time inactivity (in minutes)");
+        TimeSpan maxTimeInactivity = TimeSpan.FromMinutes(double.Parse(Console.ReadLine() ?? "0"));
+
+
+        return new Config()
+            {
+                ManagerId = 0,
+                PasswordManager =passwordManager,
+                StoreAddress = storeAddress,
+                Latitude = 0,
+                Longitude = 0,
+                MaxDeliveryRange = maxDeliveryRange,
+                AvgSpeedBike = avgSpeedBike,
+                AvgSpeedCar = avgSpeedCar,
+                AvgSpeedFoot = avgSpeedFoot,
+                AvgSpeedMotorcycle = avgSpeedMotorcycle,
+                MaxDeliveryTime =maxDeliveryTime,
+                RiskRange =riskRange,
+                MaxTimeInactivity = maxTimeInactivity,
+            };
+    }
     private static void setCourier()
     {
         Console.WriteLine("Set Courier Menu.");
@@ -569,10 +612,6 @@ internal class Program
                         break;
 
 
-
-
-
-
                 }
 
             }
@@ -583,6 +622,87 @@ internal class Program
         } while (true);
 
 
+    }
+    private static void setAdmin()
+    {
+        Console.WriteLine("Set Admin Menu.");
+        do
+        {
+            Console.WriteLine(@$"
+    to exit press 0
+    to reset all data and settings press 1
+    to initialize all data press 2
+    to get clock press 3
+    to forward clock press 4
+    to get config values press 5
+    to set config press 6
+
+        
+
+");
+            int choice = GetIntInput();
+            try
+            {
+                switch (choice)
+                {
+                    case 0:
+                        Console.WriteLine("exit from set admin");
+                        break;
+                    case 1:
+                        s_bl.Admin.ResetDB();
+                        Console.WriteLine("All data and settings have been reset successfully!");
+                        break;
+                    case 2:
+                        s_bl.Admin.InitializeDB();
+                        Console.WriteLine("All data have been initialized successfully!");
+                        break;
+                    case 3:
+                        DateTime currentTime = s_bl.Admin.GetClock();
+                        Console.WriteLine($"Current system clock time: {currentTime}");
+                        break;
+                    case 4:
+                        Console.WriteLine("Enter unit of time to forward the clock: ");
+                        Console.WriteLine($@"
+                        to forward by minutes press 0
+                        to forward by hours press 1
+                        to forward by days press 2
+                        to forward by weeks press 3
+                        to forward by months press 4
+                        to forward by years press 5
+");
+                        int unitChoice = GetIntInput();
+                        if (!Enum.IsDefined(typeof(TimeUnit), unitChoice))
+                        {
+                            throw new BlInvalidValueException("value to forward time yunit is not valid");
+                        }
+                        TimeUnit unit = (TimeUnit)unitChoice;
+                        s_bl.Admin.ForwardClock(unit);
+                        Console.WriteLine($"System clock has been forwarded by {unit}  successfully!");
+                        break;
+                    case 5:
+                        Config config= s_bl.Admin.GetConfig();
+                        Console.WriteLine("print config");
+                        Console.WriteLine(config);
+                        break;
+                        case 6:
+                        config= createConfig();
+                        s_bl.Admin.SetConfig(config);
+                        Console.WriteLine("Configuration settings have been initialized.");
+                        break ;
+                        
+                        
+
+                    default:
+                        Console.WriteLine("Invalid choice, please try again.");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+            }
+
+        } while (true);
     }
 
 
@@ -717,8 +837,8 @@ internal class Program
                 "   to set courier press 1\n" +
                 "   to set order press 2\n" +
                 "   to set delivery press 3\n" +
-                "   to set admin press 5\n" +
-                "   to print all data press 6\n" +
+                "   to set admin settings press 5\n" +
+                "   ***no relevant in stage 4 ***to print all data press 6\n" +
                 "       enter your choice: ");
             choice = GetIntInput();
             try
@@ -739,47 +859,47 @@ internal class Program
                         //dataMenu(s_dal!.Delivery!);
                         break;
                     case 5:
-                        Initialization.Do();
+                        setAdmin();
                         break;
                     case 6:
-                        var couriers = s_dal!.Courier?.ReadAll();
-                        if (!couriers!.Any())
-                            Console.WriteLine("No couriers found.");
+                        //var couriers = s_dal!.Courier?.ReadAll();
+                        //if (!couriers!.Any())
+                        //    Console.WriteLine("No couriers found.");
 
-                        else
-                            foreach (var courier in couriers!)
-                                Console.WriteLine(courier);
-
-
-
-                        var orders = s_dal!.Order?.ReadAll();
-                        if (!orders!.Any())
-                            Console.WriteLine("No orders found");
-                        else
-                            foreach (var order in orders!)
-                                Console.WriteLine(order);
+                        //else
+                        //    foreach (var courier in couriers!)
+                        //        Console.WriteLine(courier);
 
 
-                        var deliveries = s_dal!.Delivery?.ReadAll();
-                        if (!deliveries!.Any())
-                            Console.WriteLine("No deliveries found");
-                        else
 
-                            foreach (var delivery in deliveries!)
-                                Console.WriteLine(delivery);
+                        //var orders = s_dal!.Order?.ReadAll();
+                        //if (!orders!.Any())
+                        //    Console.WriteLine("No orders found");
+                        //else
+                        //    foreach (var order in orders!)
+                        //        Console.WriteLine(order);
+
+
+                        //var deliveries = s_dal!.Delivery?.ReadAll();
+                        //if (!deliveries!.Any())
+                        //    Console.WriteLine("No deliveries found");
+                        //else
+
+                        //    foreach (var delivery in deliveries!)
+                        //        Console.WriteLine(delivery);
 
 
                         break;
-                    case 7:
-                        settingMenu();
-                        break;
-                    case 8:
-                        Console.WriteLine("Delete all data.");
-                        s_dal!.Config?.Reset();
-                        s_dal!.Delivery?.DeleteAll();
-                        s_dal!.Order?.DeleteAll();
-                        s_dal!.Courier?.DeleteAll();
-                        break;
+                    //case 7:
+                    //    settingMenu();
+                    //    break;
+                    //case 8:
+                    //    Console.WriteLine("Delete all data.");
+                    //    s_dal!.Config?.Reset();
+                    //    s_dal!.Delivery?.DeleteAll();
+                    //    s_dal!.Order?.DeleteAll();
+                    //    s_dal!.Courier?.DeleteAll();
+                    //    break;
                     default:
                         Console.WriteLine("Please enter one of the following options: ");
                         break;
