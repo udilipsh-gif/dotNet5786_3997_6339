@@ -95,8 +95,8 @@ internal static class OrderManager
             EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(doOrder),
             MaxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime,
             OrderStatus = Tools.GetOrderStatus(doOrder),
-            ScheduleStatus = Tools.GetScheduleStatus(doOrder), 
-            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder), 
+            ScheduleStatus = Tools.GetScheduleStatus(doOrder),
+            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder),
             DeliveryPerOrderInLists = s_createDeliveryPerOrderInList(doOrder.Id)
         };
         return boOrder;
@@ -145,7 +145,7 @@ internal static class OrderManager
                     Id = doOrder.Id,
                     OrderId = doOrder.Id,
                     CourierId = 0,
-                    TypeOfOrder = doOrder.TypeOfOrder,
+                    TypeShipment = DO.TheTypeShipment.FOOT,
                     OrderDate = AdminManager.Now,
                     EndDelivery = DO.EndDelivery.CONCELLED,
                     TimeEndDelivery = AdminManager.Now,
@@ -179,12 +179,12 @@ internal static class OrderManager
         DO.Courier? doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);   
-        if (boOrderInList.OrderStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED ))
+        BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);
+        if (boOrderInList.OrderStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED))
             throw new BO.BlInvalidOperationException("Order is not open for selection");
 
         s_dal.Delivery.Create(new DO.Delivery
-            {
+        {
             Id = 0,
             OrderId = orderId,
             CourierId = courierId,
@@ -231,12 +231,52 @@ internal static class OrderManager
         return [.. sortedQuery];
     }
 
-    private static BO.OrderInList s_convertToBoOrderInList (DO.Order doOrder)
+    public static List<BO.OpenOrderInList> GetOrdersForDelivery(int courierId, BO.TypeOfOrder? filter, BO.OpenOrderInListField sort)
+    {
+        DO.Courier doCourier = s_dal.Courier.Read(courierId)
+            ?? throw new BO.BlDoesNotExistException("Courier not found");
+
+        var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN || o.OrderStatus == DO.OrderStatus.REFUSED)
+                    let distense = Tools.GetDistance(doOrder)
+                    where ((filter == null || (BO.TypeOfOrder)doOrder.TypeOfOrder == filter) && (distense <= doCourier.MaxDistanceDelivery))
+                    select new BO.OpenOrderInList
+                    {
+                        OrderId = doOrder.Id,
+                        TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
+                        Weight = doOrder.Weight,
+                        Address = doOrder.Addres,
+                        ActualDistance = null,//לא מחושב עדיין
+                        DistanceKm = distense,
+                        EstimatedDeliveryTime = null,
+                        ScheduleStatus = Tools.GetScheduleStatus(doOrder),
+                        TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder),
+                        MaxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime
+                    };
+
+        IEnumerable<BO.OpenOrderInList> sortedQuery = sort switch
+        {
+            BO.OpenOrderInListField.OrderId => query.OrderBy(x => x.OrderId),
+            BO.OpenOrderInListField.TypeOfOrder => query.OrderBy(x => x.TypeOfOrder),
+            BO.OpenOrderInListField.Weight => query.OrderBy(x => x.Weight),
+            BO.OpenOrderInListField.Address => query.OrderBy(x => x.Address),
+            BO.OpenOrderInListField.DistanceKm => query.OrderBy(x => x.DistanceKm),
+            BO.OpenOrderInListField.ActualDistance => query.OrderBy(x => x.ActualDistance),
+            BO.OpenOrderInListField.EstimatedDeliveryTime => query.OrderBy(x => x.EstimatedDeliveryTime),
+            BO.OpenOrderInListField.ScheduleStatus => query.OrderBy(x => x.ScheduleStatus),
+            BO.OpenOrderInListField.TimeLeftForDelivery => query.OrderBy(x => x.TimeLeftForDelivery),
+            BO.OpenOrderInListField.MaxDeliveryTime => query.OrderBy(x => x.MaxDeliveryTime),
+            _ => query.OrderBy(x => x.ScheduleStatus) // ברירת מחדל
+        };
+
+        return [.. sortedQuery];
+    }
+
+    private static BO.OrderInList s_convertToBoOrderInList(DO.Order doOrder)
     {
         DO.Delivery? delivery = (from d in s_dal.Delivery?.ReadAll()
-                           where d.OrderId == doOrder.Id
-                           orderby d.Id descending
-                           select d).FirstOrDefault();
+                                 where d.OrderId == doOrder.Id
+                                 orderby d.Id descending
+                                 select d).FirstOrDefault();
 
         var orderStatus = Tools.GetOrderStatus(doOrder, delivery);
 
