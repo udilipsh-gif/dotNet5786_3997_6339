@@ -64,6 +64,11 @@ public interface IConfig
     /// </summary>
     TimeSpan MaxTimeInactivity { get; set; }
     /// <summary>
+    /// gets or sets the Google API key used for accessing Google services.
+    /// </summary>
+    string GoogleApiKey { get; set; }
+
+    /// <summary>
     /// Resets the configuration settings to their default values.
     /// </summary>
     void Reset();

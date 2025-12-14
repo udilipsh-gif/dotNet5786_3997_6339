@@ -433,8 +433,10 @@ internal class Program
         Console.WriteLine("Set Courier Menu.");
         Console.Write("Enter ID of the requester: ");
         int requesterId = GetIntInput();
+        int choice;
         do
         {
+           
             Console.WriteLine(@$"
 
     to exit press 0
@@ -444,7 +446,7 @@ internal class Program
     to update courier press 4
     to delete courier press 5
 ");
-            int choice = GetIntInput();
+             choice = GetIntInput();
 
             try
             {
@@ -499,13 +501,14 @@ internal class Program
             {
                 Console.Error.WriteLine(ex);
             }
-        } while (true);
+        } while (choice!=0);
     }
     private static void setOrder()
     {
         Console.WriteLine("Set Order Menu.");
         Console.WriteLine("Enter ID of the requester: ");
         int requesterId = GetIntInput();
+        int choice;
         do
         {
             Console.WriteLine(@$"
@@ -521,7 +524,7 @@ internal class Program
     to get closed deliveries press 9
     to get open deliveries press 10
 ");
-            int choice = GetIntInput();
+             choice = GetIntInput();
             try
             {
                 switch (choice)
@@ -619,13 +622,14 @@ internal class Program
             {
                 Console.Error.WriteLine(ex);
             }
-        } while (true);
+        } while (choice!=0);
 
 
     }
     private static void setAdmin()
     {
         Console.WriteLine("Set Admin Menu.");
+        int choice;
         do
         {
             Console.WriteLine(@$"
@@ -640,7 +644,7 @@ internal class Program
         
 
 ");
-            int choice = GetIntInput();
+             choice = GetIntInput();
             try
             {
                 switch (choice)
@@ -682,7 +686,14 @@ internal class Program
                     case 5:
                         Config config= s_bl.Admin.GetConfig();
                         Console.WriteLine("print config");
-                        Console.WriteLine(config);
+                        if (config is null)
+                        {
+                            Console.WriteLine("Config is not initialized");
+                        }
+                        else
+                        {
+                            Console.WriteLine(config);
+                        }
                         break;
                         case 6:
                         config= createConfig();
@@ -702,7 +713,7 @@ internal class Program
                 Console.Error.WriteLine(ex);
             }
 
-        } while (true);
+        } while (choice!= 0);
     }
 
 
@@ -822,12 +833,9 @@ internal class Program
     //        }
     //    } while (choice != 0);
     //}
-    static void Main(string[] args)
+    static void Main()
     {
         Console.WriteLine("Hello, Book Soop! (stage 4)");
-
-
-
         int choice;
         do
         {
