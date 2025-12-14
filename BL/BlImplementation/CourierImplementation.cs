@@ -6,7 +6,6 @@ using Helpers;
 
 internal class CourierImplementation : ICourier
 {
-
     public void Create(int requesterId, BO.Courier boCourier)
     {
         if (!Tools.CheckManger(requesterId))

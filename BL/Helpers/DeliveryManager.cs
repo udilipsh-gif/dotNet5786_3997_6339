@@ -1,7 +1,4 @@
-﻿
-using DalApi;
-
-namespace Helpers;
+﻿namespace Helpers;
 
 internal static class DeliveryManager
 {
@@ -18,12 +15,12 @@ internal static class DeliveryManager
         return s_dal.Delivery.Read(id);
     }
 
-    public static void Close(int courierId, int deliveryId)
+    public static void Deliver(int courierId, int deliveryId)
     {
         DO.Delivery delivery = s_dal.Delivery.Read(deliveryId)
-            ?? throw new Exception("Delivery not found");
+            ?? throw new InvalidOperationException($"Delivery with ID {deliveryId} not found");
         if (delivery.CourierId != courierId)
-            throw new Exception("This delivery is not assigned to this courier");
+            throw new InvalidOperationException($"Courier with ID {courierId} not found");
         delivery = delivery with
         {
             EndDelivery = DO.EndDelivery.DELIVERED,

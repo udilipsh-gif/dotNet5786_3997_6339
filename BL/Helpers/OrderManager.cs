@@ -27,7 +27,7 @@ internal static class OrderManager
     /// This method groups all orders by their status and schedule status, providing
     /// a comprehensive overview of order distribution across different states.
     /// </remarks>
-    public static int[] GetOrdersStatistics()
+    public static int[] GetAllOrderStatistic()
     {
         var allOrders = s_dal.Order.ReadAll();
         int maxStatusVal = (int)Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>().Max();
@@ -99,18 +99,18 @@ internal static class OrderManager
     /// </remarks>
     public static List<BO.OrderInList> ReadAll(BO.OrderInListField? filter,
         Object? filterValue,
-        BO.OrderInListField orderBy = BO.OrderInListField.OrderStatus)
+        BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
     {
         Func<BO.OrderInList, bool> filterPredicate = s_getFilterFunc(filter, filterValue);
 
         Func<BO.OrderInList, object> sortSelector = s_getSortFunc(orderBy);
 
-        var Query = from doOrder in s_dal.Order.ReadAll()
+        var query = from doOrder in s_dal.Order.ReadAll()
                     let boOrder = s_convertToBoOrderInList(doOrder)
                     where filterPredicate(boOrder)
                     orderby sortSelector(boOrder)
                     select boOrder;
-        return [.. Query];
+        return [.. query];
     }
 
     /// <summary>
@@ -211,7 +211,7 @@ internal static class OrderManager
     /// - DELIVERING: Updates the current delivery with cancellation status
     /// - COMPLETED/CANCELLED: Cannot be cancelled (throws exception)
     /// </remarks>
-    public static void ConcelOrder(int orderId)
+    public static void Cancel(int orderId)
     {
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
@@ -304,7 +304,7 @@ internal static class OrderManager
     /// Only returns deliveries that have ended (EndDelivery is not null).
     /// Results are deduplicated by OrderId to show only the most recent delivery attempt for each order.
     /// </remarks>
-    public static List<BO.ClosedDeliveryInList> GetClosedOrderInLists(int courierId, BO.TypeOfOrder? filter, BO.ClosedDeliveryInListField sort)
+    public static List<BO.ClosedDeliveryInList> GetClosed(int courierId, BO.TypeOfOrder? filter, BO.ClosedDeliveryInListField? sort)
     {
         var query = from doDelivery in s_dal.Delivery.ReadAll(d => d.CourierId == courierId && d.EndDelivery != null)
                     let order = s_dal.Order.Read(doDelivery.OrderId)
@@ -354,7 +354,7 @@ internal static class OrderManager
     /// maximum delivery distance capability. Results can be filtered by order type and
     /// sorted by various fields.
     /// </remarks>
-    public static List<BO.OpenOrderInList> GetOrdersForDelivery(int courierId, BO.TypeOfOrder? filter, BO.OpenOrderInListField sort)
+    public static List<BO.OpenOrderInList> GetOpen(int courierId, BO.TypeOfOrder? filter, BO.OpenOrderInListField? sort)
     {
         DO.Courier doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
