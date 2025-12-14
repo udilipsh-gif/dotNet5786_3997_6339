@@ -448,7 +448,7 @@ internal static class OrderManager
     private static Func<BO.OrderInList, bool> s_getFilterFunc(BO.OrderInListField? filter, Object? filterValue)
     {
         if (filter is not null && filterValue is null)
-            throw new Exception("not send value for filter");
+            throw new BO.BlInvalidValueException("Filter value must be provided when a filter field is specified.");
         return filter switch
         {
             BO.OrderInListField.OrderId => (o) => o.OrderId == (int)filterValue!,

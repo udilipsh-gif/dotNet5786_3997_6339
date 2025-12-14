@@ -534,12 +534,22 @@ internal static class Tools
                     string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     XDocument doc = XDocument.Parse(xmlContent);
                     string? status = doc.Element("GeocodeResponse")?.Element("status")?.Value;
+
+                    if (status == "ZERO_RESULTS")
+                        throw new BO.BlInvalidValueException ("הכתובת לא נמצאה במאגר של גוגל.");
+                    
+
                     if (status == "OK")
                     {
-                        var locationElement = doc.Element("GeocodeResponse")?
+                        var geometry = doc.Element("GeocodeResponse")?
                                              .Element("result")?
-                                             .Element("geometry")?
-                                             .Element("location");
+                                             .Element("geometry");
+                        var locationType = geometry?.Element("location_type")?.Value;
+                        if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETRIC_CENTER")
+                            throw new BO.BlInvalidValueException("הכתובת שהוזנה לא מדויקת, נא להזין כתובת מלאה יותר.");
+                        
+                        var locationElement = geometry?.Element("location");
+
                         if (locationElement != null)
                         {
                             double lat = double.Parse(locationElement.Element("lat")!.Value);
@@ -578,5 +588,66 @@ internal static class Tools
     public static bool CheckManger(int Id)
     {
         return Id == AdminManager.GetConfig().ManagerId;
+    }
+
+    public static double? GetActualDistance(string address, BO.TheTypeShipment TypeShipment)
+    {
+        string apiKey = AdminManager.GetConfig().GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API Key is not configured.");
+        string StoreAddress = AdminManager.GetConfig().StoreAddress ?? throw new BO.BlInvalidValueException("Store Address is not configured.");
+        string mode = TypeShipment switch
+        {
+            BO.TheTypeShipment.FOOT => "walking",
+            BO.TheTypeShipment.BIKE => "walking",
+            BO.TheTypeShipment.MOTORCYCLE => "driving",
+            BO.TheTypeShipment.CAR => "driving",
+            _ => "Driving"
+        };
+
+        string url = $"https://maps.googleapis.com/maps/api/distancematrix/xml?origins={StoreAddress}&destinations={address}&mode={mode}&key={apiKey}";
+
+        using (HttpClient client = new HttpClient())
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", "dotNet5786_3997_6339");
+            try
+            {
+                HttpResponseMessage response = client.GetAsync(url).GetAwaiter().GetResult();
+                if(response.IsSuccessStatusCode)
+                {
+                    string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    XDocument doc = XDocument.Parse(xmlContent);
+                    string? status = doc.Element("DistanceMatrixResponse")?.Element("status")?.Value;
+                    if (status == "ZERO_RESULTS")
+                        throw new BO.BlInvalidValueException("The address was not found in Google's database.");
+                    if (status == "OK")
+                    {
+                        var element = doc.Element("DistanceMatrixResponse")?
+                                             .Element("row")?
+                                             .Element("element");
+                        var elementStatus = element?.Element("status")?.Value;
+                        if (elementStatus != "OK")
+                            throw new BO.BlInvalidValueException("Unable to calculate distance for the provided address.");
+                        var distanceElement = element?.Element("distance");
+                        if (distanceElement != null)
+                        {
+                            double distance = double.Parse(distanceElement.Element("value")!.Value);
+                            return distance / 1000.0; // Convert to kilometers
+                        }
+                        else
+                        {
+                            throw new Exception("Distance element not found in the response.");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to get distance matrix data.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BO.BlDoesNotExistException($"Exception: {ex.Message}");
+            }
+        }
+        return null;
     }
 }
