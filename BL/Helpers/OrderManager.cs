@@ -264,7 +264,7 @@ internal static class OrderManager
     /// Creates a new delivery record linking the courier to the order and updates
     /// the order status to DELIVERING. Only orders with OPEN or REFUSED status can be selected.
     /// </remarks>
-    public static void OrderSelection(int courierId, int orderId)
+    public static void StartDelivery(int courierId, int orderId)
     {
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
