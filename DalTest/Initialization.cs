@@ -378,7 +378,7 @@ public static class Initialization
             {
                 Id = 0,
                 OrderId = randomOrder.Id,
-                TypeOfOrder = randomOrder.TypeOfOrder,
+                TypeShipment = selectedCourier.TypeShipment,
                 ActualDistance = getActualDistance,
                 CourierId = selectedCourier.Id,
                 OrderDate = orderData,

@@ -104,6 +104,24 @@ public class Config
         RiskRange = TimeSpan.FromDays(0);
         MaxTimeInactivity = TimeSpan.FromDays(0);
     }
+    public override string ToString() => $@"
+Config details:
+        Clock: {Clock}
+        ManagerId: {ManagerId}
+        PasswordManager: {PasswordManager}
+        StoreAddress: {StoreAddress}
+        Latitude: {Latitude}
+        Longitude: {Longitude}
+        MaxDeliveryRange: {MaxDeliveryRange}
+        AvgSpeedCar: {AvgSpeedCar}
+        AvgSpeedMotorcycle: {AvgSpeedMotorcycle}
+        AvgSpeedBike: {AvgSpeedBike}
+        AvgSpeedFoot: {AvgSpeedFoot}
+        MaxDeliveryTime: {MaxDeliveryTime}
+        RiskRange: {RiskRange}
+        MaxTimeInactivity: {MaxTimeInactivity}
+        GoogleApiKey: {GoogleApiKey}
+";
 
 
 }

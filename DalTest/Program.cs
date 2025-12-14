@@ -813,7 +813,7 @@ namespace DalTest
                 Id = 0,
                 OrderId = selectedOrder.Id,
                 CourierId = selectedCourier.Id,
-                TypeOfOrder = selectedOrder.TypeOfOrder,
+                TypeShipment = selectedCourier.TypeShipment,
                 OrderDate = s_dal.Config?.Clock ?? DateTime.Now,
                 ActualDistance = actualDistance,
                 TimeEndDelivery = null

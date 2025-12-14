@@ -119,4 +119,26 @@ public class Order
     /// Initialized to an empty list by default.
     /// </remarks>
     public List<DeliveryPerOrderInList>? DeliveryPerOrderInLists { get; set; }
+
+    public override string ToString() => (@$"
+Order Details:
+        {nameof(Order)}
+        ID: {Id}
+        Type of Order: {TypeOfOrder}
+        Details: {Details}
+        Address: {Addres}
+        Weight: {Weight}
+        Latitude: {Latitude}
+        Longitude: {Longitude}
+        Distance: {Distance}
+        Name: {Name}
+        Phone: {Phone}
+        Order Date: {OrderDate}
+        Estimated Delivery Time: {EstimatedDeliveryTime}
+        Max Delivery Time: {MaxDeliveryTime}
+        Order Status: {OrderStatus}
+        Schedule Status: {ScheduleStatus}
+        Time Left For Delivery: {TimeLeftForDelivery}
+        Delivery Per Order In Lists: {DeliveryPerOrderInLists}
+");
 }

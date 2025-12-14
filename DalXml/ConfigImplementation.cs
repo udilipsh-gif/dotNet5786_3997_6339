@@ -135,6 +135,11 @@ internal class ConfigImplementation : IConfig
         get => Config.MaxTimeInactivity;
         set => Config.MaxTimeInactivity = value;
     }
+    /// <summary>
+    /// Gets or sets the API key used to authenticate requests to Google services.
+    /// </summary>
+    public string GoogleApiKey { get; set; } = string.Empty;
+
 
     /// <summary>
     /// Resets all configuration values to their default initial state.
