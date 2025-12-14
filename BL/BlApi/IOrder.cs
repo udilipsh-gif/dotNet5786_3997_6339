@@ -14,7 +14,7 @@ public interface IOrder
     
     int[] GetAllOrderStatistic(int id);
 
-    IEnumerable< BO.OrderInList >ReadAll(int id, BO.OrderStatus? filter, object? value, BO.OrderInListField? sort);
+    IEnumerable< BO.OrderInList >ReadAll(int id, BO.OrderInListField? filter, object? value, BO.OrderInListField? sort);
 
     void Update(int id, BO.Order boOrder);
 
