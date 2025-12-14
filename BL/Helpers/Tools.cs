@@ -575,7 +575,7 @@ internal static class Tools
     /// This method is used for authorization checks to determine if a user has manager privileges.
     /// The manager ID is retrieved from the system configuration.
     /// </remarks>
-    public static bool checckManger(int Id)
+    public static bool CheckManger(int Id)
     {
         return Id == AdminManager.GetConfig().ManagerId;
     }

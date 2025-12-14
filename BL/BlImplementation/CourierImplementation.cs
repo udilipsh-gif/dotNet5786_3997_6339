@@ -9,14 +9,14 @@ internal class CourierImplementation : ICourier
 
     public void Create(int requesterId, BO.Courier boCourier)
     {
-        if (requesterId != AdminManager.GetConfig().ManagerId)
+        if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException();
         CourierManager.Create(boCourier);
     }
 
     public BO.Courier? Read(int requesterId, int courierId)
     {
-        if (requesterId != AdminManager.GetConfig().ManagerId)
+        if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException();
 
         return CourierManager.Read(courierId);
@@ -25,15 +25,15 @@ internal class CourierImplementation : ICourier
     
     public void Update(int requesterId, BO.Courier boCourier)
     {
-       //if (requesterId != AdminManager.GetConfig().ManagerId)
-       //     throw new BO.UnauthorizedAccessException();
-       //אנחנו בודקים בתוך המתודה של העריכה אם הוא מנהל או לשיח אז איך אתה חוסם אותו כאן???
+        if (!Tools.CheckManger(requesterId) && requesterId != boCourier.Id)
+            throw new BO.BlNoAccessException();
+        // Remove duplicate update call
         CourierManager.Update(requesterId, boCourier);
     }
 
     public void Delete(int requesterId, int courierId)
     {
-        if (requesterId != AdminManager.GetConfig().ManagerId)
+        if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException();
         CourierManager.Delete(courierId);
     }
@@ -49,7 +49,7 @@ internal class CourierImplementation : ICourier
         bool? isActive,
         BO.CourierFieldSort? sort)
     {
-        if (requesterId != AdminManager.GetConfig().ManagerId)
+        if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException("Only manager can access the list of couriers.");
         return CourierManager.ReadAll(requesterId, isActive, sort);
     }
