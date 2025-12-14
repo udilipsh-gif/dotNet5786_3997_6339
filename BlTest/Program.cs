@@ -1,10 +1,5 @@
-﻿
-
-
-
-
-
-using DalApi;
+﻿using DalApi;
+using System;
 
 namespace BO;
 internal class Program
@@ -78,7 +73,7 @@ internal class Program
     {
         Console.WriteLine("Enter type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
         int typeOfOrderInput = GetIntInput();
-        Console.WriteLine("Enter datials of order");
+        Console.WriteLine("Enter details of order");
         string? datails = Console.ReadLine();
         Console.WriteLine("Enter address of order: ");
         string? address = Console.ReadLine();
@@ -156,37 +151,104 @@ internal class Program
         return s_bl.Courier.ReadAll(requesterId, isActive, sort);
 
     }
+    /// <summary>
+    /// Prompts the user to filter and sort orders, then retrieves a list of orders based on the specified criteria.
+    /// </summary>
+    /// <param name="requesterId">The unique identifier of the user requesting the order list.</param>
+    /// <returns>
+    /// An <see cref="IEnumerable{OrderInList}"/> containing the filtered and sorted orders.
+    /// </returns>
+    /// <remarks>
+    /// This method provides an interactive console interface for:
+    /// <list type="bullet">
+    /// <item><description>Filtering orders by various fields (OrderId, TypeOfOrder, Distance, OrderStatus, ScheduleStatus, TimeLeftForDelivery, TotalTimeOfDelivery, DeliveryAttempts)</description></item>
+    /// <item><description>Specifying filter values based on the selected field</description></item>
+    /// <item><description>Sorting orders by multiple criteria (OrderId, TypeOfOrder, DistanceKm, OrderStatus, ScheduleStatus)</description></item>
+    /// </list>
+    /// The method displays menu options to the user and collects their choices before querying the business logic layer.
+    /// </remarks>
     private static IEnumerable<OrderInList> readAllOrders(int requesterId)
     {
         Console.WriteLine($@"
                 Filter orders:                       
-                    1. OPEN only 
-                    2. IN_PROGRESS only 
-                    3. COMPLETED only
-                    4. CANCELED only
-                    5. All
+                    1. By order id 
+                    2. Type Of Order 
+                    3. Distance 
+                    4. OrderStatus
+                    5. ScheduleStatus
+                    6. Time Left For Delivery
+                    7. Total Time Of Delivery
+                    8.Delivery Attempts
+                    9. All
                         Choose");
         int filterChoice = GetIntInput();
-        OrderStatus? orderStatus = filterChoice switch
+
+        BO.OrderInListField? filter = filterChoice switch
         {
-            1 => OrderStatus.OPEN,
-            2 => OrderStatus.DELIVERING,
-            3 => OrderStatus.COMPLETED,
-            4 => OrderStatus.REFUSED,
-            5 => OrderStatus.CONCELLED,
-            6 => null,
+            1 => OrderInListField.OrderId,
+            2 => OrderInListField.TypeOfOrder,
+            3 => OrderInListField.DistanceKm,
+            4 => OrderInListField.OrderStatus,
+            5 => OrderInListField.ScheduleStatus,
+            6 => OrderInListField.TimeLeftForDelivery,
+            7 => OrderInListField.TotalTimeOfDelivery,
+            8 => OrderInListField.DeliveryAttempts,
             _ => null
         };
-        Console.WriteLine($@"
-      Choose a field to filter by value:
-          1. OrderId
-          2. CustomerName
-          3. Distance (km)
-          4. No value filter
-              Choose");
-        int valueChoice = GetIntInput();
 
-
+        var valueChoice = -1;
+        Action action = filter switch
+        {
+            OrderInListField.OrderId => () =>
+            {
+                Console.WriteLine("Enter Order ID to filter by: ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            OrderInListField.TypeOfOrder => () =>
+            {
+                Console.WriteLine("Enter Type Of Order to filter by (0=STANDART, 1=FAST_DELIVERY, 2=DELIVER_IMMEDIATELY): ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            OrderInListField.DistanceKm => () =>
+            {
+                Console.WriteLine("Enter Distance to filter by (in km): ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            OrderInListField.OrderStatus => () =>
+            {
+                Console.WriteLine("Enter Order Status to filter by (0=OPEN, 1=DELIVERING, 2=COMPLETED, 3=REFUSED, 4=CANCELLED): ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            OrderInListField.ScheduleStatus => () =>
+            {
+                Console.WriteLine("Enter Schedule Status to filter by (0=ONTYME, 1=AT_RISK, 2=LATE): ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            OrderInListField.TimeLeftForDelivery => () =>
+            {
+                Console.WriteLine("Enter Time Left For Delivery to filter by (in Hours): ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            OrderInListField.TotalTimeOfDelivery => () =>
+            {
+                Console.WriteLine("Enter Total Time Of Delivery to filter by (in Hours): ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            OrderInListField.DeliveryAttempts => () =>
+            {
+                Console.WriteLine("Enter Delivery Attempts to filter by: ");
+                valueChoice = GetIntInput();
+            }
+            ,
+            _ => () => Console.WriteLine("Enter value to filter by: ")
+        };
 
         Console.WriteLine($@"
                 Sort orders by:
@@ -205,11 +267,10 @@ internal class Program
             3 => OrderInListField.DistanceKm,
             4 => OrderInListField.OrderStatus,
             5 => OrderInListField.ScheduleStatus,
-            6 => null,
             _ => null
         };
 
-        return s_bl.Order.ReadAll(requesterId, orderStatus, valueChoice, sort);
+        return s_bl.Order.ReadAll(requesterId, filter, valueChoice, sort);
     }
 
 
@@ -269,7 +330,7 @@ internal class Program
         int id = GetIntInput();
         Console.WriteLine("Enter type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
         int typeOfOrderInput = GetIntInput();
-        Console.WriteLine("Enter datials of order");
+        Console.WriteLine("Enter details of order");
         string? datails = Console.ReadLine();
         Console.WriteLine("Enter address of order: ");
         string? address = Console.ReadLine();
@@ -412,21 +473,21 @@ internal class Program
 
 
         return new Config()
-            {
-                ManagerId = 0,
-                PasswordManager =passwordManager,
-                StoreAddress = storeAddress,
-                Latitude = 0,
-                Longitude = 0,
-                MaxDeliveryRange = maxDeliveryRange,
-                AvgSpeedBike = avgSpeedBike,
-                AvgSpeedCar = avgSpeedCar,
-                AvgSpeedFoot = avgSpeedFoot,
-                AvgSpeedMotorcycle = avgSpeedMotorcycle,
-                MaxDeliveryTime =maxDeliveryTime,
-                RiskRange =riskRange,
-                MaxTimeInactivity = maxTimeInactivity,
-            };
+        {
+            ManagerId = 0,
+            PasswordManager = passwordManager,
+            StoreAddress = storeAddress,
+            Latitude = 0,
+            Longitude = 0,
+            MaxDeliveryRange = maxDeliveryRange,
+            AvgSpeedBike = avgSpeedBike,
+            AvgSpeedCar = avgSpeedCar,
+            AvgSpeedFoot = avgSpeedFoot,
+            AvgSpeedMotorcycle = avgSpeedMotorcycle,
+            MaxDeliveryTime = maxDeliveryTime,
+            RiskRange = riskRange,
+            MaxTimeInactivity = maxTimeInactivity,
+        };
     }
     private static void setCourier()
     {
@@ -436,7 +497,7 @@ internal class Program
         int choice;
         do
         {
-           
+
             Console.WriteLine(@$"
 
     to exit press 0
@@ -446,7 +507,7 @@ internal class Program
     to update courier press 4
     to delete courier press 5
 ");
-             choice = GetIntInput();
+            choice = GetIntInput();
 
             try
             {
@@ -501,7 +562,7 @@ internal class Program
             {
                 Console.Error.WriteLine(ex);
             }
-        } while (choice!=0);
+        } while (choice != 0);
     }
     private static void setOrder()
     {
@@ -524,7 +585,7 @@ internal class Program
     to get closed deliveries press 9
     to get open deliveries press 10
 ");
-             choice = GetIntInput();
+            choice = GetIntInput();
             try
             {
                 switch (choice)
@@ -622,7 +683,7 @@ internal class Program
             {
                 Console.Error.WriteLine(ex);
             }
-        } while (choice!=0);
+        } while (choice != 0);
 
 
     }
@@ -644,7 +705,7 @@ internal class Program
         
 
 ");
-             choice = GetIntInput();
+            choice = GetIntInput();
             try
             {
                 switch (choice)
@@ -684,7 +745,7 @@ internal class Program
                         Console.WriteLine($"System clock has been forwarded by {unit}  successfully!");
                         break;
                     case 5:
-                        Config config= s_bl.Admin.GetConfig();
+                        Config config = s_bl.Admin.GetConfig();
                         Console.WriteLine("print config");
                         if (config is null)
                         {
@@ -695,13 +756,13 @@ internal class Program
                             Console.WriteLine(config);
                         }
                         break;
-                        case 6:
-                        config= createConfig();
+                    case 6:
+                        config = createConfig();
                         s_bl.Admin.SetConfig(config);
                         Console.WriteLine("Configuration settings have been initialized.");
-                        break ;
-                        
-                        
+                        break;
+
+
 
                     default:
                         Console.WriteLine("Invalid choice, please try again.");
@@ -713,7 +774,7 @@ internal class Program
                 Console.Error.WriteLine(ex);
             }
 
-        } while (choice!= 0);
+        } while (choice != 0);
     }
 
 
@@ -920,6 +981,15 @@ internal class Program
         } while (choice != 0);
     }
 }
+
+
+
+
+
+
+
+
+
 
 
 
