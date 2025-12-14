@@ -505,6 +505,10 @@ internal static class Tools
     /// A tuple containing the latitude and longitude coordinates if successful,
     /// or null if the geocoding fails or the address is not found.
     /// </returns>
+    /// <exception cref="BO.BlInvalidValueException">
+    /// Thrown when the address is not found in Google's database (ZERO_RESULTS),
+    /// or when the address is not precise enough (APPROXIMATE, RANGE_INTERPOLATED, or GEOMETRIC_CENTER location types).
+    /// </exception>
     /// <exception cref="Exception">
     /// Thrown when the API request fails, returns an error status, or encounters a parsing error.
     /// </exception>
@@ -513,11 +517,18 @@ internal static class Tools
     /// The API key is retrieved from the system configuration.
     /// The response is in XML format and parsed to extract the location coordinates.
     /// 
+    /// Location type validation:
+    /// - ROOFTOP: Precise address (accepted)
+    /// - APPROXIMATE: City/area level (rejected - throws exception)
+    /// - RANGE_INTERPOLATED: Interpolated between two points (rejected)
+    /// - GEOMETRIC_CENTER: Center of an area (rejected)
+    /// 
     /// Possible error scenarios:
-    /// - Invalid API key
-    /// - Address not found (returns null without throwing)
-    /// - Network errors (throws exception)
-    /// - Malformed XML response (throws exception)
+    /// - Invalid API key (throws Exception)
+    /// - Address not found (throws BlInvalidValueException)
+    /// - Imprecise address (throws BlInvalidValueException)
+    /// - Network errors (throws Exception)
+    /// - Malformed XML response (throws Exception)
     /// </remarks>
     public static (double Lat, double Lng)? GetGeocodingSync(string address)
     {
@@ -590,6 +601,47 @@ internal static class Tools
         return Id == AdminManager.GetConfig().ManagerId;
     }
 
+    /// <summary>
+    /// Calculates the actual road distance from the store to a delivery address using the Google Distance Matrix API.
+    /// </summary>
+    /// <param name="address">The destination address for the delivery.</param>
+    /// <param name="TypeShipment">The type of shipment/vehicle to be used for the delivery, which determines the travel mode.</param>
+    /// <returns>
+    /// The actual road distance in kilometers if successful, or null if the calculation fails.
+    /// </returns>
+    /// <exception cref="BO.BlInvalidValueException">
+    /// Thrown when:
+    /// - Google API Key is not configured in the system
+    /// - Store Address is not configured in the system
+    /// - The address was not found in Google's database (ZERO_RESULTS)
+    /// - Unable to calculate distance for the provided address (element status not OK)
+    /// </exception>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the API request fails or encounters an error during execution.
+    /// </exception>
+    /// <remarks>
+    /// This method makes a synchronous HTTP request to the Google Distance Matrix API.
+    /// The API key and store address are retrieved from the system configuration.
+    /// 
+    /// Travel mode mapping:
+    /// - FOOT/BIKE: walking mode
+    /// - MOTORCYCLE/CAR: driving mode
+    /// 
+    /// The method calculates the actual road distance based on real routes, which may differ
+    /// from the straight-line distance calculated by the Haversine formula. This is more
+    /// accurate for estimating delivery times and courier assignments.
+    /// 
+    /// The response is in XML format and parsed to extract the distance value.
+    /// The distance is returned in kilometers (converted from meters).
+    /// 
+    /// Possible error scenarios:
+    /// - Missing configuration (API key or store address)
+    /// - Invalid API key
+    /// - Address not found
+    /// - Unable to route between locations
+    /// - Network errors
+    /// - Malformed XML response
+    /// </remarks>
     public static double? GetActualDistance(string address, BO.TheTypeShipment TypeShipment)
     {
         string apiKey = AdminManager.GetConfig().GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API Key is not configured.");
