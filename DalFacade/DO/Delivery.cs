@@ -51,7 +51,7 @@ public record Delivery
         Delivery ID: {Id}
         Order ID: {OrderId}
         Courier ID: {CourierId}
-        Type of Order: {TypeOfOrder}
+        Type of Shipment: {TypeShipment}
         Order Date: {OrderDate}
         Actual Distance: {ActualDistance}
         End Delivery: {EndDelivery}

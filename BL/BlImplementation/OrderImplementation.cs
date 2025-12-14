@@ -9,6 +9,7 @@ internal class OrderImplementation : IOrder
 {
      public void Create (int id, BO.Order boOrder)
     {
+
         OrderManager.Create(boOrder);
     }
     public BO.Order? Read (int id, int orderId)
@@ -25,7 +26,8 @@ internal class OrderImplementation : IOrder
     }
     public void StartDelivery(int id, int courierId, int orderId)
     {
-        throw new NotImplementedException();
+        
+        OrderManager.StartDelivery(courierId, orderId);
     }
     public IEnumerable < BO.OrderInList> ReadAll(
         int id,
