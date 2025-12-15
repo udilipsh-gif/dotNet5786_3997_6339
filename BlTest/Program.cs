@@ -6,7 +6,6 @@ internal class Program
 {
     static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-
     public static int GetIntInput()
     {
         int result;
@@ -492,8 +491,7 @@ internal class Program
     private static void setCourier()
     {
         Console.WriteLine("Set Courier Menu.");
-        Console.Write("Enter ID of the requester: ");
-        int requesterId = GetIntInput();
+        int requesterId = s_bl.Admin.GetConfig().ManagerId;
         int choice;
         do
         {
@@ -567,8 +565,7 @@ internal class Program
     private static void setOrder()
     {
         Console.WriteLine("Set Order Menu.");
-        Console.WriteLine("Enter ID of the requester: ");
-        int requesterId = GetIntInput();
+        int requesterId = s_bl.Admin.GetConfig().ManagerId;
         int choice;
         do
         {
