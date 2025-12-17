@@ -471,7 +471,7 @@ internal static class OrderManager
             BO.OrderInListField.OrderId => (o) => o.OrderId == (int)filterValue!,
             BO.OrderInListField.TypeOfOrder => (o) => o.TypeOfOrder == (BO.TypeOfOrder)filterValue!,
             BO.OrderInListField.OrderStatus => (o) => o.OrderStatus == (BO.OrderStatus)filterValue!,
-            BO.OrderInListField.DistanceKm => (o) => o.DistanceKm == (double)filterValue!,
+            BO.OrderInListField.DistanceKm => (o) => o.DistanceKm == Convert.ToDouble(filterValue),
             BO.OrderInListField.ScheduleStatus => (o) => o.ScheduleStatus == (BO.ScheduleStatus)filterValue!,
             BO.OrderInListField.TimeLeftForDelivery => (o) => o.TimeLeftForDelivery <= (TimeSpan)filterValue!,
             BO.OrderInListField.TotalTimeOfDelivery => (o) => o.TotalTimeOfDelivery <= (TimeSpan)filterValue!,

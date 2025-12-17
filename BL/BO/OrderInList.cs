@@ -1,4 +1,6 @@
-﻿namespace BO;
+﻿using Helpers;
+
+namespace BO;
 
 /// <summary>
 /// Represents an order item in a list view with summary information.
@@ -68,16 +70,5 @@ public class OrderInList
     /// </remarks>
     public required int NumberOfDeliveryAttempts { get; init; }
 
-    public override string ToString() => (@$"
-Order In List Details:
-        ID: {this.OrderId}
-        Type of Order: {this.TypeOfOrder}
-        Distance Km: {this.DistanceKm}
-        Order Status: {this.OrderStatus}
-        Schedule Status: {this.ScheduleStatus}
-        Time Left For Delivery: {this.TimeLeftForDelivery}
-        Total Time Of Delivery: {this.TotalTimeOfDelivery}
-        Number Of Delivery Attempts: {this.NumberOfDeliveryAttempts}
-        Delivery ID: {this.DeliveryId}
-").Replace(Environment.NewLine, " ").Trim();
+    public override string ToString() => this.ToStringProperty();
 }

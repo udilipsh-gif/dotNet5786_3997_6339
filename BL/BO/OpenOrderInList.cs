@@ -1,4 +1,6 @@
-﻿namespace BO;
+﻿using Helpers;
+
+namespace BO;
 
 /// <summary>
 /// Represents an open order in a list view, available for courier assignment.
@@ -83,28 +85,5 @@ public class OpenOrderInList
     /// <value>A DateTime representing the deadline by which the order must be delivered.</value>
     public required DateTime MaxDeliveryTime { get; init; }
 
-    public override string ToString() => (@$"
-{nameof(CourierId)}
-        : {CourierId}
-        {nameof(OrderId)}
-        : {OrderId}
-        {nameof(TypeOfOrder)}
-        : {TypeOfOrder}
-        {nameof(Weight)}
-        : {Weight}
-        {nameof(Address)}
-        : {Address}
-        {nameof(DistanceKm)}
-        : {DistanceKm}
-        {nameof(ActualDistance)}
-        : {ActualDistance}
-        {nameof(EstimatedDeliveryTime)}
-        : {EstimatedDeliveryTime}
-        {nameof(ScheduleStatus)}
-        : {ScheduleStatus}
-        {nameof(TimeLeftForDelivery)}
-        : {TimeLeftForDelivery}
-        {nameof(MaxDeliveryTime)}
-        : {MaxDeliveryTime}
- ").Replace(Environment.NewLine, " ");
+    public override string ToString() => this.ToStringProperty();
 }

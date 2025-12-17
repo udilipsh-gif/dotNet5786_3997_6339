@@ -1,4 +1,7 @@
 ﻿using DalApi;
+using System.Collections;
+using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -29,8 +32,45 @@ internal static class Tools
     /// </remarks>
     public static string ToStringProperty<T>(this T t)
     {
-        return "hi";
+        if (t == null) return "null";
+
+        StringBuilder sb = new StringBuilder();
+
+        Type type = t.GetType();
+        PropertyInfo[] properties = type.GetProperties();
+       // sb.Append(type.Name + " Details:\n");
+        foreach (PropertyInfo prop in properties)
+        {
+            // שליפת הערך של המאפיין מתוך האובייקט t
+            var value = prop.GetValue(t);
+            string strValue = "null";
+
+            if (value != null)
+            {
+                  if (value is IEnumerable collection && !(value is string))
+                {
+                    var items = collection.Cast<object>()
+                                          .Select(item => item?.ToString() ?? "null");
+
+    
+                    strValue = $"[{string.Join(", ", items)}]";
+                }
+                else
+                {
+                   
+                    strValue = value.ToString();
+                    if (prop.Name is "password" or "Password")
+                        strValue = "******";
+                }
+            }
+
+            // 5. הוספת שם המאפיין והערך שלו למחרוזת הסופית
+            sb.AppendLine($"        {prop.Name}: {strValue}");
+        }
+
+        return sb.ToString();
     }
+    
 
     /// <summary>
     /// Calculates the distance between two geographic coordinates using the Haversine formula.
@@ -533,8 +573,10 @@ internal static class Tools
     public static (double Lat, double Lng)? GetGeocodingSync(string address)
     {
         var apiKey = AdminManager.GetConfig().GoogleApiKey;
+
         string url = $"https://maps.googleapis.com/maps/api/geocode/xml?address={address}&key={apiKey}";
-        using (HttpClient client = new HttpClient())
+
+        using HttpClient client = new HttpClient();
         {
             client.DefaultRequestHeaders.Add("User-Agent", "dotNet5786_3997_6339");
             try

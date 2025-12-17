@@ -156,7 +156,7 @@ internal static class Config
     /// </summary>
     internal static TimeSpan MaxTimeInactivity { get; set; } = TimeSpan.FromDays(0);
 
-    internal static string GoogleApiKey { get; set; } = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
+    internal static string GoogleApiKey { get; set; } = string.Empty;
 
     /// <summary>
     /// Resets all configuration values to their default initial state.

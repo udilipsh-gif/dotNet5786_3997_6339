@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using DO;
 using System;
 
 namespace BO;
@@ -249,6 +250,8 @@ internal class Program
             _ => () => Console.WriteLine("Enter value to filter by: ")
         };
 
+        action();
+
         Console.WriteLine($@"
                 Sort orders by:
                     1. OrderId
@@ -275,89 +278,204 @@ internal class Program
 
     private static Courier updateCourier(int requesterId)
     {
-
-
-        Console.WriteLine("Update of courier");
-
-        Console.Write("Enter ID of courier: ");
+        Console.Write("Enter ID of courier to update: ");
         int id = GetIntInput();
 
-        Console.Write("Enter Name: ");
-        string name = Console.ReadLine() ?? string.Empty;
+        var courier = s_bl.Courier.Read(requesterId, id)
+            ?? throw new BlDoesNotExistException($"Courier with ID {id} does not exist.");
 
-        Console.Write("Enter Phone: ");
-        string phone = Console.ReadLine() ?? string.Empty;
+        Console.WriteLine(@"
+    Update of courier
+        to exit press 0
+        to update name press 1
+        to update phone press 2
+        to update email press 3
+        to update password press 4
+        to update courier Active\NotActive press 5
+        to update type shipment press 6
+        to update max distance delivery press 7
+            Choose");
 
-        Console.Write("Enter Email: ");
-        string email = Console.ReadLine() ?? string.Empty;
-
-        string password = string.Empty;
-        while (password == string.Empty)
+        bool flag = true;
+        while (flag)
         {
-            Console.Write("Enter Password: ");
-            password = Console.ReadLine() ?? string.Empty;
+            Action action = GetIntInput() switch
+            {
+                0 => () =>
+                {
+                    Console.WriteLine("Exiting update menu.");
+                    flag = false;
+                    return;
+                }
+                ,
+                1 => () =>
+                {
+                    Console.Write("Enter new Name: ");
+                    courier.Name = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                2 => () =>
+                {
+                    Console.Write("Enter new Phone: ");
+                    courier.Phone = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                3 => () =>
+                {
+                    Console.Write("Enter new Email: ");
+                    courier.Email = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                4 => () =>
+                {
+                    Console.Write("Enter new Password: ");
+                    courier.Password = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                5 => () =>
+                {
+                    Console.Write("Enter Active status (true 1/ false 0): ");
+                    string activeInput = Console.ReadLine() ?? "1";
+                    courier.Active = activeInput == "1";
+                    flag = false;
+                }
+                ,
+                6 => () =>
+                {
+                    Console.Write("Enter new Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
+                    int typeShipmentInput = GetIntInput();
+                    courier.TypeShipment = (TheTypeShipment)typeShipmentInput;
+                    flag = false;
+                }
+                ,
+                7 => () =>
+                {
+                    Console.Write("Enter new Max Distance Delivery (in km): ");
+                    string maxDistanceInput = Console.ReadLine() ?? "0";
+                    courier.MaxDistanceDelivery = double.Parse(maxDistanceInput);
+                    flag = false;
+                }
+                ,
+                _ => () => Console.WriteLine("Invalid choice, please try again.")
+            };
+
+            action();
         }
-
-        Console.Write("Enter Type Shipment (0=CAR, 1=MOTORCYCLE, 2=BICYCLE, 3=FOOT): ");
-        int typeShipmentInput = GetIntInput();
-
-        Console.Write("Enter Max Distance Delivery (in km): ");
-        string maxDistanceInput = Console.ReadLine() ?? "0";
-        double maxDistanceDelivery = double.Parse(maxDistanceInput);
 
         return new Courier
         {
-            Id = id,
-            Name = name,
-            Phone = phone,
-            Email = email,
-            Password = password,
-            Active = true,
-            MaxDistanceDelivery = maxDistanceDelivery,
-            TypeShipment = (TheTypeShipment)typeShipmentInput,
-            WorkingSince = s_bl.Admin.GetClock(),
-            DeliveryOnTime = 0,
-            DeliveryLate = 0,
-
+            Id = courier.Id,
+            Name = courier.Name,
+            Phone = courier.Phone,
+            Email = courier.Email,
+            Password = courier.Password,
+            Active = courier.Active,
+            MaxDistanceDelivery = courier.MaxDistanceDelivery,
+            TypeShipment = courier.TypeShipment,
+            WorkingSince = courier.WorkingSince,
+            DeliveryOnTime = courier.DeliveryOnTime,
+            DeliveryLate = courier.DeliveryLate,
         };
 
     }
     private static Order updateOrder(int requesterId)
     {
-        Console.WriteLine("Update of order");
-        Console.WriteLine("Enter ID of order to update: ");
+        Console.Write("Enter ID of order to update: ");
         int id = GetIntInput();
-        Console.WriteLine("Enter type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
-        int typeOfOrderInput = GetIntInput();
-        Console.WriteLine("Enter details of order");
-        string? datails = Console.ReadLine();
-        Console.WriteLine("Enter address of order: ");
-        string? address = Console.ReadLine();
-        Console.WriteLine("Enter weight of order (in grams): ");
-        int weight = GetIntInput();
-        Console.WriteLine("Enter name of customer: ");
-        string? name = Console.ReadLine();
-        Console.WriteLine("Enter phone of customer: ");
-        string? phone = Console.ReadLine();
+
+        var order = s_bl.Order.Read(requesterId, id)
+            ?? throw new BlDoesNotExistException($"Order with ID {id} does not exist.");
+
+        Console.WriteLine(@"
+    Update of order
+        to exit press 0
+        to update type of order press 1
+        to update details press 2
+        to update address press 3
+        to update weight press 4
+        to update name press 5
+        to update phone press 6
+            Choose");
+        
+        bool flag = true;
+        while (flag) {
+            Action action = GetIntInput() switch
+            {
+                0 => () =>
+                {
+                    Console.WriteLine("Exiting update menu.");
+                    flag = false;
+                    return;
+                }
+                ,
+                1 => () =>
+                {
+                    Console.Write("Enter new type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
+                    int typeOfOrderInput = GetIntInput();
+                    order.TypeOfOrder = (TypeOfOrder)typeOfOrderInput;
+                    flag = false;
+                }
+                ,
+                2 => () =>
+                {
+                    Console.Write("Enter new details of order: ");
+                    order.Details = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                3 => () =>
+                {
+                    Console.Write("Enter new address of order: ");
+                    order.Addres = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                4 => () =>
+                {
+                    Console.Write("Enter new weight of order (in kg): ");
+                    order.Weight = GetIntInput();
+                    flag = false;
+                }
+                ,
+                5 => () =>
+                {
+                    Console.Write("Enter new name of customer: ");
+                    order.Name = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                6 => () =>
+                {
+                    Console.Write("Enter new phone of customer: ");
+                    order.Phone = Console.ReadLine() ?? string.Empty;
+                    flag = false;
+                }
+                ,
+                _ => () => Console.WriteLine("Invalid choice, please try again.")
+            };
+
+            action();
+        }
         return new Order
         {
-            Id = id,
-            TypeOfOrder = (TypeOfOrder)typeOfOrderInput,
-            Details = datails ?? string.Empty,
-            Addres = address ?? string.Empty,
-            Weight = weight,
-            Latitude = 0,
-            Longitude = 0,
-            Distance = 0,
-            Name = name ?? string.Empty,
-            Phone = phone ?? string.Empty,
-            OrderDate = s_bl.Admin.GetClock(),
-            EstimatedDeliveryTime = s_bl.Admin.GetClock(),
-            MaxDeliveryTime = s_bl.Admin.GetClock(),
-            OrderStatus = OrderStatus.OPEN,
-            ScheduleStatus = ScheduleStatus.ONTYME,
-            TimeLeftForDelivery = TimeSpan.Zero,
-            DeliveryPerOrderInLists = new List<DeliveryPerOrderInList>(),
+            Id = order.Id,
+            TypeOfOrder = order.TypeOfOrder,
+            Details = order.Details ?? string.Empty,
+            Addres = order.Addres ?? string.Empty,
+            Weight = order.Weight,
+            Name = order.Name ?? string.Empty,
+            Phone = order.Phone ?? string.Empty,
+            OrderDate = order.OrderDate,
+            EstimatedDeliveryTime = order.EstimatedDeliveryTime,
+            MaxDeliveryTime = order.MaxDeliveryTime,
+            OrderStatus = order.OrderStatus,
+            ScheduleStatus = order.ScheduleStatus,
+            TimeLeftForDelivery = order.TimeLeftForDelivery,
+            DeliveryPerOrderInLists = order.DeliveryPerOrderInLists,
         };
     }
     private static IEnumerable<ClosedDeliveryInList> getlistClosedDeliveries(int requesterId)
@@ -523,7 +641,6 @@ internal class Program
                         Console.WriteLine("Enter courier id: ");
                         int id = GetIntInput();
                         Courier? result = s_bl.Courier.Read(requesterId, id);
-                        //האם צריך חריגה? והאם צריך סימן שאלה, הרי אם הוא נול כבר יש שם חריגה לתפוס
                         Console.WriteLine(result);
                         break;
 
@@ -598,8 +715,8 @@ internal class Program
                     case 2:
                         Console.WriteLine("Enter order id: ");
                         int id = GetIntInput();
-                        Order? result = s_bl.Order.Read(requesterId, id);
-                        //האם צריך חריגה? והאם צריך סימן שאלה, הרי אם הוא נול כבר יש שם חריגה לתפוס
+                        Order result = s_bl.Order.Read(requesterId, id)
+                            ?? throw new BlDoesNotExistException("$\"Ordr with ID {id} does not exist.\"");
                         Console.WriteLine(result);
                         break;
                     case 3:
@@ -699,8 +816,6 @@ internal class Program
     to get config values press 5
     to set config press 6
 
-        
-
 ");
             choice = GetIntInput();
             try
@@ -758,9 +873,7 @@ internal class Program
                         s_bl.Admin.SetConfig(config);
                         Console.WriteLine("Configuration settings have been initialized.");
                         break;
-
-
-
+                    
                     default:
                         Console.WriteLine("Invalid choice, please try again.");
                         break;

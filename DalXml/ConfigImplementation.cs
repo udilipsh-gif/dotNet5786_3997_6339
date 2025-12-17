@@ -138,9 +138,10 @@ internal class ConfigImplementation : IConfig
     /// <summary>
     /// Gets or sets the API key used to authenticate requests to Google services.
     /// </summary>
-    public string GoogleApiKey { get; set; } = string.Empty;
-
-
+    public string GoogleApiKey { 
+        get => Config.GoogleApiKey; 
+        set => Config.GoogleApiKey = value ?? string.Empty; 
+    }
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>

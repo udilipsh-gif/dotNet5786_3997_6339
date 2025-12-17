@@ -1,4 +1,6 @@
-﻿namespace BO;
+﻿using Helpers;
+
+namespace BO;
 
 /// <summary>
 /// Represents a completed delivery in a list view with final outcome details.
@@ -65,6 +67,8 @@ public class ClosedDeliveryInList
     /// </summary>
     /// <value>An <see cref="EndDelivery"/> enum value indicating whether the delivery was delivered, refused, cancelled, not found, or failed.</value>
     public required EndDelivery EndDelivery {get; init; }
+
+    public override string ToString() => this.ToStringProperty();
 
 
 }

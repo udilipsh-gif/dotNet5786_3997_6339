@@ -34,8 +34,8 @@ internal static class CourierManager
             throw new BO.BlInvalidValueException("Invalid phone number.");
         if (!Tools.IsValidEmail(boCourier.Email))
             throw new BO.BlInvalidValueException("Invalid email address.");
-        //if (!Tools.IsStrongPassword(boCourier.Password))
-        //    throw new BO.BlInvalidValueException("Password is not strong enough.");
+        if (!Tools.IsStrongPassword(boCourier.Password))
+            throw new BO.BlInvalidValueException("Password is not strong enough.");
 
 
         DO.Courier doCourier = new DO.Courier

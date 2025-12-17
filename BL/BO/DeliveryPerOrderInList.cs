@@ -1,4 +1,6 @@
-﻿namespace BO
+﻿using Helpers;
+
+namespace BO
 {
     /// <summary>
     /// Represents a delivery item in a list view for order tracking purposes.
@@ -51,5 +53,7 @@
         /// </summary>
         /// <value>A DateTime representing when the delivery attempt concluded, or null if the delivery is still in progress.</value>
         public DateTime? TimeEndDelivery { get; init; }
+
+        public override string ToString() => this.ToStringProperty();
     }
 }
