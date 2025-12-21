@@ -1,4 +1,6 @@
-﻿namespace BO;
+﻿using Helpers;
+
+namespace BO;
 
 /// <summary>
 /// Represents a customer order in the business logic layer.
@@ -19,7 +21,7 @@ public class Order
     /// Gets the type of order based on delivery speed requirements.
     /// </summary>
     /// <value>A <see cref="DO.TypeOfOrder"/> value indicating whether this is a standard, fast, or immediate delivery.</value>
-    public required TypeOfOrder TypeOfOrder { get; init; }
+    public required TypeOfOrder TypeOfOrder { get; set; }
     
     /// <summary>
     /// Gets or sets additional details or special instructions for the order.
@@ -42,20 +44,20 @@ public class Order
     /// Gets or sets the latitude coordinate of the delivery location.
     /// </summary>
     /// <value>The latitude in decimal degrees.</value>
-    public required double Latitude { get; set; }
-    
+    public double Latitude { get; set; } = 0;
+
     /// <summary>
     /// Gets or sets the longitude coordinate of the delivery location.
     /// </summary>
     /// <value>The longitude in decimal degrees.</value>
-    public required double Longitude { get; set; }
-    
+    public double Longitude { get; set; } = 0;
+
     /// <summary>
     /// Gets or sets the distance from the store to the delivery location.
     /// </summary>
     /// <value>The delivery distance in kilometers.</value>
-    public required double Distance { get; set; }
-    
+    public double Distance { get; set; } = 0;
+
     /// <summary>
     /// Gets or sets the customer's name.
     /// </summary>
@@ -120,25 +122,5 @@ public class Order
     /// </remarks>
     public List<DeliveryPerOrderInList>? DeliveryPerOrderInLists { get; set; }
 
-    public override string ToString() => (@$"
-Order Details:
-        {nameof(Order)}
-        ID: {Id}
-        Type of Order: {TypeOfOrder}
-        Details: {Details}
-        Address: {Addres}
-        Weight: {Weight}
-        Latitude: {Latitude}
-        Longitude: {Longitude}
-        Distance: {Distance}
-        Name: {Name}
-        Phone: {Phone}
-        Order Date: {OrderDate}
-        Estimated Delivery Time: {EstimatedDeliveryTime}
-        Max Delivery Time: {MaxDeliveryTime}
-        Order Status: {OrderStatus}
-        Schedule Status: {ScheduleStatus}
-        Time Left For Delivery: {TimeLeftForDelivery}
-        Delivery Per Order In Lists: {DeliveryPerOrderInLists}
-");
+    public override string ToString() => this.ToStringProperty();
 }

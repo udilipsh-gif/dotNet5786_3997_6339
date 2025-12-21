@@ -1,4 +1,5 @@
 ﻿
+using Helpers;
 
 namespace BO
 {
@@ -24,17 +25,7 @@ namespace BO
 
         public int? DeliveryId { get; init; }
 
-        public override string ToString() => (@$"
-    Courier In List Details:
-        ID: {this.Id}
-        Name: {this.Name}
-        Active: {this.Active}
-        Type Shipment: {this.TypeShipment}
-        Working Since: {this.WorkingSince}
-        Delivery On Time: {this.DeliveryOnTime}
-        Delivery Late: {this.DeliveryLate}
-        Delivery ID: {this.DeliveryId}
-").Replace(Environment.NewLine, " ");
+        public override string ToString() => this.ToStringProperty();
 
     }
 }

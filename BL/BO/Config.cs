@@ -1,4 +1,6 @@
-﻿namespace BO;
+﻿using Helpers;
+
+namespace BO;
 public class Config
 {
    
@@ -75,13 +77,10 @@ public class Config
     /// </summary>
     public TimeSpan MaxTimeInactivity { get; set; } = TimeSpan.FromDays(0);
 
-
-
-
     /// <summary>
     /// gets or sets the Google API key for accessing Google services.
     /// </summary>
-    public string GoogleApiKey { get; set; } = string.Empty;
+    public string GoogleApiKey { get; set; } = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
 
     /// <summary>
     /// Resets all configuration values to their default initial state.
@@ -103,25 +102,9 @@ public class Config
         MaxDeliveryTime = TimeSpan.FromDays(0);
         RiskRange = TimeSpan.FromDays(0);
         MaxTimeInactivity = TimeSpan.FromDays(0);
+
     }
-    public override string ToString() => $@"
-Config details:
-        Clock: {Clock}
-        ManagerId: {ManagerId}
-        PasswordManager: {PasswordManager}
-        StoreAddress: {StoreAddress}
-        Latitude: {Latitude}
-        Longitude: {Longitude}
-        MaxDeliveryRange: {MaxDeliveryRange}
-        AvgSpeedCar: {AvgSpeedCar}
-        AvgSpeedMotorcycle: {AvgSpeedMotorcycle}
-        AvgSpeedBike: {AvgSpeedBike}
-        AvgSpeedFoot: {AvgSpeedFoot}
-        MaxDeliveryTime: {MaxDeliveryTime}
-        RiskRange: {RiskRange}
-        MaxTimeInactivity: {MaxTimeInactivity}
-        GoogleApiKey: {GoogleApiKey}
-";
+    public override string ToString() => this.ToStringProperty();
 
 
 }

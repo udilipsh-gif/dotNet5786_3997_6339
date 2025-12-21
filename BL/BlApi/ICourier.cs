@@ -50,5 +50,4 @@ public interface ICourier//כרגע מכיל צפייה עדכון יצירה ו
     BO.CourierFieldSort? sort);
 
 
-
 }

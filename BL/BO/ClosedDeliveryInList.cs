@@ -1,4 +1,5 @@
-﻿
+﻿using Helpers;
+
 namespace BO;
 
 /// <summary>
@@ -66,6 +67,8 @@ public class ClosedDeliveryInList
     /// </summary>
     /// <value>An <see cref="EndDelivery"/> enum value indicating whether the delivery was delivered, refused, cancelled, not found, or failed.</value>
     public required EndDelivery EndDelivery {get; init; }
+
+    public override string ToString() => this.ToStringProperty();
 
 
 }

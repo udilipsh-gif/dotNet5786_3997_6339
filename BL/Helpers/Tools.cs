@@ -1,4 +1,7 @@
 ﻿using DalApi;
+using System.Collections;
+using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -29,8 +32,45 @@ internal static class Tools
     /// </remarks>
     public static string ToStringProperty<T>(this T t)
     {
-        return "hi";
+        if (t == null) return "null";
+
+        StringBuilder sb = new StringBuilder();
+
+        Type type = t.GetType();
+        PropertyInfo[] properties = type.GetProperties();
+       // sb.Append(type.Name + " Details:\n");
+        foreach (PropertyInfo prop in properties)
+        {
+            // שליפת הערך של המאפיין מתוך האובייקט t
+            var value = prop.GetValue(t);
+            string strValue = "null";
+
+            if (value != null)
+            {
+                  if (value is IEnumerable collection && !(value is string))
+                {
+                    var items = collection.Cast<object>()
+                                          .Select(item => item?.ToString() ?? "null");
+
+    
+                    strValue = $"[{string.Join(", ", items)}]";
+                }
+                else
+                {
+                   
+                    strValue = value.ToString();
+                    if (prop.Name is "password" or "Password")
+                        strValue = "******";
+                }
+            }
+
+            // 5. הוספת שם המאפיין והערך שלו למחרוזת הסופית
+            sb.AppendLine($"        {prop.Name}: {strValue}");
+        }
+
+        return sb.ToString();
     }
+    
 
     /// <summary>
     /// Calculates the distance between two geographic coordinates using the Haversine formula.
@@ -505,6 +545,10 @@ internal static class Tools
     /// A tuple containing the latitude and longitude coordinates if successful,
     /// or null if the geocoding fails or the address is not found.
     /// </returns>
+    /// <exception cref="BO.BlInvalidValueException">
+    /// Thrown when the address is not found in Google's database (ZERO_RESULTS),
+    /// or when the address is not precise enough (APPROXIMATE, RANGE_INTERPOLATED, or GEOMETRIC_CENTER location types).
+    /// </exception>
     /// <exception cref="Exception">
     /// Thrown when the API request fails, returns an error status, or encounters a parsing error.
     /// </exception>
@@ -513,17 +557,26 @@ internal static class Tools
     /// The API key is retrieved from the system configuration.
     /// The response is in XML format and parsed to extract the location coordinates.
     /// 
+    /// Location type validation:
+    /// - ROOFTOP: Precise address (accepted)
+    /// - APPROXIMATE: City/area level (rejected - throws exception)
+    /// - RANGE_INTERPOLATED: Interpolated between two points (rejected)
+    /// - GEOMETRIC_CENTER: Center of an area (rejected)
+    /// 
     /// Possible error scenarios:
-    /// - Invalid API key
-    /// - Address not found (returns null without throwing)
-    /// - Network errors (throws exception)
-    /// - Malformed XML response (throws exception)
+    /// - Invalid API key (throws Exception)
+    /// - Address not found (throws BlInvalidValueException)
+    /// - Imprecise address (throws BlInvalidValueException)
+    /// - Network errors (throws Exception)
+    /// - Malformed XML response (throws Exception)
     /// </remarks>
     public static (double Lat, double Lng)? GetGeocodingSync(string address)
     {
         var apiKey = AdminManager.GetConfig().GoogleApiKey;
+
         string url = $"https://maps.googleapis.com/maps/api/geocode/xml?address={address}&key={apiKey}";
-        using (HttpClient client = new HttpClient())
+
+        using HttpClient client = new HttpClient();
         {
             client.DefaultRequestHeaders.Add("User-Agent", "dotNet5786_3997_6339");
             try
@@ -534,12 +587,22 @@ internal static class Tools
                     string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     XDocument doc = XDocument.Parse(xmlContent);
                     string? status = doc.Element("GeocodeResponse")?.Element("status")?.Value;
+
+                    if (status == "ZERO_RESULTS")
+                        throw new BO.BlInvalidValueException ("הכתובת לא נמצאה במאגר של גוגל.");
+                    
+
                     if (status == "OK")
                     {
-                        var locationElement = doc.Element("GeocodeResponse")?
+                        var geometry = doc.Element("GeocodeResponse")?
                                              .Element("result")?
-                                             .Element("geometry")?
-                                             .Element("location");
+                                             .Element("geometry");
+                        var locationType = geometry?.Element("location_type")?.Value;
+                        if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETRIC_CENTER")
+                            throw new BO.BlInvalidValueException("הכתובת שהוזנה לא מדויקת, נא להזין כתובת מלאה יותר.");
+                        
+                        var locationElement = geometry?.Element("location");
+
                         if (locationElement != null)
                         {
                             double lat = double.Parse(locationElement.Element("lat")!.Value);
@@ -578,5 +641,107 @@ internal static class Tools
     public static bool CheckManger(int Id)
     {
         return Id == AdminManager.GetConfig().ManagerId;
+    }
+
+    /// <summary>
+    /// Calculates the actual road distance from the store to a delivery address using the Google Distance Matrix API.
+    /// </summary>
+    /// <param name="address">The destination address for the delivery.</param>
+    /// <param name="TypeShipment">The type of shipment/vehicle to be used for the delivery, which determines the travel mode.</param>
+    /// <returns>
+    /// The actual road distance in kilometers if successful, or null if the calculation fails.
+    /// </returns>
+    /// <exception cref="BO.BlInvalidValueException">
+    /// Thrown when:
+    /// - Google API Key is not configured in the system
+    /// - Store Address is not configured in the system
+    /// - The address was not found in Google's database (ZERO_RESULTS)
+    /// - Unable to calculate distance for the provided address (element status not OK)
+    /// </exception>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the API request fails or encounters an error during execution.
+    /// </exception>
+    /// <remarks>
+    /// This method makes a synchronous HTTP request to the Google Distance Matrix API.
+    /// The API key and store address are retrieved from the system configuration.
+    /// 
+    /// Travel mode mapping:
+    /// - FOOT/BIKE: walking mode
+    /// - MOTORCYCLE/CAR: driving mode
+    /// 
+    /// The method calculates the actual road distance based on real routes, which may differ
+    /// from the straight-line distance calculated by the Haversine formula. This is more
+    /// accurate for estimating delivery times and courier assignments.
+    /// 
+    /// The response is in XML format and parsed to extract the distance value.
+    /// The distance is returned in kilometers (converted from meters).
+    /// 
+    /// Possible error scenarios:
+    /// - Missing configuration (API key or store address)
+    /// - Invalid API key
+    /// - Address not found
+    /// - Unable to route between locations
+    /// - Network errors
+    /// - Malformed XML response
+    /// </remarks>
+    public static double? GetActualDistance(string address, BO.TheTypeShipment TypeShipment)
+    {
+        string apiKey = AdminManager.GetConfig().GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API Key is not configured.");
+        string StoreAddress = AdminManager.GetConfig().StoreAddress ?? throw new BO.BlInvalidValueException("Store Address is not configured.");
+        string mode = TypeShipment switch
+        {
+            BO.TheTypeShipment.FOOT => "walking",
+            BO.TheTypeShipment.BIKE => "walking",
+            BO.TheTypeShipment.MOTORCYCLE => "driving",
+            BO.TheTypeShipment.CAR => "driving",
+            _ => "Driving"
+        };
+
+        string url = $"https://maps.googleapis.com/maps/api/distancematrix/xml?origins={StoreAddress}&destinations={address}&mode={mode}&key={apiKey}";
+
+        using (HttpClient client = new HttpClient())
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", "dotNet5786_3997_6339");
+            try
+            {
+                HttpResponseMessage response = client.GetAsync(url).GetAwaiter().GetResult();
+                if(response.IsSuccessStatusCode)
+                {
+                    string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    XDocument doc = XDocument.Parse(xmlContent);
+                    string? status = doc.Element("DistanceMatrixResponse")?.Element("status")?.Value;
+                    if (status == "ZERO_RESULTS")
+                        throw new BO.BlInvalidValueException("The address was not found in Google's database.");
+                    if (status == "OK")
+                    {
+                        var element = doc.Element("DistanceMatrixResponse")?
+                                             .Element("row")?
+                                             .Element("element");
+                        var elementStatus = element?.Element("status")?.Value;
+                        if (elementStatus != "OK")
+                            throw new BO.BlInvalidValueException("Unable to calculate distance for the provided address.");
+                        var distanceElement = element?.Element("distance");
+                        if (distanceElement != null)
+                        {
+                            double distance = double.Parse(distanceElement.Element("value")!.Value);
+                            return distance / 1000.0; // Convert to kilometers
+                        }
+                        else
+                        {
+                            throw new Exception("Distance element not found in the response.");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to get distance matrix data.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BO.BlDoesNotExistException($"Exception: {ex.Message}");
+            }
+        }
+        return null;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace BO;
+﻿using Helpers;
+
+namespace BO;
 
 /// <summary>
 /// Represents a courier in the business logic layer who delivers orders to customers.
@@ -73,17 +75,7 @@ public class Courier
     /// Returns a string representation of the courier's details.
     /// </summary>
     /// <returns>A formatted string containing all courier information including ID, name, contact details, status, and capabilities.</returns>
-    public override string ToString() => (@$"
-    Courier Details:
-        ID: {this.Id}
-        Name: {this.Name}
-        Phone: {this.Phone}
-        Email: {this.Email}
-        Active: {this.Active}
-        Max Distance Delivery: {this.MaxDistanceDelivery:F1}
-        Type Shipment: {this.TypeShipment}
-        Working Since: {this.WorkingSince}
-    ");
+    public override string ToString() => this.ToStringProperty();
 
     public List<CourierInList> CourierInLists { get; set; } = new List<CourierInList>();
 }

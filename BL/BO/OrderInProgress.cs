@@ -1,5 +1,7 @@
 ﻿
 
+using Helpers;
+
 namespace BO;
 
 
@@ -119,4 +121,6 @@ public class OrderInProgress
     /// A negative value indicates the order is already late.
     /// </remarks>
     public required TimeSpan TimeRemaining { get; init; }
+
+    public override string ToString() => this.ToStringProperty();                    
 }

@@ -220,4 +220,15 @@
     <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2025-08-03T20:12:06.0000000</WorkingSince>
   </Courier>
+  <Courier>
+    <Id>200986339</Id>
+    <Name>david 4</Name>
+    <Phone>0527148483</Phone>
+    <Email>david48483@email.com</Email>
+    <Password>Da-2546389</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>65</MaxDistanceDelivery>
+    <TypeShipment>CAR</TypeShipment>
+    <WorkingSince>2025-12-14T20:12:06.0000000</WorkingSince>
+  </Courier>
 </ArrayaOfCouriers>
