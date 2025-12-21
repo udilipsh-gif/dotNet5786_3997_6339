@@ -26,7 +26,8 @@ internal class DeliveryImplementation : IDelivery
             OrderDate = (DateTime?)delivery.Element("OrderDate") ?? throw new FormatException("can't convert order date"),
             ActualDistance = delivery.ToDoubleNullable("ActualDistance"),
             EndDelivery = delivery.ToEnumNullable<EndDelivery>("EndDelivery") ?? null,
-            TimeEndDelivery = (DateTime?)delivery.Element("TimeEndDelivery") ?? null,
+            TimeEndDelivery = (string?)delivery.Element("TimeEndDelivery") == "" ? 
+                null : (DateTime?)delivery.Element("TimeEndDelivery"),
         };
     }
 
