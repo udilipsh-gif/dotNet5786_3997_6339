@@ -520,4 +520,14 @@
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>2025-12-14T20:12:06.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200054</Id>
+    <OrderId>100004</OrderId>
+    <CourierId>200986339</CourierId>
+    <TypeOfOrder>MOTORCYCLE</TypeOfOrder>
+    <OrderDate>2025-12-14T20:12:06.0000000</OrderDate>
+    <ActualDistance>3.353</ActualDistance>
+    <EndDelivery></EndDelivery>
+    <TimeEndDelivery></TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
