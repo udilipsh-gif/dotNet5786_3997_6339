@@ -500,4 +500,14 @@
     <EndDelivery>REFUSED</EndDelivery>
     <TimeEndDelivery>2025-12-14T20:28:12.7200000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200051</Id>
+    <OrderId>100050</OrderId>
+    <CourierId>203383997</CourierId>
+    <TypeOfOrder>MOTORCYCLE</TypeOfOrder>
+    <OrderDate>2025-12-14T20:12:06.0000000</OrderDate>
+    <ActualDistance>7.789</ActualDistance>
+    <EndDelivery></EndDelivery>
+    <TimeEndDelivery></TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
