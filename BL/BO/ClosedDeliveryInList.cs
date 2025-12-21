@@ -1,4 +1,5 @@
-﻿namespace BO;
+﻿
+namespace BO;
 
 /// <summary>
 /// Represents a completed delivery in a list view with final outcome details.
