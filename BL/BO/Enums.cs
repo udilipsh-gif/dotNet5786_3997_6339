@@ -153,7 +153,7 @@ public enum OrderStatus
     /// <summary>
     /// The order was cancelled.
     /// </summary>
-    CONCELLED
+    CANCELLED
 }
 
 /// <summary>
@@ -177,9 +177,9 @@ public enum ScheduleStatus
     LATE,
 
     /// <summary>
-    /// The order is conselled.
+    /// The order is canceled.
     /// </summary>
-    CONCEL
+    CANCELLED
 }
 public enum EndDelivery
 {
@@ -196,7 +196,7 @@ public enum EndDelivery
     /// <summary>
     /// The delivery was cancelled.
     /// </summary>
-    CONCELLED,
+    CANCELLED,
 
     /// <summary>
     /// The delivery address or recipient was not found.
