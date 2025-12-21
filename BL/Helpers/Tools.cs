@@ -274,7 +274,7 @@ internal static class Tools
             return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
         }
 
-        return BO.ScheduleStatus.CONCEL;
+        return BO.ScheduleStatus.CANCELLED;
 
     }
 
