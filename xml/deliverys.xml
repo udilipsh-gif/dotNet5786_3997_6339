@@ -502,12 +502,22 @@
   </Delivery>
   <Delivery>
     <Id>200051</Id>
-    <OrderId>100050</OrderId>
-    <CourierId>203383997</CourierId>
-    <TypeOfOrder>MOTORCYCLE</TypeOfOrder>
+    <OrderId>100051</OrderId>
+    <CourierId>0</CourierId>
+    <TypeOfOrder>FOOT</TypeOfOrder>
     <OrderDate>2025-12-14T20:12:06.0000000</OrderDate>
-    <ActualDistance>7.789</ActualDistance>
-    <EndDelivery></EndDelivery>
-    <TimeEndDelivery></TimeEndDelivery>
+    <ActualDistance>0</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2025-12-14T20:12:06.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200052</Id>
+    <OrderId>100042</OrderId>
+    <CourierId>0</CourierId>
+    <TypeOfOrder>FOOT</TypeOfOrder>
+    <OrderDate>2025-12-14T20:12:06.0000000</OrderDate>
+    <ActualDistance>0</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2025-12-14T20:12:06.0000000</TimeEndDelivery>
   </Delivery>
 </ArrayOfDeliverys>

@@ -245,6 +245,8 @@ internal static class OrderManager
             DO.OrderStatus.OPEN or DO.OrderStatus.REFUSED => () =>
             {
                 doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
+                s_dal.Order.Update(doOrder);
+               
                 s_dal.Delivery.Create(new DO.Delivery
                 {
                     Id = 0,
@@ -260,6 +262,8 @@ internal static class OrderManager
             ,
             DO.OrderStatus.DELIVERING => () =>
             {
+                doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
+                s_dal.Order.Update(doOrder);
                 var delivery = (from d in s_dal.Delivery?.ReadAll()
                                 where d.OrderId == doOrder.Id
                                 orderby d.Id descending
@@ -274,6 +278,8 @@ internal static class OrderManager
             ,
             _ => throw new BO.BlInvalidOperationException("Invalid order status.")
         };
+
+        action();  
     }
 
     /// <summary>

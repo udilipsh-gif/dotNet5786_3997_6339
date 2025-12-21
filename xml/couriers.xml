@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayaOfCouriers>
+	<Courier>
+		<Id>0</Id>
+		<Name>System</Name>
+		<Phone>0000000000</Phone>
+		<Email>System@courier.com</Email>
+		<Password>*******</Password>
+		<Active>false</Active>
+		<MaxDistanceDelivery>0</MaxDistanceDelivery>
+		<TypeShipment>FOOT</TypeShipment>
+		<WorkingSince>1970-10-22T20:12:06.0000000</WorkingSince>
+	</Courier>
   <Courier>
     <Id>276739561</Id>
     <Name>Dani Levy</Name>

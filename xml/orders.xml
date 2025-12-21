@@ -705,22 +705,6 @@
     <DistanceKmWalk />
   </Order>
   <Order>
-    <Id>100042</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 41</Details>
-    <Addres>רוקח 19, רמת גן</Addres>
-    <Latitude>32.0881212</Latitude>
-    <Longitude>34.8105571</Longitude>
-    <Name>Customer41</Name>
-    <Phone>0587194172</Phone>
-    <Weight>18</Weight>
-    <OrderDate>2025-04-22T20:12:06.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm />
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100015</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 14</Details>
@@ -764,6 +748,38 @@
     <Weight>8</Weight>
     <OrderDate>2025-01-04T20:12:06.0000000</OrderDate>
     <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100051</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>חיעכליחעחלי21</Details>
+    <Addres>סוקלוב 24 בני ברק</Addres>
+    <Latitude>32.0883857</Latitude>
+    <Longitude>34.8341205</Longitude>
+    <Name>חיים משה</Name>
+    <Phone>0548478933</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2025-12-14T20:12:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100042</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 41</Details>
+    <Addres>רוקח 19, רמת גן</Addres>
+    <Latitude>32.0881212</Latitude>
+    <Longitude>34.8105571</Longitude>
+    <Name>Customer41</Name>
+    <Phone>0587194172</Phone>
+    <Weight>18</Weight>
+    <OrderDate>2025-04-22T20:12:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
     <DistanceKm />
     <DistanceKmRoad />
     <DistanceKmWalk />
