@@ -748,7 +748,7 @@ internal class Program
                         Console.WriteLine("Order canceled successfully!");
                         break;
                     case 7:
-                        Console.WriteLine("Enter order id to report delivery: ");
+                        Console.WriteLine("Enter delivery id to report: ");
                         int orderId = GetIntInput();
                         Console.WriteLine("Enter courier id");
                         int courierId = GetIntInput();

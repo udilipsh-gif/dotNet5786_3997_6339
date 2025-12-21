@@ -166,8 +166,8 @@ internal static class Tools
             {
                 DO.EndDelivery.DELIVERED => BO.OrderStatus.COMPLETED,
                 DO.EndDelivery.REFUSED => BO.OrderStatus.REFUSED,
-                DO.EndDelivery.CONCELLED => BO.OrderStatus.CONCELLED,
-                DO.EndDelivery.FAILED => BO.OrderStatus.CONCELLED,
+                DO.EndDelivery.CONCELLED => BO.OrderStatus.CANCELLED,
+                DO.EndDelivery.FAILED => BO.OrderStatus.CANCELLED,
                 DO.EndDelivery.NOTFOUND => BO.OrderStatus.OPEN,
                 null => BO.OrderStatus.OPEN,
                 _ => throw new Exception("Unknown delivery status"),
@@ -477,7 +477,7 @@ internal static class Tools
     /// </remarks>
     public static TimeSpan GetTimeLeftForDelivery(DO.Order order, BO.OrderStatus status)
     {
-        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CONCELLED)
+        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED)
         {
             return TimeSpan.Zero;
         }
@@ -516,7 +516,7 @@ internal static class Tools
     /// </remarks>
     public static TimeSpan GetTotalTimeOfDelivery(DO.Order order, BO.OrderStatus status, DO.Delivery? delivery)
     {
-        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CONCELLED)
+        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED)
         {
             return delivery!.TimeEndDelivery!.Value - order.OrderDate;
         }
