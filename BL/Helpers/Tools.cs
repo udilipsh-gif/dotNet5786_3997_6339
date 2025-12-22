@@ -21,14 +21,19 @@ internal static class Tools
     private static readonly IDal s_dal = Factory.Get; //stage 4
 
     /// <summary>
-    /// Converts an object to its string representation.
+    /// Converts an object to its string representation with property details.
     /// </summary>
     /// <typeparam name="T">The type of the object to convert.</typeparam>
     /// <param name="t">The object to convert.</param>
-    /// <returns>A string representation of the object.</returns>
+    /// <returns>
+    /// A formatted string containing all properties and their values.
+    /// Returns "null" if the object is null.
+    /// </returns>
     /// <remarks>
-    /// Currently returns a placeholder value "hi". This method should be implemented
-    /// to provide meaningful string representations of objects.
+    /// This method uses reflection to iterate through all public properties of the object.
+    /// For collection properties (except strings), displays items in a comma-separated list format.
+    /// Password fields are masked with asterisks for security.
+    /// Each property is displayed on a new line with indentation.
     /// </remarks>
     public static string ToStringProperty<T>(this T t)
     {
@@ -85,7 +90,7 @@ internal static class Tools
     /// between two points on Earth's surface. The Earth's radius is assumed to be 6371 km.
     /// Implementation based on GIMINI algorithm.
     /// </remarks>
-    public static double GetDistance(double lat1, double lon1, double lat2, double lon2) //GIMINI
+    public static double GetDistance(double lat1, double lon1, double lat2, double lon2) 
     {
         const double R = 6371;
 
@@ -144,15 +149,15 @@ internal static class Tools
     /// <param name="delivery">The delivery record associated with the order, or null if no delivery exists.</param>
     /// <returns>
     /// The business logic order status:
-    /// - OPEN if no delivery exists
+    /// - OPEN if no delivery exists or delivery ended with NOTFOUND status
     /// - COMPLETED if delivery ended with DELIVERED status
     /// - REFUSED if delivery ended with REFUSED status
-    /// - CONCELLED if delivery ended with CONCELLED or FAILED status
-    /// - OPEN if delivery ended with NOTFOUND status (ready to retry)
+    /// - CANCELLED if delivery ended with CONCELLED or FAILED status
     /// </returns>
     /// <exception cref="Exception">Thrown when the delivery has an unknown status.</exception>
     /// <remarks>
     /// This method maps data layer delivery end statuses to business logic order statuses.
+    /// Orders with NOTFOUND delivery status are returned to OPEN status for retry attempts.
     /// </remarks>
     public static BO.OrderStatus GetOrderStatus(DO.Order order, DO.Delivery? delivery)
     {
@@ -203,7 +208,7 @@ internal static class Tools
     /// - ONTYME: Delivery is on track to meet the deadline
     /// - INRISK: Delivery is at risk of being late (within the risk range buffer)
     /// - LATE: Delivery has missed or will miss the deadline
-    /// - CONCEL: Order has been cancelled or refused
+    /// - CANCELLED: Order has been cancelled or refused
     /// </returns>
     /// <exception cref="Exception">
     /// Thrown when risk range or max delivery time is not configured,
@@ -212,7 +217,8 @@ internal static class Tools
     /// <remarks>
     /// For COMPLETED orders: Compares actual delivery time against the maximum allowed time.
     /// For DELIVERING orders: Calculates estimated delivery time and compares against deadline.
-    /// For OPEN orders: Estimates time needed based on distance and compares against deadline.
+    /// For OPEN orders: Estimates time needed based on distance (using 4 km/h average) and compares against deadline.
+    /// For CANCELLED/REFUSED orders: Returns CANCELLED status.
     /// The risk range buffer helps identify orders that may become late soon.
     /// </remarks>
     public static BO.ScheduleStatus GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
@@ -470,10 +476,11 @@ internal static class Tools
     /// <param name="status">The current status of the order.</param>
     /// <returns>
     /// The time remaining as a TimeSpan, or TimeSpan.Zero if the order is completed or cancelled.
+    /// May return negative TimeSpan if the order is already late.
     /// </returns>
     /// <remarks>
-    /// For COMPLETED or CONCELLED orders, returns zero as no time is left.
-    /// For active orders, calculates: (OrderDate + MaxDeliveryTime) - CurrentTime
+    /// For COMPLETED or CANCELLED orders, returns zero as no time is left.
+    /// For active orders (OPEN, DELIVERING, REFUSED), calculates: (OrderDate + MaxDeliveryTime) - CurrentTime
     /// </remarks>
     public static TimeSpan GetTimeLeftForDelivery(DO.Order order, BO.OrderStatus status)
     {
@@ -508,11 +515,11 @@ internal static class Tools
     /// <param name="delivery">The delivery record containing completion time.</param>
     /// <returns>
     /// The total delivery time as a TimeSpan if the order is completed or cancelled,
-    /// or TimeSpan.Zero if the order is still active.
+    /// or TimeSpan.Zero if the order is still active (OPEN, DELIVERING, or REFUSED).
     /// </returns>
     /// <remarks>
-    /// For COMPLETED or CONCELLED orders, calculates: TimeEndDelivery - OrderDate
-    /// For active orders (OPEN, DELIVERING), returns zero as delivery is not complete.
+    /// For COMPLETED or CANCELLED orders, calculates: TimeEndDelivery - OrderDate
+    /// For active orders (OPEN, DELIVERING, REFUSED), returns zero as delivery is not complete.
     /// </remarks>
     public static TimeSpan GetTotalTimeOfDelivery(DO.Order order, BO.OrderStatus status, DO.Delivery? delivery)
     {
@@ -599,7 +606,7 @@ internal static class Tools
                                              .Element("result")?
                                              .Element("geometry");
                         var locationType = geometry?.Element("location_type")?.Value;
-                        if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETRIC_CENTER")
+                        if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETIC_CENTER")
                             throw new BO.BlInvalidValueException("הכתובת שהוזנה לא מדויקת, נא להזין כתובת מלאה יותר.");
                         
                         var locationElement = geometry?.Element("location");

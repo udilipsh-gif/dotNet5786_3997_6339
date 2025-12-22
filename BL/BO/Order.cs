@@ -20,7 +20,7 @@ public class Order
     /// <summary>
     /// Gets the type of order based on delivery speed requirements.
     /// </summary>
-    /// <value>A <see cref="DO.TypeOfOrder"/> value indicating whether this is a standard, fast, or immediate delivery.</value>
+    /// <value>A <see cref="TypeOfOrder"/> value indicating whether this is a standard, fast, or immediate delivery.</value>
     public required TypeOfOrder TypeOfOrder { get; set; }
     
     /// <summary>
@@ -36,26 +36,27 @@ public class Order
     public required string Addres { get; set; }
 
     /// <summary>
-    /// Gets or sets the weight value.
+    /// Gets or sets the weight of the order.
     /// </summary>
+    /// <value>The weight in grams.</value>
     public required int Weight { get; set; }
 
     /// <summary>
     /// Gets or sets the latitude coordinate of the delivery location.
     /// </summary>
-    /// <value>The latitude in decimal degrees.</value>
+    /// <value>The latitude in decimal degrees. Valid range is -90 to +90.</value>
     public double Latitude { get; set; } = 0;
 
     /// <summary>
     /// Gets or sets the longitude coordinate of the delivery location.
     /// </summary>
-    /// <value>The longitude in decimal degrees.</value>
+    /// <value>The longitude in decimal degrees. Valid range is -180 to +180.</value>
     public double Longitude { get; set; } = 0;
 
     /// <summary>
-    /// Gets or sets the distance from the store to the delivery location.
+    /// Gets or sets the straight-line distance from the store to the delivery location.
     /// </summary>
-    /// <value>The delivery distance in kilometers.</value>
+    /// <value>The delivery distance in kilometers calculated using the Haversine formula.</value>
     public double Distance { get; set; } = 0;
 
     /// <summary>
@@ -67,14 +68,8 @@ public class Order
     /// <summary>
     /// Gets or sets the customer's phone number.
     /// </summary>
-    /// <value>The contact phone number for the customer.</value>
+    /// <value>The contact phone number for the customer in Israeli or international format.</value>
     public required string Phone { get; set; }
-    
-    /// <summary>
-    /// Gets or sets the weight of the order.
-    /// </summary>
-    /// <value>The weight in kilograms, or null if not specified.</value>
-   
     
     /// <summary>
     /// Gets the date and time when the order was placed.
@@ -85,7 +80,10 @@ public class Order
     /// <summary>
     /// Gets or sets the estimated delivery time for the order.
     /// </summary>
-    /// <value>A DateTime representing when the order is expected to be delivered.</value>
+    /// <value>A DateTime representing when the order is expected to be delivered, or null if not yet calculated.</value>
+    /// <remarks>
+    /// This estimate is based on distance, courier vehicle type, and average travel speeds.
+    /// </remarks>
     public DateTime? EstimatedDeliveryTime { get; set; }
     
     /// <summary>
@@ -109,18 +107,22 @@ public class Order
     /// <summary>
     /// Gets or sets the time remaining until the maximum delivery deadline.
     /// </summary>
-    /// <value>A TimeSpan representing how much time is left before the order becomes late.</value>
+    /// <value>A TimeSpan representing how much time is left before the order becomes late. Negative values indicate the order is already late.</value>
     public required TimeSpan TimeLeftForDelivery { get; set; }
 
     /// <summary>
     /// Gets or sets the list of delivery attempts associated with this order.
     /// </summary>
-    /// <value>A list of <see cref="DeliveryPerInList"/> objects representing all delivery attempts for this order.</value>
+    /// <value>A list of <see cref="DeliveryPerOrderInList"/> objects representing all delivery attempts for this order, or null if no deliveries exist.</value>
     /// <remarks>
-    /// This collection tracks the history of delivery assignments and attempts for the order.
-    /// Initialized to an empty list by default.
+    /// This collection tracks the history of delivery assignments and attempts for the order,
+    /// including successful deliveries, failed attempts, and cancellations.
     /// </remarks>
     public List<DeliveryPerOrderInList>? DeliveryPerOrderInLists { get; set; }
 
+    /// <summary>
+    /// Returns a string representation of the order with all property values.
+    /// </summary>
+    /// <returns>A formatted string containing all order properties and their values.</returns>
     public override string ToString() => this.ToStringProperty();
 }

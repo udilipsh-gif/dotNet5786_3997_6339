@@ -180,9 +180,10 @@ internal static class AdminManager //stage 4
     {
         lock (BlMutex) //stage 7
         {
-            DalTest.Initialization.Do(); //stage 4
+            
             AdminManager.UpdateClock(AdminManager.Now);  //stage 5 - needed since we want the label on Pl to be updated           
             AdminManager.SetConfig(AdminManager.GetConfig()); //stage 5 - needed for update the PL
+            DalTest.Initialization.Do(); //stage 4
         }
     }
 

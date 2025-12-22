@@ -1,6 +1,7 @@
 ﻿namespace DalTest;
 using DalApi;
 using DO;
+using System.Xml.Linq;
 
 
 /// <summary>
@@ -64,7 +65,7 @@ public static class Initialization
       ["שד' יצחק רבין 7 פתח תקווה", 32.076664, 34.859017, 3.91, 4.8875, 6.4515],
       ["רמת חן 30 רמת גן", 32.054005, 34.815657, 4.29, 5.3625, 7.0785],
       ["סוקלוב 30 תל אביב", 32.087445, 34.776397, 4.3, 5.375, 7.095],
-      ["ויצמן 15 תל אביב", 32.075678, 34.77789, 4.52, 5.65, 7.458],
+      ["ויאצה 15 תל אביב", 32.075678, 34.77789, 4.52, 5.65, 7.458],
       ["שד' ירושלים 30 תל אביב", 32.072345, 34.779012, 4.59, 5.7375, 7.5735],
       ["הבנים 35 תל אביב", 32.073567, 34.778123, 4.6, 5.75, 7.59],
       ["שד' התמרים 35 תל אביב", 32.069234, 34.780123, 4.68, 5.85, 7.722],
@@ -223,42 +224,64 @@ public static class Initialization
     /// </remarks>
     private static void CreateOrders()
     {
-        int num_of_order = 0;
+        //int num_of_order = 0;
 
-        /// <summary>
-        /// Determines the order status based on the order number.
-        /// </summary>
-        /// <param name="num_of_order">The current order number being processed.</param>
-        /// <returns>An OrderStatus value based on the order count.</returns>
-        static OrderStatus getRandomOrderStatus(int num_of_order)
-        {
-            return num_of_order++ switch
-            {
-                < 20 => OrderStatus.OPEN,
-                < 30 => OrderStatus.DELIVERING,
-                _ => (OrderStatus)s_rand.Next(2, 5)
-            };
-        }
+        ///// <summary>
+        ///// Determines the order status based on the order number.
+        ///// </summary>
+        ///// <param name="num_of_order">The current order number being processed.</param>
+        ///// <returns>An OrderStatus value based on the order count.</returns>
+        //static OrderStatus getRandomOrderStatus(int num_of_order)
+        //{
+        //    return num_of_order++ switch
+        //    {
+        //        < 20 => OrderStatus.OPEN,
+        //        < 30 => OrderStatus.DELIVERING,
+        //        _ => (OrderStatus)s_rand.Next(2, 5)
+        //    };
+        //}
 
         for (int i = 0; i < 50; i++)
         {
-            var adressIndex = s_rand.Next(s_addresses.Length);
-            s_dal?.Order.Create(new()
+            int adressIndex = -1;
+            string addres = string.Empty;
+
+            (double Lat, double Lng)? adressCoordinates = null;
+            while (adressCoordinates == null || adressCoordinates.Value.Lat == 0 || adressCoordinates.Value.Lng == 0)
+            {
+                adressIndex = s_rand.Next(0, s_addresses.Length);
+                addres = (string)s_addresses[adressIndex][0];
+                try
+                {
+                    adressCoordinates = s_getGeocodingSync(addres);
+                }
+                catch 
+                {
+                
+                }
+            }
+            double lat = adressCoordinates?.Lat ?? throw new DO.DalValueIsNotValid("Latitude is missing.");
+            double lng = adressCoordinates?.Lng ?? throw new DO.DalValueIsNotValid("Longitude is missing.");
+            double storeLat = s_dal?.Config.Latitude ?? throw new InvalidOperationException("Store latitude is not set.");
+            double storeLng = s_dal?.Config.Longitude ?? throw new InvalidOperationException("Store longitude is not set.");
+            double DistanceKm = s_getDistance(lat, lng, storeLat, storeLng);
+
+                        s_dal?.Order.Create(new()
             {
                 Id = 0,
                 TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 2),
                 Phone = "0" + s_rand.Next(500000000, 599999999).ToString(),
-                Addres = (string)s_addresses[adressIndex][0],
-                Latitude = (double)s_addresses[adressIndex][2],
-                Longitude = (double)s_addresses[adressIndex][2],
+                Addres = addres,
+                Latitude = lat,
+                Longitude = lng,
                 Name = "Customer" + i,
                 Weight = s_rand.Next(1, 21),
                 Details = "Order details for order " + i,
                 OrderDate = s_dal.Config.Clock.AddDays(-s_rand.Next(0, 366)),
-                DistanceKm = (double)s_addresses[adressIndex][3],
-                DistanceKmWalk = (double)s_addresses[adressIndex][4],
-                DistanceKmRoad = (double)s_addresses[adressIndex][5],
-                OrderStatus = getRandomOrderStatus(num_of_order),
+                DistanceKm = DistanceKm,
+                //DistanceKmWalk = (double)s_addresses[adressIndex][4],
+                //DistanceKmRoad = (double)s_addresses[adressIndex][5],
+                OrderStatus = OrderStatus.OPEN,   //getRandomOrderStatus(num_of_order),
             });
         }
     }
@@ -391,14 +414,10 @@ public static class Initialization
     /// <summary>
     /// Main initialization method that sets up the entire data store with configuration, couriers, orders, and deliveries.
     /// </summary>
-    /// <param name="dalCourier">Data access layer interface for courier operations.</param>
-    /// <param name="dalOrder">Data access layer interface for order operations.</param>
-    /// <param name="dalDelivery">Data access layer interface for delivery operations.</param>
-    /// <param name="dalConfig">Data access layer interface for configuration operations.</param>
     /// <remarks>
     /// This method performs the following steps:
     /// <list type="number">
-    /// <item><description>Validates that all DAL interfaces are not null</description></item>
+    /// <item><description>Retrieves the DAL instance from the Factory</description></item>
     /// <item><description>Resets all existing configuration and data</description></item>
     /// <item><description>Creates initial configuration settings</description></item>
     /// <item><description>Generates 20 sample couriers</description></item>
@@ -406,7 +425,6 @@ public static class Initialization
     /// <item><description>Generates 50 sample deliveries with matched couriers</description></item>
     /// </list>
     /// </remarks>
-    /// <exception cref="NullReferenceException">Thrown if any of the DAL parameters are null.</exception>
     public static void Do() //stage 2
     {
 
@@ -426,4 +444,163 @@ public static class Initialization
         CreateDelivery();
         Console.WriteLine("Data initialization completed.");
     }
+
+
+    /// <summary>
+    /// Converts a street address to geographic coordinates using the Google Geocoding API.
+    /// </summary>
+    /// <param name="address">The street address to geocode.</param>
+    /// <returns>
+    /// A tuple containing the latitude and longitude coordinates if successful,
+    /// or null if the geocoding fails or the address is not found.
+    /// </returns>
+    /// <exception cref="DO.DalValueIsNotValid">
+    /// Thrown when the address is not found in Google's database (ZERO_RESULTS),
+    /// or when the address is not precise enough (APPROXIMATE, RANGE_INTERPOLATED, or GEOMETRIC_CENTER location types).
+    /// </exception>
+    /// <exception cref="Exception">
+    /// Thrown when the API request fails, returns an error status, or encounters a parsing error.
+    /// </exception>
+    /// <remarks>
+    /// This method makes a synchronous HTTP request to the Google Geocoding API.
+    /// The API key is retrieved from the system configuration.
+    /// The response is in XML format and parsed to extract the location coordinates.
+    /// 
+    /// Location type validation:
+    /// - ROOFTOP: Precise address (accepted)
+    /// - APPROXIMATE: City/area level (rejected - throws exception)
+    /// - RANGE_INTERPOLATED: Interpolated between two points (rejected)
+    /// - GEOMETRIC_CENTER: Center of an area (rejected)
+    /// 
+    /// Possible error scenarios:
+    /// - Invalid API key (throws Exception)
+    /// - Address not found (throws DalValueIsNotValid)
+    /// - Imprecise address (throws DalValueIsNotValid)
+    /// - Network errors (throws Exception)
+    /// - Malformed XML response (throws Exception)
+    /// </remarks>
+    public static (double Lat, double Lng)? s_getGeocodingSync(string address)
+    {
+        var apiKey = s_dal?.Config.GoogleApiKey;
+
+        string url = $"https://maps.googleapis.com/maps/api/geocode/xml?address={address}&key={apiKey}";
+
+        using HttpClient client = new HttpClient();
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", "dotNet5786_3997_6339");
+            try
+            {
+                HttpResponseMessage response = client.GetAsync(url).GetAwaiter().GetResult();
+                if (response.IsSuccessStatusCode)
+                {
+                    string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    XDocument doc = XDocument.Parse(xmlContent);
+                    string? status = doc.Element("GeocodeResponse")?.Element("status")?.Value;
+
+                    if (status == "ZERO_RESULTS")
+                        throw new DO.DalValueIsNotValid("הכתובת לא נמצאה במאגר של גוגל.");
+
+
+                    if (status == "OK")
+                    {
+                        var geometry = doc.Element("GeocodeResponse")?
+                                             .Element("result")?
+                                             .Element("geometry");
+                        var locationType = geometry?.Element("location_type")?.Value;
+                        if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETRIC_CENTER")
+                            throw new DO.DalValueIsNotValid("The address is not precise enough.");
+
+                        var locationElement = geometry?.Element("location");
+
+                        if (locationElement != null)
+                        {
+                            double lat = double.Parse(locationElement.Element("lat")!.Value);
+                            double lng = double.Parse(locationElement.Element("lng")!.Value);
+
+                            return (lat, lng);
+                        }
+                        else
+                        {
+                            throw new Exception("Location element not found in the response.");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception("Failed to get geocoding data.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Adderss: {address} \n Exception: {ex.Message}");
+            }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Calculates the distance between two geographic coordinates using the Haversine formula.
+    /// </summary>
+    /// <param name="lat1">The latitude of the first point in decimal degrees.</param>
+    /// <param name="lon1">The longitude of the first point in decimal degrees.</param>
+    /// <param name="lat2">The latitude of the second point in decimal degrees.</param>
+    /// <param name="lon2">The longitude of the second point in decimal degrees.</param>
+    /// <returns>The distance between the two points in kilometers.</returns>
+    /// <remarks>
+    /// This method uses the Haversine formula to calculate the great-circle distance
+    /// between two points on Earth's surface. The Earth's radius is assumed to be 6371 km.
+    /// Implementation based on GIMINI algorithm.
+    /// </remarks>
+    public static double s_getDistance(double lat1, double lon1, double lat2, double lon2)
+    {
+        const double R = 6371;
+
+        double dLat = s_toRadians(lat2 - lat1);
+        double dLon = s_toRadians(lon2 - lon1);
+
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                   Math.Cos(s_toRadians(lat1)) * Math.Cos(s_toRadians(lat2)) *
+                   Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+        return R * c;
+    }
+
+    /// <summary>
+    /// Calculates the distance from the store to the order's delivery location.
+    /// </summary>
+    /// <param name="order">The order containing the delivery location coordinates.</param>
+    /// <returns>The distance from the store to the order location in kilometers.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the store's latitude or longitude is not configured in the system.
+    /// </exception>
+    /// <remarks>
+    /// This overload retrieves the store's coordinates from the system configuration
+    /// and calculates the distance to the order's delivery location.
+    /// </remarks>
+    public static double s_getDistance(Order order) //פונקציית העמסה למרחק מהחנות להזמנה
+    {
+        double storeLatitude = s_dal?.Config.Latitude ??
+            throw new InvalidOperationException("Latitude is not set in configuration.");
+
+        double storeLongitude = s_dal?.Config.Longitude ??
+            throw new InvalidOperationException("Longitude is not set in configuration.");
+
+        return s_getDistance(order.Latitude, order.Longitude, storeLatitude, storeLongitude);
+    }
+
+    /// <summary>
+    /// Converts an angle from degrees to radians.
+    /// </summary>
+    /// <param name="angleIn10thofaDegree">The angle in degrees to convert.</param>
+    /// <returns>The angle converted to radians.</returns>
+    /// <remarks>
+    /// This is a helper method used by the Haversine distance calculation.
+    /// </remarks>
+    private static double s_toRadians(double angleIn10thofaDegree)
+    {
+        return (angleIn10thofaDegree * Math.PI) / 180;
+    }
+
 }
