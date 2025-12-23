@@ -1,21 +1,29 @@
 ﻿using Helpers;
 
 namespace BO;
+
+/// <summary>
+/// Represents configuration values exposed by the business logic layer.
+/// </summary>
+/// <remarks>
+/// This model is used to view and update system configuration through the presentation layer.
+/// It is a business-level representation of the underlying DAL configuration.
+/// </remarks>
 public class Config
 {
-   
-    //TO_DO: //stage 4
-    //add props from DalApi.IConfig that we want to show/change in PL
-    //...
-     
-
     /// <summary>
     /// Gets or sets the system clock time.
     /// </summary>
-    public  DateTime Clock { get; set; }
+    /// <remarks>
+    /// This value may be used to simulate time for testing.
+    /// </remarks>
+    public DateTime Clock { get; set; }
 
-
-    public int ManagerId {  get; set; }
+    /// <summary>
+    /// Gets or sets the manager unique identifier.
+    /// </summary>
+    /// <value>The manager ID used for authentication/authorization.</value>
+    public int ManagerId { get; set; }
 
     /// <summary>
     /// Gets or sets the manager's password.
@@ -38,74 +46,79 @@ public class Config
     public double? Longitude { get; set; } = null;
 
     /// <summary>
-    /// Gets or sets the maximum delivery range in distance units.
+    /// Gets or sets the maximum delivery range in kilometers.
     /// </summary>
     public double? MaxDeliveryRange { get; set; } = null;
 
     /// <summary>
-    /// Gets or sets the average speed for car deliveries.
+    /// Gets or sets the average speed for car deliveries (km/h).
     /// </summary>
-    public double AvgSpeedCar { get; set; } = 00.0;
+    public double AvgSpeedCar { get; set; } = 0.0;
 
     /// <summary>
-    /// Gets or sets the average speed for motorcycle deliveries.
+    /// Gets or sets the average speed for motorcycle deliveries (km/h).
     /// </summary>
-    public double AvgSpeedMotorcycle { get; set; } = 00.0;
+    public double AvgSpeedMotorcycle { get; set; } = 0.0;
 
     /// <summary>
-    /// Gets or sets the average speed for bike deliveries.
+    /// Gets or sets the average speed for bike deliveries (km/h).
     /// </summary>
-    public double AvgSpeedBike { get; set; } = 00.0;
+    public double AvgSpeedBike { get; set; } = 0.0;
 
     /// <summary>
-    /// Gets or sets the average speed for foot deliveries.
+    /// Gets or sets the average speed for foot deliveries (km/h).
     /// </summary>
-    public double AvgSpeedFoot { get; set; } = 00.0;
+    public double AvgSpeedFoot { get; set; } = 0.0;
 
     /// <summary>
     /// Gets or sets the maximum time allowed for a delivery.
     /// </summary>
-    public TimeSpan MaxDeliveryTime { get; set; } = TimeSpan.FromDays(0);
+    public TimeSpan MaxDeliveryTime { get; set; } = TimeSpan.Zero;
 
     /// <summary>
-    /// Gets or sets the time range that indicates a delivery is at risk of being late.
+    /// Gets or sets the time buffer that indicates a delivery is at risk of being late.
     /// </summary>
-    public TimeSpan RiskRange { get; set; } = TimeSpan.FromDays(0);
+    public TimeSpan RiskRange { get; set; } = TimeSpan.Zero;
 
     /// <summary>
-    /// Gets or sets the maximum time of inactivity allowed.
+    /// Gets or sets the maximum time of inactivity allowed before a courier is flagged.
     /// </summary>
-    public TimeSpan MaxTimeInactivity { get; set; } = TimeSpan.FromDays(0);
+    public TimeSpan MaxTimeInactivity { get; set; } = TimeSpan.Zero;
 
     /// <summary>
-    /// gets or sets the Google API key for accessing Google services.
+    /// Gets or sets the Google API key used to access Google services.
     /// </summary>
-    public string GoogleApiKey { get; set; } = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
+    /// <remarks>
+    /// Do not commit real API keys to source control.
+    /// Prefer loading this value from user secrets, environment variables, or secured configuration.
+    /// </remarks>
+    public string GoogleApiKey { get; set; } = string.Empty;
 
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
     public void Reset()
     {
-       
         Clock = DateTime.Now;
-        //manager_id = StartManagerId;
         PasswordManager = "Admin1234$";
         StoreAddress = null;
         Latitude = null;
         Longitude = null;
         MaxDeliveryRange = null;
-        AvgSpeedCar = 00.0;
-        AvgSpeedMotorcycle = 00.0;
-        AvgSpeedBike = 00.0;
-        AvgSpeedFoot = 00.0;
-        MaxDeliveryTime = TimeSpan.FromDays(0);
-        RiskRange = TimeSpan.FromDays(0);
-        MaxTimeInactivity = TimeSpan.FromDays(0);
-
+        AvgSpeedCar = 0.0;
+        AvgSpeedMotorcycle = 0.0;
+        AvgSpeedBike = 0.0;
+        AvgSpeedFoot = 0.0;
+        MaxDeliveryTime = TimeSpan.Zero;
+        RiskRange = TimeSpan.Zero;
+        MaxTimeInactivity = TimeSpan.Zero;
+        GoogleApiKey = string.Empty;
     }
+
+    /// <summary>
+    /// Returns a string representation of the current configuration with all property values.
+    /// </summary>
+    /// <returns>A formatted string containing all configuration properties and their values.</returns>
     public override string ToString() => this.ToStringProperty();
-
-
 }
 

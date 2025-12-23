@@ -1,17 +1,25 @@
-﻿
-namespace BlApi;
+﻿namespace BlApi;
 
+/// <summary>
+/// Defines the main business logic facade.
+/// </summary>
+/// <remarks>
+/// This interface exposes the available BL services (admin, courier, order) through a single entry point.
+/// </remarks>
 public interface IBl
 {
+    /// <summary>
+    /// Gets the administrative service.
+    /// </summary>
     IAdmin Admin { get; }
-    ICourier Courier { get; }
-    IOrder Order { get; }
-    //IClosedDeliveryInList ClosedDeliveryInList { get; }
-    //ICourierInList CourierInList { get; }
-    //IDelivery Delivery { get; }
-    //IDeliveryPerOrderInList DeliveryPerOrderInList { get; }
-    //IOpenOrderInList OpenOrderInList { get; }
-    //IOrderInProgress OrderInProgress { get; }
-    //IOrderInList OrderInList { get; }
 
+    /// <summary>
+    /// Gets the courier management service.
+    /// </summary>
+    ICourier Courier { get; }
+
+    /// <summary>
+    /// Gets the order management service.
+    /// </summary>
+    IOrder Order { get; }
 }
