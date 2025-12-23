@@ -14,6 +14,8 @@ internal static class DeliveryManager
 {
     private static IDal s_dal = Factory.Get; //stage 4
 
+    internal static ObserverManager Observer = new();
+
     /// <summary>
     /// Retrieves all deliveries from the data access layer.
     /// </summary>
@@ -80,6 +82,9 @@ internal static class DeliveryManager
             TimeEndDelivery = AdminManager.Now
         };
         s_dal.Delivery.Update(delivery);
+        Observer.NotifyItemUpdated(deliveryId);
+        Observer.NotifyItemUpdated(delivery.OrderId);                
+        Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -119,6 +124,7 @@ internal static class DeliveryManager
             TimeEndDelivery = null
         };
         s_dal.Delivery.Create(delivery);
+        Observer.NotifyListUpdated();
     }
 
 

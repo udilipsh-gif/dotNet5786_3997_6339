@@ -6,7 +6,7 @@
 /// <remarks>
 /// The returned model is typically used to show delivery attempts and their outcomes for a given order.
 /// </remarks>
-public interface IDeliveryPerOrderInList
+public interface IDeliveryPerOrderInList : IObservable
 {
     /// <summary>
     /// Retrieves a delivery summary item by its unique identifier.

@@ -7,7 +7,7 @@
 /// Administrative operations include initializing/resetting the system state, manipulating the business clock,
 /// and reading/updating system configuration.
 /// </remarks>
-public interface IAdmin
+public interface IAdmin 
 {
     /// <summary>
     /// Resets the database and system state to defaults.

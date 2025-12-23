@@ -2,6 +2,7 @@
 using BlApi;
 
 using Helpers;
+using System;
 
 /// <summary>
 /// Implements the <see cref="ICourier"/> interface and provides business logic operations for courier management
@@ -25,7 +26,7 @@ internal class CourierImplementation : ICourier
     {
         if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException();
-        CourierManager.Create(boCourier);
+        CourierManager.Create(boCourier);    
     }
 
     /// <summary>
@@ -116,4 +117,16 @@ internal class CourierImplementation : ICourier
             throw new BO.BlNoAccessException("Only manager can access the list of couriers.");
         return CourierManager.ReadAll(requesterId, isActive, sort);
     }
+
+    public void AddObserver(Action listObserver) =>
+        CourierManager.Observer.AddListObserver(listObserver);
+
+    public void RemoveObserver(Action listObserver) =>
+        CourierManager.Observer.RemoveListObserver(listObserver);
+
+    public void AddObserver(int id, Action observer) =>
+        CourierManager.Observer.AddObserver(id, observer);
+
+    public void RemoveObserver(int id, Action observer) =>
+        CourierManager.Observer.RemoveObserver(id, observer);
 }

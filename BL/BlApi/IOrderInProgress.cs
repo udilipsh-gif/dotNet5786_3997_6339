@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines operations for retrieving an order that is currently in progress (active delivery).
 /// </summary>
-public interface IOrderInProgress
+public interface IOrderInProgress : IObservable
 {
     /// <summary>
     /// Retrieves the current order in progress for a specified courier.

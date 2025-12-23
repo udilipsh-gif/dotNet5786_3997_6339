@@ -239,4 +239,16 @@ internal class OrderImplementation : IOrder
 
         return OrderManager.GetOpen(courierId, filter, sort);
     }
+
+    public void AddObserver(Action listObserver) =>
+        OrderManager.Observer.AddListObserver(listObserver);
+
+    public void RemoveObserver(Action listObserver) =>
+        OrderManager.Observer.RemoveListObserver(listObserver);
+
+    public void AddObserver(int id, Action observer) =>
+        OrderManager.Observer.AddObserver(id, observer);
+
+    public void RemoveObserver(int id, Action observer) =>
+        OrderManager.Observer.RemoveObserver(id, observer);
 }

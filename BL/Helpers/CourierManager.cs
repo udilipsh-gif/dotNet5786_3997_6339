@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using System;
 
 namespace Helpers;
 
@@ -14,6 +15,8 @@ namespace Helpers;
 internal static class CourierManager
 {
     private static readonly IDal s_dal = Factory.Get;
+
+    internal static ObserverManager Observer = new();
 
     /// <summary>
     /// Authenticates a user by ID and password, determining if they are a manager or courier.
@@ -102,6 +105,7 @@ internal static class CourierManager
         {
             throw new BO.BlAlreadyExistsException($"courier with id {boCourier.Id} is alredy exists", ex);
         }
+        Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -198,6 +202,7 @@ internal static class CourierManager
         {
             throw new BO.BlDoesNotExistException($"courier with id {boCourier.Id} is not found", ex);
         }
+        Observer.NotifyItemUpdated(boCourier.Id);
     }
 
     /// <summary>
@@ -228,6 +233,9 @@ internal static class CourierManager
             throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
 
         s_dal.Courier.Delete(id);
+        Observer.NotifyItemUpdated(id);
+        Observer.NotifyListUpdated();
+
     }
 
     /// <summary>

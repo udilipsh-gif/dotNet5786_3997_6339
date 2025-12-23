@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines operations for retrieving courier summary/list information.
 /// </summary>
-public interface ICourierInList
+public interface ICourierInList : IObservable
 {
     /// <summary>
     /// Retrieves a courier list item by its unique identifier.

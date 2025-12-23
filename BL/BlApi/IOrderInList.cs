@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines operations for retrieving order summary/list information.
 /// </summary>
-public interface IOrderInList
+public interface IOrderInList : IObservable
 {
     /// <summary>
     /// Retrieves an order summary item by its unique identifier.

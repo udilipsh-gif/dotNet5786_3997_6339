@@ -10,7 +10,7 @@ namespace BlApi;
 /// including delivery assignment, completion, cancellation, and various query operations.
 /// Implementations are expected to enforce authorization rules.
 /// </remarks>
-public interface IOrder
+public interface IOrder : IObservable
 {
     /// <summary>
     /// Creates a new order in the system.

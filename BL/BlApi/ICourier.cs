@@ -7,7 +7,7 @@
 /// This interface includes authentication and CRUD operations for couriers, as well as list retrieval
 /// with optional filtering and sorting.
 /// </remarks>
-public interface ICourier
+public interface ICourier : IObservable
 {
     /// <summary>
     /// Authenticates a user (manager or courier) using an ID and password.

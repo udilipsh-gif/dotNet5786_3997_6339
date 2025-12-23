@@ -15,6 +15,8 @@ internal static class OrderManager
 {
     private static IDal s_dal = Factory.Get; //stage 4
 
+    internal static ObserverManager Observer = new();
+
     /// <summary>
     /// Retrieves statistical counts of orders grouped by order status and schedule status.
     /// </summary>
@@ -103,6 +105,7 @@ internal static class OrderManager
             OrderDate = AdminManager.Now,
         };
         s_dal.Order.Create(doOrder);
+        Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -215,6 +218,7 @@ internal static class OrderManager
             OrderDate = boOrder.OrderDate,
         };
         s_dal.Order.Update(doOrder);
+        Observer.NotifyItemUpdated(boOrder.Id);
     }
 
     /// <summary>
@@ -254,8 +258,8 @@ internal static class OrderManager
             {
                 doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
                 s_dal.Order.Update(doOrder);
-               
-                s_dal.Delivery.Create(new DO.Delivery
+                Observer.NotifyItemUpdated(doOrder.Id);
+                DO.Delivery delivery = new DO.Delivery
                 {
                     Id = 0,
                     OrderId = doOrder.Id,
@@ -265,13 +269,17 @@ internal static class OrderManager
                     EndDelivery = DO.EndDelivery.CONCELLED,
                     TimeEndDelivery = AdminManager.Now,
                     ActualDistance = 0
-                });
+
+                };
+                s_dal.Delivery.Create(delivery);
+                Observer.NotifyListUpdated();
             }
             ,
             DO.OrderStatus.DELIVERING => () =>
             {
                 doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
                 s_dal.Order.Update(doOrder);
+                Observer.NotifyItemUpdated(doOrder.Id);
                 var delivery = (from d in s_dal.Delivery?.ReadAll()
                                 where d.OrderId == doOrder.Id
                                 orderby d.Id descending
@@ -282,6 +290,7 @@ internal static class OrderManager
                     EndDelivery = DO.EndDelivery.CONCELLED,
                     TimeEndDelivery = AdminManager.Now
                 });
+                Observer.NotifyItemUpdated(delivery.Id);
             }
             ,
             _ => throw new BO.BlInvalidOperationException("Invalid order status.")
@@ -319,6 +328,8 @@ internal static class OrderManager
         {
             OrderStatus = DO.OrderStatus.DELIVERING
         });
+        Observer.NotifyItemUpdated(orderId);
+        Observer.NotifyItemUpdated(courierId);
     }
 
     /// <summary>
