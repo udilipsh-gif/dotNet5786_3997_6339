@@ -45,7 +45,7 @@ internal static class Config
     /// <summary>
     /// The starting ID value for managers.
     /// </summary>
-    internal static int StartManagerId = 100000000;
+    internal static int StartManagerId = 344045810;
 
     /// <summary>
     /// Private field for tracking the current manager ID.
@@ -167,17 +167,18 @@ internal static class Config
         delivery_id = StartDeliveryId;
         Clock = DateTime.Now;
         manager_id = StartManagerId;
+        StoreAddress = "בר כוכבא 21 בני ברק";
+        Latitude = 32.0936195;
+        Longitude = 34.8229463;
+        MaxDeliveryRange = 20;
         PasswordManager = "Admin1234$";
-        StoreAddress = null;
-        Latitude = null;
-        Longitude = null;
-        MaxDeliveryRange = null;
-        AvgSpeedCar = 00.0;
-        AvgSpeedMotorcycle = 00.0;
-        AvgSpeedBike = 00.0;
-        AvgSpeedFoot = 00.0;
-        MaxDeliveryTime = TimeSpan.FromDays(0);
-        RiskRange = TimeSpan.FromDays(0);
-        MaxTimeInactivity = TimeSpan.FromDays(0);
+        AvgSpeedCar = 30;
+        AvgSpeedMotorcycle = 50;
+        AvgSpeedBike = 20;
+        AvgSpeedFoot = 5;
+        MaxDeliveryTime = TimeSpan.FromHours(2);
+        RiskRange = TimeSpan.FromMinutes(30);
+        MaxTimeInactivity = TimeSpan.FromMinutes(15);
+        GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
     }
 }

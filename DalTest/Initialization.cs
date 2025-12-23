@@ -253,11 +253,12 @@ public static class Initialization
                 addres = (string)s_addresses[adressIndex][0];
                 try
                 {
+                   // Console.WriteLine($"Getting geocoding for order {i} address: {addres}");
                     adressCoordinates = s_getGeocodingSync(addres);
                 }
-                catch 
+                catch //(Exception ex)
                 {
-                
+                  // Console.WriteLine($"Error retrieving geocoding: {ex.Message}");
                 }
             }
             double lat = adressCoordinates?.Lat ?? throw new DO.DalValueIsNotValid("Latitude is missing.");
