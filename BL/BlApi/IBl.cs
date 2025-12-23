@@ -6,7 +6,7 @@
 /// <remarks>
 /// This interface exposes the available BL services (admin, courier, order) through a single entry point.
 /// </remarks>
-public interface IBl : IObservable
+public interface IBl 
 {
     /// <summary>
     /// Gets the administrative service.
