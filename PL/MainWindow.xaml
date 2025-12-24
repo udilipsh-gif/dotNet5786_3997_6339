@@ -22,9 +22,9 @@
         <WrapPanel Grid.Row="0" Grid.Column="0" >
             <Label Content="חנות הספרים שלי" Padding="5" Width="220"/>
             <TextBlock Text="{Binding SystemCurrentTime}" Padding="10,2,0,0"  TextWrapping="NoWrap" Width="245" FontSize="12"/>
-            <Button Content="דקה + " Height="20"/>
+            <Button Content="דקה + " Height="20" Click="MinutePlus_Click" />
             <Button Content="דקה - " Height="20"/>
-            <Button Content="שעה + " Height="20"/>
+            <Button Content="שעה + " Height="20" Click="HourPlus_Click"/>
             <Button Content="שעה - " Height="20"/>
             <Button Content="שנה + " Height="20"/>
         </WrapPanel>

@@ -28,18 +28,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         DataContext = this;
 
-        // ערך התחלתי
         SystemCurrentTime = s_bl.Admin.GetClock();
 
-        // הרשמה ל-Clock observer
         _clockObserver = () => Dispatcher.Invoke(() =>
             SystemCurrentTime = s_bl.Admin.GetClock()
         );
 
         s_bl.Admin.AddClockObserver(_clockObserver);
 
-        // ביטול הרשמה בסגירה (מונע memory leak)
         Closed += (_, __) => s_bl.Admin.RemoveClockObserver(_clockObserver);
+    }
+
+    private void MinutePlus_Click(object sender, RoutedEventArgs e) 
+    {
+        s_bl.Admin.ForwardClock(BO.TimeUnit.MINUTE);
+    }
+    private void HourPlus_Click(object sender, RoutedEventArgs e) 
+    {
+        s_bl.Admin.ForwardClock(xp,BO.TimeUnit.HOUR-);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
