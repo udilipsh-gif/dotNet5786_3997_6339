@@ -45,4 +45,9 @@ public interface IAdmin
     /// </summary>
     /// <param name="config">The configuration to set.</param>
     void SetConfig(BO.Config config);
+
+    void AddConfigObserver(Action configObserver);
+    void RemoveConfigObserver(Action configObserver);
+    void AddClockObserver(Action clockObserver);
+    void RemoveClockObserver(Action clockObserver);
 }
