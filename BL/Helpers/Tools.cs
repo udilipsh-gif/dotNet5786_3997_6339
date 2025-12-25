@@ -606,7 +606,7 @@ internal static class Tools
                                              .Element("result")?
                                              .Element("geometry");
                         var locationType = geometry?.Element("location_type")?.Value;
-                        if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETIC_CENTER")
+                        if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETRIC_CENTER")
                             throw new BO.BlInvalidValueException("הכתובת שהוזנה לא מדויקת, נא להזין כתובת מלאה יותר.");
                         
                         var locationElement = geometry?.Element("location");

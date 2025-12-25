@@ -32,7 +32,7 @@ public interface IAdmin
     /// Advances the business clock by one unit.
     /// </summary>
     /// <param name="unit">The unit to advance by (minute, hour, day, week, month, or year).</param>
-    void ForwardClock(BO.TimeUnit unit);
+    void ForwardClock(BO.TimeUnit unit, int num = 1);
 
     /// <summary>
     /// Retrieves the current system configuration.

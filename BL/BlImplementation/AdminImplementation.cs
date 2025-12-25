@@ -45,40 +45,42 @@ internal class AdminImplementation : IAdmin
     }
 
     /// <summary>
-    /// Advances the system clock by one unit of time.
+    /// Advances the system clock by a specified number of time units.
     /// </summary>
     /// <param name="unit">The time unit to advance by (minute, hour, day, week, month, or year).</param>
+    /// <param name="num">The number of units to advance. Defaults to 1 if not specified.</param>
     /// <exception cref="BO.BlInvalidValueException">Thrown when <paramref name="unit"/> is not a recognized value.</exception>
     /// <remarks>
-    /// Each call advances the clock by exactly one unit (e.g., 1 hour, 1 day).
+    /// This method allows advancing the clock by multiple units at once (e.g., 5 minutes, 2 hours).
+    /// The default value for <paramref name="num"/> is 1, maintaining backward compatibility with code that omits this parameter.
     /// </remarks>
-    public void ForwardClock(BO.TimeUnit unit)
+    public void ForwardClock(BO.TimeUnit unit, int num = 1)
     {
 
         switch (unit)
         {
             case BO.TimeUnit.MINUTE:
-                AdminManager.UpdateClock(AdminManager.Now.AddMinutes(1));
+                AdminManager.UpdateClock(AdminManager.Now.AddMinutes(num));
                 break;
 
             case BO.TimeUnit.HOUR:
-                AdminManager.UpdateClock(AdminManager.Now.AddHours(1));
+                AdminManager.UpdateClock(AdminManager.Now.AddHours(num));
                 break;
 
             case BO.TimeUnit.DAY:
-                AdminManager.UpdateClock(AdminManager.Now.AddDays(1));
+                AdminManager.UpdateClock(AdminManager.Now.AddDays(num));
 
                 break;
 
             case BO.TimeUnit.MONTH:
-                AdminManager.UpdateClock(AdminManager.Now.AddMonths(1));
+                AdminManager.UpdateClock(AdminManager.Now.AddMonths(num));
                 break;
             case BO.TimeUnit.WEEK:
-                AdminManager.UpdateClock(AdminManager.Now.AddDays(7));
+                AdminManager.UpdateClock(AdminManager.Now.AddDays(7* num));
                 break;
 
             case BO.TimeUnit.YEAR:
-                AdminManager.UpdateClock(AdminManager.Now.AddYears(1));
+                AdminManager.UpdateClock(AdminManager.Now.AddYears(num));
                 break;
 
             default:
@@ -86,6 +88,19 @@ internal class AdminImplementation : IAdmin
         }
 
 
+    }
+
+    /// <summary>
+    /// Advances the system clock by exactly one time unit.
+    /// </summary>
+    /// <param name="unit">The time unit to advance by (minute, hour, day, week, month, or year).</param>
+    /// <remarks>
+    /// This is a convenience overload that calls <see cref="ForwardClock(BO.TimeUnit, int)"/> with num=1.
+    /// Maintains backward compatibility with existing code.
+    /// </remarks>
+    public void ForwardClock(BO.TimeUnit unit)
+    {
+        ForwardClock(unit, 1);
     }
 
     /// <summary>
@@ -106,12 +121,44 @@ internal class AdminImplementation : IAdmin
         AdminManager.SetConfig(config);
     }
 
+    /// <summary>
+    /// Registers an observer to be notified when the system clock is updated.
+    /// </summary>
+    /// <param name="clockObserver">The action to invoke when the clock changes.</param>
+    /// <remarks>
+    /// The observer will be called each time <see cref="ForwardClock(BO.TimeUnit, int)"/> is invoked
+    /// or whenever the clock is programmatically updated.
+    /// </remarks>
     public void AddClockObserver(Action clockObserver) =>
         AdminManager.ClockUpdatedObservers += clockObserver;
+
+    /// <summary>
+    /// Unregisters a previously registered clock observer.
+    /// </summary>
+    /// <param name="clockObserver">The action to remove from the observer list.</param>
+    /// <remarks>
+    /// It is important to remove observers when they are no longer needed to prevent memory leaks.
+    /// </remarks>
     public void RemoveClockObserver(Action clockObserver) =>
         AdminManager.ClockUpdatedObservers -= clockObserver;
+
+    /// <summary>
+    /// Registers an observer to be notified when the system configuration is updated.
+    /// </summary>
+    /// <param name="configObserver">The action to invoke when the configuration changes.</param>
+    /// <remarks>
+    /// The observer will be called each time <see cref="SetConfig(BO.Config)"/> is invoked.
+    /// </remarks>
     public void AddConfigObserver(Action configObserver) =>
         AdminManager.ConfigUpdatedObservers += configObserver;
+
+    /// <summary>
+    /// Unregisters a previously registered configuration observer.
+    /// </summary>
+    /// <param name="configObserver">The action to remove from the observer list.</param>
+    /// <remarks>
+    /// It is important to remove observers when they are no longer needed to prevent memory leaks.
+    /// </remarks>
     public void RemoveConfigObserver(Action configObserver) =>
         AdminManager.ConfigUpdatedObservers -= configObserver;
 }
