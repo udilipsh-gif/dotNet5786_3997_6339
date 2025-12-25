@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace PL;
@@ -72,27 +74,57 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         };
     }
 
-    private void MinutePlus_Click(object sender, RoutedEventArgs e)
+    private void AddMinute_Click(object sender, RoutedEventArgs e)
     {
         s_bl.Admin.ForwardClock(BO.TimeUnit.MINUTE);
     }
-    private void MinuteMinus_Click(object sender, RoutedEventArgs e)
-    {
-        s_bl.Admin.ForwardClock(BO.TimeUnit.MINUTE, -1);
-    }
-    private void HourPlus_Click(object sender, RoutedEventArgs e)
+    private void AddHour_Click(object sender, RoutedEventArgs e)
     {
         s_bl.Admin.ForwardClock(BO.TimeUnit.HOUR);
     }
-    private void HourMinus_Click(object sender, RoutedEventArgs e)
+    private void AddDay_Click(object sender, RoutedEventArgs e)
     {
-        s_bl.Admin.ForwardClock(BO.TimeUnit.HOUR, -1);
+        s_bl.Admin.ForwardClock(BO.TimeUnit.DAY);
     }
-    private void YearPlus_Click(object sender, RoutedEventArgs e)
+    private void AddWeek_Click(object sender, RoutedEventArgs e)
+    {
+        s_bl.Admin.ForwardClock(BO.TimeUnit.WEEK);
+    }
+    private void AddMonth_Click(object sender, RoutedEventArgs e)
+    {
+        s_bl.Admin.ForwardClock(BO.TimeUnit.MONTH);
+    }
+    private void AddYear_Click(object sender, RoutedEventArgs e)
     {
         s_bl.Admin.ForwardClock(BO.TimeUnit.YEAR);
     }
 
+    private void ResetDB(object sender, RoutedEventArgs e)
+    {
+        var result = MessageBox.Show("למחוק את כל המידע?", "ResetDB",
+                                         MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if(result is MessageBoxResult.Yes)
+        {
+            s_bl.Admin.ResetDB();
+        }
+            
+    }
+
+    private void InitDB(object sender, RoutedEventArgs e)
+    {
+        var result = MessageBox.Show("האם אתה מעוניין לאתחל את כל המידע?", "InitDB",
+                                         MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (result is MessageBoxResult.Yes)
+        {
+            s_bl.Admin.InitializeDB();
+        }
+        
+    }
+
+    private void CourierList(object sender, RoutedEventArgs e)
+    {
+        Console.WriteLine("**************");
+    }
 
     private bool _isDirty = false;
 
@@ -162,5 +194,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
 
+    }
+}
+
+public class SpanTimeConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is TimeSpan ts)
+        {
+            // המרה מהנתונים לתצוגה (ימים:שעות)
+            return $"{ts.Days:00}:{ts.Hours:00}";
+        }
+        return "00:00";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        // המרה מהתצוגה חזרה לנתונים
+        if (value is string input)
+        {
+            var parts = input.Split(':');
+            if (parts.Length == 2 &&
+                int.TryParse(parts[0], out int days) &&
+                int.TryParse(parts[1], out int hours))
+            {
+                return new TimeSpan(days, hours, 0, 0);
+            }
+        }
+        return TimeSpan.Zero;
     }
 }

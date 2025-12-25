@@ -54,33 +54,33 @@ internal class AdminImplementation : IAdmin
     /// This method allows advancing the clock by multiple units at once (e.g., 5 minutes, 2 hours).
     /// The default value for <paramref name="num"/> is 1, maintaining backward compatibility with code that omits this parameter.
     /// </remarks>
-    public void ForwardClock(BO.TimeUnit unit, int num = 1)
+    public void ForwardClock(BO.TimeUnit unit)
     {
 
         switch (unit)
         {
             case BO.TimeUnit.MINUTE:
-                AdminManager.UpdateClock(AdminManager.Now.AddMinutes(num));
+                AdminManager.UpdateClock(AdminManager.Now.AddMinutes(1));
                 break;
 
             case BO.TimeUnit.HOUR:
-                AdminManager.UpdateClock(AdminManager.Now.AddHours(num));
+                AdminManager.UpdateClock(AdminManager.Now.AddHours(1));
                 break;
 
             case BO.TimeUnit.DAY:
-                AdminManager.UpdateClock(AdminManager.Now.AddDays(num));
+                AdminManager.UpdateClock(AdminManager.Now.AddDays(1));
 
                 break;
 
             case BO.TimeUnit.MONTH:
-                AdminManager.UpdateClock(AdminManager.Now.AddMonths(num));
+                AdminManager.UpdateClock(AdminManager.Now.AddMonths(1));
                 break;
             case BO.TimeUnit.WEEK:
-                AdminManager.UpdateClock(AdminManager.Now.AddDays(7* num));
+                AdminManager.UpdateClock(AdminManager.Now.AddDays(7));
                 break;
 
             case BO.TimeUnit.YEAR:
-                AdminManager.UpdateClock(AdminManager.Now.AddYears(num));
+                AdminManager.UpdateClock(AdminManager.Now.AddYears(1));
                 break;
 
             default:
@@ -88,19 +88,6 @@ internal class AdminImplementation : IAdmin
         }
 
 
-    }
-
-    /// <summary>
-    /// Advances the system clock by exactly one time unit.
-    /// </summary>
-    /// <param name="unit">The time unit to advance by (minute, hour, day, week, month, or year).</param>
-    /// <remarks>
-    /// This is a convenience overload that calls <see cref="ForwardClock(BO.TimeUnit, int)"/> with num=1.
-    /// Maintains backward compatibility with existing code.
-    /// </remarks>
-    public void ForwardClock(BO.TimeUnit unit)
-    {
-        ForwardClock(unit, 1);
     }
 
     /// <summary>
