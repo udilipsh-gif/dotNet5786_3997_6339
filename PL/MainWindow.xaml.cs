@@ -105,7 +105,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                                          MessageBoxButton.YesNo, MessageBoxImage.Question);
         if(result is MessageBoxResult.Yes)
         {
-            s_bl.Admin.ResetDB();
+            CloseAllWindowsExceptMain();
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                s_bl.Admin.ResetDB();
+            }
+            finally 
+            {
+                Mouse.OverrideCursor = null;
+            }
         }
             
     }
@@ -116,7 +125,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                                          MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result is MessageBoxResult.Yes)
         {
-            s_bl.Admin.InitializeDB();
+            CloseAllWindowsExceptMain();
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                s_bl.Admin.InitializeDB();
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
         }
         
     }
@@ -124,6 +142,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void CourierList(object sender, RoutedEventArgs e)
     {
         Console.WriteLine("**************");
+    }
+
+    /// <summary>
+    /// סוגר את כל החלונות הפתוחים חוץ מהחלון הראשי (MainWindow)
+    /// </summary>
+    private void CloseAllWindowsExceptMain()
+    {
+        // עובר על כל החלונות הפתוחים
+        foreach (Window window in Application.Current.Windows)
+        {
+            // בודק שזה לא החלון הראשי
+            if (window != this && window.GetType() != typeof(MainWindow))
+            {
+                window.Close();
+            }
+        }
     }
 
     private bool _isDirty = false;
