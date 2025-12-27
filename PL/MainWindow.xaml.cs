@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using PL.Courier;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -12,68 +14,60 @@ namespace PL;
 
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
-    private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
-    private DateTime _systemCurrentTime;
-    public DateTime SystemCurrentTime
-    {
-        get => _systemCurrentTime;
-        set
-        {
-            if (_systemCurrentTime == value) return;
-            _systemCurrentTime = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private BO.Config _adminConfig;
-    public BO.Config AdminConfig
-    {
-        get => _adminConfig;
-        set
-        {
-            if (_adminConfig == value) return;
-            _adminConfig = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private readonly Action _clockObserver;
-    private readonly Action _configObserver;
-
 
     public MainWindow()
     {
         InitializeComponent();
 
+        this.Loaded += MainWindow_Loaded;
+
+        this.Closed += MainWindow_Close;
+
         DataContext = this;
 
-        SystemCurrentTime = s_bl.Admin.GetClock();
-
-        AdminConfig = s_bl.Admin.GetConfig();
-
-        _configObserver = () => Dispatcher.Invoke(() =>
-            AdminConfig = s_bl.Admin.GetConfig()
-        );
-
-        _clockObserver = () => Dispatcher.Invoke(() =>
-            SystemCurrentTime = s_bl.Admin.GetClock()
-        );
-
-        _configObserver = () => Dispatcher.Invoke(() =>
-            AdminConfig = s_bl.Admin.GetConfig()
-        );
-
-        s_bl.Admin.AddClockObserver(_clockObserver);
-        s_bl.Admin.AddConfigObserver(_configObserver);
-
-        Closed += (_, __) =>
-        {
-            s_bl.Admin.RemoveClockObserver(_clockObserver);
-            s_bl.Admin.RemoveConfigObserver(_configObserver);
-        };
     }
 
+    private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
+    public DateTime CurrentTime
+    {
+        get { return (DateTime)GetValue(CurrentTimeProperty); }
+        set { SetValue(CurrentTimeProperty, value); }
+    }
+
+    public static readonly DependencyProperty CurrentTimeProperty =
+        DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(MainWindow));
+
+    public BO.Config Configuration
+    {
+        get { return (BO.Config)GetValue(ConfigurationProperty); }
+        set { SetValue(ConfigurationProperty, value); }
+    }
+
+    public static readonly DependencyProperty ConfigurationProperty =
+        DependencyProperty.Register("Configuration", typeof(BO.Config), typeof(MainWindow));
+
+    private void MainWindow_Close(object? sender, EventArgs e)
+    {
+        s_bl.Admin.RemoveClockObserver(ClockObserver);
+        s_bl.Admin.RemoveClockObserver(ConfigObserver);
+    }
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        CurrentTime = s_bl.Admin.GetClock();
+        s_bl.Admin.AddClockObserver(ClockObserver);
+
+        Configuration = s_bl.Admin.GetConfig();
+        s_bl.Admin.AddConfigObserver(ConfigObserver);
+    }
+
+    private void ClockObserver() => CurrentTime = s_bl.Admin.GetClock();
+    private void ConfigObserver() => Configuration = s_bl.Admin.GetConfig();
+
+
+    private void btnCourierList_Click(object sender, RoutedEventArgs e)
+    { new CourierListWindow().Show(); }
     private void AddMinute_Click(object sender, RoutedEventArgs e)
     {
         s_bl.Admin.ForwardClock(BO.TimeUnit.MINUTE);
@@ -103,7 +97,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         var result = MessageBox.Show("למחוק את כל המידע?", "ResetDB",
                                          MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if(result is MessageBoxResult.Yes)
+        if (result is MessageBoxResult.Yes)
         {
             CloseAllWindowsExceptMain();
             try
@@ -111,12 +105,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 Mouse.OverrideCursor = Cursors.Wait;
                 s_bl.Admin.ResetDB();
             }
-            finally 
+            finally
             {
                 Mouse.OverrideCursor = null;
             }
         }
-            
+
     }
 
     private void InitDB(object sender, RoutedEventArgs e)
@@ -136,13 +130,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 Mouse.OverrideCursor = null;
             }
         }
-        
+
     }
 
-    private void CourierList(object sender, RoutedEventArgs e)
-    {
-        Console.WriteLine("**************");
-    }
 
     /// <summary>
     /// סוגר את כל החלונות הפתוחים חוץ מהחלון הראשי (MainWindow)
@@ -195,19 +185,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 {
                     // כאן ה-Binding כבר עדכן את המשתנה AdminConfig ברוב המקרים,
                     // אבל ליתר ביטחון אפשר לכפות עדכון אם צריך, או פשוט לשמור:
-                    s_bl.Admin.SetConfig(AdminConfig);
+                    s_bl.Admin.SetConfig(Configuration);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("שגיאה: " + ex.Message);
-                    AdminConfig = s_bl.Admin.GetConfig(); // שחזור במקרה שגיאה
+                    Configuration = s_bl.Admin.GetConfig(); // שחזור במקרה שגיאה
                 }
             }
             else
             {
                 // המשתמש בחר "לא" - מבטלים את השינוי
                 // טעינה מחדש דורסת את מה שהמשתמש הקליד
-                AdminConfig = s_bl.Admin.GetConfig();
+                Configuration = s_bl.Admin.GetConfig();
             }
         }
 

@@ -7,33 +7,39 @@
         mc:Ignorable="d"
         WindowState="Maximized"
         FlowDirection="RightToLeft"
-        Height="600" Width="900" 
-        Title="MainWindow" MinHeight="250" MinWidth="400">
+        Height="450" Width="800" 
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        Title="MainWindow" MinHeight="300" MinWidth="450">
     <Window.Resources>
         <local:SpanTimeConverter x:Key="SpanTimeConverter" />
     </Window.Resources>
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="90"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="270"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <WrapPanel Grid.Row="0" Grid.Column="0"  >
-            <Label Content="חנות הספרים שלי" Padding="5" Width="220"/>
-            <TextBlock Text="{Binding SystemCurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" Padding="10,5"  TextWrapping="NoWrap" Width="245" FontSize="12"/>
-
-            <Button Grid.Column="0" Grid.Row="0" Margin="2,0" Content="דקה" Height="Auto" Click="AddMinute_Click" BorderThickness="0"/>
-            <Button Grid.Column="0" Grid.Row="0" Margin="2,0" Content="שעה" Height="Auto" Click="AddHour_Click" BorderThickness="0"/>
-            <Button Grid.Column="0" Grid.Row="0" Margin="2,0" Content="יום" Height="Auto" Click="AddDay_Click" BorderThickness="0"/>
-            <Button Grid.Column="0" Grid.Row="0" Margin="2,0" Content="שבוע" Height="Auto" Click="AddWeek_Click" BorderThickness="0"/>
-            <Button Grid.Column="0" Grid.Row="0" Margin="2,0" Content="חודש" Height="Auto" Click="AddMonth_Click" BorderThickness="0"/>
-            <Button Grid.Column="0" Grid.Row="0" Margin="2,0" Content="שנה" Height="Auto" Click="AddYear_Click" BorderThickness="0"/>
-                    
-        </WrapPanel>
+        <Grid Grid.Row="0" Grid.Column="0"  >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="חנות הספרים שלי" Padding="5" Width="220"/>
+            <Label Grid.Row="1" Content="{Binding CurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" FontWeight="Bold" Padding="10,5" FontSize="20"/>
+            <WrapPanel Grid.Row="2" Margin="10,0">
+                <Button Margin="2,0" Content="דקה" Height="Auto" Width="Auto" Click="AddMinute_Click" BorderThickness="0"/>
+                <Button Margin="2,0" Content="שעה" Height="Auto" Width="Auto" Click="AddHour_Click" BorderThickness="0"/>
+                <Button Margin="2,0" Content="יום" Height="Auto" Width="Auto" Click="AddDay_Click" BorderThickness="0"/>
+                <Button Margin="2,0" Content="שבוע" Height="Auto" Width="Auto" Click="AddWeek_Click" BorderThickness="0"/>
+                <Button Margin="2,0" Content="חודש" Height="Auto" Width="Auto" Click="AddMonth_Click" BorderThickness="0"/>
+                <Button Margin="2,0" Content="שנה" Height="Auto" Width="Auto" Click="AddYear_Click" BorderThickness="0"/>
+            </WrapPanel>
+        </Grid>
         <Grid Grid.Column="0" Grid.Row="1" Margin="20">
             <ScrollViewer>
                 <StackPanel>
@@ -48,51 +54,52 @@
                     <TextBlock Text="עריכת הגדרות מערכת" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
 
                     <Label Content="מזהה מנהל:"/>
-                    <TextBox Text="{Binding AdminConfig.ManagerId, Mode=TwoWay }"
+                    <TextBox Text="{Binding Configuration.ManagerId, Mode=TwoWay }"
                              PreviewTextInput="NumberValidationTextBox"
                              MaxLength="9"
                              Margin="0,0,0,10"/>
 
                     <Label Content="כתובת חנות:"/>
-                    <TextBox Text="{Binding AdminConfig.StoreAddress, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.StoreAddress, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                     <Label Content="קו רוחב:"/>
-                    <TextBox Text="{Binding AdminConfig.Latitude, Mode=TwoWay}" Margin="0,0,0,10" IsReadOnly="True"/>
+                    <TextBox Text="{Binding Configuration.Latitude, Mode=TwoWay}" Margin="0,0,0,10" IsReadOnly="True"/>
 
                     <Label Content="קו אורך:"/>
-                    <TextBox Text="{Binding AdminConfig.Longitude, Mode=TwoWay}" Margin="0,0,0,10" IsReadOnly="True"/>
+                    <TextBox Text="{Binding Configuration.Longitude, Mode=TwoWay}" Margin="0,0,0,10" IsReadOnly="True"/>
 
                     <Label Content="מהירות רכב (קמ״ש):"/>
-                    <TextBox Text="{Binding AdminConfig.AvgSpeedCar, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedCar, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                     <Label Content="מהירות אופונוע (קמ״ש):"/>
-                    <TextBox Text="{Binding AdminConfig.AvgSpeedMotorcycle, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                     <Label Content="מהירות אופניים (קמ״ש):"/>
-                    <TextBox Text="{Binding AdminConfig.AvgSpeedBike, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedBike, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                     <Label Content="מהירות הליכה (קמ״ש):"/>
-                    <TextBox Text="{Binding AdminConfig.AvgSpeedFoot, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedFoot, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                     <Label Content="זמן משלוח מקסימלי (ימים:שעות):"/>
-                    <TextBox Text="{Binding AdminConfig.MaxDeliveryTime, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.MaxDeliveryTime, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" Margin="0,0,0,10"/>
 
                     <Label Content="טווח סיכון (ימים:שעות):"/>
-                    <TextBox Text="{Binding AdminConfig.RiskRange, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" Margin="0,0,0,10" />
+                    <TextBox Text="{Binding Configuration.RiskRange, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" Margin="0,0,0,10" />
 
                     <Label Content="זמן חוסר פעילות לשליח (ימים.שעות):"/>
-                    <TextBox Text="{Binding AdminConfig.MaxTimeInactivity, Mode=TwoWay, Converter={StaticResource SpanTimeConverter}}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.MaxTimeInactivity, Mode=TwoWay, Converter={StaticResource SpanTimeConverter}}" Margin="0,0,0,10"/>
 
                 </StackPanel>
             </ScrollViewer>
         </Grid>
-        <WrapPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="10,10">
+        
+        <Menu Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="10,10">
             <Button  Content="איפוס מערכת" Margin="10" Padding="5" Click="ResetDB"/>
             <Button  Content="אתחול מערכת" Margin="10" Padding="5" Click="InitDB"/>
-            <Button  Content="ניהול שליחים" Margin="10" Padding="5" Click="CourierList"/>
-            <Button  Content="ניהול הזמנות" Margin="10" Padding="5" Click="CourierList"/>
-            <Button  Content="ניהול משלוחים" Margin="10" Padding="5" Click="CourierList"/>
-        </WrapPanel>
+            <Button  Content="ניהול שליחים" Margin="10" Padding="5" Click="btnCourierList_Click"/>
+            <Button  Content="ניהול הזמנות" Margin="10" Padding="5" /> <!-- Updated Click event -->
+            <Button  Content="ניהול משלוחים" Margin="10" Padding="5" /> <!-- Updated Click event -->
+        </Menu>
 
     </Grid>
 </Window>
