@@ -39,6 +39,8 @@ namespace PL.Courier
             set { SetValue(CourierInListProperty, value); }
         }
 
+        public BO.CourierFieldFilter CourierFilter { get; set; } = BO.CourierFieldFilter.All;
+
         public static readonly DependencyProperty CourierInListProperty =
             DependencyProperty.Register(nameof(CourierInList), typeof(IEnumerable<BO.CourierInList>), typeof(CourierListWindow), new PropertyMetadata(null));
 
@@ -61,7 +63,29 @@ namespace PL.Courier
 
         private void UpdateCourierList()
         {
-            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, true, BO.CourierFieldSort.Id);
+            bool? isActive = CourierFilter switch
+            {
+                BO.CourierFieldFilter.IsActive => true,
+                BO.CourierFieldFilter.InActive => false,
+                BO.CourierFieldFilter.All => null,
+                _ => null
+            };
+
+            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, isActive, null);
+     
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            bool? isActive = CourierFilter switch
+            {
+                BO.CourierFieldFilter.IsActive => true,
+                BO.CourierFieldFilter.InActive => false,
+                BO.CourierFieldFilter.All => null,
+                _ => null
+            };
+            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, isActive, null);
+
         }
     }
 }
