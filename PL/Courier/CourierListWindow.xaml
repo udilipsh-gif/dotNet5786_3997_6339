@@ -46,10 +46,11 @@
                     <GridViewColumn Header="Is Active" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox IsEnabled="False" IsChecked="{Binding IsActive}" />
+                                <CheckBox IsEnabled="False" IsChecked="{Binding Active}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn Header="TypeShipment" DisplayMemberBinding="{Binding TypeShipment}" Width="150"/>
                 </GridView>
             </ListView.View>
         </ListView>
