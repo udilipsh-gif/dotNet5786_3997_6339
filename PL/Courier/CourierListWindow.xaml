@@ -49,8 +49,12 @@
                                 <CheckBox IsEnabled="False" IsChecked="{Binding Active}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="TypeShipment" DisplayMemberBinding="{Binding TypeShipment}" Width="150"/>
+                    </GridViewColumn> 
+                    <GridViewColumn Header="TypeShipment" DisplayMemberBinding="{Binding TypeShipment}" Width="Auto"/>
+                    <GridViewColumn Header="WorkingSince" DisplayMemberBinding="{Binding WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" Width="Auto" />
+                    <GridViewColumn Header="DeliveryOnTime" DisplayMemberBinding="{Binding DeliveryOnTime}" Width="Auto"/>
+                    <GridViewColumn Header="DeliveryLate" DisplayMemberBinding="{Binding DeliveryLate}" Width="Auto"/>
+                    <GridViewColumn Header="DeliveryId" DisplayMemberBinding="{Binding DeliveryId}" Width="Auto"/>
                 </GridView>
             </ListView.View>
         </ListView>
