@@ -65,17 +65,36 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
     { new CourierListWindow().Show(); }
-    private void ClockForwerd_Click(object sender, RoutedEventArgs e)
+    private void ClockForward_Click(object sender, RoutedEventArgs e)
     {
-        var value = sender.ToString() switch
+    
+        if (sender is FrameworkElement element && element.Tag != null)
         {
+      
+            string tagValue = element.Tag.ToString();
 
+            try
+            {
+                var value = tagValue switch
+                {
+                    "Minute" => BO.TimeUnit.MINUTE,
+                    "Hour" => BO.TimeUnit.HOUR,
+                    "Day" => BO.TimeUnit.DAY,
+                    "Week" => BO.TimeUnit.WEEK,
+                    "Month" => BO.TimeUnit.MONTH,
+                    "Year" => BO.TimeUnit.YEAR,
+                    _ => throw new ArgumentException("Invalid time unit")
+                };
 
-        };
-
-        s_bl.Admin.ForwardClock(BO.TimeUnit.MINUTE);
+                s_bl.Admin.ForwardClock(value);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message); 
+            }
+        }
     }
-   
+
 
     private void ResetDB(object sender, RoutedEventArgs e)
     {
