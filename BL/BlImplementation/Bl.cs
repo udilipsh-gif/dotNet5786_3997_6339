@@ -1,18 +1,27 @@
 ﻿namespace BlImplementation;
 using BlApi;
+
+/// <summary>
+/// Business logic facade that exposes the system's BL services.
+/// </summary>
+/// <remarks>
+/// This class composes the concrete implementations of the BL contracts and provides a single
+/// entry point for accessing administrative, courier, and order operations.
+/// </remarks>
 internal class Bl : IBl
 {
+    /// <summary>
+    /// Gets the administrative service.
+    /// </summary>
     public IAdmin Admin { get; } = new AdminImplementation();
+
+    /// <summary>
+    /// Gets the courier management service.
+    /// </summary>
     public ICourier Courier { get; } = new CourierImplementation();
+
+    /// <summary>
+    /// Gets the order management service.
+    /// </summary>
     public IOrder Order { get; } = new OrderImplementation();
-
-    //public IClosedDeliveryInList ClosedDeliveryInList { get; } = new ClosedDeliveryInListImplementation();
-    //public ICourierInList CourierInList { get; } = new CourierInListImplementation();
-    //public IDelivery Delivery { get; } = new DeliveryImplementation();
-    //public IDeliveryPerOrderInList DeliveryPerOrderInList { get; } = new DeliveryPerOrderInListImplementation();
-    //public IOpenOrderInList OpenOrderInList { get; } = new OpenOrderInListImplementation();
-    //public IOrderInProgress OrderInProgress { get; } = new OrderInProgressImplementation();
-    //public IOrderInList OrderInList { get; } = new OrderInListImplementation();
-
-
 }

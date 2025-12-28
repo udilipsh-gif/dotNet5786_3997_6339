@@ -11,6 +11,10 @@ internal class ConfigImplementation : IConfig
     /// <summary>
     /// Gets or sets the current system clock time.
     /// </summary>
+    /// <remarks>
+    /// This property allows the system to simulate different time periods for testing purposes.
+    /// Changes to this value affect all time-dependent operations in the system.
+    /// </remarks>
     public DateTime Clock
     {
         get => Config.Clock;
@@ -40,6 +44,10 @@ internal class ConfigImplementation : IConfig
     /// <summary>
     /// Gets or sets the physical address of the store.
     /// </summary>
+    /// <remarks>
+    /// When setting a null value, it will be converted to an empty string.
+    /// This address is used for geocoding and distance calculations.
+    /// </remarks>
     public string? StoreAddress
     {
         get => Config.StoreAddress;
@@ -49,6 +57,10 @@ internal class ConfigImplementation : IConfig
     /// <summary>
     /// Gets or sets the latitude coordinate of the store location.
     /// </summary>
+    /// <remarks>
+    /// When setting a null value, it will be converted to 0.0.
+    /// Valid latitude values range from -90 to +90 degrees.
+    /// </remarks>
     public double? Latitude
     {
         get => Config.Latitude;

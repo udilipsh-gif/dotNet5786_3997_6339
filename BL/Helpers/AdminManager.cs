@@ -97,6 +97,8 @@ internal static class AdminManager //stage 4
         //...
         if (s_dal.Config.ManagerId != configuration.ManagerId)
         {
+            if(!Tools.IsValidId(configuration.ManagerId)) 
+                throw new BO.BlInvalidValueException("Invalid Manager ID.");
             s_dal.Config.ManagerId = configuration.ManagerId;
             configChanged = true;
         }
@@ -107,7 +109,14 @@ internal static class AdminManager //stage 4
         }
         if (s_dal.Config.StoreAddress != configuration.StoreAddress)
         {
+            string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
+            (double Lat, double Lon)? adressCoordinates = Tools.GetGeocodingSync(address) ??
+                throw new BO.BlInvalidValueException("Geocoding failed.");
+            configuration.Latitude = adressCoordinates?.Lat;
+            configuration.Longitude = adressCoordinates?.Lon;
             s_dal.Config.StoreAddress = configuration.StoreAddress;
+            s_dal.Config.Latitude = adressCoordinates?.Lat ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
+            s_dal.Config.Longitude = adressCoordinates?.Lon ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
             configChanged = true;
         }
         if (s_dal.Config.Latitude != configuration.Latitude)
@@ -172,7 +181,7 @@ internal static class AdminManager //stage 4
         {
             s_dal.ResetDB(); //stage 4
             AdminManager.UpdateClock(AdminManager.Now); //stage 5 - needed since we want the label on Pl to be updated
-            AdminManager.SetConfig(AdminManager.GetConfig()); //stage 5 - needed to update PL 
+            ConfigUpdatedObservers?.Invoke(); //stage 5 - needed to update PL 
         }
     }
 
@@ -180,9 +189,10 @@ internal static class AdminManager //stage 4
     {
         lock (BlMutex) //stage 7
         {
-            DalTest.Initialization.Do(); //stage 4
+            
             AdminManager.UpdateClock(AdminManager.Now);  //stage 5 - needed since we want the label on Pl to be updated           
-            AdminManager.SetConfig(AdminManager.GetConfig()); //stage 5 - needed for update the PL
+            ConfigUpdatedObservers?.Invoke(); //stage 5 - needed for update the PL
+            DalTest.Initialization.Do(); //stage 4
         }
     }
 

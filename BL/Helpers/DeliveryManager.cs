@@ -14,16 +14,19 @@ internal static class DeliveryManager
 {
     private static IDal s_dal = Factory.Get; //stage 4
 
+    internal static ObserverManager Observer = new();
+
     /// <summary>
     /// Retrieves all deliveries from the data access layer.
     /// </summary>
-    /// <param name="sort">Optional sorting criterion for couriers. Defaults to <see cref="BO.CourierFieldSort.Id"/>.</param>
+    /// <param name="sort">Optional sorting criterion for deliveries. Currently not implemented - parameter is ignored.</param>
     /// <returns>
     /// An <see cref="IEnumerable{T}"/> of <see cref="DO.Delivery"/> objects representing all deliveries in the system.
     /// </returns>
     /// <remarks>
     /// Note: The sort parameter is currently not utilized in the implementation.
     /// All deliveries are returned in their default order from the data access layer.
+    /// This method is intended for internal use within the business logic layer.
     /// </remarks>
     internal static IEnumerable<DO.Delivery> ReadAll(
     BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
@@ -79,6 +82,9 @@ internal static class DeliveryManager
             TimeEndDelivery = AdminManager.Now
         };
         s_dal.Delivery.Update(delivery);
+        Observer.NotifyItemUpdated(deliveryId);
+        Observer.NotifyItemUpdated(delivery.OrderId);                
+        Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -94,11 +100,12 @@ internal static class DeliveryManager
     /// <list type="number">
     /// <item><description>Validates that the courier can handle the delivery distance</description></item>
     /// <item><description>Creates a new delivery record with the current timestamp</description></item>
-    /// <item><description>Calculates the actual distance based on the order address and shipment type</description></item>
+    /// <item><description>Calculates the actual road/walking distance based on the order address and shipment type using Google Distance Matrix API</description></item>
     /// <item><description>Assigns the courier to the delivery</description></item>
-    /// <item><description>Persists the delivery to the data access layer</description></item>
+    /// <item><description>Sets TypeShipment based on the courier's vehicle type (not order type)</description></item>
+    /// <item><description>Persists the delivery to the data access layer with ID 0 (auto-generated)</description></item>
     /// </list>
-    /// The delivery is created with a null end status, indicating it is in progress.
+    /// The delivery is created with null end status and time, indicating it is in progress.
     /// </remarks>
     public static void Create(DO.Order order, DO.Courier courier)
     {
@@ -110,13 +117,14 @@ internal static class DeliveryManager
             Id = 0,
             OrderId = order.Id,
             CourierId = courier.Id,
-            TypeShipment = (DO.TheTypeShipment)order.TypeOfOrder,
+            TypeShipment = courier.TypeShipment,
             OrderDate = AdminManager.Now,
-            ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)order.TypeOfOrder), // updated method call
+            ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
             EndDelivery = null,
             TimeEndDelivery = null
         };
         s_dal.Delivery.Create(delivery);
+        Observer.NotifyListUpdated();
     }
 
 
