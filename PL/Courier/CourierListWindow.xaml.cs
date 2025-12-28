@@ -28,10 +28,6 @@ namespace PL.Courier
             InitializeComponent();
 
         }
-        //private void queryCourseList()
-        //    => Courier = (Semester == BO.Courier.) ?
-        //        s_bl?.Courier.ReadAll()! : s_bl?.Course.ReadAll(null, BO.CourseFieldFilter.SemesterName, Semester)!;
-
 
         public IEnumerable<BO.CourierInList> CourierInList
         {
@@ -39,10 +35,17 @@ namespace PL.Courier
             set { SetValue(CourierInListProperty, value); }
         }
 
-        public BO.CourierFieldFilter CourierFilter { get; set; } = BO.CourierFieldFilter.All;
-
         public static readonly DependencyProperty CourierInListProperty =
             DependencyProperty.Register(nameof(CourierInList), typeof(IEnumerable<BO.CourierInList>), typeof(CourierListWindow), new PropertyMetadata(null));
+
+        public BO.CourierFieldFilter CourierFilter
+        {
+            get { return (BO.CourierFieldFilter)GetValue(CourierFilterProperty); }
+            set { SetValue(CourierFilterProperty, value); }
+        }
+
+        public static readonly DependencyProperty CourierFilterProperty =
+            DependencyProperty.Register(nameof(CourierFilter), typeof(BO.CourierFieldFilter), typeof(CourierListWindow), new PropertyMetadata(BO.CourierFieldFilter.All));
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -77,15 +80,8 @@ namespace PL.Courier
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            bool? isActive = CourierFilter switch
-            {
-                BO.CourierFieldFilter.IsActive => true,
-                BO.CourierFieldFilter.InActive => false,
-                BO.CourierFieldFilter.All => null,
-                _ => null
-            };
-            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, isActive, null);
-
+            UpdateCourierList();
+            
         }
     }
 }
