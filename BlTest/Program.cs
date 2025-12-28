@@ -1240,7 +1240,7 @@ internal class Program
                 "   to exit press 0\n" +
                 "   to set courier press 1\n" +
                 "   to set order press 2\n" +
-                "   to set delivery press 3\n" +
+                //"   to set delivery press 3\n" +
                 "   to set admin settings press 5\n" +
                 "   ***no relevant in stage 4 ***to print all data press 6\n" +
                 "       enter your choice: ");
