@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
-  <NextOrderId>100051</NextOrderId>
-  <NextDeliveryId>200051</NextDeliveryId>
-  <Clock>25/12/2025 20:41:08</Clock>
+  <NextOrderId>100001</NextOrderId>
+  <NextDeliveryId>200001</NextDeliveryId>
+  <Clock>28/12/2025 20:31:34</Clock>
   <manager_id>344045810</manager_id>
   <PasswordManager>Admin1234$</PasswordManager>
   <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
@@ -13,9 +13,9 @@
   <AvgSpeedMotorcycle>50</AvgSpeedMotorcycle>
   <AvgSpeedBike>20</AvgSpeedBike>
   <AvgSpeedFoot>5</AvgSpeedFoot>
-  <MaxDeliveryTime>5.00:00:00</MaxDeliveryTime>
-  <RiskRange>2.02:00:00</RiskRange>
-  <MaxTimeInactivity>200.00:00:00</MaxTimeInactivity>
-  <ManagerId>200986339</ManagerId>
+  <MaxDeliveryTime>02:00:00</MaxDeliveryTime>
+  <RiskRange>00:30:00</RiskRange>
+  <MaxTimeInactivity>00:15:00</MaxTimeInactivity>
+  <ManagerId>344045810</ManagerId>
   <GoogleApiKey>AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk</GoogleApiKey>
 </config>
