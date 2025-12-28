@@ -10,7 +10,11 @@
         Title="CourierListWindow" Height="450" Width="650"
         Loaded="Window_Loaded"
         Closed="Window_Close">
-    
+
+    <Window.Resources>
+        <local:CourierFieldFilter x:Key="CourierFieldFilter" />
+    </Window.Resources>
+
     <!--External Grid-->
     <Grid>
         <Grid.RowDefinitions>

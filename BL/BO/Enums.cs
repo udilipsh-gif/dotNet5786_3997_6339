@@ -26,17 +26,11 @@ public enum CourierFieldSort
 /// </summary>
 public enum CourierFieldFilter
 {
-    /// <summary>Filter by courier ID.</summary>
-    ById,
+    All,
 
-    /// <summary>Filter by courier name.</summary>
-    ByName,
+    IsActive,
 
-    /// <summary>Filter by courier availability.</summary>
-    ByAvailable,
-
-    /// <summary>Filter by courier active/inactive status.</summary>
-    ByActiveStatus
+    InActive,
 }
 
 /// <summary>

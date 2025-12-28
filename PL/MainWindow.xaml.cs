@@ -64,14 +64,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
 
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
-    { new CourierListWindow().Show(); }
+        => new CourierListWindow().Show();
+    
     private void ClockForward_Click(object sender, RoutedEventArgs e)
     {
     
         if (sender is FrameworkElement element && element.Tag != null)
         {
       
-            string tagValue = element.Tag.ToString();
+            string tagValue = element.Tag.ToString() ?? string.Empty;
 
             try
             {
@@ -83,7 +84,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     "Week" => BO.TimeUnit.WEEK,
                     "Month" => BO.TimeUnit.MONTH,
                     "Year" => BO.TimeUnit.YEAR,
-                    _ => throw new ArgumentException("Invalid time unit")
+                    _ => throw new BO.BlInvalidValueException("Invalid time unit")
                 };
 
                 s_bl.Admin.ForwardClock(value);
