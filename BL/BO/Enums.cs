@@ -1,4 +1,6 @@
-﻿namespace BO;
+﻿using System.ComponentModel;
+
+namespace BO;
 
 /// <summary>
 /// Defines the fields available for sorting courier list results.
@@ -26,10 +28,13 @@ public enum CourierFieldSort
 /// </summary>
 public enum CourierFieldFilter
 {
+    [Description("הכול")]
     All,
 
+    [Description("פעילים בלבד")]
     IsActive,
 
+    [Description("לא פעילים בלבד")]
     InActive,
 }
 
