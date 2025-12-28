@@ -7,7 +7,9 @@
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="CourierListWindow" Height="450" Width="650">
+        Title="CourierListWindow" Height="450" Width="650"
+        Loaded="Window_Loaded"
+        Closed="Window_Close">
     
     <!--External Grid-->
     <Grid>
@@ -25,10 +27,20 @@
             <Label Grid.Column="0" Content="Label" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch"/>
         </Grid>
-        <ListView Margin="5" Grid.Row="1" ItemsSource="{Binding Path=CourseList}">
+        <ListView Margin="5" Grid.Row="1" ItemsSource="{Binding Path=CourierList}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn/>
+                    <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}" Width="50"/>
+
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="150"/>
+
+                    <GridViewColumn Header="Is Active" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsEnabled="False" IsChecked="{Binding IsActive}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

@@ -19,10 +19,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         InitializeComponent();
 
-        this.Loaded += MainWindow_Loaded;
-
-        this.Closed += MainWindow_Close;
-
         DataContext = this;
 
     }
@@ -49,6 +45,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void MainWindow_Close(object? sender, EventArgs e)
     {
+        CloseAllWindowsExceptMain();
         s_bl.Admin.RemoveClockObserver(ClockObserver);
         s_bl.Admin.RemoveClockObserver(ConfigObserver);
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BO;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -26,23 +27,29 @@ namespace PL.Courier
         {
             InitializeComponent();
 
-            this.Loaded += MainWindow_Loaded;
-
-            this.Closed += MainWindow_Close;
-
-
         }
+        //private void queryCourseList()
+        //    => Courier = (Semester == BO.Courier.) ?
+        //        s_bl?.Courier.ReadAll()! : s_bl?.Course.ReadAll(null, BO.CourseFieldFilter.SemesterName, Semester)!;
+        private void queryCourierList() => s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, true, BO.CourierFieldSort.Id);
 
-        private void MainWindow_Close(object? sender, EventArgs e)
+        private void courierListObserver()
+             => queryCourierList();
+
+
+        private void Window_Close(object? sender, EventArgs e)
+             => s_bl.Courier.RemoveObserver(courierListObserver);
+
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-        }
+            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, true, BO.CourierFieldSort.Id);
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
- 
+            s_bl.Courier.AddObserver(courierListObserver);
         }
+             
 
-        public IEnumerable<BO.CourierInList> CourierList
+        public IEnumerable<BO.CourierInList> CourierInList
         {
             get { return (IEnumerable<BO.CourierInList>)GetValue(CourierListProperty); }
             set { SetValue(CourierListProperty, value); }

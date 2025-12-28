@@ -9,7 +9,9 @@
         FlowDirection="RightToLeft"
         Height="450" Width="800" 
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="MainWindow" MinHeight="300" MinWidth="450">
+        Title="MainWindow" MinHeight="300" MinWidth="450"
+        Loaded="MainWindow_Loaded"
+        Closed="MainWindow_Close">
     <Window.Resources>
         <local:SpanTimeConverter x:Key="SpanTimeConverter" />
     </Window.Resources>
