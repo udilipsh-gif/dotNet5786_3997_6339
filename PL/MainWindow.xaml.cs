@@ -65,30 +65,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
     { new CourierListWindow().Show(); }
-    private void AddMinute_Click(object sender, RoutedEventArgs e)
+    private void ClockForwerd_Click(object sender, RoutedEventArgs e)
     {
+        var value = sender.ToString() switch
+        {
+
+
+        };
+
         s_bl.Admin.ForwardClock(BO.TimeUnit.MINUTE);
     }
-    private void AddHour_Click(object sender, RoutedEventArgs e)
-    {
-        s_bl.Admin.ForwardClock(BO.TimeUnit.HOUR);
-    }
-    private void AddDay_Click(object sender, RoutedEventArgs e)
-    {
-        s_bl.Admin.ForwardClock(BO.TimeUnit.DAY);
-    }
-    private void AddWeek_Click(object sender, RoutedEventArgs e)
-    {
-        s_bl.Admin.ForwardClock(BO.TimeUnit.WEEK);
-    }
-    private void AddMonth_Click(object sender, RoutedEventArgs e)
-    {
-        s_bl.Admin.ForwardClock(BO.TimeUnit.MONTH);
-    }
-    private void AddYear_Click(object sender, RoutedEventArgs e)
-    {
-        s_bl.Admin.ForwardClock(BO.TimeUnit.YEAR);
-    }
+   
 
     private void ResetDB(object sender, RoutedEventArgs e)
     {

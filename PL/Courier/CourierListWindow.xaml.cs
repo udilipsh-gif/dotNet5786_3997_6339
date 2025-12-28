@@ -31,31 +31,37 @@ namespace PL.Courier
         //private void queryCourseList()
         //    => Courier = (Semester == BO.Courier.) ?
         //        s_bl?.Courier.ReadAll()! : s_bl?.Course.ReadAll(null, BO.CourseFieldFilter.SemesterName, Semester)!;
-        private void queryCourierList() => s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, true, BO.CourierFieldSort.Id);
 
-        private void courierListObserver()
-             => queryCourierList();
-
-
-        private void Window_Close(object? sender, EventArgs e)
-             => s_bl.Courier.RemoveObserver(courierListObserver);
-
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, true, BO.CourierFieldSort.Id);
-
-            s_bl.Courier.AddObserver(courierListObserver);
-        }
-             
 
         public IEnumerable<BO.CourierInList> CourierInList
         {
-            get { return (IEnumerable<BO.CourierInList>)GetValue(CourierListProperty); }
-            set { SetValue(CourierListProperty, value); }
+            get { return (IEnumerable<BO.CourierInList>)GetValue(CourierInListProperty); }
+            set { SetValue(CourierInListProperty, value); }
         }
 
-        public static readonly DependencyProperty CourierListProperty =
-            DependencyProperty.Register("CourierInList", typeof(IEnumerable<BO.CourierInList>), typeof(CourierListWindow), new PropertyMetadata(null));
+        public static readonly DependencyProperty CourierInListProperty =
+            DependencyProperty.Register(nameof(CourierInList), typeof(IEnumerable<BO.CourierInList>), typeof(CourierListWindow), new PropertyMetadata(null));
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            UpdateCourierList();
+
+            s_bl.Courier.AddObserver(courierListObserver);
+        }
+
+        private void Window_Close(object? sender, EventArgs e)
+        {
+            s_bl.Courier.RemoveObserver(courierListObserver);
+        }
+
+        private void courierListObserver()
+        {
+            UpdateCourierList();
+        }
+
+        private void UpdateCourierList()
+        {
+            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, true, BO.CourierFieldSort.Id);
+        }
     }
 }
