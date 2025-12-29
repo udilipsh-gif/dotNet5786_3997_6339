@@ -74,7 +74,7 @@ namespace PL.Courier
                 _ => null
             };
 
-            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, isActive, null);
+            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, isActive, BO.CourierFieldSort.Id);
      
         }
 

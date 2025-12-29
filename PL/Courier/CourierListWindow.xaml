@@ -36,28 +36,54 @@
                       SelectedIndex="0">
             </ComboBox>
         </Grid>
-        <ListView Margin="5" Grid.Row="1" ItemsSource="{Binding Path=CourierInList}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}" Width="50"/>
+        
+        <DataGrid AutoGenerateColumns="False" Margin="5" Grid.Row="1" ItemsSource="{Binding CourierInList}">
+            <DataGrid.Columns>
 
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="150"/>
+                <DataGridTextColumn Header="Id" 
+                            Binding="{Binding Id}" 
+                            SortMemberPath="Id" 
+                            Width="Auto"/>
 
-                    <GridViewColumn Header="Is Active" Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsEnabled="False" IsChecked="{Binding Active}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn> 
-                    <GridViewColumn Header="TypeShipment" DisplayMemberBinding="{Binding TypeShipment}" Width="Auto"/>
-                    <GridViewColumn Header="WorkingSince" DisplayMemberBinding="{Binding WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" Width="Auto" />
-                    <GridViewColumn Header="DeliveryOnTime" DisplayMemberBinding="{Binding DeliveryOnTime}" Width="Auto"/>
-                    <GridViewColumn Header="DeliveryLate" DisplayMemberBinding="{Binding DeliveryLate}" Width="Auto"/>
-                    <GridViewColumn Header="DeliveryId" DisplayMemberBinding="{Binding DeliveryId}" Width="Auto"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                <DataGridTextColumn Header="Name" 
+                            Binding="{Binding Name}" 
+                            SortMemberPath="Name" 
+                            Width="Auto"/>
+
+                <DataGridCheckBoxColumn Header="Is Active" 
+                           Binding="{Binding Active}" 
+                           SortMemberPath="Active"
+                           IsReadOnly="True" 
+                           Width="Auto"/>
+                
+                <DataGridTextColumn Header="TypeShipment" 
+                            Binding="{Binding TypeShipment}" 
+                            SortMemberPath="TypeShipment" 
+                            Width="Auto"/>
+
+                <DataGridTextColumn Header="Working Since" 
+                            Binding="{Binding WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" 
+                            SortMemberPath="WorkingSince" 
+                            Width="Auto"/>
+
+                <DataGridTextColumn Header="DeliveryOnTime" 
+                            Binding="{Binding DeliveryOnTime}" 
+                            SortMemberPath="DeliveryOnTime" 
+                            Width="Auto"/>
+
+                <DataGridTextColumn Header="DeliveryLate" 
+                            Binding="{Binding DeliveryLate}" 
+                            SortMemberPath="DeliveryLate" 
+                            Width="Auto"/>
+
+                <DataGridTextColumn Header="DeliveryId" 
+                            Binding="{Binding DeliveryId}" 
+                            SortMemberPath="DeliveryId" 
+                            Width="Auto"/>
+
+
+            </DataGrid.Columns>
+        </DataGrid>
         <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="Auto" Margin="10" Width="100"/>
     </Grid>
 </Window>
