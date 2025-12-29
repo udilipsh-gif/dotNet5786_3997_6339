@@ -124,13 +124,10 @@ namespace PL.Courier
             if (sender is DataGrid dataGrid
                 && dataGrid.SelectedItem is BO.CourierInList courierInList)
             {
-                // Edit existing courier - הכפתור בתוך השורה
-                //courierWindow = new CourierWindow(courierInList.Id);
                 courierWindow = new CourierWindow(courierInList.Id);
             }
             else
             {
-                // Add new courier - הכפתור מחוץ ל-DataGrid
                 courierWindow = new CourierWindow(0);
             }
             courierWindow.ShowDialog();
