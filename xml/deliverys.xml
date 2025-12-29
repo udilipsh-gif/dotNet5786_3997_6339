@@ -1,2 +1,503 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ArrayOfDeliverys />
+<ArrayOfDeliverys>
+  <Delivery>
+    <Id>200001</Id>
+    <OrderId>100016</OrderId>
+    <CourierId>367939416</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:21:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200002</Id>
+    <OrderId>100002</OrderId>
+    <CourierId>324186138</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200003</Id>
+    <OrderId>100011</OrderId>
+    <CourierId>306521070</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200004</Id>
+    <OrderId>100023</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200005</Id>
+    <OrderId>100006</OrderId>
+    <CourierId>324186138</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200006</Id>
+    <OrderId>100048</OrderId>
+    <CourierId>367939416</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200007</Id>
+    <OrderId>100002</OrderId>
+    <CourierId>306521070</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200008</Id>
+    <OrderId>100027</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200009</Id>
+    <OrderId>100020</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:06:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200010</Id>
+    <OrderId>100009</OrderId>
+    <CourierId>324186138</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:14:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200011</Id>
+    <OrderId>100021</OrderId>
+    <CourierId>237792638</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200012</Id>
+    <OrderId>100032</OrderId>
+    <CourierId>324186138</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:19:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200013</Id>
+    <OrderId>100039</OrderId>
+    <CourierId>306521070</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200014</Id>
+    <OrderId>100025</OrderId>
+    <CourierId>316516370</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200015</Id>
+    <OrderId>100032</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:27:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200016</Id>
+    <OrderId>100005</OrderId>
+    <CourierId>201744789</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:18:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200017</Id>
+    <OrderId>100035</OrderId>
+    <CourierId>215904559</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200018</Id>
+    <OrderId>100002</OrderId>
+    <CourierId>201744789</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:50:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200019</Id>
+    <OrderId>100007</OrderId>
+    <CourierId>324186138</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200020</Id>
+    <OrderId>100037</OrderId>
+    <CourierId>201744789</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200021</Id>
+    <OrderId>100007</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:15:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200022</Id>
+    <OrderId>100014</OrderId>
+    <CourierId>306521070</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:09:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200023</Id>
+    <OrderId>100013</OrderId>
+    <CourierId>367939416</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200024</Id>
+    <OrderId>100011</OrderId>
+    <CourierId>327611205</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:11:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200025</Id>
+    <OrderId>100032</OrderId>
+    <CourierId>306521070</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200026</Id>
+    <OrderId>100021</OrderId>
+    <CourierId>381336389</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200027</Id>
+    <OrderId>100049</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200028</Id>
+    <OrderId>100009</OrderId>
+    <CourierId>201744789</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:43:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200029</Id>
+    <OrderId>100008</OrderId>
+    <CourierId>337335004</CourierId>
+    <TypeShipment>BIKE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200030</Id>
+    <OrderId>100049</OrderId>
+    <CourierId>201744789</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200031</Id>
+    <OrderId>100018</OrderId>
+    <CourierId>201744789</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:33:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200032</Id>
+    <OrderId>100021</OrderId>
+    <CourierId>215904559</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200033</Id>
+    <OrderId>100045</OrderId>
+    <CourierId>381336389</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:00:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200034</Id>
+    <OrderId>100030</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:09:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200035</Id>
+    <OrderId>100017</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200036</Id>
+    <OrderId>100021</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:27:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200037</Id>
+    <OrderId>100008</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200038</Id>
+    <OrderId>100015</OrderId>
+    <CourierId>381336389</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200039</Id>
+    <OrderId>100037</OrderId>
+    <CourierId>381336389</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200040</Id>
+    <OrderId>100045</OrderId>
+    <CourierId>306521070</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200041</Id>
+    <OrderId>100004</OrderId>
+    <CourierId>324186138</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:22:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200042</Id>
+    <OrderId>100014</OrderId>
+    <CourierId>381336389</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200043</Id>
+    <OrderId>100030</OrderId>
+    <CourierId>369813645</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:58:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200044</Id>
+    <OrderId>100012</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:56:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200045</Id>
+    <OrderId>100036</OrderId>
+    <CourierId>381336389</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:13:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200046</Id>
+    <OrderId>100035</OrderId>
+    <CourierId>327611205</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2025-12-29T21:51:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200047</Id>
+    <OrderId>100008</OrderId>
+    <CourierId>381336389</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200048</Id>
+    <OrderId>100029</OrderId>
+    <CourierId>306292247</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2025-12-29T22:46:32.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200049</Id>
+    <OrderId>100047</OrderId>
+    <CourierId>324186138</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200050</Id>
+    <OrderId>100003</OrderId>
+    <CourierId>367939416</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2025-12-29T20:51:32.0000000</OrderDate>
+    <ActualDistance />
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>0001-01-01T00:00:00.0000000</TimeEndDelivery>
+  </Delivery>
+</ArrayOfDeliverys>
