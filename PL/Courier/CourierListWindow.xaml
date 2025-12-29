@@ -70,6 +70,7 @@
                   ItemsSource="{Binding CourierInList}"
                   ToolTip="טבלת שליחים - הצג, מיין וסנן מידע על שליחים"
                   AutomationProperties.Name="טבלת רשימת שליחים"
+                  MouseDoubleClick="Add_Edit_Courier_Click"
                   IsReadOnly="True"
                   SelectionMode="Single"
                   CanUserAddRows="False"

@@ -121,14 +121,16 @@ namespace PL.Courier
         private void Add_Edit_Courier_Click(object sender, RoutedEventArgs e)
         {
             CourierWindow courierWindow;
-            if (sender is Button button && button.DataContext is BO.CourierInList courierInList)
+            if (sender is DataGrid dataGrid
+                && dataGrid.SelectedItem is BO.CourierInList courierInList)
             {
-                // Edit existing courier
+                // Edit existing courier - הכפתור בתוך השורה
+                //courierWindow = new CourierWindow(courierInList.Id);
                 courierWindow = new CourierWindow(courierInList.Id);
             }
             else
             {
-                // Add new courier
+                // Add new courier - הכפתור מחוץ ל-DataGrid
                 courierWindow = new CourierWindow(0);
             }
             courierWindow.ShowDialog();
