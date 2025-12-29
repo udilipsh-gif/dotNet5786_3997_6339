@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
-        xmlns:converters="clr-namespace:PL.Converters"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
@@ -19,8 +18,6 @@
     <Window.Resources>
         <!-- CourierFieldFilter enumeration converter for ComboBox items -->
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
-        <!-- Converter to display enum Description attribute in Hebrew -->
-        <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </Window.Resources>
 
     <!-- Main Grid: Container for all window content, divided into 3 rows -->
@@ -63,12 +60,6 @@
                       SelectedIndex="0"
                       ToolTip="בחר סינון: הכל, פעילים בלבד, או לא פעילים"
                       AutomationProperties.Name="תיבת בחירה לסינון שליחים">
-                <!-- ComboBox ItemTemplate: Uses converter to show Hebrew descriptions from enum Description attributes -->
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
             </ComboBox>
         </Grid>
         

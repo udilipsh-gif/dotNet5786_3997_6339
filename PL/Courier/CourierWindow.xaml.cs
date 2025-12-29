@@ -97,7 +97,7 @@ public partial class CourierWindow : Window
     private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
     {
         // ולידציה בסיסית לפני שליחה (אופציונלי)
-        if (string.IsNullOrEmpty(CurrentCourier.Name))
+        if (CurrentCourier == null || string.IsNullOrEmpty(CurrentCourier.Name))
         {
             MessageBox.Show("נא להזין שם");
             return;
@@ -137,13 +137,13 @@ public partial class CourierWindow : Window
     {
         // קריאה לפונקציית Create ב-BL
         // ה-CurrentCourier מתעדכן אוטומטית מהמסך בזכות ה-Binding
-        s_bl.Courier.Create(CURRENT_MANAGER_ID, CurrentCourier);
+        //s_bl.Courier.Create(CURRENT_MANAGER_ID, CurrentCourier);
     }
 
     private void UpdateCourier()
     {
         // קריאה לפונקציית Update ב-BL
-        s_bl.Courier.Update(CURRENT_MANAGER_ID, CurrentCourier);
+       // s_bl.Courier.Update(CURRENT_MANAGER_ID, CurrentCourier);
     }
 }
 
@@ -228,14 +228,14 @@ public partial class CourierWindow : Window
 //    }
 
 
-//    //public BO.Courier Courier
-//    //{
-//    //    get { return (BO.Courier)GetValue(CourierProperty); }
-//    //    set { SetValue(CourierProperty, value); }
-//    //}
+    //public BO.Courier Courier
+    //{
+    //    get { return (BO.Courier)GetValue(CourierProperty); }
+    //    set { SetValue(CourierProperty, value); }
+    //}
 
-//    //public static readonly DependencyProperty CourierProperty =
-//    //    DependencyProperty.Register(nameof(Courier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(null));
+    //public static readonly DependencyProperty CourierProperty =
+    //    DependencyProperty.Register(nameof(Courier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(null));
 
 
 //    private void Window_Loaded(object sender, RoutedEventArgs e)
