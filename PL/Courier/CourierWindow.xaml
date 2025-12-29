@@ -6,34 +6,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Courier"
         mc:Ignorable="d"
-        Title="CourierWindow" Height="450" Width="800"
-        Loaded="CourierWindow_Loaded">
+        Title="CourierWindow" Height="450" Width="800">
         
 
-    <Window.Resources>
-        <Style TargetType="Label" x:Key="UniformLabel">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="TextBox" x:Key="UniformTextBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="CheckBox" x:Key="UniformCheckBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="ComboBox" x:Key="UniformComboBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-        <Style TargetType="DatePicker" x:Key="UniformDatePicker">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-    </Window.Resources>
+    
 
     <Grid FlowDirection="RightToLeft">
         <Grid.ColumnDefinitions>
