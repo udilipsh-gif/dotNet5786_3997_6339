@@ -38,15 +38,16 @@ public partial class CourierWindow : Window
        DependencyProperty.Register(nameof(ButtonText), typeof(string), typeof(CourierWindow), new PropertyMetadata("Add"));
 
     // רשימה ל-ComboBox של סוגי רכב
-    public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; set; }
+    public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
+     Enum.GetValues(typeof(BO.TheTypeShipment)).Cast<BO.TheTypeShipment>();
+
 
     // בנאי
     public CourierWindow(int id = 0)
     {
         InitializeComponent();
+        DataContext = this;
 
-        // Initialize VehicleTypesList with all enum values
-        VehicleTypesList = (BO.TheTypeShipment[])Enum.GetValues(typeof(BO.TheTypeShipment));
 
         if (id != 0) // מצב עדכון
         {
@@ -86,7 +87,7 @@ public partial class CourierWindow : Window
             };
         }
 
-        this.DataContext = this;
+     
     }
 
     
