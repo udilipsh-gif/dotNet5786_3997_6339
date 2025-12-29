@@ -39,15 +39,14 @@ public partial class CourierWindow : Window
 
     // רשימה ל-ComboBox של סוגי רכב
     public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; set; }
+        = Enum.GetValues(typeof(BO.TheTypeShipment)) as IEnumerable<BO.TheTypeShipment>;
 
     // בנאי
     public CourierWindow(int id = 0)
     {
         InitializeComponent();
 
-        // אתחול רשימת סוגי רכב עבור ה-ComboBox
-        VehicleTypesList = Enum.GetValues(typeof(BO.TheTypeShipment)) as IEnumerable<BO.TheTypeShipment>;
-
+       
         if (id != 0) // מצב עדכון
         {
             ButtonText = "Update";
