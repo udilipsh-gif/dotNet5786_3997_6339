@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,16 +13,45 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace PL.Courier
+namespace PL.Courier;
+
+/// <summary>
+/// Interaction logic for CourierWindow.xaml
+/// </summary>
+public partial class CourierWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for CourierWindow.xaml
-    /// </summary>
-    public partial class CourierWindow : Window
+    public CourierWindow(int ID)
     {
-        public CourierWindow()
+        InitializeComponent();
+    }
+
+    public BO.Courier Courier
+    {
+        get { return (BO.Courier)GetValue(CourierProperty); }
+        set { SetValue(CourierProperty, value); }
+    }
+
+    public static readonly DependencyProperty CourierProperty =
+        DependencyProperty.Register(nameof(Courier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(null));
+
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Load courier data when the window is loaded
+    }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+        // Handle any cleanup when the window is closed
+    }
+
+    private void UpdateCourierDetails()
+    {
+        // Update the courier details displayed in the window
+
+        if (Courier != null)
         {
-            InitializeComponent();
+            CourierInList = s_bl.Courier.GetCourierInList(Courier.ID);
         }
     }
 }

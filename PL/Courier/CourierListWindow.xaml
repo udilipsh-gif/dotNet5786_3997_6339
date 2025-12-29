@@ -4,86 +4,149 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
+        xmlns:converters="clr-namespace:PL.Converters"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="CourierListWindow" Height="450" Width="650"
+        Title="רשימת שליחים" 
+        Height="450" 
+        Width="650"
         Loaded="Window_Loaded"
-        Closed="Window_Close">
+        Closed="Window_Close"
+        ToolTip="חלון רשימת שליחים - מציג את כל השליחים במערכת">
 
+    <!-- Window Resources: Defines reusable resources for the window -->
     <Window.Resources>
+        <!-- CourierFieldFilter enumeration converter for ComboBox items -->
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
+        <!-- Converter to display enum Description attribute in Hebrew -->
+        <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
     </Window.Resources>
 
-    <!--External Grid-->
+    <!-- Main Grid: Container for all window content, divided into 3 rows -->
     <Grid>
+        <!-- Row Definitions: Header (40), Content (500), Footer (Auto) -->
         <Grid.RowDefinitions>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="500*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--Internal, Upper Grid-->
-        <Grid HorizontalAlignment="Stretch" Height="auto" Grid.Row="0" VerticalAlignment="Stretch" Width="auto">
+        
+        <!-- Filter Panel Grid: Contains the filter label and ComboBox for courier filtering -->
+        <Grid HorizontalAlignment="Stretch" 
+              Height="auto" 
+              Grid.Row="0" 
+              VerticalAlignment="Stretch" 
+              Width="auto"
+              ToolTip="פאנל סינון שליחים">
+            <!-- Column Definitions: Two equal columns for label and ComboBox -->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="Label" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-            <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" 
+            
+            <!-- Filter Label: Displays "Filter by:" text -->
+            <Label Grid.Column="0" 
+                   Content="סינון לפי:" 
+                   HorizontalAlignment="Right" 
+                   VerticalAlignment="Center"
+                   ToolTip="תווית לסינון שליחים"
+                   AutomationProperties.Name="תווית סינון"/>
+            
+            <!-- Filter ComboBox: Allows user to select filter criteria (All/Active/Inactive) with Hebrew descriptions -->
+            <ComboBox Grid.Column="1" 
+                      HorizontalAlignment="Stretch"  
+                      VerticalAlignment="Stretch" 
                       ItemsSource="{Binding Source={StaticResource CourierFieldFilterKey}}" 
                       SelectedItem="{Binding CourierFilter}"
                       SelectionChanged="ComboBox_SelectionChanged"
-                      SelectedIndex="0">
+                      SelectedIndex="0"
+                      ToolTip="בחר סינון: הכל, פעילים בלבד, או לא פעילים"
+                      AutomationProperties.Name="תיבת בחירה לסינון שליחים">
+                <!-- ComboBox ItemTemplate: Uses converter to show Hebrew descriptions from enum Description attributes -->
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
             </ComboBox>
         </Grid>
         
-        <DataGrid AutoGenerateColumns="False" Margin="5" Grid.Row="1" ItemsSource="{Binding CourierInList}">
+        <!-- Couriers DataGrid: Main table displaying courier information with sorting capabilities -->
+        <DataGrid AutoGenerateColumns="False" 
+                  Margin="5" 
+                  Grid.Row="1" 
+                  ItemsSource="{Binding CourierInList}"
+                  ToolTip="טבלת שליחים - הצג, מיין וסנן מידע על שליחים"
+                  AutomationProperties.Name="טבלת רשימת שליחים"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False">
+            <!-- DataGrid Columns: Defines all columns for courier data display -->
             <DataGrid.Columns>
 
-                <DataGridTextColumn Header="Id" 
+                <!-- ID Column: Displays unique courier identifier -->
+                <DataGridTextColumn Header="מזהה" 
                             Binding="{Binding Id}" 
                             SortMemberPath="Id" 
                             Width="Auto"/>
 
-                <DataGridTextColumn Header="Name" 
+                <!-- Name Column: Displays courier's full name -->
+                <DataGridTextColumn Header="שם" 
                             Binding="{Binding Name}" 
                             SortMemberPath="Name" 
                             Width="Auto"/>
 
-                <DataGridCheckBoxColumn Header="Is Active" 
+                <!-- Active Status Column: Shows whether courier is currently active (CheckBox) -->
+                <DataGridCheckBoxColumn Header="פעיל" 
                            Binding="{Binding Active}" 
                            SortMemberPath="Active"
                            IsReadOnly="True" 
                            Width="Auto"/>
                 
-                <DataGridTextColumn Header="TypeShipment" 
+                <!-- Shipment Type Column: Displays the type of delivery vehicle (Car/Motorcycle/OnFoot) -->
+                <DataGridTextColumn Header="סוג משלוח" 
                             Binding="{Binding TypeShipment}" 
                             SortMemberPath="TypeShipment" 
                             Width="Auto"/>
 
-                <DataGridTextColumn Header="Working Since" 
+                <!-- Working Since Column: Shows the date when courier started working (formatted as dd/MM/yyyy) -->
+                <DataGridTextColumn Header="עובד מאז" 
                             Binding="{Binding WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" 
                             SortMemberPath="WorkingSince" 
                             Width="Auto"/>
 
-                <DataGridTextColumn Header="DeliveryOnTime" 
+                <!-- On-Time Deliveries Column: Shows count of deliveries delivered on time -->
+                <DataGridTextColumn Header="משלוחים בזמן" 
                             Binding="{Binding DeliveryOnTime}" 
                             SortMemberPath="DeliveryOnTime" 
                             Width="Auto"/>
 
-                <DataGridTextColumn Header="DeliveryLate" 
+                <!-- Late Deliveries Column: Shows count of deliveries that were late -->
+                <DataGridTextColumn Header="משלוחים באיחור" 
                             Binding="{Binding DeliveryLate}" 
                             SortMemberPath="DeliveryLate" 
                             Width="Auto"/>
 
-                <DataGridTextColumn Header="DeliveryId" 
+                <!-- Current Delivery ID Column: Displays the ID of courier's current active delivery (if any) -->
+                <DataGridTextColumn Header="משלוח נוכחי" 
                             Binding="{Binding DeliveryId}" 
                             SortMemberPath="DeliveryId" 
                             Width="Auto"/>
 
-
             </DataGrid.Columns>
         </DataGrid>
-        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="Auto" Margin="10" Width="100"/>
+        
+        <!-- Add Button: Opens a window to add a new courier to the system -->
+        <Button Content="הוסף שליח" 
+                Grid.Row="2" 
+                HorizontalAlignment="Center" 
+                Height="Auto" 
+                Margin="10" 
+                Width="100"
+                Click="Add_Edit_Courier_Click"
+                ToolTip="לחץ כאן להוספת שליח חדש למערכת"
+                AutomationProperties.Name="כפתור הוספת שליח חדש"/>
     </Grid>
 </Window>
