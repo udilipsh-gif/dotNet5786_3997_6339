@@ -213,7 +213,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
-        // Add your logic here, for example, allow only digits:
+        // Allow only digits
         e.Handled = !e.Text.All(char.IsDigit);
     }
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

@@ -13,11 +13,7 @@ public partial class CourierWindow : Window
     // נניח שזה ה-ID של המנהל המחובר כרגע (תצטרך להחליף זאת בלוגיקה האמיתית שלך)
     private int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId;
 
-
-
-    // האובייקט אותו אנו עורכים או מוסיפים
-    public static readonly DependencyProperty CurrentCourierProperty =
-        DependencyProperty.Register(nameof(CurrentCourier), typeof(BO.Courier), typeof(CourierWindow));
+    public bool IsUpdateMode => ButtonText == "Update";
 
     public BO.Courier? CurrentCourier
     {
@@ -25,8 +21,23 @@ public partial class CourierWindow : Window
         set => SetValue(CurrentCourierProperty, value);
     }
 
-   
-   
+    // האובייקט אותו אנו עורכים או מוסיפים
+    public static readonly DependencyProperty CurrentCourierProperty =
+        DependencyProperty.Register(nameof(CurrentCourier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(new BO.Courier()
+        {
+            Id = 0,
+            Name = "",
+            Phone = "",
+            Email = "",
+            Password = "",
+            Active = true,
+            MaxDistanceDelivery = 0,
+            TypeShipment = TheTypeShipment.CAR,
+            WorkingSince = s_bl.Admin.GetClock(),
+            DeliveryLate = 0,
+            DeliveryOnTime = 0
+
+        }));
 
     public string ButtonText
     {
@@ -52,12 +63,11 @@ public partial class CourierWindow : Window
         if (id != 0) // מצב עדכון
         {
             ButtonText = "Update";
+            
             try
             {
                 // שליפת השליח מה-BL
                 CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, id);
-
-               
             }
             catch (Exception ex)
             {
@@ -68,10 +78,8 @@ public partial class CourierWindow : Window
         else // מצב הוספה
         {
             ButtonText = "Add";
-            // אתחול אובייקט חדש וריק
             CurrentCourier = new BO.Courier()
             {
-                
                 Id = 0,
                 Name = "",
                 Phone = "",
@@ -80,11 +88,12 @@ public partial class CourierWindow : Window
                 Active = true,
                 MaxDistanceDelivery = 0,
                 TypeShipment = TheTypeShipment.CAR,
-                WorkingSince = DateTime.Now,
-                DeliveryLate=0,
-                DeliveryOnTime= 0
+                WorkingSince = s_bl.Admin.GetClock(),
+                DeliveryLate = 0,
+                DeliveryOnTime = 0
 
             };
+
         }
 
      
@@ -146,6 +155,12 @@ public partial class CourierWindow : Window
     {
         // קריאה לפונקציית Update ב-BL
        // s_bl.Courier.Update(CURRENT_MANAGER_ID, CurrentCourier);
+    }
+
+    private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
+    {
+        // Allow only digits
+        e.Handled = !e.Text.All(char.IsDigit);
     }
 }
 
