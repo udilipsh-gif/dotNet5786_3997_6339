@@ -8,7 +8,81 @@
         Title="CourierWindow" Height="450" Width="800"
         Loaded="CourierWindow_Loaded"
         Closed="CourierWindow_Closed">
-    <Grid>
+    <Window.Resources>
+        <Style TargetType="Label" x:Key="UniformLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+
+        <Style TargetType="TextBox" x:Key="UniformTextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
         
+        <Style TargetType="CheckBox" x:Key="UniformCheckBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="ComboBox" x:Key="UniformComboBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="DatePicker" x:Key="UniformDatePicker">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Column 0: הערך (TextBox) רחב -->
+            <ColumnDefinition Width="*"/>
+            <!-- Column 1: ה-Label קצר לפי תוכן -->
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- שורה 0 -->
+        <TextBox Grid.Row="0" Grid.Column="0" Style="{StaticResource UniformTextBox}"/>
+        <Label Grid.Row="0" Grid.Column="1" Content=":שם" Style="{StaticResource UniformLabel}"/>
+
+        <!-- שורה 1 -->
+        <TextBox Grid.Row="1" Grid.Column="0" Style="{StaticResource UniformTextBox}"/>
+        <Label Grid.Row="1" Grid.Column="1" Content=":.ת.ז" Style="{StaticResource UniformLabel}"/>
+        <!--שורה 2-->
+        <TextBox Grid.Row="2" Grid.Column="0" Style="{StaticResource UniformTextBox}"/>
+        <Label Grid.Row="2" Grid.Column="1" Content=":טלפון" Style="{StaticResource UniformLabel}"/>
+        <TextBox Grid.Row="3" Grid.Column="0" Style="{StaticResource UniformTextBox}"/>
+        <Label Grid.Row="3" Grid.Column="1" Content=":דוא״ל" Style="{StaticResource UniformLabel}"/>
+        <TextBox Grid.Row="4" Grid.Column="0" Style="{StaticResource UniformTextBox}"/>
+        <Label Grid.Row="4" Grid.Column="1" Content=":מרחק מקסימלי לשילוח" Style="{StaticResource UniformLabel}"/>
+        <ComboBox Grid.Row="5" Grid.Column="0" Style="{StaticResource UniformComboBox}"/>
+        <Label Grid.Row="5" Grid.Column="1" Content=":סוג התניידות" Style="{StaticResource UniformLabel}"/>
+        <CheckBox Grid.Row="6" Grid.Column="0" Style="{StaticResource UniformCheckBox}"/>
+        <Label Grid.Row="6" Grid.Column="1" Content=":סטטוס שליח" Style="{StaticResource UniformLabel}"/>
+        <DatePicker Grid.Row="7" Grid.Column="0" Style="{StaticResource UniformDatePicker}"/>
+        <Label Grid.Row="7" Grid.Column="1" Content=":פעיל החל מ" Style="{StaticResource UniformLabel}"/>
+        <TextBox Grid.Row="8" Grid.Column="0" Style="{StaticResource UniformTextBox}"/>
+        <Label Grid.Row="8" Grid.Column="1" Content=":מספר משלוחים בזמן" Style="{StaticResource UniformLabel}"/>
+
     </Grid>
 </Window>
