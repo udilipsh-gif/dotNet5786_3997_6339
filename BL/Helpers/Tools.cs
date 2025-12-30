@@ -336,8 +336,16 @@ internal static class Tools
     /// </remarks>
     public static bool IsValidPhone(string phone)
     {
-        return Regex.IsMatch(phone, @"^0\d{8,9}$") ||
-        Regex.IsMatch(phone, @"^\+?[1-9]\d{1,14}$");
+        if (phone.Length<7 ||phone.Length>10)
+            return false;
+        for (int i=0; i<phone.Length; i++)//בעיקרון ניתן להגביל ל10 תווים
+        {
+            if (phone[i] < '0' || phone[i] > '9')
+            
+                return false;
+            
+        }
+        return true;
     }
 
     /// <summary>
