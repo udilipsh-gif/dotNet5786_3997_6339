@@ -197,12 +197,14 @@ internal static class CourierManager
         try
         {
             s_dal.Courier.Update(doCourier);
+            Observer.NotifyItemUpdated(boCourier.Id);
+            Observer.NotifyListUpdated();
         }
         catch (Exception ex)
         {
             throw new BO.BlDoesNotExistException($"courier with id {boCourier.Id} is not found", ex);
         }
-        Observer.NotifyItemUpdated(boCourier.Id);
+        
     }
 
     /// <summary>

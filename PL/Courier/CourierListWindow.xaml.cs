@@ -1,6 +1,7 @@
 ﻿using BO;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,8 @@ namespace PL.Courier
         /// </summary>
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
+        private int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId;
+
         /// <summary>
         /// Constructor - Creates a new courier list window
         /// </summary>
@@ -37,9 +40,9 @@ namespace PL.Courier
         /// <summary>
         /// The list of couriers displayed in the window
         /// </summary>
-        public IEnumerable<BO.CourierInList> CourierInList
+        public ObservableCollection<BO.CourierInList> CourierInList
         {
-            get { return (IEnumerable<BO.CourierInList>)GetValue(CourierInListProperty); }
+            get { return (ObservableCollection<BO.CourierInList>)GetValue(CourierInListProperty); }
             set { SetValue(CourierInListProperty, value); }
         }
 
@@ -47,7 +50,7 @@ namespace PL.Courier
         /// DependencyProperty for the courier list
         /// </summary>
         public static readonly DependencyProperty CourierInListProperty =
-            DependencyProperty.Register(nameof(CourierInList), typeof(IEnumerable<BO.CourierInList>), typeof(CourierListWindow), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(CourierInList), typeof(ObservableCollection<BO.CourierInList>), typeof(CourierListWindow), new PropertyMetadata(null));
 
         /// <summary>
         /// The current filter selector (All/Active/Inactive)
@@ -104,7 +107,7 @@ namespace PL.Courier
             };
 
             // Call business layer to get the filtered courier list
-            CourierInList = s_bl.Courier.ReadAll(s_bl.Admin.GetConfig().ManagerId, isActive, BO.CourierFieldSort.Id);
+            CourierInList = new ObservableCollection<BO.CourierInList>(s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id));
         }
 
         /// <summary>
@@ -130,7 +133,7 @@ namespace PL.Courier
             {
                 courierWindow = new CourierWindow(0);
             }
-            courierWindow.ShowDialog();
+            courierWindow.Show();
         }
     }
 }

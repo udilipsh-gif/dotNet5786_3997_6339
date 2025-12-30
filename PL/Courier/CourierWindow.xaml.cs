@@ -1,7 +1,9 @@
 ﻿using BO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace PL.Courier;
 
@@ -11,11 +13,12 @@ public partial class CourierWindow : Window
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
     // נניח שזה ה-ID של המנהל המחובר כרגע (תצטרך להחליף זאת בלוגיקה האמיתית שלך)
-    private int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId;
+    private readonly int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId!;
 
+    private int CURRENT_ID = 0;
     public bool IsUpdateMode => ButtonText == "Update";
 
-    public BO.Courier? CurrentCourier
+    public BO.Courier CurrentCourier
     {
         get => (BO.Courier)GetValue(CurrentCourierProperty);
         set => SetValue(CurrentCourierProperty, value);
@@ -23,7 +26,7 @@ public partial class CourierWindow : Window
 
     // האובייקט אותו אנו עורכים או מוסיפים
     public static readonly DependencyProperty CurrentCourierProperty =
-        DependencyProperty.Register(nameof(CurrentCourier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(new BO.Courier()
+        DependencyProperty.Register("CurrentCourier", typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(new BO.Courier()
         {
             Id = 0,
             Name = "",
@@ -57,17 +60,20 @@ public partial class CourierWindow : Window
     public CourierWindow(int id = 0)
     {
         InitializeComponent();
-        DataContext = this;
+        CURRENT_ID = id;
+    }
 
-
-        if (id != 0) // מצב עדכון
+    private void CourierWindow_Loaded(object sender, EventArgs e)
+    {
+        if (CURRENT_ID != 0) // מצב עדכון
         {
             ButtonText = "Update";
-            
+
             try
             {
                 // שליפת השליח מה-BL
-                CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, id);
+                CourierObserver();
+                s_bl.Courier.AddObserver(CourierObserver);
             }
             catch (Exception ex)
             {
@@ -96,13 +102,15 @@ public partial class CourierWindow : Window
 
         }
 
-     
+
     }
 
-    
+
+
     private void CourierWindow_Closed(object sender, EventArgs e)
     {
-        // ניקוי אם צריך
+        if (CURRENT_ID != 0)
+            s_bl.Courier.RemoveObserver(CourierObserver);
     }
 
     private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
@@ -116,14 +124,14 @@ public partial class CourierWindow : Window
 
         try
         {
-            if (ButtonText == "Add")
+            if (sender is Button button && button.Content is "Add")
             {
-                AddCourier();
+                s_bl.Courier.Create(CURRENT_MANAGER_ID, CurrentCourier);
                 MessageBox.Show("השליח נוסף בהצלחה!");
             }
             else
             {
-                UpdateCourier();
+                s_bl.Courier.Update(CURRENT_MANAGER_ID, CurrentCourier);
                 MessageBox.Show("הפרטים עודכנו בהצלחה!");
             }
 
@@ -144,17 +152,18 @@ public partial class CourierWindow : Window
         }
     }
 
-    private void AddCourier()
+    private void PasswordChanged(object sender, RoutedEventArgs e)
     {
-        // קריאה לפונקציית Create ב-BL
-        // ה-CurrentCourier מתעדכן אוטומטית מהמסך בזכות ה-Binding
-        //s_bl.Courier.Create(CURRENT_MANAGER_ID, CurrentCourier);
+        if (sender is PasswordBox passwordBox)
+        {
+            CurrentCourier.Password = passwordBox.Password;
+        }
     }
 
-    private void UpdateCourier()
+    private void CourierObserver()
     {
-        // קריאה לפונקציית Update ב-BL
-       // s_bl.Courier.Update(CURRENT_MANAGER_ID, CurrentCourier);
+        CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
+            ?? throw new BlDoesNotExistException($"The Courier with id: {CURRENT_ID} is not exist: ");
     }
 
     private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
@@ -245,14 +254,14 @@ public partial class CourierWindow : Window
 //    }
 
 
-    //public BO.Courier Courier
-    //{
-    //    get { return (BO.Courier)GetValue(CourierProperty); }
-    //    set { SetValue(CourierProperty, value); }
-    //}
+//public BO.Courier Courier
+//{
+//    get { return (BO.Courier)GetValue(CourierProperty); }
+//    set { SetValue(CourierProperty, value); }
+//}
 
-    //public static readonly DependencyProperty CourierProperty =
-    //    DependencyProperty.Register(nameof(Courier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(null));
+//public static readonly DependencyProperty CourierProperty =
+//    DependencyProperty.Register(nameof(Courier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(null));
 
 
 //    private void Window_Loaded(object sender, RoutedEventArgs e)

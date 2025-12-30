@@ -190,6 +190,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     // כאן ה-Binding כבר עדכן את המשתנה AdminConfig ברוב המקרים,
                     // אבל ליתר ביטחון אפשר לכפות עדכון אם צריך, או פשוט לשמור:
                     s_bl.Admin.SetConfig(Configuration);
+                    MessageBox.Show("הנתונים נשמרו בהצלחה.");
                 }
                 catch (Exception ex)
                 {
