@@ -1,17 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayaOfCouriers>
   <Courier>
-    <Id>355189655</Id>
-    <Name>Yair Cohen</Name>
-    <Phone>0530883996</Phone>
-    <Email>yair.cohen@courier.com</Email>
-    <Password>Pass#323988</Password>
-    <Active>false</Active>
-    <MaxDistanceDelivery>3</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
-    <WorkingSince>2025-04-24T20:51:32.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>226072914</Id>
     <Name>Ariela Levin</Name>
     <Phone>0516114185</Phone>
@@ -54,17 +43,6 @@
     <MaxDistanceDelivery>24</MaxDistanceDelivery>
     <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2025-09-15T20:51:32.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>220987169</Id>
-    <Name>Moshe Bar</Name>
-    <Phone>0587074035</Phone>
-    <Email>moshe.bar@courier.com</Email>
-    <Password>Pass#394485</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>1.0104587462318368</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-04-20T20:51:32.0000000</WorkingSince>
   </Courier>
   <Courier>
     <Id>369813645</Id>
@@ -153,17 +131,6 @@
     <MaxDistanceDelivery>4</MaxDistanceDelivery>
     <TypeShipment>BIKE</TypeShipment>
     <WorkingSince>2025-05-29T20:51:32.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>313110235</Id>
-    <Name>Dani Levy</Name>
-    <Phone>0597278350</Phone>
-    <Email>dani.levy@courier.com</Email>
-    <Password>Pass#144522</Password>
-    <Active>false</Active>
-    <MaxDistanceDelivery>13</MaxDistanceDelivery>
-    <TypeShipment>MOTORCYCLE</TypeShipment>
-    <WorkingSince>2025-05-30T20:51:32.0000000</WorkingSince>
   </Courier>
   <Courier>
     <Id>306521070</Id>

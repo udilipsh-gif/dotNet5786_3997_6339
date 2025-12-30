@@ -1,14 +1,23 @@
 ﻿using BO;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Metrics;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace PL.Courier;
 
-public partial class CourierWindow : Window
+public partial class CourierWindow : Window, System.ComponentModel.INotifyPropertyChanged
 {
+    // INotifyPropertyChanged implementation בשביל כפתור המחיקה שיופיע רק במצב עדכון
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     // 1. גישה לשכבת ה-BL
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
@@ -17,6 +26,8 @@ public partial class CourierWindow : Window
 
     private int CURRENT_ID = 0;
     public bool IsUpdateMode => ButtonText == "Update";
+
+    private bool _isDeleting = false; // דגל שמורה אם אנו בתוך מחיקה
 
     public BO.Courier CurrentCourier
     {
@@ -51,6 +62,18 @@ public partial class CourierWindow : Window
     public static readonly DependencyProperty ButtonTextProperty =
        DependencyProperty.Register(nameof(ButtonText), typeof(string), typeof(CourierWindow), new PropertyMetadata("Add"));
 
+    // נראות כפתור המחיקה
+    private Visibility _deleteButtonVisibility = Visibility.Collapsed;
+    public Visibility DeleteButtonVisibility
+    {
+        get => _deleteButtonVisibility;
+        set
+        {
+            _deleteButtonVisibility = value;
+            OnPropertyChanged(nameof(DeleteButtonVisibility));
+        }
+    }
+
     // רשימה ל-ComboBox של סוגי רכב
     public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
      Enum.GetValues(typeof(BO.TheTypeShipment)).Cast<BO.TheTypeShipment>();
@@ -68,6 +91,7 @@ public partial class CourierWindow : Window
         if (CURRENT_ID != 0) // מצב עדכון
         {
             ButtonText = "Update";
+            DeleteButtonVisibility = Visibility.Visible;
 
             try
             {
@@ -84,6 +108,8 @@ public partial class CourierWindow : Window
         else // מצב הוספה
         {
             ButtonText = "Add";
+            DeleteButtonVisibility = Visibility.Collapsed;
+
             CurrentCourier = new BO.Courier()
             {
                 Id = 0,
@@ -104,6 +130,42 @@ public partial class CourierWindow : Window
 
 
     }
+
+    // מחיקת שליח
+    private void btnDelete_Click(object sender, RoutedEventArgs e)
+    {
+        var result = MessageBox.Show(
+            "ביקשת למחוק שליח?",
+            "אישור מחיקה",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result != MessageBoxResult.Yes)
+            return;
+
+        try
+        {
+            //הסרת המשקיף לפני המחיקה אחרת הוא שוב ניגש אל השליח המחוק וזורק לי חריגה. 
+            // s_bl.Courier.RemoveObserver(CourierObserver);
+            _isDeleting = true; // דגל שמורה שהמחיקה בעבודה כדי שהמשקיף לא ינסה לגשת לנתונים המחוקים ויזרוק לי חרגיה
+            s_bl.Courier.Delete(CURRENT_MANAGER_ID, CURRENT_ID);
+            MessageBox.Show("השליח נמחק בהצלחה");
+            Close(); // מומלץ לסגור את החלון
+        }
+        catch (BO.BlDoesNotExistException)
+        {//לכאורה בלתי אפשרי כי מחיקה מתרחשת מתוך שליח קיים
+            MessageBox.Show("שליח לא נמצא למחיקה");
+        }
+        catch (BO.BlInvalidOperationException)
+        {
+            MessageBox.Show("לא ניתן למחוק שליח עם הזמנה בתהליך");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"שגיאה במחיקה: {ex.Message}");
+        }
+    }
+
 
 
 
@@ -162,9 +224,15 @@ public partial class CourierWindow : Window
 
     private void CourierObserver()
     {
+        if (_isDeleting)
+            return; // אם אנו בתוך מחיקה – לא עושים כלום
+
         CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
-            ?? throw new BlDoesNotExistException($"The Courier with id: {CURRENT_ID} is not exist: ");
-    }
+            ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} is not exist: ");
+
+       
+
+    }   
 
     private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
@@ -175,112 +243,4 @@ public partial class CourierWindow : Window
 
 
 
-//using BO;
 
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using System.Windows;
-//using System.Windows.Controls;
-//using System.Windows.Data;
-//using System.Windows.Documents;
-//using System.Windows.Input;
-//using System.Windows.Media;
-//using System.Windows.Media.Imaging;
-//using System.Windows.Shapes;
-
-//namespace PL.Courier;
-
-///// <summary>
-///// Interaction logic for CourierWindow.xaml
-///// </summary>
-//public partial class CourierWindow : Window
-//{
-//    private static readonly BlApi.IBl bl = BlApi.Factory.Get();
-//    // Property תלות עבור הטקסט של הכפתור
-//    public static readonly DependencyProperty ButtonTextProperty =
-//        DependencyProperty.Register(
-//            nameof(ButtonText),
-//            typeof(string),
-//            typeof(CourierWindow),
-//            new PropertyMetadata("Add"));
-
-//    public string ButtonText
-//    {
-//        get => (string)GetValue(ButtonTextProperty);
-//        set => SetValue(ButtonTextProperty, value);
-//    }
-
-//    public CourierWindow(int id)
-//    {
-//        InitializeComponent();
-
-//        if (id != 0) // עדכון
-//        {
-
-//            ButtonText = "Update";
-//        }
-//        else
-//        {
-
-//            ButtonText = "Add";
-//        }
-
-//        this.DataContext = this; 
-//    }
-
-//    private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
-//    {
-//        if (ButtonText == "Add")
-//        {
-//            AddCourier();
-//        }
-//        else
-//        {
-//            UpdateCourier();
-//        }
-//    }
-
-//    private void AddCourier()
-//    {
-
-//    }
-
-//    private void UpdateCourier()
-//    {
-//        // כאן הקוד לעדכון ישות קיימת
-//    }
-
-
-//public BO.Courier Courier
-//{
-//    get { return (BO.Courier)GetValue(CourierProperty); }
-//    set { SetValue(CourierProperty, value); }
-//}
-
-//public static readonly DependencyProperty CourierProperty =
-//    DependencyProperty.Register(nameof(Courier), typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(null));
-
-
-//    private void Window_Loaded(object sender, RoutedEventArgs e)
-//    {
-//        // Load courier data when the window is loaded
-//    }
-
-//    private void Window_Closed(object sender, EventArgs e)
-//    {
-//        // Handle any cleanup when the window is closed
-//    }
-
-//    private void UpdateCourierDetails()
-//    {
-//        // Update the courier details displayed in the window
-
-//        if (Courier != null)
-//        {
-//            CourierInList = s_bl.Courier.GetCourierInList(Courier.ID);
-//        }
-//    }
-//}
