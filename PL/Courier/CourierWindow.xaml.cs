@@ -26,7 +26,8 @@ public partial class CourierWindow : Window
 
     // האובייקט אותו אנו עורכים או מוסיפים
     public static readonly DependencyProperty CurrentCourierProperty =
-        DependencyProperty.Register("CurrentCourier", typeof(BO.Courier), typeof(CourierWindow), new PropertyMetadata(new BO.Courier()
+        DependencyProperty.Register("CurrentCourier", typeof(BO.Courier),
+            typeof(CourierWindow), new PropertyMetadata(new BO.Courier()
         {
             Id = 0,
             Name = "",
@@ -49,7 +50,8 @@ public partial class CourierWindow : Window
     }
     //טקסט של הכפתור (הוספה/עדכון)
     public static readonly DependencyProperty ButtonTextProperty =
-       DependencyProperty.Register(nameof(ButtonText), typeof(string), typeof(CourierWindow), new PropertyMetadata("Add"));
+       DependencyProperty.Register(nameof(ButtonText), typeof(string),
+           typeof(CourierWindow), new PropertyMetadata("Add"));
 
     // רשימה ל-ComboBox של סוגי רכב
     public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
