@@ -79,13 +79,15 @@
                 <Label Grid.Row="2" Grid.Column="1" Content=":סיסמה" Style="{StaticResource UniformLabel}"/>
                 
                 <!--שורה 2-->
-                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding CurrentCourier.Phone, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding CurrentCourier.Phone, Mode=TwoWay}"
+                         PreviewTextInput="NumberValidationTextBox" MaxLength="10" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="3" Grid.Column="1" Content=":טלפון" Style="{StaticResource UniformLabel}"/>
                 <!--שורה 3-->
                 <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding CurrentCourier.Email, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="4" Grid.Column="1" Content=":דוא״ל" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}"
+                         PreviewTextInput="NumberValidationTextBox" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="5" Grid.Column="1" Content=":מרחק מקסימלי לשילוח" Style="{StaticResource UniformLabel}"/>
 
                 <ComboBox Grid.Row="6" Grid.Column="0" ItemsSource="{Binding VehicleTypesList}" SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>
@@ -108,13 +110,30 @@
                 <TextBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.OrderInProgress, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="11" Grid.Column="1" Content=":מספר משלוח נוכחי" Style="{StaticResource UniformLabel}"/>
 
-                <Button Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2"
-                        Content="{Binding ButtonText}"
+                <StackPanel Grid.Row="12"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="5">
+
+                    <Button Content="{Binding ButtonText}"
                         Click="btnAddUpdate_Click"
                         Height="30"
                         Width="100"
+                        Margin="5"/>
+
+                    <Button Content="מחיקה"
+                        Click="btnDelete_Click"
+                        Height="30"
+                        Width="100"
                         Margin="5"
-                        HorizontalAlignment="Center"/>          
+                        Background="Red"
+                        Visibility="{Binding DeleteButtonVisibility}"/>
+                </StackPanel>
+
+
+
             </Grid>
         </ScrollViewer>
 

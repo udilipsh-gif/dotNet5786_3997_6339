@@ -71,25 +71,32 @@
                     <TextBox Text="{Binding Configuration.Longitude, Mode=TwoWay}" Margin="0,0,0,10" IsReadOnly="True"/>
 
                     <Label Content="מהירות רכב (קמ״ש):"/>
-                    <TextBox Text="{Binding Configuration.AvgSpeedCar, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedCar, Mode=TwoWay}" 
+                             PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
                     <Label Content="מהירות אופונוע (קמ״ש):"/>
-                    <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle, Mode=TwoWay}"
+                             PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
                     <Label Content="מהירות אופניים (קמ״ש):"/>
-                    <TextBox Text="{Binding Configuration.AvgSpeedBike, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedBike, Mode=TwoWay}"
+                             PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
                     <Label Content="מהירות הליכה (קמ״ש):"/>
-                    <TextBox Text="{Binding Configuration.AvgSpeedFoot, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedFoot, Mode=TwoWay}"
+                            PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
                     <Label Content="זמן משלוח מקסימלי (ימים:שעות):"/>
-                    <TextBox Text="{Binding Configuration.MaxDeliveryTime, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding Configuration.MaxDeliveryTime, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}"
+                               PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
                     <Label Content="טווח סיכון (ימים:שעות):"/>
-                    <TextBox Text="{Binding Configuration.RiskRange, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" Margin="0,0,0,10" />
+                    <TextBox Text="{Binding Configuration.RiskRange, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" 
+                               PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10" />
 
-                    <Label Content="זמן חוסר פעילות לשליח (ימים.שעות):"/>
-                    <TextBox Text="{Binding Configuration.MaxTimeInactivity, Mode=TwoWay, Converter={StaticResource SpanTimeConverter}}" Margin="0,0,0,10"/>
+                    <Label Content="זמן חוסר פעילות לשליח (ימים:שעות):"/>
+                    <TextBox Text="{Binding Configuration.MaxTimeInactivity, Mode=TwoWay, Converter={StaticResource SpanTimeConverter}}" 
+                               PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
                 </StackPanel>
             </ScrollViewer>
