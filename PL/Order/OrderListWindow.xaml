@@ -73,8 +73,8 @@
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="מזהה הזמנה"
-                                    Binding="{Binding Id}"
-                                    SortMemberPath="Id"
+                                    Binding="{Binding OrderId}"
+                                    SortMemberPath="OrderId"
                                     Width="Auto"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
