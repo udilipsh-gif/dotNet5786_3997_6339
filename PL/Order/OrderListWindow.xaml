@@ -74,7 +74,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="מזהה הזמנה"
                                     Binding="{Binding OrderId}"
-                                    SortMemberPath="Id"
+                                    SortMemberPath="OrderId"
                                     Width="Auto"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
@@ -99,7 +99,7 @@
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="מרחק"
-                                        Binding="{Binding DistanceKm}"
+                                        Binding="{Binding DistanceKm, StringFormat=N2}"
                                         SortMemberPath="DistanceKm"
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>

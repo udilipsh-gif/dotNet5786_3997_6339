@@ -43,11 +43,11 @@ namespace PL.Order
             // ממלאים את ComboBox בערכים
             StatusComboBox.ItemsSource = new BO.ScheduleStatus?[]
             {
-        null,                     
-        BO.ScheduleStatus.ONTYME,
-        BO.ScheduleStatus.INRISK,
-        BO.ScheduleStatus.LATE,
-        BO.ScheduleStatus.CANCELLED
+                    null,                     
+                    BO.ScheduleStatus.ONTYME,
+                    BO.ScheduleStatus.INRISK,
+                    BO.ScheduleStatus.LATE,
+                    BO.ScheduleStatus.CANCELLED
             };
             StatusComboBox.SelectedIndex = 0; // ברירת מחדל - הכל
 
