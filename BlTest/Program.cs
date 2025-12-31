@@ -172,7 +172,7 @@ internal class Program
                 Filter couriers:                       
                     1.Active only 
                     2. Inactive only 
-                    3. All
+                    3. All (3 or any digits...)
                         Choose");
         int filterChoice = GetIntInput();
 
