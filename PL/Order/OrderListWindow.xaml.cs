@@ -1,46 +1,86 @@
 ﻿using PL.Courier;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace PL.Order;
-
-/// <summary>
-/// Interaction logic for OrderListWindow.xaml
-/// </summary>
-public partial class OrderListWindow : Window
+namespace PL.Order
 {
-    public OrderListWindow()
+    public partial class OrderListWindow : Window
     {
-        InitializeComponent();
-    }
+        static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
+        private int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId;
 
-    static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+        public ObservableCollection<BO.OrderInList> OrderList
+        {
+            get { return (ObservableCollection<BO.OrderInList>)GetValue(OrderListProperty); }
+            set { SetValue(OrderListProperty, value); }
+        }
 
+        public static readonly DependencyProperty OrderListProperty =
+            DependencyProperty.Register(nameof(OrderList), typeof(ObservableCollection<BO.OrderInList>), typeof(OrderListWindow), new PropertyMetadata(null));
 
-    public IEnumerable<BO.OrderInList> OrderList
-    {
-        get { return (IEnumerable<BO.OrderInList>)GetValue(OrderListProperty); }
-        set { SetValue(OrderListProperty, value); }
-    }
+        // Property לסינון לפי סטטוס
+        public BO.ScheduleStatus? SelectedStatusFilter
+        {
+            get { return (BO.ScheduleStatus?)GetValue(SelectedStatusFilterProperty); }
+            set { SetValue(SelectedStatusFilterProperty, value); }
+        }
 
+        public static readonly DependencyProperty SelectedStatusFilterProperty =
+            DependencyProperty.Register(nameof(SelectedStatusFilter), typeof(BO.ScheduleStatus?), typeof(OrderListWindow), new PropertyMetadata(null));
 
-    public static readonly DependencyProperty OrderListProperty =
-    DependencyProperty.Register("OrderList", typeof(IEnumerable<BO.OrderInList>), typeof(OrderListWindow), new PropertyMetadata(null));
+        public OrderListWindow()
+        {
+            InitializeComponent();
+            this.DataContext = this;
+            Loaded += Window_Loaded;
+        }
 
-    private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // אפשר לאכלס ComboBox בסטטוסים
+            StatusComboBox.ItemsSource = new BO.ScheduleStatus?[] { null, BO.ScheduleStatus.ONTYME, BO.ScheduleStatus.LATE };
+            StatusComboBox.SelectedIndex = 0; // כברירת מחדל - כל ההזמנות
+            LoadOrders();
+        }
 
+        // טעינת ההזמנות לפי הסינון שנבחר
+        private void LoadOrders()
+        {
+            try
+            {
+                BO.OrderInListField? filterField = null;
+                object? filterValue = null;
+
+                if (SelectedStatusFilter != null)
+                {
+                    filterField = BO.OrderInListField.OrderStatus;
+                    filterValue = SelectedStatusFilter;
+                }
+
+                // קריאה ל-BL עם פילטר וסדר מיון לפי Id
+                var orders = s_bl.Order.ReadAll(
+                    CURRENT_MANAGER_ID,
+                    filterField,
+                    filterValue,
+                    BO.OrderInListField.OrderId
+                );
+
+                OrderList = new ObservableCollection<BO.OrderInList>(orders);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading orders: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // אירוע שינוי ב-ComboBox
+        private void StatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SelectedStatusFilter = StatusComboBox.SelectedItem as BO.ScheduleStatus?;
+            LoadOrders();
+        }
     }
 }

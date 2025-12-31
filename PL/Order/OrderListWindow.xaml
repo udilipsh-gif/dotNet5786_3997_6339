@@ -42,12 +42,26 @@
     </Window.Resources>
 
     <Grid>
-        <DataGrid AutoGenerateColumns="False"
+        <!-- הגדרת שורות: שורה 0 = ComboBox, שורה 1 = DataGrid -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ComboBox לסינון לפי סטטוס -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+            <Label Content="סינון לפי סטטוס:" VerticalAlignment="Center"/>
+            <ComboBox x:Name="StatusComboBox"
+                      Width="150"
+                      SelectionChanged="StatusComboBox_SelectionChanged"/>
+        </StackPanel>
+
+        <!-- DataGrid להצגת ההזמנות -->
+        <DataGrid Grid.Row="1"
+                  AutoGenerateColumns="False"
                   Margin="5"
                   ItemsSource="{Binding OrderList}"
                   ToolTip="טבלת הזמנות - הצג, מיין וסנן מידע על הזמנות"
-                  AutomationProperties.Name="טבלת רשימת הזמנות">
-            <!--MouseDoubleClick="Add_Edit_Order_Click"
                   IsReadOnly="True"
                   SelectionMode="Single"
                   CanUserAddRows="False"
@@ -55,11 +69,9 @@
                   HorizontalScrollBarVisibility="Auto"
                   FlowDirection="RightToLeft"
                   EnableRowVirtualization="False"
-                  EnableColumnVirtualization="False"
-                  RowHeight="Auto">-->
+                  EnableColumnVirtualization="False">
 
             <DataGrid.Columns>
-
                 <DataGridTextColumn Header="מזהה הזמנה"
                                     Binding="{Binding Id}"
                                     SortMemberPath="Id"
@@ -93,20 +105,20 @@
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="סטטוס עמידה בזמנים"
-                                    Binding="{Binding ScheduleStatus}"
+                                    Binding="{Binding ScheduleStatus, StringFormat='{}{0:dd/MM/yyyy}'}"
                                     SortMemberPath="ScheduleStatus"
                                     Width="*"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="זמן לסיום"
-                                    Binding="{Binding TimeLeftForDelivery}"
+                                    Binding="{Binding TimeLeftForDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
                                     SortMemberPath="TimeLeftForDelivery"
                                     Width="Auto"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridCheckBoxColumn Header="סך זמן השלמת הטיפול"
-                                        Binding="{Binding TotalTimeOfDelivery}"
+                                        Binding="{Binding TotalTimeOfDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
                                         SortMemberPath="TotalTimeOfDelivery"
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
@@ -116,7 +128,6 @@
                                         SortMemberPath="NumberOfDeliveryAttempts"
                                         Width="*"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
