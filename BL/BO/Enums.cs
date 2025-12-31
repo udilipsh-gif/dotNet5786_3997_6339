@@ -191,7 +191,11 @@ public enum TypeOfOrder
     FAST_DELIVERY,
 
     /// <summary>Immediate delivery - only motorcycle available.</summary>
-    DELIVER_IMMEDIATELY
+    DELIVER_IMMEDIATELY,
+    /// <summary>
+    /// the order type includes all possible types.
+    /// </summary>
+    ALL
 }
 
 /// <summary>
@@ -230,7 +234,11 @@ public enum ScheduleStatus
     LATE,
 
     /// <summary>The order is canceled.</summary>
-    CANCELLED
+    CANCELLED,
+    /// <summary>
+    /// the delivery status includes all possible states.
+    /// </summary>
+    ALL
 }
 
 /// <summary>

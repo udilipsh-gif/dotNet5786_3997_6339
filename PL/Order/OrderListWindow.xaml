@@ -54,6 +54,12 @@
             <ComboBox x:Name="StatusComboBox"
                       Width="150"
                       SelectionChanged="StatusComboBox_SelectionChanged"/>
+            <Label Content="סינון לפי סוג הזמנה:" VerticalAlignment="Center" />
+
+            <ComboBox x:Name="TypeComboBox"
+                      SelectionChanged="TypeComboBox_SelectionChanged"
+                      Width="150" />
+
         </StackPanel>
 
         <!-- DataGrid להצגת ההזמנות -->
@@ -99,7 +105,7 @@
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="מרחק"
-                                        Binding="{Binding DistanceKm}"
+                                        Binding="{Binding DistanceKm, StringFormat={}{0:F2}}"
                                         SortMemberPath="DistanceKm"
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
