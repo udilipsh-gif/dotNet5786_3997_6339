@@ -8,7 +8,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת הזמנות"
         Height="450"
-        Width="650">
+        Width="900">
 
     <Window.Resources>
         <!-- Style לתאים עם Wrap -->
@@ -81,7 +81,7 @@
                 <DataGridTextColumn Header="סטטוס הזמנה"
                                     Binding="{Binding OrderStatus}"
                                     SortMemberPath="OrderStatus"
-                                    Width="*"
+                                    Width="Auto"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
@@ -94,7 +94,7 @@
                 <DataGridTextColumn Header="סוג הזמנה"
                                     Binding="{Binding TypeOfOrder}"
                                     SortMemberPath="TypeOfOrder"
-                                    Width="*"
+                                    Width="Auto"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
@@ -107,7 +107,7 @@
                 <DataGridTextColumn Header="סטטוס עמידה בזמנים"
                                     Binding="{Binding ScheduleStatus}"
                                     SortMemberPath="ScheduleStatus"
-                                    Width="*"
+                                    Width="Auto"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
@@ -126,7 +126,7 @@
                 <DataGridTextColumn Header="מספר ניסיונות משלוח"
                                         Binding="{Binding NumberOfDeliveryAttempts}"
                                         SortMemberPath="NumberOfDeliveryAttempts"
-                                        Width="*"
+                                        Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
             </DataGrid.Columns>
         </DataGrid>
