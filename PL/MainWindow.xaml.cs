@@ -144,8 +144,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">Event arguments.</param>
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
-        => new CourierListWindow().Show();
-    
+    {
+        OpenOrActivateWindow<CourierListWindow>();
+    }
+
     /// <summary>
     /// Handles the clock forward button clicks, advances the system clock by the specified time unit.
     /// </summary>
@@ -411,6 +413,31 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
 
+    }
+
+    private void OpenOrActivateWindow<T>() where T : Window, new()
+    {
+        // חיפוש חלון פתוח מהסוג המבוקש באוסף החלונות של האפליקציה
+        var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();
+
+        if (existingWindow != null)
+        {
+            // אם החלון כבר קיים:
+            // 1. אם הוא ממוזער - נחזיר אותו למצב רגיל
+            if (existingWindow.WindowState == WindowState.Minimized)
+            {
+                existingWindow.WindowState = WindowState.Normal;
+            }
+
+            // 2. נביא אותו לקדמת המסך (פוקוס)
+            existingWindow.Activate();
+        }
+        else
+        {
+            // אם החלון לא קיים - ניצור מופע חדש ונציג אותו
+            var newWindow = new T();
+            newWindow.Show(); // שימוש ב-Show לא חוסם את החלון הראשי
+        }
     }
 }
 
