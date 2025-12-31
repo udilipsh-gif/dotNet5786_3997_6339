@@ -1,4 +1,5 @@
 ﻿using PL.Courier;
+using PL.Order;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
@@ -411,6 +412,14 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     {
 
     }
+
+    /// <summary>
+    /// Handles the order list button click event, opens the order management window.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void btnOrderList_Click(object sender, RoutedEventArgs e)
+        => OpenOrActivateWindow<OrderListWindow>();
 
     private void OpenOrActivateWindow<T>() where T : Window, new()
     {
