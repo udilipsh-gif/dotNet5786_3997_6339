@@ -13,29 +13,35 @@
         MinHeight="520" MinWidth="350">
     
     <Window.Resources>
+        <!-- Style for labels: Center-aligned vertically, right-aligned horizontally -->
         <Style TargetType="Label" x:Key="UniformLabel">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="Margin" Value="5"/>
         </Style> 
 
+        <!-- Style for text boxes: Center-aligned vertically, stretches horizontally -->
         <Style TargetType="TextBox" x:Key="UniformTextBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
 
+        <!-- Style for password boxes: Center-aligned vertically, stretches horizontally -->
         <Style TargetType="PasswordBox" x:Key="UniformPasswordBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
 
+        <!-- Style for checkboxes: Center-aligned vertically, content right-aligned -->
         <Style TargetType="CheckBox" x:Key="UniformCheckBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Right" />
             <Setter Property="Margin" Value="5"/>
         </Style>
+        
+        <!-- Style for combo boxes: Center-aligned vertically -->
         <Style TargetType="ComboBox" x:Key="UniformComboBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="5"/>
@@ -43,6 +49,7 @@
     </Window.Resources>
 
     <Grid>
+        <!-- Scroll viewer to enable scrolling when window content exceeds available space -->
         <ScrollViewer>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -66,50 +73,59 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- שורה 0 -->
+                <!-- Row 0: Courier ID field - Read-only in update mode, allows numeric input (max 9 digits) -->
                 <TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="{Binding IsUpdateMode}" Text="{Binding CurrentCourier.Id, Mode=TwoWay}" 
                          PreviewTextInput="NumberValidationTextBox" MaxLength="9"  Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="0" Grid.Column="1" Content=":.ת.ז" Style="{StaticResource UniformLabel}"/>
-                <!-- שורה 1 -->
+                
+                <!-- Row 1: Courier name field -->
                 <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding CurrentCourier.Name, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="1" Grid.Column="1" Content=":שם" Style="{StaticResource UniformLabel}"/>
 
+                <!-- Row 2: Password field - Uses PasswordBox for secure input -->
                 <PasswordBox Grid.Row="2" Grid.Column="0" DataContext="{Binding CurrentCourier.Password, Mode=TwoWay}"
                              PasswordChanged="PasswordChanged" Style="{StaticResource UniformPasswordBox}"/>
                 <Label Grid.Row="2" Grid.Column="1" Content=":סיסמה" Style="{StaticResource UniformLabel}"/>
                 
-                <!--שורה 2-->
+                <!-- Row 3: Phone number field - Allows numeric input only (max 10 digits) -->
                 <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding CurrentCourier.Phone, Mode=TwoWay}"
                          PreviewTextInput="NumberValidationTextBox" MaxLength="10" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="3" Grid.Column="1" Content=":טלפון" Style="{StaticResource UniformLabel}"/>
-                <!--שורה 3-->
+                
+                <!-- Row 4: Email address field -->
                 <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding CurrentCourier.Email, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="4" Grid.Column="1" Content=":דוא״ל" Style="{StaticResource UniformLabel}"/>
 
+                <!-- Row 5: Maximum delivery distance field - Allows numeric input only -->
                 <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}"
                          PreviewTextInput="NumberValidationTextBox" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="5" Grid.Column="1" Content=":מרחק מקסימלי לשילוח" Style="{StaticResource UniformLabel}"/>
 
+                <!-- Row 6: Vehicle/shipment type selector - ComboBox with available vehicle types -->
                 <ComboBox Grid.Row="6" Grid.Column="0" ItemsSource="{Binding VehicleTypesList}" SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>
                 <Label Grid.Row="6" Grid.Column="1" Content=":סוג התניידות" Style="{StaticResource UniformLabel}"/>
 
+                <!-- Row 7: Active status checkbox - Indicates whether courier is currently active -->
                 <CheckBox Grid.Row="7" Grid.Column="0" IsChecked="{Binding CurrentCourier.Active, Mode=TwoWay}" Style="{StaticResource UniformCheckBox}"/>
                 <Label Grid.Row="7" Grid.Column="1" Content=":סטטוס שליח" Style="{StaticResource UniformLabel}"/>
 
+                <!-- Row 8: Working since date field - Read-only, displays date courier started working -->
                 <TextBox Grid.Row="8" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.WorkingSince, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="8" Grid.Column="1" Content=":פעיל החל מ" Style="{StaticResource UniformLabel}"/>
 
+                <!-- Row 9: On-time deliveries count field - Read-only, displays number of deliveries completed on time -->
                 <TextBox Grid.Row="9" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.DeliveryOnTime, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="9" Grid.Column="1" Content=":מספר משלוחים בזמן" Style="{StaticResource UniformLabel}"/>
 
-
+                <!-- Row 10: Late deliveries count field - Read-only, displays number of late deliveries -->
                 <TextBox Grid.Row="10" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.DeliveryLate, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="10" Grid.Column="1" Content=":מספר משלוחים באיחור" Style="{StaticResource UniformLabel}"/>
 
-
+                <!-- Row 11: Current order in progress field - Read-only, displays current delivery ID if any -->
                 <TextBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.OrderInProgress, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="11" Grid.Column="1" Content=":מספר משלוח נוכחי" Style="{StaticResource UniformLabel}"/>
 
+                <!-- Row 12: Action buttons panel - Contains Add/Update button and Delete button (if in update mode) -->
                 <StackPanel Grid.Row="12"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
@@ -117,12 +133,14 @@
                     HorizontalAlignment="Center"
                     Margin="5">
 
+                    <!-- Add/Update button - Text changes based on mode (Add for new courier, Update for existing) -->
                     <Button Content="{Binding ButtonText}"
                         Click="btnAddUpdate_Click"
                         Height="30"
                         Width="100"
                         Margin="5"/>
 
+                    <!-- Delete button - Only visible in update mode, red background to indicate destructive action -->
                     <Button Content="מחיקה"
                         Click="btnDelete_Click"
                         Height="30"

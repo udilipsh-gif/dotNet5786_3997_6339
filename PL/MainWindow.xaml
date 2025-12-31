@@ -12,6 +12,7 @@
         Loaded="MainWindow_Loaded"
         Closed="MainWindow_Close">
     <Window.Resources>
+        <!-- Converter for TimeSpan to string format (DD:HH) and back -->
         <local:SpanTimeConverter x:Key="SpanTimeConverter" />
     </Window.Resources>
 
@@ -25,26 +26,43 @@
             <ColumnDefinition Width="270"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        
+        <!-- Top-left section: Store name, clock display, and time advance buttons -->
         <Grid Grid.Row="0" Grid.Column="0"  >
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+            
+            <!-- Store name label -->
             <Label Grid.Row="0" Content="חנות הספרים שלי" Padding="5" Width="220"/>
+            
+            <!-- Current system clock display - Shows date and time in Hebrew locale -->
             <Label Grid.Row="1"  Language="he-IL" Content="{Binding CurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" FontWeight="Bold" Padding="10,5" FontSize="20"/>
+            
+            <!-- Clock advance buttons - Each button advances the clock by different time units -->
             <WrapPanel Grid.Row="2" Margin="10,0">
+                <!-- Advance clock by 1 minute -->
                 <Button Margin="2,0" Content="דקה" Height="Auto" Width="Auto" Tag="Minute" Click="ClockForward_Click" BorderThickness="0"/>
+                <!-- Advance clock by 1 hour -->
                 <Button Margin="2,0" Content="שעה" Height="Auto" Width="Auto" Tag="Hour" Click="ClockForward_Click" BorderThickness="0"/>
+                <!-- Advance clock by 1 day -->
                 <Button Margin="2,0" Content="יום" Height="Auto" Width="Auto" Tag="Day" Click="ClockForward_Click" BorderThickness="0"/>
+                <!-- Advance clock by 1 week -->
                 <Button Margin="2,0" Content="שבוע" Height="Auto" Width="Auto" Tag="Week" Click="ClockForward_Click" BorderThickness="0"/>
+                <!-- Advance clock by 1 month -->
                 <Button Margin="2,0" Content="חודש" Height="Auto" Width="Auto" Tag="Month" Click="ClockForward_Click" BorderThickness="0"/>
+                <!-- Advance clock by 1 year -->
                 <Button Margin="2,0" Content="שנה" Height="Auto" Width="Auto" Tag="Year" Click="ClockForward_Click" BorderThickness="0"/>
             </WrapPanel>
         </Grid>
+        
+        <!-- Left section: Configuration editor with scrollable form -->
         <Grid Grid.Column="0" Grid.Row="1" Margin="20">
             <ScrollViewer>
                 <StackPanel>
+                    <!-- Style for all TextBoxes in configuration form - Handles focus tracking and change detection -->
                     <StackPanel.Resources>
                         <Style TargetType="TextBox">
                             <EventSetter Event="GotFocus" Handler="TextBox_GotFocus"/>
@@ -53,47 +71,60 @@
                             <Setter Property="Margin" Value="0,0,0,10" />
                         </Style>
                     </StackPanel.Resources>
+                    
+                    <!-- Configuration section title -->
                     <TextBlock Text="עריכת הגדרות מערכת" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
 
+                    <!-- Manager ID field - Numeric only, max 9 digits -->
                     <Label Content="מזהה מנהל:"/>
                     <TextBox Text="{Binding Configuration.ManagerId, Mode=TwoWay }"
                              PreviewTextInput="NumberValidationTextBox"
                              MaxLength="9"
                              Margin="0,0,0,10"/>
 
+                    <!-- Store address field -->
                     <Label Content="כתובת חנות:"/>
                     <TextBox Text="{Binding Configuration.StoreAddress, Mode=TwoWay}" Margin="0,0,0,10"/>
 
+                    <!-- Latitude field - Read-only, populated from address lookup -->
                     <Label Content="קו רוחב:"/>
                     <TextBox Text="{Binding Configuration.Latitude, Mode=TwoWay}" Margin="0,0,0,10" IsReadOnly="True"/>
 
+                    <!-- Longitude field - Read-only, populated from address lookup -->
                     <Label Content="קו אורך:"/>
                     <TextBox Text="{Binding Configuration.Longitude, Mode=TwoWay}" Margin="0,0,0,10" IsReadOnly="True"/>
 
+                    <!-- Car average speed field - Numeric only, in km/h -->
                     <Label Content="מהירות רכב (קמ״ש):"/>
                     <TextBox Text="{Binding Configuration.AvgSpeedCar, Mode=TwoWay}" 
                              PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
+                    <!-- Motorcycle average speed field - Numeric only, in km/h -->
                     <Label Content="מהירות אופונוע (קמ״ש):"/>
                     <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle, Mode=TwoWay}"
                              PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
+                    <!-- Bike average speed field - Numeric only, in km/h -->
                     <Label Content="מהירות אופניים (קמ״ש):"/>
                     <TextBox Text="{Binding Configuration.AvgSpeedBike, Mode=TwoWay}"
                              PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
+                    <!-- Walking average speed field - Numeric only, in km/h -->
                     <Label Content="מהירות הליכה (קמ״ש):"/>
                     <TextBox Text="{Binding Configuration.AvgSpeedFoot, Mode=TwoWay}"
                             PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
+                    <!-- Maximum delivery time field - Uses converter for DD:HH format -->
                     <Label Content="זמן משלוח מקסימלי (ימים:שעות):"/>
                     <TextBox Text="{Binding Configuration.MaxDeliveryTime, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}"
                                PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
 
+                    <!-- Risk range field - Uses converter for DD:HH format -->
                     <Label Content="טווח סיכון (ימים:שעות):"/>
                     <TextBox Text="{Binding Configuration.RiskRange, Converter={StaticResource SpanTimeConverter}, Mode=TwoWay}" 
                                PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10" />
 
+                    <!-- Maximum inactivity time for courier field - Uses converter for DD:HH format -->
                     <Label Content="זמן חוסר פעילות לשליח (ימים:שעות):"/>
                     <TextBox Text="{Binding Configuration.MaxTimeInactivity, Mode=TwoWay, Converter={StaticResource SpanTimeConverter}}" 
                                PreviewTextInput="NumberValidationTextBox" Margin="0,0,0,10"/>
@@ -102,12 +133,18 @@
             </ScrollViewer>
         </Grid>
         
+        <!-- Top menu bar: Main navigation and action buttons -->
         <Menu Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="10,10">
+            <!-- Reset database button - Clears all data -->
             <Button  Content="איפוס מערכת" Margin="10" Padding="5" Click="ResetDB"/>
+            <!-- Initialize database button - Populates with sample data -->
             <Button  Content="אתחול מערכת" Margin="10" Padding="5" Click="InitDB"/>
+            <!-- Courier management button - Opens courier list window -->
             <Button  Content="ניהול שליחים" Margin="10" Padding="5" Click="btnCourierList_Click"/>
-            <Button  Content="ניהול הזמנות" Margin="10" Padding="5" /> <!-- Updated Click event -->
-            <Button  Content="ניהול משלוחים" Margin="10" Padding="5" /> <!-- Updated Click event -->
+            <!-- Order management button - To be implemented -->
+            <Button  Content="ניהול הזמנות" Margin="10" Padding="5" />
+            <!-- Delivery management button - To be implemented -->
+            <Button  Content="ניהול משלוחים" Margin="10" Padding="5" />
         </Menu>
 
     </Grid>

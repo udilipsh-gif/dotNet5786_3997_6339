@@ -8,34 +8,68 @@ using System.Windows.Controls;
 
 namespace PL.Courier;
 
+/// <summary>
+/// Interaction logic for CourierWindow.xaml - provides CRUD operations for courier management.
+/// </summary>
+/// <remarks>
+/// This window allows managers to add, view, edit, and delete courier information.
+/// Couriers can also edit their own information through this window.
+/// Implements INotifyPropertyChanged for dynamic UI updates.
+/// </remarks>
 public partial class CourierWindow : Window, System.ComponentModel.INotifyPropertyChanged
 {
-    // INotifyPropertyChanged implementation בשביל כפתור המחיקה שיופיע רק במצב עדכון
+    /// <summary>
+    /// Event raised when a property value changes, enabling data binding updates.
+    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>
+    /// Raises the PropertyChanged event for the specified property.
+    /// </summary>
+    /// <param name="propertyName">The name of the property that changed.</param>
     protected void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    // 1. גישה לשכבת ה-BL
+    /// <summary>
+    /// Business logic layer instance for accessing courier operations.
+    /// </summary>
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-    // נניח שזה ה-ID של המנהל המחובר כרגע (תצטרך להחליף זאת בלוגיקה האמיתית שלך)
+    /// <summary>
+    /// The ID of the currently logged-in manager.
+    /// </summary>
     private readonly int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId!;
 
+    /// <summary>
+    /// The ID of the courier being viewed or edited. 0 indicates add mode.
+    /// </summary>
     private int CURRENT_ID = 0;
+
+    /// <summary>
+    /// Gets whether the window is in update mode (as opposed to add mode).
+    /// </summary>
     public bool IsUpdateMode => ButtonText == "Update";
 
-    private bool _isDeleting = false; // דגל שמורה אם אנו בתוך מחיקה
+    /// <summary>
+    /// Flag indicating whether a deletion operation is in progress.
+    /// Prevents the observer from accessing deleted data during the deletion process.
+    /// </summary>
+    private bool _isDeleting = false;
 
+    /// <summary>
+    /// Gets or sets the current courier being displayed or edited.
+    /// </summary>
     public BO.Courier CurrentCourier
     {
         get => (BO.Courier)GetValue(CurrentCourierProperty);
         set => SetValue(CurrentCourierProperty, value);
     }
 
-    // האובייקט אותו אנו עורכים או מוסיפים
+    /// <summary>
+    /// Dependency property for the CurrentCourier object.
+    /// </summary>
     public static readonly DependencyProperty CurrentCourierProperty =
         DependencyProperty.Register("CurrentCourier", typeof(BO.Courier),
             typeof(CourierWindow), new PropertyMetadata(new BO.Courier()
@@ -54,18 +88,30 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
 
         }));
 
+    /// <summary>
+    /// Gets or sets the text displayed on the action button ("Add" or "Update").
+    /// </summary>
     public string ButtonText
     {
         get => (string)GetValue(ButtonTextProperty);
         set => SetValue(ButtonTextProperty, value);
     }
-    //טקסט של הכפתור (הוספה/עדכון)
+
+    /// <summary>
+    /// Dependency property for the ButtonText property.
+    /// </summary>
     public static readonly DependencyProperty ButtonTextProperty =
        DependencyProperty.Register(nameof(ButtonText), typeof(string),
            typeof(CourierWindow), new PropertyMetadata("Add"));
 
-    // נראות כפתור המחיקה
+    /// <summary>
+    /// Backing field for DeleteButtonVisibility property.
+    /// </summary>
     private Visibility _deleteButtonVisibility = Visibility.Collapsed;
+
+    /// <summary>
+    /// Gets or sets the visibility of the delete button (visible only in update mode).
+    /// </summary>
     public Visibility DeleteButtonVisibility
     {
         get => _deleteButtonVisibility;
@@ -76,28 +122,37 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
         }
     }
 
-    // רשימה ל-ComboBox של סוגי רכב
+    /// <summary>
+    /// List of all vehicle/shipment types for the ComboBox.
+    /// </summary>
     public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
      Enum.GetValues(typeof(BO.TheTypeShipment)).Cast<BO.TheTypeShipment>();
 
 
-    // בנאי
+    /// <summary>
+    /// Initializes a new instance of the CourierWindow class.
+    /// </summary>
+    /// <param name="id">The ID of the courier to edit, or 0 to add a new courier.</param>
     public CourierWindow(int id = 0)
     {
         InitializeComponent();
         CURRENT_ID = id;
     }
 
+    /// <summary>
+    /// Handles the window loaded event, initializes the window mode (add or update).
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event arguments.</param>
     private void CourierWindow_Loaded(object sender, EventArgs e)
     {
-        if (CURRENT_ID != 0) // מצב עדכון
+        if (CURRENT_ID != 0)
         {
             ButtonText = "Update";
             DeleteButtonVisibility = Visibility.Visible;
 
             try
             {
-                // שליפת השליח מה-BL
                 CourierObserver();
                 s_bl.Courier.AddObserver(CourierObserver);
             }
@@ -107,7 +162,7 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
                 Close();
             }
         }
-        else // מצב הוספה
+        else
         {
             ButtonText = "Add";
             DeleteButtonVisibility = Visibility.Collapsed;
@@ -133,12 +188,21 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
 
     }
 
-    // מחיקת שליח
+    /// <summary>
+    /// Handles the delete button click event, prompts for confirmation and deletes the courier.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event arguments.</param>
+    /// <remarks>
+    /// Prompts the user for confirmation before deletion.
+    /// Sets the _isDeleting flag to prevent the observer from accessing deleted data.
+    /// Cannot delete couriers with active orders in progress.
+    /// </remarks>
     private void btnDelete_Click(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show(
-            "ביקשת למחוק שליח?",
-            "אישור מחיקה",
+            "האם אתה רוצה למחוק את השליח הזה?",
+            "השליח נמחק",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
@@ -147,15 +211,13 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
 
         try
         {
-            //הסרת המשקיף לפני המחיקה אחרת הוא שוב ניגש אל השליח המחוק וזורק לי חריגה. 
-            // s_bl.Courier.RemoveObserver(CourierObserver);
-            _isDeleting = true; // דגל שמורה שהמחיקה בעבודה כדי שהמשקיף לא ינסה לגשת לנתונים המחוקים ויזרוק לי חרגיה
+            _isDeleting = true; 
             s_bl.Courier.Delete(CURRENT_MANAGER_ID, CURRENT_ID);
             MessageBox.Show("השליח נמחק בהצלחה");
-            Close(); // מומלץ לסגור את החלון
+            Close();
         }
         catch (BO.BlDoesNotExistException)
-        {//לכאורה בלתי אפשרי כי מחיקה מתרחשת מתוך שליח קיים
+        {
             MessageBox.Show("שליח לא נמצא למחיקה");
         }
         catch (BO.BlInvalidOperationException)
@@ -171,18 +233,32 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
 
 
 
+    /// <summary>
+    /// Handles the window closed event, removes observers.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event arguments.</param>
     private void CourierWindow_Closed(object sender, EventArgs e)
     {
         if (CURRENT_ID != 0)
             s_bl.Courier.RemoveObserver(CourierObserver);
     }
 
+    /// <summary>
+    /// Handles the add/update button click event, validates and saves courier data.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event arguments.</param>
+    /// <remarks>
+    /// Performs basic validation before submitting data to the business logic layer.
+    /// Creates a new courier if in add mode, updates existing courier if in update mode.
+    /// Closes the window upon successful operation.
+    /// </remarks>
     private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
     {
-        // ולידציה בסיסית לפני שליחה (אופציונלי)
         if (CurrentCourier == null || string.IsNullOrEmpty(CurrentCourier.Name))
         {
-            MessageBox.Show("נא להזין שם");
+            MessageBox.Show("Please enter a name");
             return;
         }
 
@@ -191,31 +267,39 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
             if (sender is Button button && button.Content is "Add")
             {
                 s_bl.Courier.Create(CURRENT_MANAGER_ID, CurrentCourier);
-                MessageBox.Show("השליח נוסף בהצלחה!");
+                MessageBox.Show("Courier added successfully!");
             }
             else
             {
                 s_bl.Courier.Update(CURRENT_MANAGER_ID, CurrentCourier);
-                MessageBox.Show("הפרטים עודכנו בהצלחה!");
+                MessageBox.Show("Details updated successfully!");
             }
 
-            // סגירת החלון לאחר הצלחה
             this.Close();
         }
         catch (BO.BlInvalidValueException ex)
         {
-            MessageBox.Show($"נתונים לא תקינים: {ex.Message}");
+            MessageBox.Show($"Invalid data: {ex.Message}");
         }
         catch (BO.BlAlreadyExistsException ex)
         {
-            MessageBox.Show($"שגיאה: {ex.Message}");
+            MessageBox.Show($"Error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"שגיאה כללית: {ex.Message}");
+            MessageBox.Show($"General error: {ex.Message}");
         }
     }
 
+    /// <summary>
+    /// Handles the password changed event for the PasswordBox control.
+    /// </summary>
+    /// <param name="sender">The PasswordBox that triggered the event.</param>
+    /// <param name="e">Event arguments.</param>
+    /// <remarks>
+    /// Updates the CurrentCourier's password as the user types.
+    /// This is necessary because PasswordBox.Password is not a dependency property and cannot be bound directly.
+    /// </remarks>
     private void PasswordChanged(object sender, RoutedEventArgs e)
     {
         if (sender is PasswordBox passwordBox)
@@ -224,21 +308,37 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
         }
     }
 
+    /// <summary>
+    /// Observer method that updates the courier data when changes occur in the business layer.
+    /// </summary>
+    /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier no longer exists.</exception>
+    /// <remarks>
+    /// This method is called whenever the business layer notifies of changes to the courier.
+    /// It is skipped if a deletion operation is in progress to avoid accessing deleted data.
+    /// </remarks>
     private void CourierObserver()
     {
         if (_isDeleting)
-            return; // אם אנו בתוך מחיקה – לא עושים כלום
+            return;
 
         CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
-            ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} is not exist: ");
+            ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
 
        
 
     }   
 
+    /// <summary>
+    /// Handles text input validation for numeric-only fields.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event arguments containing the text input.</param>
+    /// <remarks>
+    /// Only allows digit characters to be entered.
+    /// Used for ID and other numeric fields to prevent invalid input.
+    /// </remarks>
     private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
     {
-        // Allow only digits
         e.Handled = !e.Text.All(char.IsDigit);
     }
 }
