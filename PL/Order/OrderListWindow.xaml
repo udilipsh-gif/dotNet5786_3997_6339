@@ -98,14 +98,14 @@
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                <DataGridCheckBoxColumn Header="מרחק"
+                <DataGridTextColumn Header="מרחק"
                                         Binding="{Binding DistanceKm}"
                                         SortMemberPath="DistanceKm"
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="סטטוס עמידה בזמנים"
-                                    Binding="{Binding ScheduleStatus, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                    Binding="{Binding ScheduleStatus}"
                                     SortMemberPath="ScheduleStatus"
                                     Width="*"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
@@ -117,13 +117,13 @@
                                     Width="Auto"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                <DataGridCheckBoxColumn Header="סך זמן השלמת הטיפול"
+                <DataGridTextColumn Header="סך זמן השלמת הטיפול"
                                         Binding="{Binding TotalTimeOfDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
                                         SortMemberPath="TotalTimeOfDelivery"
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                <DataGridCheckBoxColumn Header="מספר ניסיונות משלוח"
+                <DataGridTextColumn Header="מספר ניסיונות משלוח"
                                         Binding="{Binding NumberOfDeliveryAttempts}"
                                         SortMemberPath="NumberOfDeliveryAttempts"
                                         Width="*"

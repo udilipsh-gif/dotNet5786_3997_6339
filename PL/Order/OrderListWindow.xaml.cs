@@ -40,11 +40,20 @@ namespace PL.Order
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // אפשר לאכלס ComboBox בסטטוסים
-            StatusComboBox.ItemsSource = new BO.ScheduleStatus?[] { null, BO.ScheduleStatus.ONTYME, BO.ScheduleStatus.LATE };
-            StatusComboBox.SelectedIndex = 0; // כברירת מחדל - כל ההזמנות
-            LoadOrders();
+            // ממלאים את ComboBox בערכים
+            StatusComboBox.ItemsSource = new BO.ScheduleStatus?[]
+            {
+        null,                     
+        BO.ScheduleStatus.ONTYME,
+        BO.ScheduleStatus.INRISK,
+        BO.ScheduleStatus.LATE,
+        BO.ScheduleStatus.CANCELLED
+            };
+            StatusComboBox.SelectedIndex = 0; // ברירת מחדל - הכל
+
+            LoadOrders(); // טוענים את ההזמנות
         }
+
 
         // טעינת ההזמנות לפי הסינון שנבחר
         private void LoadOrders()
