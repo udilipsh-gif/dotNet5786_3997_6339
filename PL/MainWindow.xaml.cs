@@ -1,4 +1,6 @@
 ﻿using PL.Courier;
+using PL.Order;
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
@@ -26,7 +28,7 @@ namespace PL;
 /// </list>
 /// Implements INotifyPropertyChanged for data binding support.
 /// </remarks>
-public partial class MainWindow : Window, INotifyPropertyChanged
+public partial class MainWindow : Window, INotifyPropertyChanged//זה היה בגלל הנסיון של משקיף למחוק מחוק אבל נראה לי שטופל כבר אחרת. לבדוק אם נצרך.
 {
 
     /// <summary>
@@ -145,7 +147,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     /// <param name="e">Event arguments.</param>
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
         => new CourierListWindow().Show();
-    
+
+    /// <summary>
+    /// Handles the order list button click event, opens the order management window.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void btnOrderList_Click(object sender, RoutedEventArgs e)
+        => new OrderListWindow().Show();
     /// <summary>
     /// Handles the clock forward button clicks, advances the system clock by the specified time unit.
     /// </summary>
