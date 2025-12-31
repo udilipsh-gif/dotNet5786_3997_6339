@@ -1,17 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayaOfCouriers>
   <Courier>
-    <Id>310604997</Id>
-    <Name>Dani Levy</Name>
-    <Phone>0538440322</Phone>
-    <Email>dani.levy@courier.com</Email>
-    <Password>Pass#291495</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>3.3936455852035294</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-11-23T21:16:16.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>398770973</Id>
     <Name>Eli Amar</Name>
     <Phone>0531861449</Phone>
