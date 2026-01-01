@@ -30,15 +30,18 @@ namespace PL;
 public partial class ManagerWindow : Window, INotifyPropertyChanged
 {
 
+    int UserId = 0;
+
     /// <summary>
     /// Initializes a new instance of the ManagerWindow class.
     /// </summary>
-    public ManagerWindow()
+    public ManagerWindow(int id)
     {
         InitializeComponent();
 
-        DataContext = this;
+        UserId = id;
 
+        DataContext = this;
     }
 
     /// <summary>
@@ -99,6 +102,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// </remarks>
     private void ManagerWindow_Close(object? sender, EventArgs e)
     {
+        CloseAllWindowsExceptMain();
         s_bl.Admin.RemoveClockObserver(ClockObserver);
         s_bl.Admin.RemoveConfigObserver(ConfigObserver);
     }

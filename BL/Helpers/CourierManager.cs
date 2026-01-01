@@ -35,9 +35,10 @@ internal static class CourierManager
     /// </remarks>
     internal static string? Login(int id, string password)
     {
-        if (id == AdminManager.GetConfig().ManagerId)
+        var _config = AdminManager.GetConfig();
+        if (id == _config.ManagerId)
         {
-            if (password == AdminManager.GetConfig().PasswordManager)
+            if (password == _config.PasswordManager)
                 return "Manager";
             else
                 throw new BO.BlIncorrectPasswordException();

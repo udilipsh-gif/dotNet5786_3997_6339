@@ -2,8 +2,8 @@
 <config>
   <NextOrderId>100051</NextOrderId>
   <NextDeliveryId>200051</NextDeliveryId>
-  <Clock>30/12/2025 21:16:16</Clock>
-  <manager_id>344045810</manager_id>
+  <Clock>31/12/2025 02:16:16</Clock>
+  <ManagerId>344045810</ManagerId>
   <PasswordManager>Admin1234$</PasswordManager>
   <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
   <Latitude>32.0936195</Latitude>

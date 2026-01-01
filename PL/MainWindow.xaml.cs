@@ -9,20 +9,108 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Linq;
+using BO;
+using System.Diagnostics;
 
 namespace PL;
 
 public partial class MainWindow : Window
 {
+    private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
+    public ICommand LoginCommand { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the current system clock time displayed in the UI.
+    /// </summary>
+    /// <remarks>
+    /// This property is bound to the UI and automatically updates when the system clock advances.
+    /// It reflects the business clock time, which may differ from the actual system time.
+    /// </remarks>
+    public DateTime CurrentTime
+    {
+        get { return (DateTime)GetValue(CurrentTimeProperty); }
+        set { SetValue(CurrentTimeProperty, value); }
+    }
+
+    /// <summary>
+    /// Dependency property for the CurrentTime property.
+    /// </summary>
+    public static readonly DependencyProperty CurrentTimeProperty =
+        DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(MainWindow));
+
+    public string UserId
+    {
+        get { return (string)GetValue(UserIdProperty); }
+        set { SetValue(UserIdProperty, value); }
+    }
+
+    public static readonly DependencyProperty UserIdProperty =
+        DependencyProperty.Register("UserId", typeof(string), typeof(MainWindow));
+
 
     /// <summary>
     /// Initializes a new instance of the MainWindow class.
     /// </summary>
     public MainWindow()
     {
-        InitializeComponent();
+        LoginCommand = new RelayCommand(ExecuteLogin, CanLogin);
 
-    } 
+        InitializeComponent();
+    }
+
+    private void ExecuteLogin(object? parameter)
+    {
+        try
+        {
+            var passwordBox = parameter as PasswordBox;
+            if (passwordBox == null || string.IsNullOrEmpty(passwordBox.Password))
+            {
+                MessageBox.Show("נא להזין סיסמה", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (string.IsNullOrEmpty(UserId))
+            {
+                MessageBox.Show("נא להזין תעודת זהות", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (!int.TryParse(UserId, out int userId))
+            {
+                MessageBox.Show("תעודת זהות לא תקינה", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            string user = s_bl.Courier.Login(userId, passwordBox.Password);
+
+            UserId = string.Empty;
+            passwordBox.Clear();
+
+            if (user == "Manager")
+            {
+                OpenOrActivateWindow<ManagerWindow>(userId);
+                return;
+            }
+            else if (user == "Courier")
+            {
+                // אפשר לפתוח חלון שליח
+                MessageBox.Show($"ברוך הבא, שליח {userId}", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            throw new BlNoAccessException("לא הצלחנו לחבר אותך");
+        }
+        catch (BlIncorrectPasswordException ex)
+        {
+            MessageBox.Show("הסיסמה לא נכונה");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+        
+
+    }
 
     /// <summary>
     /// Closes all open windows except the main window (MainWindow).
@@ -43,13 +131,7 @@ public partial class MainWindow : Window
         }
     }
 
-
-    private void btnManagerWindow_Click(object sender, RoutedEventArgs e)
-    {
-        OpenOrActivateWindow<ManagerWindow>();
-    }
-
-    private void OpenOrActivateWindow<T>() where T : Window, new()
+    private void OpenOrActivateWindow<T>(int userId) where T : Window
     {
         // חיפוש חלון פתוח מהסוג המבוקש באוסף החלונות של האפליקציה
         var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();
@@ -69,14 +151,68 @@ public partial class MainWindow : Window
         else
         {
             // אם החלון לא קיים - ניצור מופע חדש ונציג אותו
-            var newWindow = new T();
+            var newWindow = (T)Activator.CreateInstance(typeof(T), userId)!;
             newWindow.Show(); // שימוש ב-Show לא חוסם את החלון הראשי
         }
     }
 
+    private bool CanLogin(object? parameter)
+    {
+        // 1. בדיקה שיש תעודת זהות (מקושרת ב-Binding)
+        if (string.IsNullOrEmpty(this.UserId))
+            return false;
+
+        // 2. בדיקה שיש סיסמה (התקבלה כפרמטר מה-Binding)
+        var passwordBox = parameter as PasswordBox;
+        if (passwordBox == null || string.IsNullOrEmpty(passwordBox.Password))
+            return false;
+
+        return true;
+    }
+
+    private void ClockObserver() => CurrentTime = s_bl.Admin.GetClock();
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        ClockObserver();
+        s_bl.Admin.AddClockObserver(ClockObserver);
+    }
 
     private void MainWindow_Close(object sender, System.EventArgs e)
     {
         CloseAllWindowsExceptMain();
+        s_bl.Admin.RemoveClockObserver(ClockObserver);
+
+    }
+}
+
+
+public class RelayCommand : ICommand
+{
+    // משנים גם כאן ל-object?
+    private readonly Action<object?> _execute;
+    private readonly Predicate<object?>? _canExecute;
+
+    // וגם בבנאי
+    public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
+    {
+        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        _canExecute = canExecute;
+    }
+
+    public event EventHandler? CanExecuteChanged
+    {
+        add { CommandManager.RequerySuggested += value; }
+        remove { CommandManager.RequerySuggested -= value; }
+    }
+
+    public bool CanExecute(object? parameter)
+    {
+        return _canExecute == null || _canExecute(parameter);
+    }
+
+    public void Execute(object? parameter)
+    {
+        _execute(parameter);
     }
 }
