@@ -54,6 +54,12 @@
             <ComboBox x:Name="StatusComboBox"
                       Width="150"
                       SelectionChanged="StatusComboBox_SelectionChanged"/>
+            <Label Content="סינון לפי סוג הזמנה:" VerticalAlignment="Center" />
+
+            <ComboBox x:Name="TypeComboBox"
+                      SelectionChanged="TypeComboBox_SelectionChanged"
+                      Width="150" />
+
         </StackPanel>
 
         <!-- DataGrid להצגת ההזמנות -->
