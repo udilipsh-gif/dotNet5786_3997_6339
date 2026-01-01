@@ -184,6 +184,8 @@ public enum TheTypeShipment
 /// </summary>
 public enum TypeOfOrder
 {
+
+
     /// <summary>Standard delivery - all shipment types are available.</summary>
     STANDART,
 
@@ -192,10 +194,10 @@ public enum TypeOfOrder
 
     /// <summary>Immediate delivery - only motorcycle available.</summary>
     DELIVER_IMMEDIATELY,
-    /// <summary>
-    /// the order type includes all possible types.
-    /// </summary>
+
+    /// <summary>the order type includes all possible types. </summary>
     ALL
+
 }
 
 /// <summary>
@@ -235,10 +237,12 @@ public enum ScheduleStatus
 
     /// <summary>The order is canceled.</summary>
     CANCELLED,
-    /// <summary>
-    /// the delivery status includes all possible states.
-    /// </summary>
+
+
+    /// <summary>the delivery status includes all possible states.</summary>
     ALL
+
+
 }
 
 /// <summary>
