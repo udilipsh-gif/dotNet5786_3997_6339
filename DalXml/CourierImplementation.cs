@@ -20,15 +20,15 @@ public class CourierImplementation : ICourier
     {
         return new Courier()
         {
-            Id = s.ToIntNullable("Id") ?? throw new FormatException("can't convert id"),
+            Id = s.ToIntNullable("Id") ?? 0,
             Name = (string?)s.Element("Name") ?? "",
             Phone = (string?)s.Element("Phone") ?? "",
             Email = (string?)s.Element("Email") ?? "",
             Password = (string?)s.Element("Password") ?? "",
             Active = (bool?)s.Element("Active") ?? false,
-            MaxDistanceDelivery = (double?)s.Element("MaxDistanceDelivery") ?? null,
+            MaxDistanceDelivery = XMLTools.ToDoubleNullable(s, "MaxDistanceDelivery"),
             TypeShipment = s.ToEnumNullable<TheTypeShipment>("TypeShipment") ?? TheTypeShipment.FOOT,
-            WorkingSince = (DateTime?)s.Element("WorkingSince") ?? throw new FormatException("can't convert date"),
+            WorkingSince = (DateTime?)s.Element("WorkingSince") ?? DateTime.MinValue,
         };
     }
 
@@ -141,6 +141,18 @@ public class CourierImplementation : ICourier
         couriersRootElem.RemoveAll();
 
         XMLTools.SaveListToXMLElement(couriersRootElem, Config.s_couriers_xml);
+
+        Create(new Courier
+        {
+            Id = 0,
+            Name = "System",
+            Phone = string.Empty,
+            Password = string.Empty,
+            Email = string.Empty,
+            Active = false,
+            TypeShipment = TheTypeShipment.FOOT,
+            WorkingSince = DateTime.MinValue
+        });
     }
 
     /// <summary>

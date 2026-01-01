@@ -214,9 +214,9 @@ internal static class Config
     {
         NextOrderId = 100001;
         NextDeliveryId = 200001;
-        PasswordManager = "Admin1234$";
+        PasswordManager = "1";
         Clock = DateTime.Now;
-        ManagerId = 344045810;
+        ManagerId = 1;
         StoreAddress = "בר כוכבא 21 בני ברק";
         Latitude = 32.0936195;
         Longitude = 34.8229463;
