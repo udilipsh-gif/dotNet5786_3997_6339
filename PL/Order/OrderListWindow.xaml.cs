@@ -78,7 +78,7 @@ public partial class OrderListWindow : Window
             object? filterValue = null;
 
             // סינון לפי סטטוס
-            if (SelectedStatusFilter != null)  // אם null → הכל, אין סינון
+            if (SelectedStatusFilter != null&& SelectedStatusFilter !=BO.ScheduleStatus.ALL)  // אם null → הכל, אין סינון
             {
                 filterField = BO.OrderInListField.OrderStatus;
                 filterValue = SelectedStatusFilter;
@@ -93,7 +93,7 @@ public partial class OrderListWindow : Window
             );
 
             // סינון נוסף לפי סוג הזמנה
-            if (SelectedTypeFilter != null)  // אם null → הכל
+            if (SelectedTypeFilter != null&& SelectedTypeFilter != BO.TypeOfOrder.ALL)  // אם null → הכל
             {
                 orders = orders.Where(o => o.TypeOfOrder == SelectedTypeFilter);
             }
