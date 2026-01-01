@@ -41,7 +41,22 @@ internal class CourierImplementation : ICourier
     /// <summary>
     /// Deletes all couriers from the data source.
     /// </summary>
-    public void DeleteAll()  => DataSource.Couriers.Clear();
+    public void DeleteAll()
+    { 
+        DataSource.Couriers.Clear();
+        Create(new Courier
+        {
+            Id = 0,
+            Name = "System",
+            Phone = string.Empty,
+            Password = string.Empty,
+            Email = string.Empty,
+            Active = false,
+            TypeShipment = TheTypeShipment.FOOT,
+            WorkingSince = DateTime.MinValue
+        });
+
+    }
   
     /// <summary>
     /// Reads and retrieves a courier by their unique ID.

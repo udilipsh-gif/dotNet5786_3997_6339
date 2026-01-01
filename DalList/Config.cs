@@ -45,7 +45,7 @@ internal static class Config
     /// <summary>
     /// The starting ID value for managers.
     /// </summary>
-    internal static int StartManagerId = 344045810;
+    internal static int StartManagerId = 1;
 
     /// <summary>
     /// Private field for tracking the current manager ID.
@@ -171,7 +171,7 @@ internal static class Config
         Latitude = 32.0936195;
         Longitude = 34.8229463;
         MaxDeliveryRange = 20;
-        PasswordManager = "Admin1234$";
+        PasswordManager = "1";
         AvgSpeedCar = 30;
         AvgSpeedMotorcycle = 50;
         AvgSpeedBike = 20;
