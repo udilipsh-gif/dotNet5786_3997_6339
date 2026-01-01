@@ -2,20 +2,20 @@
 <config>
   <NextOrderId>100051</NextOrderId>
   <NextDeliveryId>200051</NextDeliveryId>
-  <Clock>31/12/2025 02:16:16</Clock>
-  <ManagerId>1</ManagerId>
-  <PasswordManager>1</PasswordManager>
-  <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
+  <Clock>02/01/2026 01:43:25</Clock>
+  <ManagerId>203383997</ManagerId>
+  <PasswordManager>Admin1234$</PasswordManager>
+  <StoreAddress>bar cochva, 21, Bney Braq</StoreAddress>
   <Latitude>32.0936195</Latitude>
   <Longitude>34.8229463</Longitude>
-  <MaxDeliveryRange>20</MaxDeliveryRange>
-  <AvgSpeedCar>30</AvgSpeedCar>
-  <AvgSpeedMotorcycle>50</AvgSpeedMotorcycle>
-  <AvgSpeedBike>20</AvgSpeedBike>
+  <MaxDeliveryRange>50</MaxDeliveryRange>
+  <AvgSpeedCar>60</AvgSpeedCar>
+  <AvgSpeedMotorcycle>40</AvgSpeedMotorcycle>
+  <AvgSpeedBike>15</AvgSpeedBike>
   <AvgSpeedFoot>5</AvgSpeedFoot>
-  <MaxDeliveryTime>5.05:00:00</MaxDeliveryTime>
-  <RiskRange>1.06:30:00</RiskRange>
-  <MaxTimeInactivity>220.12:15:00</MaxTimeInactivity>
+  <MaxDeliveryTime>5.00:00:00</MaxDeliveryTime>
+  <RiskRange>4.00:00:00</RiskRange>
+  <MaxTimeInactivity>14.00:00:00</MaxTimeInactivity>
   <ManagerId>312506082</ManagerId>
   <GoogleApiKey>AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk</GoogleApiKey>
 </config>
