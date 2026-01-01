@@ -81,7 +81,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            string user = s_bl.Courier.Login(userId, passwordBox.Password);
+            string? user = s_bl.Courier.Login(userId, passwordBox.Password);
 
             UserId = string.Empty;
             passwordBox.Clear();
@@ -100,7 +100,7 @@ public partial class MainWindow : Window
 
             throw new BlNoAccessException("לא הצלחנו לחבר אותך");
         }
-        catch (BlIncorrectPasswordException ex)
+        catch (BlIncorrectPasswordException)
         {
             MessageBox.Show("הסיסמה לא נכונה");
         }
@@ -182,6 +182,11 @@ public partial class MainWindow : Window
     {
         CloseAllWindowsExceptMain();
         s_bl.Admin.RemoveClockObserver(ClockObserver);
+
+    }
+
+    private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
 
     }
 }

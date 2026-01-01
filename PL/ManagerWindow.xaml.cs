@@ -304,7 +304,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// </remarks>
     private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (sender is TextBox tb && tb.IsFocused)
+        if (e.OriginalSource is TextBox tb && tb.IsFocused)
         {
             _isDirty = true;
         }
@@ -350,7 +350,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     {
         if (_isDirty)
         {
-            var result = MessageBox.Show("You made changes. Save?", "Save",
+            var result = MessageBox.Show("הנתונים השתנו. לשמור?", "שמירת שינויים",
                                          MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)

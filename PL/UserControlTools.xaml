@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="PL.TimeSpanInput"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PL"
+             x:Name="Root">
+    <UserControl.Resources>
+        <Style TargetType="Label" x:Key="UniformLabel">
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="UniformTextBoxNom">
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="Auto"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="local:Tools.NumericOnly" Value="True"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid DataContext="{Binding ElementName=Root}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Column="0" Content="שעות:" Style="{StaticResource UniformLabel}"/>
+        <TextBox Grid.Column="1" 
+                 Text="{Binding HoursPart, UpdateSourceTrigger=PropertyChanged}" 
+                 Style="{StaticResource UniformTextBoxNom}"/>
+
+        <Label Grid.Column="2" Content="ימים:" Style="{StaticResource UniformLabel}"/>
+        <TextBox Grid.Column="3" 
+                 Text="{Binding DaysPart, UpdateSourceTrigger=PropertyChanged}" 
+                 Style="{StaticResource UniformTextBoxNom}"/>
+    </Grid>
+</UserControl>
