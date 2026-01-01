@@ -85,7 +85,7 @@ namespace PL.Courier
         /// Dependency property for the CourierFilter property.
         /// </summary>
         public static readonly DependencyProperty CourierFilterProperty =
-            DependencyProperty.Register(nameof(CourierFilter), typeof(BO.CourierFieldFilter), typeof(CourierListWindow), new PropertyMetadata(BO.CourierFieldFilter.All));
+           DependencyProperty.Register(nameof(CourierFilter), typeof(BO.CourierFieldFilter), typeof(CourierListWindow), new PropertyMetadata(BO.CourierFieldFilter.All));
 
         /// <summary>
         /// Handles the window loaded event, initializes the courier list and registers for updates.

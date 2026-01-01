@@ -108,17 +108,5 @@ public partial class OrderListWindow : Window
 
 
 
-    // אירוע שינוי ב-ComboBox
-    private void StatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SelectedStatusFilter = StatusComboBox.SelectedItem as BO.ScheduleStatus?;
-        LoadOrders();
-    }
-
-    private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SelectedTypeFilter = TypeComboBox.SelectedItem as BO.TypeOfOrder?;
-        LoadOrders();
-    }
-
+    
 }

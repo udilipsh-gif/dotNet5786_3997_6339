@@ -54,24 +54,20 @@ internal class CourierFieldFilter : IEnumerable
     /// <returns>An IEnumerator for the CourierFieldFilter enum values.</returns>
     IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
 }
-internal class OrderFieldSort : IEnumerable
+internal class OrderFilterScheduleStatus : IEnumerable
 {
-    /// <summary>
-    /// Static collection of all OrderFieldSort enum values.
-    /// </summary>
     static readonly IEnumerable<BO.ScheduleStatus> s_enums =
-        (Enum.GetValues(typeof(BO.ScheduleStatus)) as IEnumerable<BO.ScheduleStatus>)!;
-    /// <summary>
-    /// Returns an enumerator that iterates through the OrderFieldSort enum values.
-    /// </summary>
-    /// <returns>An IEnumerator for the OrderFieldSort enum values.</returns>
-    IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
-}
-internal class OrderTypeSort : IEnumerable
-{
-    static readonly IEnumerable<BO.TypeOfOrder> s_enums =
-        (Enum.GetValues(typeof(BO.TypeOfOrder)) as IEnumerable<BO.TypeOfOrder>)!;
+(Enum.GetValues(typeof(BO.ScheduleStatus)) as IEnumerable<BO.ScheduleStatus>)!;
 
     IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
 }
+
+internal class OrderFilterTypeOfOrder : IEnumerable
+{
+    static readonly IEnumerable<BO.TypeOfOrder> s_enums =
+(Enum.GetValues(typeof(BO.TypeOfOrder)) as IEnumerable<BO.TypeOfOrder>)!;
+
+    IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
+}
+
 

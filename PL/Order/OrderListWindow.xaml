@@ -3,14 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PL.Order"
+        xmlns:local="clr-namespace:PL"
+       
+
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+       
+      
+      
+       
+      
+       
+     
+       
+       
         Title="רשימת הזמנות"
         Height="450"
         Width="900">
 
     <Window.Resources>
+        <!-- ComboBox לסינון לפי סטטוס -->
+        
+        <local:OrderFilterScheduleStatus x:Key="OrderFilterScheduleStatusKey" />
+       
+        
+        
+
+        <!-- ComboBox לסינון לפי סוג הזמנה -->
+        <local:OrderFilterTypeOfOrder x:Key="OrderFilterTypeOfOrderKey" />
+
+       
+
+
         <!-- Style לתאים עם Wrap -->
         <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap"/>
@@ -47,20 +71,19 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        
+        
 
-        <!-- ComboBox לסינון לפי סטטוס -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
-            <Label Content="סינון לפי סטטוס:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="StatusComboBox"
-                      Width="150"
-                      SelectionChanged="StatusComboBox_SelectionChanged"/>
-            <Label Content="סינון לפי סוג הזמנה:" VerticalAlignment="Center" />
+        <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterScheduleStatusKey}}"
+                  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-            <ComboBox x:Name="TypeComboBox"
-                      SelectionChanged="TypeComboBox_SelectionChanged"
-                      Width="150" />
+        <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterTypeOfOrderKey}}"
+           Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
-        </StackPanel>
+
+
+
+
 
         <!-- DataGrid להצגת ההזמנות -->
         <DataGrid Grid.Row="1"
