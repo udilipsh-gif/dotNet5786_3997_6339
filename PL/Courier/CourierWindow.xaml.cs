@@ -53,12 +53,6 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
     public bool IsUpdateMode => ButtonText == "Update";
 
     /// <summary>
-    /// Flag indicating whether a deletion operation is in progress.
-    /// Prevents the observer from accessing deleted data during the deletion process.
-    /// </summary>
-    private bool _isDeleting = false;
-
-    /// <summary>
     /// Gets or sets the current courier being displayed or edited.
     /// </summary>
     public BO.Courier CurrentCourier
@@ -195,7 +189,6 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
     /// <param name="e">Event arguments.</param>
     /// <remarks>
     /// Prompts the user for confirmation before deletion.
-    /// Sets the _isDeleting flag to prevent the observer from accessing deleted data.
     /// Cannot delete couriers with active orders in progress.
     /// </remarks>
     private void btnDelete_Click(object sender, RoutedEventArgs e)
@@ -211,14 +204,14 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
 
         try
         {
-            _isDeleting = true; 
             s_bl.Courier.Delete(CURRENT_MANAGER_ID, CURRENT_ID);
             MessageBox.Show("השליח נמחק בהצלחה");
+
             Close();
         }
         catch (BO.BlDoesNotExistException)
         {
-            MessageBox.Show("שליח לא נמצא למחיקה");
+            MessageBox.Show($"שליח לא נמצא למחיקה");
         }
         catch (BO.BlInvalidOperationException)
         {
@@ -318,13 +311,22 @@ public partial class CourierWindow : Window, System.ComponentModel.INotifyProper
     /// </remarks>
     private void CourierObserver()
     {
-        if (_isDeleting)
-            return;
+        try
+        {
+            CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
+                        ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
+        }
+        catch(BO.BlDoesNotExistException)
+        {
+            Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
 
-        CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
-            ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
 
-       
+
 
     }   
 
