@@ -4,19 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
-       
-
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-       
-      
-      
-       
-      
-       
-     
-       
-       
         Title="רשימת הזמנות"
         Height="450"
         Width="900">
@@ -75,10 +64,12 @@
         
 
         <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterScheduleStatusKey}}"
+                x:Name="StatusComboBox"
                   Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
         <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterTypeOfOrderKey}}"
-           Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+          x:Name="TypeComboBox"
+                  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 
 
 

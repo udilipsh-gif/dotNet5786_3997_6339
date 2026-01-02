@@ -55,13 +55,13 @@ public partial class OrderListWindow : Window
     {
         StatusComboBox.ItemsSource =
         new BO.ScheduleStatus?[] { null }  // null = הכל
-        .Concat(new OrderFieldSort().Cast<BO.ScheduleStatus?>());
+        .Concat(new CourierFieldFilter().Cast<BO.ScheduleStatus?>());
         StatusComboBox.SelectedIndex = 0;  // ברירת מחדל = הכל
 
         // סוג הזמנה
         TypeComboBox.ItemsSource =
             new BO.TypeOfOrder?[] { null }  // null = הכל
-            .Concat(new OrderTypeSort().Cast<BO.TypeOfOrder?>());
+            .Concat(new CourierFieldSort().Cast<BO.TypeOfOrder?>());
         TypeComboBox.SelectedIndex = 0;  // ברירת מחדל = הכל
 
         LoadOrders();
