@@ -12,16 +12,16 @@
 
     <Window.Resources>
         <!-- ComboBox לסינון לפי סטטוס -->
-        
+
         <local:OrderFilterScheduleStatus x:Key="OrderFilterScheduleStatusKey" />
-       
-        
-        
+
+
+
 
         <!-- ComboBox לסינון לפי סוג הזמנה -->
         <local:OrderFilterTypeOfOrder x:Key="OrderFilterTypeOfOrderKey" />
 
-       
+
 
 
         <!-- Style לתאים עם Wrap -->
@@ -59,6 +59,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="0,0,0,10">
@@ -79,8 +80,8 @@
             </StackPanel>
 
         </StackPanel>
-        
-        
+
+
 
         <!-- DataGrid להצגת ההזמנות -->
         <DataGrid Grid.Row="1"
@@ -154,7 +155,20 @@
                                         SortMemberPath="NumberOfDeliveryAttempts"
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+
             </DataGrid.Columns>
         </DataGrid>
+        <!-- Add Button: Opens a window to add a new courier to the system -->
+        <Button Content="הוסף הזמנה" 
+        Grid.Row="2" 
+        HorizontalAlignment="Center" 
+        VerticalAlignment="Bottom" 
+        Height="35"        
+        Margin="10,20"         
+        Width="100"
+        Click="Add_Edit_Order_Click"
+        ToolTip="לחץ כאן להוספת הזמנה למערכת"
+        AutomationProperties.Name="כפתור הוספת הזמנה"/>
     </Grid>
 </Window>

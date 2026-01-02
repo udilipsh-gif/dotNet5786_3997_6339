@@ -74,6 +74,21 @@ public partial class OrderListWindow : Window
         LoadOrders();
     }
 
+    private void Add_Edit_Order_Click(object sender, RoutedEventArgs e)
+    {
+        OrderWindow orderWindow;
+        if (sender is DataGrid dataGrid
+            && dataGrid.SelectedItem is BO.OrderInList orderInList)
+        {
+            orderWindow = new OrderWindow(orderInList.OrderId);
+        }
+        else
+        {
+            orderWindow = new OrderWindow(0);
+        }
+        orderWindow.Show();
+    }
+
     //// Property לסינון לפי סטטוס
     //public BO.ScheduleStatus? SelectedStatusFilter
     //{

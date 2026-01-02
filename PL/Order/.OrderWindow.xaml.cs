@@ -36,6 +36,29 @@ public partial class OrderWindow : Window
     /// The ID of the currently logged-in manager.
     /// </summary>
     private readonly int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId!;
+
+
+    public IEnumerable<BO.TypeOfOrder> TypeOfOrderValues
+    {
+        get
+        {
+            return Enum.GetValues(typeof(BO.TypeOfOrder)).Cast<BO.TypeOfOrder>();
+        }
+    }
+    public IEnumerable<BO.ScheduleStatus> ScheduleStatusValues
+    {
+        get
+        {
+            return Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>();
+        }
+    }
+    public IEnumerable<BO.OrderStatus> OrderStatusValues
+    {
+        get
+        {
+            return Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>();
+        }
+    }
     public OrderWindow(int id=0)
     {
         InitializeComponent();
