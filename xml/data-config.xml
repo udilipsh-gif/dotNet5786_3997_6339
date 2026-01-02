@@ -3,8 +3,8 @@
   <NextOrderId>100051</NextOrderId>
   <NextDeliveryId>200051</NextDeliveryId>
   <Clock>02/01/2026 01:43:25</Clock>
-  <ManagerId>203383997</ManagerId>
-  <PasswordManager>Admin1234$</PasswordManager>
+  <ManagerId>1</ManagerId>
+  <PasswordManager>1</PasswordManager>
   <StoreAddress>bar cochva, 21, Bney Braq</StoreAddress>
   <Latitude>32.0936195</Latitude>
   <Longitude>34.8229463</Longitude>
@@ -16,6 +16,5 @@
   <MaxDeliveryTime>5.00:00:00</MaxDeliveryTime>
   <RiskRange>4.00:00:00</RiskRange>
   <MaxTimeInactivity>14.00:00:00</MaxTimeInactivity>
-  <ManagerId>312506082</ManagerId>
   <GoogleApiKey>AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk</GoogleApiKey>
 </config>

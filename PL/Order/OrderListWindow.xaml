@@ -60,21 +60,27 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="0,0,0,10">
+            <StackPanel Margin="5,0">
+                <TextBlock Text="סנן לפי סטטוס עמידה בזמנים:" Margin="0,0,0,3"/>
+                <ComboBox Width="150" 
+                          ItemsSource="{Binding Source={StaticResource OrderFilterScheduleStatusKey}}"
+                          SelectedValue="{Binding ScheduleStatusFilter, Mode=TwoWay}"
+                          SelectionChanged="ComboBox_SelectionChanged"/>
+            </StackPanel>
+
+            <StackPanel Margin="5,0">
+                <TextBlock Text="סנן לפי סוג הזמנה:" Margin="0,0,0,3"/>
+                <ComboBox Width="150" 
+                          ItemsSource="{Binding Source={StaticResource OrderFilterTypeOfOrderKey}}"
+                          SelectedValue="{Binding TypeOfOrderFilter, Mode=TwoWay}"
+                          SelectionChanged="ComboBox_SelectionChanged"/>
+            </StackPanel>
+
+        </StackPanel>
         
         
-
-        <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterScheduleStatusKey}}"
-                x:Name="StatusComboBox"
-                  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-
-        <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterTypeOfOrderKey}}"
-          x:Name="TypeComboBox"
-                  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-
-
-
-
-
 
         <!-- DataGrid להצגת ההזמנות -->
         <DataGrid Grid.Row="1"

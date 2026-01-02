@@ -89,17 +89,6 @@
     <WorkingSince>2025-02-20T01:43:25.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>308755041</Id>
-    <Name>Rina Cohen</Name>
-    <Phone>0523230186</Phone>
-    <Email>rina.cohen@courier.com</Email>
-    <Password>Pass#346857</Password>
-    <Active>false</Active>
-    <MaxDistanceDelivery>14</MaxDistanceDelivery>
-    <TypeShipment>MOTORCYCLE</TypeShipment>
-    <WorkingSince>2025-01-06T01:43:25.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>333693686</Id>
     <Name>Moshe Bar</Name>
     <Phone>0575974557</Phone>
@@ -109,17 +98,6 @@
     <MaxDistanceDelivery>2.0410489597862997</MaxDistanceDelivery>
     <TypeShipment>FOOT</TypeShipment>
     <WorkingSince>2025-02-05T01:43:25.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>305815749</Id>
-    <Name>Rachel Adler</Name>
-    <Phone>0593369780</Phone>
-    <Email>rachel.adler@courier.com</Email>
-    <Password>Pass#148249</Password>
-    <Active>false</Active>
-    <MaxDistanceDelivery>2</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
-    <WorkingSince>2025-04-01T01:43:25.0000000</WorkingSince>
   </Courier>
   <Courier>
     <Id>241767090</Id>

@@ -286,7 +286,7 @@ internal class Program
             ,
             OrderInListField.ScheduleStatus => () =>
             {
-                Console.WriteLine("Enter Schedule Status to filter by (0=ONTYME, 1=AT_RISK, 2=LATE): ");
+                Console.WriteLine("Enter Schedule Status to filter by (0=ONTYME, 1=AT_RISK, 2=LATE, 3=CANCELLED): ");
                 valueChoice = GetIntInput();
             }
             ,
