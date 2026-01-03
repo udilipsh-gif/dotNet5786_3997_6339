@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PL"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         mc:Ignorable="d"
-        Title="CourierWindow"
+        Title="שליח בודד"
         Height="520" Width="350"
         Loaded="CourierWindow_Loaded"
         Closed="CourierWindow_Closed"

@@ -3,14 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PL"
+
            DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
     mc:Ignorable="d"
-    Title="CourierWindow"
+    Title="הזמנה בודדת"
     Height="520" Width="350"
    
     MinHeight="520" MinWidth="350">
 
     <Window.Resources>
+
+        <local:EnumToBooleanConverter x:Key="MyEnumConverter" />
         <!-- Style for labels: Center-aligned vertically, right-aligned horizontally -->
         <Style TargetType="Label" x:Key="UniformLabel">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -25,25 +29,18 @@
             <Setter Property="Margin" Value="5"/>
         </Style>
 
-        <!-- Style for password boxes: Center-aligned vertically, stretches horizontally -->
-        <Style TargetType="PasswordBox" x:Key="UniformPasswordBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-
-        <!-- Style for checkboxes: Center-aligned vertically, content right-aligned -->
-        <Style TargetType="CheckBox" x:Key="UniformCheckBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalContentAlignment" Value="Right" />
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-
+     
         <!-- Style for combo boxes: Center-aligned vertically -->
         <Style TargetType="ComboBox" x:Key="UniformComboBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
+        <!-- Style for radio buttons: Center-aligned vertically -->
+        <Style TargetType="RadioButton" x:Key="UniformRadioButton">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="5" />
+        </Style>
+
     </Window.Resources>
 
     <Grid>
@@ -70,33 +67,36 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Row 0: Courier ID field - Read-only in update mode, allows numeric input (max 9 digits) -->
                 <TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.Id, Mode=TwoWay}" 
                     Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="0" Grid.Column="1" Content=":מזהה הזמנה" Style="{StaticResource UniformLabel}"/>
 
                 <!-- Row 1: Courier name field -->
-                <ComboBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding TypeOfOrderValues}" SelectedItem="{Binding CurrentOrder.TypeOfOrder, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>
-                <Label Grid.Row="1" Grid.Column="1" Content=":סוג הזמנה" Style="{StaticResource UniformLabel}"/>
+                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" FlowDirection="RightToLeft">
 
-                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Margin="10">
-                    <TextBlock Text="סוג הזמנה: " VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <RadioButton Content="סטנדרט" Margin="0,0,5,0"
+                 IsChecked="{Binding CurrentOrder.TypeOfOrder, 
+                             Converter={StaticResource MyEnumConverter},      
+                             ConverterParameter=STANDART}"
+                             Style="{StaticResource UniformRadioButton}" />
 
-                    <RadioButton Content="סטנדרט" 
-                 GroupName="DeliveryType" 
-                 IsChecked="True" 
-                 Margin="5"/>
+                    <RadioButton Content="מהיר"
+                 IsChecked="{Binding CurrentOrder.TypeOfOrder, 
+                             Converter={StaticResource MyEnumConverter},   
+                             ConverterParameter=FAST_DELIVERY}"
+                             Style="{StaticResource UniformRadioButton}" />
 
-                    <RadioButton Content="מהיר" 
-                 GroupName="DeliveryType" 
-                 Margin="5"/>
-
-                    <RadioButton Content="מיידי" 
-                 GroupName="DeliveryType" 
-                 Margin="5"/>
+                    <RadioButton Content="מיידי" Margin="5,0,0,0"
+                 IsChecked="{Binding CurrentOrder.TypeOfOrder, 
+                             Converter={StaticResource MyEnumConverter},           
+                             ConverterParameter=DELIVER_IMMEDIATELY}"
+                             Style="{StaticResource UniformRadioButton}" />
                 </StackPanel>
+
+                <Label Grid.Row="1" Grid.Column="1" Content=":סוג הזמנה" Style="{StaticResource UniformLabel}"/>
 
                 <!-- Row 2: Password field - Uses PasswordBox for secure input -->
                 <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding CurrentOrder.Details, Mode=TwoWay}"
@@ -136,6 +136,8 @@
                 <Label Grid.Row="9" Grid.Column="1" Content="זמן אספקה מירבי" Style="{StaticResource UniformLabel}"/>
 
                 <ComboBox Grid.Row="10" Grid.Column="0" ItemsSource="{Binding OrderStatusValues}" SelectedItem="{Binding CurrentOrder.OrderStatus, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>
+                
+                
                 <Label Grid.Row="10" Grid.Column="1" Content=":סטטוס הזמנה" Style="{StaticResource UniformLabel}"/>
 
                 <ComboBox Grid.Row="11" Grid.Column="0" ItemsSource="{Binding ScheduleStatusValues}" SelectedItem="{Binding CurrentOrder.ScheduleStatus, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>

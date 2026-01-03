@@ -12,16 +12,10 @@
 
     <Window.Resources>
         <!-- ComboBox לסינון לפי סטטוס -->
-
         <local:OrderFilterScheduleStatus x:Key="OrderFilterScheduleStatusKey" />
-
-
-
 
         <!-- ComboBox לסינון לפי סוג הזמנה -->
         <local:OrderFilterTypeOfOrder x:Key="OrderFilterTypeOfOrderKey" />
-
-
 
 
         <!-- Style לתאים עם Wrap -->
@@ -55,11 +49,13 @@
     </Window.Resources>
 
     <Grid>
-        <!-- הגדרת שורות: שורה 0 = ComboBox, שורה 1 = DataGrid -->
+        <!--3 שורות, סינון, תוכן, כפתור -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            
+
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="0,0,0,10">
@@ -159,7 +155,7 @@
 
             </DataGrid.Columns>
         </DataGrid>
-        <!-- Add Button: Opens a window to add a new courier to the system -->
+        <!-- Add Button: Opens a window to add a new order to the system -->
         <Button Content="הוסף הזמנה" 
         Grid.Row="2" 
         HorizontalAlignment="Center" 
