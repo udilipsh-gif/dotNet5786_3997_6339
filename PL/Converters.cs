@@ -8,11 +8,9 @@ public class EnumToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        // בדיקה בטוחה שמונעת קריסה אם משהו הוא NULL
-        if (value == null || parameter == null)
-            return false;
 
-        string checkValue = value.ToString()!;
+        //המרה של ערך ENUM לבוליאני
+        string checkValue = value.ToString()!;//אין אפשרות שיהיה null כי זה ENUM
         string targetValue = parameter.ToString()!;
 
         return checkValue.Equals(targetValue, StringComparison.InvariantCultureIgnoreCase);
@@ -20,16 +18,12 @@ public class EnumToBooleanConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        // בדיקה בטוחה
-        if (value == null || parameter == null)
-            return Binding.DoNothing;
-
+        //המרה של ערך בוליאני חזרה ל ENUM
         bool useValue = (bool)value;
-        string targetValue = parameter.ToString()!;
+        string targetValue = parameter.ToString()!;//אין אפשרות שיהיה null כי זה פרמטר שהוגדר בקישור
 
         if (useValue)
         {
-            // המרה בטוחה של ה-Enum
             return Enum.Parse(targetType, targetValue);
         }
 
