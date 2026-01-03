@@ -92,7 +92,8 @@
                   HorizontalScrollBarVisibility="Auto"
                   FlowDirection="RightToLeft"
                   EnableRowVirtualization="False"
-                  EnableColumnVirtualization="False">
+                  EnableColumnVirtualization="False"
+                  MouseDoubleClick="Add_Edit_Order_Click">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="מזהה הזמנה"
@@ -157,14 +158,14 @@
         </DataGrid>
         <!-- Add Button: Opens a window to add a new order to the system -->
         <Button Content="הוסף הזמנה" 
-        Grid.Row="2" 
-        HorizontalAlignment="Center" 
-        VerticalAlignment="Bottom" 
-        Height="35"        
-        Margin="10,20"         
-        Width="100"
-        Click="Add_Edit_Order_Click"
-        ToolTip="לחץ כאן להוספת הזמנה למערכת"
-        AutomationProperties.Name="כפתור הוספת הזמנה"/>
+            Grid.Row="2" 
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Bottom" 
+            Height="35"        
+            Margin="10,20"         
+            Width="100"
+            Click="Add_Edit_Order_Click"
+            ToolTip="לחץ כאן להוספת הזמנה למערכת"
+            AutomationProperties.Name="כפתור הוספת הזמנה"/>
     </Grid>
 </Window>

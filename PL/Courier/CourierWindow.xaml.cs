@@ -16,7 +16,7 @@ namespace PL.Courier;
 /// Couriers can also edit their own information through this window.
 /// Implements INotifyPropertyChanged for dynamic UI updates.
 /// </remarks>
-public partial class CourierWindow : Window, System.ComponentModel.INotifyPropertyChanged
+public partial class CourierWindow : Window, INotifyPropertyChanged
 {
     /// <summary>
     /// Event raised when a property value changes, enabling data binding updates.

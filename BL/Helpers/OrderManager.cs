@@ -219,6 +219,7 @@ internal static class OrderManager
         };
         s_dal.Order.Update(doOrder);
         Observer.NotifyItemUpdated(boOrder.Id);
+        Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -231,7 +232,8 @@ internal static class OrderManager
     /// </remarks>
     public static void Delete(int id)
     {
-        throw new BO.BlDoesNotExistException("Order cannot be deleted");
+
+        throw new BO.BlInvalidOperationException("Order cannot be deleted");
     }
 
     /// <summary>
@@ -273,6 +275,7 @@ internal static class OrderManager
                 };
                 s_dal.Delivery.Create(delivery);
                 Observer.NotifyListUpdated();
+
             }
             ,
             DO.OrderStatus.DELIVERING => () =>

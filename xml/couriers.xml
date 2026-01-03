@@ -177,17 +177,6 @@
     <WorkingSince>2025-07-26T01:43:25.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>205952372</Id>
-    <Name>Ariel Gold</Name>
-    <Phone>0567534073</Phone>
-    <Email>ariel.gold@courier.com</Email>
-    <Password>Pass#359187</Password>
-    <Active>false</Active>
-    <MaxDistanceDelivery>1.7571312024353156</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-03-08T01:43:25.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>295248571</Id>
     <Name>Galit Peretz</Name>
     <Phone>0593013865</Phone>
@@ -208,5 +197,16 @@
     <MaxDistanceDelivery>64</MaxDistanceDelivery>
     <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2025-03-16T01:43:25.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>205952372</Id>
+    <Name>Ariel Gold</Name>
+    <Phone>0584599997</Phone>
+    <Email>ariel.gold@courier.com</Email>
+    <Password>Pass#359187</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>1.7571312024353156</MaxDistanceDelivery>
+    <TypeShipment>FOOT</TypeShipment>
+    <WorkingSince>2025-03-08T01:43:25.0000000</WorkingSince>
   </Courier>
 </ArrayaOfCouriers>
