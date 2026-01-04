@@ -188,17 +188,6 @@
     <WorkingSince>2025-03-16T01:43:25.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>205952372</Id>
-    <Name>Ariel Gold</Name>
-    <Phone>0584599997</Phone>
-    <Email>ariel.gold@courier.com</Email>
-    <Password>Pass#359187</Password>
-    <Active>false</Active>
-    <MaxDistanceDelivery>1.7571312024353156</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-03-08T01:43:25.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>207377395</Id>
     <Name>Dina Klein</Name>
     <Phone>0552402084</Phone>
