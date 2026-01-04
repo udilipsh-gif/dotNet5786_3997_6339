@@ -12,6 +12,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="ניהול שליח" MinHeight="300" MinWidth="450">
     <Window.Resources>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <Style TargetType="Label" x:Key="UniformMAinLabel">
             <Setter Property="VerticalAlignment" Value="Bottom"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
@@ -104,13 +105,78 @@
                 </StackPanel>
             </Grid>
         </ScrollViewer>
-        <ScrollViewer Grid.Column="1" Visibility="Collapsed">
-            <StackPanel Style="{StaticResource UniformStackPanel}">
-                <Label  Content="שם:" Style="{StaticResource UniformLabel}"/>
-                <TextBlock Text="{Binding CurrentUser.OrderInProgress}"  
-                           Style="{StaticResource UniformTextBlock}"/>
-            </StackPanel>
-
+        <ScrollViewer Grid.Column="1" Visibility="{Binding CurrentUser.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}}">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="150*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="150*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Content="משלוח פעיל" Style="{StaticResource UniformMAinLabel}"/>
+                <StackPanel Grid.Row="1">
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מספר משלוח:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.DeliveryId}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מספר הזמנה:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.OrderId}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="סוג הזמנה:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.TypeOfOrder}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="פרטי ההזמנה:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.Details}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="כתובת:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.Address}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מרחק אוירי:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.Distance, StringFormat=N2}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מרחק בפועל:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.ActualDistance, StringFormat=N2}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="שם הלקוח:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.CustomerName}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מספר טלפון:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.CustomerPhone}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="הזמנה מתאריך:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.OrderTime}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="משלוח התחיל ב:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.StartDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="צפי אספקה:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.EstimatedDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="התחיבות למשלוח עד ל:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.MaxDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="זמן שנשאר למשלוח:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.StartDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מצב הזמנה:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.TimeRemaining}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                </StackPanel>
+                <Button Grid.Row="2"  Content="דווח הזמנה" Command="" Width="100" Height="50"/>
+            </Grid>
         </ScrollViewer>
 
     </Grid>
