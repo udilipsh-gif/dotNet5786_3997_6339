@@ -36,7 +36,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
 
-    private int CURRENT_ID = 0;
+    private int CurrentID = 0;
 
     /// <summary>
     /// The ID of the currently logged-in manager.
@@ -64,18 +64,18 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
 
 
-    private Visibility _cancelButtonVisibility = Visibility.Collapsed;
+    //private Visibility _cancelButtonVisibility = Visibility.Collapsed;
 
 
-    public Visibility CancelButtonVisibility
-    {
-        get => _cancelButtonVisibility;
-        set
-        {
-            _cancelButtonVisibility = value;
-            OnPropertyChanged(nameof(CancelButtonVisibility));
-        }
-    }
+    //public Visibility CancelButtonVisibility
+    //{
+    //    get => _cancelButtonVisibility;
+    //    set
+    //    {
+    //        _cancelButtonVisibility = value;
+    //        OnPropertyChanged(nameof(CancelButtonVisibility));
+    //    }
+    //}
 
    
 
@@ -99,7 +99,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     public OrderWindow(int id = 0)
     {
         InitializeComponent();
-        CURRENT_ID = id;
+        CurrentID = id;
     }
 
     public BO.Order CurrentOrder
@@ -124,23 +124,39 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
                  TypeOfOrder = BO.TypeOfOrder.STANDART,
                  ScheduleStatus = BO.ScheduleStatus.ONTYME,
                  EstimatedDeliveryTime = null,
-                 MaxDeliveryTime = DateTime.Now + s_bl.Admin.GetConfig().MaxDeliveryTime
-
-
-
+                 MaxDeliveryTime = DateTime.Now + s_bl.Admin.GetConfig().MaxDeliveryTime,
+                 DeliveryPerOrderInLists = new List<BO.DeliveryPerOrderInList>()
              }));
+
+    //public BO.DeliveryPerOrderInList deliveryPerOrderInList
+    //{
+    //    get => (BO.DeliveryPerOrderInList)GetValue(deliveryPerOrderInListProperty);
+    //    set => SetValue(deliveryPerOrderInListProperty, value);
+    //}
+    //public static readonly DependencyProperty deliveryPerOrderInListProperty =
+    //     DependencyProperty.Register("deliveryPerOrderInList", typeof(BO.DeliveryPerOrderInList),
+    //         typeof(OrderWindow), new PropertyMetadata(new BO.DeliveryPerOrderInList()
+    //         {
+
+    //              DeliveryId = 0,
+    //                CourierId = 0,
+    //               CourierName = "",
+    //               TypeShipment = BO.TheTypeShipment.CAR,
+    //               OrderDate = DateTime.Now,
+    //         }));
+
 
     private void OrderWindow_Loaded(object sender, EventArgs e)
     {
-        if (CURRENT_ID != 0)
+        if (CurrentID != 0)
         {
             ButtonText = "Update";
-            CancelButtonVisibility = Visibility.Visible;
+            //CancelButtonVisibility = Visibility.Visible;
 
             try
             {
                 OrderObserver();
-                s_bl.Order.AddObserver(OrderObserver);
+                s_bl.Order.AddObserver(CurrentID, OrderObserver);
             }
             catch (Exception ex)
             {
@@ -151,7 +167,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         else
         {
             ButtonText = "Add";
-            CancelButtonVisibility = Visibility.Collapsed;
+            //CancelButtonVisibility = Visibility.Collapsed;
 
             CurrentOrder = new BO.Order()
             {
@@ -190,7 +206,16 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
         try
         {
-            s_bl.Order.Cancel(CURRENT_MANAGER_ID, CURRENT_ID);
+            s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID);
+            if (CurrentOrder.OrderStatus == BO.OrderStatus.DELIVERING)
+            {
+              var currentDelivery = CurrentOrder.DeliveryPerOrderInLists.LastOrDefault();
+                int courierId = currentDelivery.CourierId??0;
+               string mailCourior=  s_bl.Courier.Read(CURRENT_MANAGER_ID, courierId).Email;
+             Tools. SendEmail(mailCourior, "הזמנה בוטלה", $"הזמנה מספר {CurrentOrder.Id} בוטלה על ידי המנהל");
+
+
+            }
             MessageBox.Show("הזמנה בוטלה בהצלחה");
 
             Close();
@@ -212,8 +237,8 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     {
         try
         {
-            CurrentOrder = s_bl.Order.Read(CURRENT_MANAGER_ID, CURRENT_ID)
-                        ?? throw new BO.BlDoesNotExistException($"The Order with id: {CURRENT_ID} does not exist");
+            CurrentOrder = s_bl.Order.Read(CURRENT_MANAGER_ID, CurrentID)
+                        ?? throw new BO.BlDoesNotExistException($"The Order with id: {CurrentID} does not exist");
         }
         catch (BO.BlDoesNotExistException)
         {
@@ -226,8 +251,8 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     }
     private void OrderWindow_Closed(object sender, EventArgs e)
     {
-        if (CURRENT_ID != 0)
-            s_bl.Order.RemoveObserver(OrderObserver);
+        if (CurrentID != 0)
+            s_bl.Order.RemoveObserver(CurrentID, OrderObserver);
     }
 
     private void btnAddUpdate_Click(object sender, RoutedEventArgs e)

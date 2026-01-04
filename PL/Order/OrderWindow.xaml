@@ -9,6 +9,235 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         mc:Ignorable="d"
         Title="הזמנה בודדת"
+        Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">
+    <Window.Resources>
+        <local:EnumToBooleanConverter x:Key="MyEnumConverter" />
+
+        <Style TargetType="Label" x:Key="UniformLabel">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <Style TargetType="TextBox" x:Key="UniformTextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Height" Value="25"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Margin="10"
+                Padding="10"
+                CornerRadius="10"
+                Background="#F5F5F5"
+                BorderBrush="#DDD"
+                BorderThickness="1">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="משלוח ברשימה"
+                           FontWeight="Bold" FontSize="18"
+                           HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+                <StackPanel Grid.Row="1" FlowDirection="RightToLeft" Margin="0,0,0,10">
+                    <!--<StackPanel Orientation="Horizontal">
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="שליח נוכחי: " FontWeight="Bold"/>
+                        <TextBlock Text="{Binding CurrentOrder.CourierName}"/>
+                    </StackPanel>-->
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" FlowDirection="RightToLeft">
+
+                    <ItemsControl ItemsSource="{Binding CurrentOrder.DeliveryPerOrderInLists}">
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+
+                                <Border Margin="0,0,0,10" 
+                        Padding="30"
+                                        
+                        BorderBrush="#DDDDDD" 
+                        BorderThickness="0,0,0,1" 
+                        Background="White">
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="ת.ז. שליח:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CourierId}" FontSize="14"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="שם שליח:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CourierName}" FontSize="14"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="סוג התניידות:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TypeShipment}" FontSize="14"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="התחלה:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding OrderDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" FontSize="14"/>
+
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="סיום:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding TimeEndDelivery, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" FontSize="14"/>
+
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="סטטוס סיום:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding EndDelivery}" FontSize="14"/>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="10" FlowDirection="RightToLeft">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentOrder.Name, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="0" Grid.Column="0" Content="שם הלקוח:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentOrder.Phone, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="טלפון:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CurrentOrder.Addres, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="2" Grid.Column="0" Content="כתובת:" Style="{StaticResource UniformLabel}"/>
+
+            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <RadioButton Content="רגיל" Margin="2" IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=STANDART, Mode=TwoWay}" />
+                <RadioButton Content="מהיר" Margin="2" IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=FAST_DELIVERY, Mode=TwoWay}" />
+                <RadioButton Content="מיידי" Margin="2" IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=DELIVER_IMMEDIATELY, Mode=TwoWay}" />
+            </StackPanel>
+            <Label Grid.Row="3" Grid.Column="0" Content="דחיפות:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding CurrentOrder.Details, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="4" Grid.Column="0" Content="הערות:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding CurrentOrder.Weight, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="5" Grid.Column="0" Content="משקל:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="6" Grid.Column="1" IsReadOnly="True" Text="{Binding CurrentOrder.Distance, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="6" Grid.Column="0" Content="מרחק:" Style="{StaticResource UniformLabel}"/>
+
+
+            <TextBox Grid.Row="0" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.OrderDate, StringFormat='{}{0:dd.MM.yyyy}'}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="0" Grid.Column="3" Content="זמן פתיחה:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="1" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.EstimatedDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}'}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="1" Grid.Column="3" Content="צפי אספקה:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="2" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}'}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="2" Grid.Column="3" Content="זמן מירבי לאספקה:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="3" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.OrderStatus}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="3" Grid.Column="3" Content="סטטוס:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="4" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="4" Grid.Column="3" Content="עמידה בזמנים:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="5" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="5" Grid.Column="3" Content="זמן שנותר:" Style="{StaticResource UniformLabel}"/>
+
+            <TextBox Grid.Row="6" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.Id}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="6" Grid.Column="3" Content="מזהה הזמנה:" Style="{StaticResource UniformLabel}"/>
+
+
+
+            <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="5" 
+                        Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+
+                <Button Content="{Binding ButtonText}" Click="btnAddUpdate_Click"
+                        Height="40" Width="150" Margin="15" FontSize="14"/>
+
+                <Button Content="בטל הזמנה" Click="btnCancel_Click"
+                        Height="40" Width="150" Margin="15" FontSize="14" Background="#FFCCCC">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.BasedOn>
+                                <StaticResourceExtension ResourceKey="{x:Type Button}"/>
+                            </Style.BasedOn>
+                            <Setter Property="IsEnabled" Value="False"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="OPEN">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="REFUSED">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="DELIVERING">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+</Window>
+
+
+<!--<Window x:Class="PL.Order.OrderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PL"
+        Loaded="OrderWindow_Loaded"
+        Closed="OrderWindow_Closed"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        mc:Ignorable="d"
+        Title="הזמנה בודדת"
         Height="520" Width="350"
         MinHeight="520" MinWidth="350">
 
@@ -16,33 +245,33 @@
 
         <local:EnumToBooleanConverter x:Key="MyEnumConverter" />
         
-        <!-- Style for labels: Center-aligned vertically, right-aligned horizontally -->
+        --><!-- Style for labels: Center-aligned vertically, right-aligned horizontally --><!--
         <Style TargetType="Label" x:Key="UniformLabel">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
 
-        <!-- Style for text boxes: Center-aligned vertically, stretches horizontally -->
+        --><!-- Style for text boxes: Center-aligned vertically, stretches horizontally --><!--
         <Style TargetType="TextBox" x:Key="UniformTextBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
 
-        <!--<Style TargetType="TextBlock" x:Key="UniformTextBlock">
+        --><!--<Style TargetType="TextBlock" x:Key="UniformTextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="5"/>
         </Style>-->
 
         <!-- Style for combo boxes: Center-aligned vertically -->
-        <Style TargetType="ComboBox" x:Key="UniformComboBox">
+        <!--<Style TargetType="ComboBox" x:Key="UniformComboBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="5"/>
-        </Style>
+        </Style>-->
         
-        <!-- Style for radio buttons: Center-aligned vertically -->
+        <!-- Style for radio buttons: Center-aligned vertically --><!--
         <Style TargetType="RadioButton" x:Key="UniformRadioButton">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="5" />
@@ -50,10 +279,62 @@
 
     </Window.Resources>
 
+
     <Grid>
-        <!-- Scroll viewer to enable scrolling when window content exceeds available space -->
-        <ScrollViewer>
-            <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Margin="10"
+                Padding="15"
+                CornerRadius="10"
+                Background="#F5F5F5"
+                BorderBrush="#DDD"
+                BorderThickness="1"
+                VerticalAlignment="Stretch">
+
+            <StackPanel FlowDirection="RightToLeft">
+                <TextBlock Text="משלוח ברשימה"
+                           FontWeight="Bold"
+                           FontSize="18"
+                           Foreground="#333"
+                           Margin="0,0,0,15"
+                           HorizontalAlignment="Center"/>
+
+                <TextBlock Text="ת.ז. שליח:" FontWeight="Bold" Margin="0,5,0,0"/>
+                <TextBlock Text="{Binding CurrentOrder.Id}" FontSize="14" Margin="0,0,0,10"/>
+
+                <Separator Margin="0,5"/>
+
+                <TextBlock Text="שם השליח:" FontWeight="Bold" Margin="0,5,0,0"/>
+                <TextBlock Text="{Binding CurrentOrder.DeliveryPerOrderInLists}" FontSize="14" Margin="0,0,0,10"/>
+
+                <Separator Margin="0,5"/>
+
+                <TextBlock Text="סוג התניידות:" FontWeight="Bold" Margin="0,5,0,0"/>
+                <TextBlock Text="{Binding CurrentOrder.TypeOfOrder}" FontSize="14" Margin="0,0,0,10"/>
+
+
+                <TextBlock Text="תחילת משלוח:" FontWeight="Bold" Margin="0,5,0,0"/>
+                <TextBlock Text="{Binding CurrentOrder.TypeOfOrder}" FontSize="14" Margin="0,0,0,10"/>
+
+
+                <TextBlock Text="זמן סיום:" FontWeight="Bold" Margin="0,5,0,0"/>
+                <TextBlock Text="{Binding CurrentOrder.TypeOfOrder}" FontSize="14" Margin="0,0,0,10"/>
+
+
+                <TextBlock Text="סוג סיום:" FontWeight="Bold" Margin="0,5,0,0"/>
+                <TextBlock Text="{Binding CurrentOrder.TypeOfOrder}" FontSize="14" Margin="0,0,0,10"/>
+
+                <Separator Margin="0,5"/>
+
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="10">
+            <Grid FlowDirection="LeftToRight">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -77,117 +358,297 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <TextBox Grid.Row="6" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.Id, Mode=TwoWay}" 
-                    Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="6" Grid.Column="1" Content=":מזהה הזמנה" Style="{StaticResource UniformLabel}"/>
+                <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding CurrentOrder.Name, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="0" Grid.Column="1" Content="שם הלקוח:" Style="{StaticResource UniformLabel}"/>
 
-                <!-- Row 1: Courier name field -->
-                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" FlowDirection="RightToLeft">
+                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding CurrentOrder.Phone, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="1" Grid.Column="1" Content="טלפון:" Style="{StaticResource UniformLabel}"/>
 
-                    <RadioButton Content="סטנדרט" Margin="0,0,5,0"
+                <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding CurrentOrder.Addres, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="2" Grid.Column="1" Content="כתובת:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding CurrentOrder.Weight, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="3" Grid.Column="1" Content="משקל:" Style="{StaticResource UniformLabel}"/>
+
+                <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="Right">
+                    <RadioButton Content="סטנדרט" Margin="5"
+                                 IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=STANDART, Mode=TwoWay}" />
+                    <RadioButton Content="מהיר" Margin="5"
+                                 IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=FAST_DELIVERY, Mode=TwoWay}" />
+                    <RadioButton Content="מיידי" Margin="5"
+                                 IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=DELIVER_IMMEDIATELY, Mode=TwoWay}" />
+                </StackPanel>
+                <Label Grid.Row="4" Grid.Column="1" Content="סוג הזמנה:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding CurrentOrder.Details, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="5" Grid.Column="1" Content="הערות:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="6" Grid.Column="0" Text="{Binding CurrentOrder.Distance, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="6" Grid.Column="1" Content="מרחק:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="7" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.OrderDate, StringFormat='{}{0:dd.MM.yyyy}'}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="7" Grid.Column="1" Content="זמן פתיחה:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="8" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.EstimatedDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}'}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="8" Grid.Column="1" Content="צפי אספקה:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="9" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}'}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="9" Grid.Column="1" Content="זמן מירבי:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="10" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.OrderStatus}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="10" Grid.Column="1" Content="סטטוס:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="11" Grid.Column="1" Content="עמידה בזמנים:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="12" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="12" Grid.Column="1" Content="זמן שנותר:" Style="{StaticResource UniformLabel}"/>
+
+                <TextBox Grid.Row="13" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.Id}" Style="{StaticResource UniformTextBox}"/>
+                <Label Grid.Row="13" Grid.Column="1" Content="מזהה הזמנה:" Style="{StaticResource UniformLabel}"/>
+
+                <StackPanel Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" 
+                            Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+
+                    <Button Content="{Binding ButtonText}" Click="btnAddUpdate_Click"
+                            Height="35" Width="120" Margin="10"/>
+
+                    <Button Content="בטל הזמנה" Click="btnCancel_Click"
+                            Height="35" Width="120" Margin="10" Background="#FFCCCC">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Style.BasedOn>
+                                    <StaticResourceExtension ResourceKey="{x:Type Button}"/>
+                                </Style.BasedOn>
+
+                                <Setter Property="IsEnabled" Value="False"/>
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="OPEN">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="REFUSED">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="DELIVERING">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>-->
+
+<!--<Grid>
+
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                --><!-- קובייה שמאלית --><!--
+                <ColumnDefinition Width="*"/>
+                --><!-- טופס ימני --><!--
+            </Grid.ColumnDefinitions>
+            --><!-- Scroll viewer to enable scrolling when window content exceeds available space --><!--
+            <ScrollViewer Grid.Column="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                       
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+
+
+                    --><!-- Row 1: Courier name field --><!--
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft">
+
+                        <RadioButton Content="סטנדרט" Margin="0,0,5,0"
                  IsChecked="{Binding CurrentOrder.TypeOfOrder, 
                              Converter={StaticResource MyEnumConverter},      
                              ConverterParameter=STANDART,Mode=TwoWay}"
                             
                              Style="{StaticResource UniformRadioButton}" />
 
-                    <RadioButton Content="מהיר"
+                        <RadioButton Content="מהיר"
                  IsChecked="{Binding CurrentOrder.TypeOfOrder, 
                              Converter={StaticResource MyEnumConverter},   
                              ConverterParameter=FAST_DELIVERY, Mode=TwoWay}"
                              Style="{StaticResource UniformRadioButton}" />
 
-                    <RadioButton Content="מיידי" Margin="5,0,0,0"
+                        <RadioButton Content="מיידי" Margin="5,0,0,0"
                  IsChecked="{Binding CurrentOrder.TypeOfOrder, 
                              Converter={StaticResource MyEnumConverter},           
                              ConverterParameter=DELIVER_IMMEDIATELY, Mode=TwoWay}"
                              Style="{StaticResource UniformRadioButton}" />
-                </StackPanel>
+                    </StackPanel>
 
-                <Label Grid.Row="1" Grid.Column="1" Content=":סוג הזמנה" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="4" Grid.Column="2" Content=":סוג הזמנה" Style="{StaticResource UniformLabel}"/>
 
-                <!-- Row 2: Password field - Uses PasswordBox for secure input -->
-                <TextBox Grid.Row="2" Grid.Column="0" Text="{Binding CurrentOrder.Details, Mode=TwoWay}"
+                    --><!-- Row 2: Password field - Uses PasswordBox for secure input --><!--
+                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding CurrentOrder.Details, Mode=TwoWay}"
                  Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="2" Grid.Column="1" Content=":הערות" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="5" Grid.Column="2" Content=":הערות" Style="{StaticResource UniformLabel}"/>
 
-                <!-- Row 3: Phone number field - Allows numeric input only (max 10 digits) -->
-                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding CurrentOrder.Addres, Mode=TwoWay}"
+                    --><!-- Row 3: Phone number field - Allows numeric input only (max 10 digits) --><!--
+                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CurrentOrder.Addres, Mode=TwoWay}"
                 Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="3" Grid.Column="1" Content=":כתובת" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="2" Grid.Column="2" Content=":כתובת" Style="{StaticResource UniformLabel}"/>
 
-                <!-- Row 4: Email address field -->
-                <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding CurrentOrder.Weight, Mode=TwoWay}"
+                    --><!-- Row 4: Email address field --><!--
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding CurrentOrder.Weight, Mode=TwoWay}"
                 Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="4" Grid.Column="1" Content=":משקל" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="3" Grid.Column="2" Content=":משקל" Style="{StaticResource UniformLabel}"/>
 
-                <!-- Row 5: Maximum delivery distance field - Allows numeric input only -->
-                <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding CurrentOrder.Distance, Mode=TwoWay}"
+                    --><!-- Row 5: Maximum delivery distance field - Allows numeric input only --><!--
+                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding CurrentOrder.Distance, Mode=TwoWay}"
                    Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="5" Grid.Column="1" Content=":מרחק" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="6" Grid.Column="2" Content=":מרחק" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding CurrentOrder.Name, Mode=TwoWay}"
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentOrder.Name, Mode=TwoWay}"
                 Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="0" Grid.Column="1" Content=": שם הלקוח" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content=": שם הלקוח" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="13" Grid.Column="0" Text="{Binding CurrentOrder.Phone, Mode=TwoWay}"
+                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentOrder.Phone, Mode=TwoWay}"
                  Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="13" Grid.Column="1" Content=":טלפון" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="1" Grid.Column="2" Content=":טלפון" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="7" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.OrderDate, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="7" Grid.Column="1" Content="זמן פתיחת הזמנה" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Grid.Row="7" Grid.Column="1" IsReadOnly="True" Text="{Binding CurrentOrder.OrderDate, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                    <Label Grid.Row="7" Grid.Column="2" Content="זמן פתיחת הזמנה" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="8" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.EstimatedDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="8" Grid.Column="1" Content="זמן אספקה צפוי" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Grid.Row="8" Grid.Column="1" IsReadOnly="True" Text="{Binding CurrentOrder.EstimatedDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                    <Label Grid.Row="8" Grid.Column="2" Content="זמן אספקה צפוי" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="9" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="9" Grid.Column="1" Content="זמן אספקה מירבי" Style="{StaticResource UniformLabel}"/>
-                
-                <TextBox Grid.Row="10" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.OrderStatus}"  Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="10" Grid.Column="1" Content=":סטטוס הזמנה" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Grid.Row="9" Grid.Column="1" IsReadOnly="True" Text="{Binding CurrentOrder.MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                    <Label Grid.Row="9" Grid.Column="2" Content="זמן אספקה מירבי" Style="{StaticResource UniformLabel}"/>
 
-                <!--<ComboBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" ItemsSource="{Binding ScheduleStatusValues}" SelectedItem="{Binding CurrentOrder.ScheduleStatus, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>-->
-                <TextBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus}"  Style="{StaticResource UniformTextBox}"/>
+                    <TextBox Grid.Row="10" Grid.Column="1" IsReadOnly="True" Text="{Binding CurrentOrder.OrderStatus}"  Style="{StaticResource UniformTextBox}"/>
+                    <Label Grid.Row="10" Grid.Column="2" Content=":סטטוס הזמנה" Style="{StaticResource UniformLabel}"/>
 
-                <Label Grid.Row="11" Grid.Column="1" Content="סטטוס עמידה בזמנים" Style="{StaticResource UniformLabel}"/>
+                    --><!--<ComboBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" ItemsSource="{Binding ScheduleStatusValues}" SelectedItem="{Binding CurrentOrder.ScheduleStatus, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>--><!--
+                    <TextBox Grid.Row="11" Grid.Column="1" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus}"  Style="{StaticResource UniformTextBox}"/>
 
-                <TextBox Grid.Row="12" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="12" Grid.Column="1" Content="זמן שנותר לסיום ההזמנה" Style="{StaticResource UniformLabel}"/>
+                    <Label Grid.Row="11" Grid.Column="2" Content="סטטוס עמידה בזמנים" Style="{StaticResource UniformLabel}"/>
 
-                <StackPanel Grid.Row="14"
+                    <TextBox Grid.Row="12" Grid.Column="1" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+                    <Label Grid.Row="12" Grid.Column="2" Content="זמן שנותר לסיום ההזמנה" Style="{StaticResource UniformLabel}"/>
+
+
+
+
+
+
+                    <StackPanel Grid.Row="14"
                   Grid.Column="0"
                   Grid.ColumnSpan="2"
                   Orientation="Horizontal"
                   HorizontalAlignment="Center"
                   Margin="5">
 
-                    <!-- Add/Update button - Text changes based on mode (Add for new courier, Update for existing) -->
-                    <Button Content="{Binding ButtonText}"
+                        --><!-- Add/Update button - Text changes based on mode (Add for new courier, Update for existing) --><!--
+                        <Button Content="{Binding ButtonText}"
                           Click="btnAddUpdate_Click"
                           Height="30"
                           Width="100"
                           Margin="5"/>
 
-                    <!-- Delete button - Only visible in update mode, red background to indicate destructive action -->
-                    <Button Content="ביטול"
+                        --><!-- Delete button - Only visible in update mode, red background to indicate destructive action -->
+                        <!--<Button Content="ביטול"
                           Click="btnCancel_Click"
                           Height="30"
                           Width="100"
                           Margin="5"
                           Background="Green"
-                          Visibility="{Binding CancelButtonVisibility}"/>
-                </StackPanel>
+                          Visibility="{Binding CancelButtonVisibility}"/>--><!--
 
+                        <Button Content="ביטול"
+                            Click="btnCancel_Click"
+                            Height="30"
+                            Width="100"
+                            Margin="5"
+                            Background="Green">
 
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="IsEnabled" Value="False"/>
 
+                                    <Style.Triggers>
 
+                                        <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="OPEN">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </DataTrigger>
 
+                                        <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="REFUSED">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </DataTrigger>
 
+                                        <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="DELIVERING">
+                                            <Setter Property="IsEnabled" Value="True"/>
+                                        </DataTrigger>
 
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+        <Border Grid.Column="0"
+        Margin="10"
+        Padding="10"
+        CornerRadius="10"
+        Background="White"
+        BorderBrush="#CCC"
+        BorderThickness="1"
+        VerticalAlignment="Top">
 
+            <StackPanel>
 
-            </Grid>
+                <TextBlock Text="פרטי הזמנה"
+                   FontWeight="Bold"
+                   FontSize="16"
+                   Margin="0,0,0,10"/>
 
-        </ScrollViewer>
-     </Grid>
-</Window>
+                <TextBlock Text="מספר הזמנה:" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding CurrentOrder.Id}"/>
+
+                <Separator Margin="0,10"/>
+
+                <TextBlock Text="שליח:" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding CurrentOrder.CourierName}"/>
+
+                <Separator Margin="0,10"/>
+
+                <TextBlock Text="עדיפות:" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding CurrentOrder.TypeOfOrder}"/>
+
+            </StackPanel>
+        </Border>
+
+    </Grid>
+    
+</Window>-->

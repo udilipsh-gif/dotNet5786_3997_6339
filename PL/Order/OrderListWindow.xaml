@@ -7,8 +7,7 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת הזמנות"
-        Height="450"
-        Width="900">
+        Height="450" Width="900" Loaded="Window_Loaded">
 
     <Window.Resources>
         <!-- ComboBox לסינון לפי סטטוס -->
@@ -16,7 +15,7 @@
 
         <!-- ComboBox לסינון לפי סוג הזמנה -->
         <local:OrderFilterTypeOfOrder x:Key="OrderFilterTypeOfOrderKey" />
-
+      
 
         <!-- Style לתאים עם Wrap -->
         <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
@@ -153,7 +152,46 @@
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
+                <DataGridTemplateColumn Header="ביטול" Width="Auto" HeaderStyle="{StaticResource WrappedHeaderStyle}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="בטל" 
+                            Click="btnCancelOrder_Click" 
+                            Padding="5,2" 
+                            Margin="2"
+                            ToolTip="לחץ כאן לביטול הזמנה"
+                            Background="Green">
 
+
+                                <Button.Style>
+                                    <Style TargetType="Button">
+
+
+
+                                        <Setter Property="IsEnabled" Value="False"/>
+
+                                        <Style.Triggers>
+
+                                            <DataTrigger Binding="{Binding OrderStatus}" Value="OPEN">
+                                                <Setter Property="IsEnabled" Value="True"/>
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding OrderStatus}" Value="REFUSED">
+                                                <Setter Property="IsEnabled" Value="True"/>
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding OrderStatus}" Value="DELIVERING">
+                                                <Setter Property="IsEnabled" Value="True"/>
+                                            </DataTrigger>
+
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <!-- Add Button: Opens a window to add a new order to the system -->
