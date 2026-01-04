@@ -104,4 +104,5 @@ public class Courier
     /// If it is not used, consider removing it to avoid confusion.
     /// </remarks>
     public List<CourierInList> CourierInLists { get; set; } = new List<CourierInList>();
+
 }

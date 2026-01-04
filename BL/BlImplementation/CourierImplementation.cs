@@ -39,7 +39,7 @@ internal class CourierImplementation : ICourier
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier does not exist.</exception>
     public BO.Courier? Read(int requesterId, int courierId)
     {
-        if (!Tools.CheckManger(requesterId))
+        if (!Tools.CheckManger(requesterId) && requesterId != courierId)
             throw new BO.BlNoAccessException();
 
         return CourierManager.Read(courierId);
