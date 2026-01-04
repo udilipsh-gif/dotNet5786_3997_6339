@@ -942,7 +942,7 @@ internal class Program
                         int orderId = GetIntInput();
                         Console.WriteLine("Enter courier id");
                         int courierId = GetIntInput();
-                        s_bl.Order.Deliver(requesterId, courierId, orderId);
+                        s_bl.Order.Deliver(requesterId, courierId, orderId, EndDelivery.DELIVERED);
                         Console.WriteLine("Delivery reported successfully!");
                         break;
                     case 8:

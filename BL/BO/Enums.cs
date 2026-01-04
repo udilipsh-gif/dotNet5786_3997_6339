@@ -250,18 +250,28 @@ public enum ScheduleStatus
 /// </summary>
 public enum EndDelivery
 {
-    /// <summary>The delivery was successfully completed.</summary>
+    /// <summary>
+    /// The delivery was successfully completed.
+    /// </summary>
     DELIVERED,
 
-    /// <summary>The delivery was refused by the recipient.</summary>
+    /// <summary>
+    /// The delivery was refused by the recipient.
+    /// </summary>
     REFUSED,
 
-    /// <summary>The delivery was cancelled.</summary>
+    /// <summary>
+    /// The delivery was cancelled.
+    /// </summary>
     CANCELLED,
 
-    /// <summary>The delivery address or recipient was not found.</summary>
+    /// <summary>
+    /// The delivery address or recipient was not found.
+    /// </summary>
     NOTFOUND,
 
-    /// <summary>The delivery failed for other reasons.</summary>
+    /// <summary>
+    /// The delivery failed for other reasons.
+    /// </summary>
     FAILED
 }

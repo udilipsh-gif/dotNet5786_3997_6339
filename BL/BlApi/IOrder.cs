@@ -98,14 +98,15 @@ public interface IOrder : IObservable
     /// </summary>
     /// <param name="id">The ID of the user attempting to complete the delivery (must be a manager or the assigned courier).</param>
     /// <param name="courierId">The unique identifier of the courier completing the delivery.</param>
-    /// <param name="orderId">The unique identifier of the order being completed.</param>
+    /// <param name="deliveryId">The unique identifier of the Delyivery being completed.</param>
+    /// <param name="endDelivery">The details of the delivery completion outcome.</param>
     /// <exception cref="BO.BlNoAccessException">Thrown when the user is neither a manager nor the assigned courier.</exception>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the order or delivery is not found.</exception>
     /// <exception cref="BO.BlInvalidOperationException">Thrown when the order is not in DELIVERING status.</exception>
     /// <remarks>
     /// Managers can complete any delivery. Couriers can only complete their own assigned deliveries.
     /// </remarks>
-    void Deliver(int id, int courierId, int orderId);
+    void Deliver(int id, int courierId, int deliveryId, BO.EndDelivery endDelivery);
 
     /// <summary>
     /// Starts a delivery by assigning a courier to an open order.

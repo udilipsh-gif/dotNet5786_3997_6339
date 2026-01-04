@@ -146,11 +146,11 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Managers can complete any delivery. Couriers can only complete their own assigned deliveries.
     /// </remarks>
-    public void Deliver(int id, int courierId, int orderId)
+    public void Deliver(int id, int courierId, int deliveryId, BO.EndDelivery endDelivery)
     {
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
-        DeliveryManager.Deliver(courierId, orderId);
+        DeliveryManager.Deliver(courierId, deliveryId, endDelivery);
     }
 
     /// <summary>

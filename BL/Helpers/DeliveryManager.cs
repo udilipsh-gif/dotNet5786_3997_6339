@@ -70,7 +70,7 @@ internal static class DeliveryManager
     /// <item><description>Records the completion time using the current system clock</description></item>
     /// </list>
     /// </remarks>
-    public static void Deliver(int courierId, int deliveryId)
+    public static void Deliver(int courierId, int deliveryId, BO.EndDelivery endDelivery)
     {
         DO.Delivery delivery = s_dal.Delivery.Read(deliveryId)
             ?? throw new BO.BlDoesNotExistException($"Delivery with ID {deliveryId} not found");
@@ -78,12 +78,13 @@ internal static class DeliveryManager
             throw new BO.BlInvalidValueException($"Courier with ID {courierId} is not assigned to this delivery  ");
         delivery = delivery with
         {
-            EndDelivery = DO.EndDelivery.DELIVERED,
+           EndDelivery = (DO.EndDelivery)endDelivery,
             TimeEndDelivery = AdminManager.Now
         };
         s_dal.Delivery.Update(delivery);
         Observer.NotifyItemUpdated(deliveryId);
-        Observer.NotifyItemUpdated(delivery.OrderId);                
+        Observer.NotifyItemUpdated(delivery.OrderId);
+        Observer.NotifyItemUpdated(courierId);
         Observer.NotifyListUpdated();
     }
 

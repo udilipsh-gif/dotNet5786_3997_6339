@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Compile Remove="AssemblyInfo.cs" />
+    <Compile Remove="Delivery\StertDeliveryWindow.cs" />
   </ItemGroup>
 
   <ItemGroup>

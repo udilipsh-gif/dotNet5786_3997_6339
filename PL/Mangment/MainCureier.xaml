@@ -13,6 +13,7 @@
         Title="ניהול שליח" MinHeight="300" MinWidth="450">
     <Window.Resources>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <local:NullToBooleanConverter x:Key="NullToBooleanConverter"/>
         <Style TargetType="Label" x:Key="UniformMAinLabel">
             <Setter Property="VerticalAlignment" Value="Bottom"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
@@ -103,9 +104,14 @@
                         <TextBlock Text="{Binding CurrentUser.DeliveryLate}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                 </StackPanel>
+                <Button Grid.Row="2"
+                        IsEnabled="{Binding CurrentUser.OrderInProgress, Converter={StaticResource NullToBooleanConverter}}"
+                        Content="התחלת משלוח" Click="StartDelivery_Click" Width="100" Height="50"/>
             </Grid>
         </ScrollViewer>
-        <ScrollViewer Grid.Column="1" Visibility="{Binding CurrentUser.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}}">
+        <ScrollViewer Grid.Column="1"
+                      Visibility="{Binding CurrentUser.OrderInProgress, 
+                      Converter={StaticResource NullToVisibilityConverter}}">
             <Grid Margin="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="150*"/>
@@ -175,7 +181,7 @@
                         <TextBlock Text="{Binding CurrentUser.OrderInProgress.TimeRemaining}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                 </StackPanel>
-                <Button Grid.Row="2"  Content="דווח הזמנה" Command="" Width="100" Height="50"/>
+                <Button Grid.Row="2"  Content="דווח הזמנה" Click="ReportDelivery_Click" Width="100" Height="50"/>
             </Grid>
         </ScrollViewer>
 

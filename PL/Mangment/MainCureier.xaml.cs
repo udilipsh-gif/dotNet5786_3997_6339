@@ -74,7 +74,7 @@ public partial class MainCureier : Window
         {
             CurrentUser = s_bl.Courier.Read(USERID, USERID)
                 ?? throw new BO.BlDoesNotExistException();
-            if(CurrentUser.OrderInProgress is not null)
+            if (CurrentUser.OrderInProgress is not null)
             {
                 IsOrderInProgress = true;
             }
@@ -90,8 +90,44 @@ public partial class MainCureier : Window
         }
     }
 
-    private void ScrollViewer_CleanUpVirtualizedItem(object sender, CleanUpVirtualizedItemEventArgs e)
+    private void ReportDelivery_Click(object sender, RoutedEventArgs e)
     {
+        if (CurrentUser?.OrderInProgress == null)
+        {
+            MessageBox.Show("אין משלוח פעיל לסיום", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
+        // פתיחת חלון בחירת סיבת סיום
+        var selectionWindow = new CloseDeliveryWindow()
+        {
+            Owner = this // נעילת החלון הנוכחי
+        };
+
+        // הצגת החלון כ-Modal Dialog
+        bool? result = selectionWindow.ShowDialog();
+
+        if (result == true && selectionWindow.IsConfirmed)
+        {
+            var selectedReason = selectionWindow.SelectedEndDelivery;
+
+            try
+            {
+                s_bl.Order.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, endDelivery: (BO.EndDelivery)selectedReason);
+
+                MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
+                GetCurier(); // רענון הנתונים
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"שגיאה בסיום המשלוח: {ex.Message}", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+        }
+    }
+
+    private void StartDelivery_Click(object sender, RoutedEventArgs e)
+    {
+        
     }
 }
