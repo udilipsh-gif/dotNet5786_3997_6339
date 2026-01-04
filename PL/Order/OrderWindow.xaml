@@ -165,7 +165,7 @@
                           Height="30"
                           Width="100"
                           Margin="5"
-                          Background="Red"
+                          Background="Green"
                           Visibility="{Binding CancelButtonVisibility}"/>
                 </StackPanel>
 
