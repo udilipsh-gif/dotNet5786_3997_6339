@@ -56,17 +56,6 @@
     <WorkingSince>2025-03-06T01:43:25.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>207377395</Id>
-    <Name>Dina Klein</Name>
-    <Phone>0552402084</Phone>
-    <Email>dina.klein@courier.com</Email>
-    <Password>Pass#184885</Password>
-    <Active>false</Active>
-    <MaxDistanceDelivery>59</MaxDistanceDelivery>
-    <TypeShipment>CAR</TypeShipment>
-    <WorkingSince>2025-05-07T01:43:25.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>343111629</Id>
     <Name>Shira Israelof</Name>
     <Phone>0502244735</Phone>
@@ -208,5 +197,16 @@
     <MaxDistanceDelivery>1.7571312024353156</MaxDistanceDelivery>
     <TypeShipment>FOOT</TypeShipment>
     <WorkingSince>2025-03-08T01:43:25.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>207377395</Id>
+    <Name>Dina Klein</Name>
+    <Phone>0552402084</Phone>
+    <Email>dina.klein@courier.com</Email>
+    <Password>Pass#184885</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>59</MaxDistanceDelivery>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <WorkingSince>2025-05-07T01:43:25.0000000</WorkingSince>
   </Courier>
 </ArrayaOfCouriers>

@@ -29,7 +29,13 @@
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
-     
+
+        <!--<Style TargetType="TextBlock" x:Key="UniformTextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>-->
+
         <!-- Style for combo boxes: Center-aligned vertically -->
         <Style TargetType="ComboBox" x:Key="UniformComboBox">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -81,19 +87,20 @@
                     <RadioButton Content="סטנדרט" Margin="0,0,5,0"
                  IsChecked="{Binding CurrentOrder.TypeOfOrder, 
                              Converter={StaticResource MyEnumConverter},      
-                             ConverterParameter=STANDART}"
+                             ConverterParameter=STANDART,Mode=TwoWay}"
+                            
                              Style="{StaticResource UniformRadioButton}" />
 
                     <RadioButton Content="מהיר"
                  IsChecked="{Binding CurrentOrder.TypeOfOrder, 
                              Converter={StaticResource MyEnumConverter},   
-                             ConverterParameter=FAST_DELIVERY}"
+                             ConverterParameter=FAST_DELIVERY, Mode=TwoWay}"
                              Style="{StaticResource UniformRadioButton}" />
 
                     <RadioButton Content="מיידי" Margin="5,0,0,0"
                  IsChecked="{Binding CurrentOrder.TypeOfOrder, 
                              Converter={StaticResource MyEnumConverter},           
-                             ConverterParameter=DELIVER_IMMEDIATELY}"
+                             ConverterParameter=DELIVER_IMMEDIATELY, Mode=TwoWay}"
                              Style="{StaticResource UniformRadioButton}" />
                 </StackPanel>
 
@@ -135,11 +142,13 @@
 
                 <TextBox Grid.Row="9" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="9" Grid.Column="1" Content="זמן אספקה מירבי" Style="{StaticResource UniformLabel}"/>
-
-                <ComboBox Grid.Row="10" Grid.Column="0" ItemsSource="{Binding OrderStatusValues}" SelectedItem="{Binding CurrentOrder.OrderStatus, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>
+                
+                <TextBox Grid.Row="10" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.OrderStatus}"  Style="{StaticResource UniformTextBox}"/>
                 <Label Grid.Row="10" Grid.Column="1" Content=":סטטוס הזמנה" Style="{StaticResource UniformLabel}"/>
 
-                <ComboBox Grid.Row="11" Grid.Column="0" ItemsSource="{Binding ScheduleStatusValues}" SelectedItem="{Binding CurrentOrder.ScheduleStatus, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>
+                <!--<ComboBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" ItemsSource="{Binding ScheduleStatusValues}" SelectedItem="{Binding CurrentOrder.ScheduleStatus, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>-->
+                <TextBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus}"  Style="{StaticResource UniformTextBox}"/>
+
                 <Label Grid.Row="11" Grid.Column="1" Content="סטטוס עמידה בזמנים" Style="{StaticResource UniformLabel}"/>
 
                 <TextBox Grid.Row="12" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
