@@ -94,7 +94,8 @@ public partial class MainWindow : Window
             else if (user == "Courier")
             {
                 // אפשר לפתוח חלון שליח
-                MessageBox.Show($"ברוך הבא, שליח {userId}", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
+                if(userId != 0)
+                    new MainCureier(userId).Show();
                 return;
             }
 

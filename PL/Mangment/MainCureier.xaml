@@ -7,9 +7,111 @@
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
         Height="800" Width="900" 
+        Loaded="MainCureier_Loaded"
+        Closed="MainCureier_Closed"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="ניהול המערכת" MinHeight="300" MinWidth="450">
+        Title="ניהול שליח" MinHeight="300" MinWidth="450">
+    <Window.Resources>
+        <Style TargetType="Label" x:Key="UniformMAinLabel">
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+        <Style TargetType="Label" x:Key="UniformLabel">
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="UniformTextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Height" Value="Auto"/>
+            <Setter Property="FontSize" Value="16"/>
+        </Style>
+        <Style TargetType="StackPanel" x:Key="UniformStackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="450*"/>
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <ScrollViewer Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="150*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="150*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Content="הפרטים שלי" Style="{StaticResource UniformMAinLabel}"/>
+                <StackPanel Grid.Row="1">
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="שם:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.Name}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="טלפון:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.Phone}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מייל:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.Email}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="פעיל:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource UniformTextBlock}">
+                                    <Setter Property="Text" Value="לא"/>
+                                    <Setter Property="Foreground" Value="Red"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CurrentUser.Active}" Value="True">
+                                            <Setter Property="Text" Value="כן"/>
+                                            <Setter Property="Foreground" Value="Green"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מרחק מירבי:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.MaxDistanceDelivery}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="אמצעי ניידות:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.TypeShipment}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="עובד מאז:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.WorkingSince}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="משלוחים בזמן:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.DeliveryOnTime}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="משלוחים באיחור:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.DeliveryLate}"  Style="{StaticResource UniformTextBlock}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+        <ScrollViewer Grid.Column="1" Visibility="Collapsed">
+            <StackPanel Style="{StaticResource UniformStackPanel}">
+                <Label  Content="שם:" Style="{StaticResource UniformLabel}"/>
+                <TextBlock Text="{Binding CurrentUser.OrderInProgress}"  
+                           Style="{StaticResource UniformTextBlock}"/>
+            </StackPanel>
+
+        </ScrollViewer>
 
     </Grid>
 </Window>
