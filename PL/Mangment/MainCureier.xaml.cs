@@ -45,10 +45,21 @@ public partial class MainCureier : Window
         DependencyProperty.Register("CurrentUser", typeof(BO.Courier),
             typeof(MainCureier), new PropertyMetadata(null));
 
+    public bool IsOrderInProgress
+    {
+        get => (bool)GetValue(IsOrderInProgressProperty);
+        set => SetValue(IsOrderInProgressProperty, value);
+    }
+
+    public static readonly DependencyProperty IsOrderInProgressProperty =
+        DependencyProperty.Register("IsOrderInProgress", typeof(bool),
+            typeof(MainCureier), new PropertyMetadata(false));
+
     private void MainCureier_Loaded(object sender, RoutedEventArgs e)
     {
         GetCurier();
         s_bl.Courier.AddObserver(GetCurier);
+        IsOrderInProgress = false;
     }
 
     private void MainCureier_Closed(object sender, EventArgs e)
@@ -63,6 +74,10 @@ public partial class MainCureier : Window
         {
             CurrentUser = s_bl.Courier.Read(USERID, USERID)
                 ?? throw new BO.BlDoesNotExistException();
+            if(CurrentUser.OrderInProgress is not null)
+            {
+                IsOrderInProgress = true;
+            }
         }
         catch (BO.BlDoesNotExistException)
         {
