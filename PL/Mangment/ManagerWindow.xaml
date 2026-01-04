@@ -169,7 +169,7 @@
             <!-- Courier management button - Opens courier list window -->
             <Button  Content="ניהול שליחים" Margin="10" Padding="5" Click="btnCourierList_Click"/>
             <!-- Order management button - To be implemented -->
-            <Button  Content="ניהול הזמנות" Margin="10" Padding="5" Click="btnOrderList_Click"/>
+            <Button  Content="ניהול הזמנות" ToolTip="טבלת הזמנות - הצג רשימה, מיין וסנן מידע על הזמנות" Margin="10" Padding="5" Click="btnOrderList_Click"/>
             <!-- Delivery management button - To be implemented -->
             <Button  Content="ניהול משלוחים" Margin="10" Padding="5" />
         </Menu>

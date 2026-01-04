@@ -12,16 +12,10 @@
 
     <Window.Resources>
         <!-- ComboBox לסינון לפי סטטוס -->
-        
         <local:OrderFilterScheduleStatus x:Key="OrderFilterScheduleStatusKey" />
-       
-        
-        
 
         <!-- ComboBox לסינון לפי סוג הזמנה -->
         <local:OrderFilterTypeOfOrder x:Key="OrderFilterTypeOfOrderKey" />
-
-       
 
 
         <!-- Style לתאים עם Wrap -->
@@ -55,24 +49,33 @@
     </Window.Resources>
 
     <Grid>
-        <!-- הגדרת שורות: שורה 0 = ComboBox, שורה 1 = DataGrid -->
+        <!--3 שורות, סינון, תוכן, כפתור -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            
+
         </Grid.RowDefinitions>
-        
-        
 
-        <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterScheduleStatusKey}}"
-                x:Name="StatusComboBox"
-                  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="0,0,0,10">
+            <StackPanel Margin="5,0">
+                <TextBlock Text="סנן לפי סטטוס עמידה בזמנים:" Margin="0,0,0,3"/>
+                <ComboBox Width="150" 
+                          ItemsSource="{Binding Source={StaticResource OrderFilterScheduleStatusKey}}"
+                          SelectedValue="{Binding ScheduleStatusFilter, Mode=TwoWay}"
+                          SelectionChanged="ComboBox_SelectionChanged"/>
+            </StackPanel>
 
-        <ComboBox ItemsSource="{Binding Source={StaticResource OrderFilterTypeOfOrderKey}}"
-          x:Name="TypeComboBox"
-                  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <StackPanel Margin="5,0">
+                <TextBlock Text="סנן לפי סוג הזמנה:" Margin="0,0,0,3"/>
+                <ComboBox Width="150" 
+                          ItemsSource="{Binding Source={StaticResource OrderFilterTypeOfOrderKey}}"
+                          SelectedValue="{Binding TypeOfOrderFilter, Mode=TwoWay}"
+                          SelectionChanged="ComboBox_SelectionChanged"/>
+            </StackPanel>
 
-
-
+        </StackPanel>
 
 
 
@@ -89,7 +92,8 @@
                   HorizontalScrollBarVisibility="Auto"
                   FlowDirection="RightToLeft"
                   EnableRowVirtualization="False"
-                  EnableColumnVirtualization="False">
+                  EnableColumnVirtualization="False"
+                  MouseDoubleClick="Add_Edit_Order_Click">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="מזהה הזמנה"
@@ -148,7 +152,20 @@
                                         SortMemberPath="NumberOfDeliveryAttempts"
                                         Width="Auto"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+
             </DataGrid.Columns>
         </DataGrid>
+        <!-- Add Button: Opens a window to add a new order to the system -->
+        <Button Content="הוסף הזמנה" 
+            Grid.Row="2" 
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Bottom" 
+            Height="35"        
+            Margin="10,20"         
+            Width="100"
+            Click="Add_Edit_Order_Click"
+            ToolTip="לחץ כאן להוספת הזמנה למערכת"
+            AutomationProperties.Name="כפתור הוספת הזמנה"/>
     </Grid>
 </Window>
