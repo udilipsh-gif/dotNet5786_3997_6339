@@ -45,7 +45,8 @@ public partial class OrderListWindow : Window
         );
 
         // 3. עדכון הרשימה המוצגת במסך
-        OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
+         OrderList = new ObservableCollection<BO.OrderInList>( filteredResults);
+        //OrderList = new ObservableCollection<BO.OrderInList>(s_bl.Order.ReadAll(CURRENT_MANAGER_ID,null,null,null));
     }
 
     private void orderListObserver()

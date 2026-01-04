@@ -77,20 +77,25 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         }
     }
 
-    public IEnumerable<BO.ScheduleStatus> ScheduleStatusValues
-    {
-        get
-        {
-            return Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>();
-        }
-    }
-    public IEnumerable<BO.OrderStatus> OrderStatusValues
-    {
-        get
-        {
-            return Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>();
-        }
-    }
+   
+
+
+
+    //שיניתי את הערכים לצפייה בלבד אז אין צורך למשוך אינום
+    //public IEnumerable<BO.ScheduleStatus> ScheduleStatusValues
+    //{
+    //    get
+    //    {
+    //        return Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>();
+    //    }
+    //}
+    //public IEnumerable<BO.OrderStatus> OrderStatusValues
+    //{
+    //    get
+    //    {
+    //        return Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>();
+    //    }
+    //}
     public OrderWindow(int id = 0)
     {
         InitializeComponent();
