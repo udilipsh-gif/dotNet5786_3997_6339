@@ -77,7 +77,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     //    }
     //}
 
-   
+
 
 
 
@@ -109,24 +109,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     }
     public static readonly DependencyProperty CurrentOrderProperty =
          DependencyProperty.Register("CurrentOrder", typeof(BO.Order),
-             typeof(OrderWindow), new PropertyMetadata(new BO.Order()
-             {
-                 Id = 0,
-                 Name = "",
-                 Phone = "",
-                 Addres = "",
-                 Details = "",
-                 OrderStatus = BO.OrderStatus.OPEN,
-                 OrderDate = DateTime.Now,
-                 TimeLeftForDelivery = s_bl.Admin.GetConfig().MaxDeliveryTime,
-                 Weight = 0,
-                 Distance = 0,
-                 TypeOfOrder = BO.TypeOfOrder.STANDART,
-                 ScheduleStatus = BO.ScheduleStatus.ONTYME,
-                 EstimatedDeliveryTime = null,
-                 MaxDeliveryTime = DateTime.Now + s_bl.Admin.GetConfig().MaxDeliveryTime,
-                 DeliveryPerOrderInLists = new List<BO.DeliveryPerOrderInList>()
-             }));
+             typeof(OrderWindow), new PropertyMetadata(null));
 
     //public BO.DeliveryPerOrderInList deliveryPerOrderInList
     //{
@@ -175,16 +158,16 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
                 Name = "",
                 Phone = "",
                 Addres = "",
-                Details = "",
+                // Details = "",
                 OrderStatus = BO.OrderStatus.OPEN,
-                OrderDate = DateTime.Now,
+                OrderDate = s_bl.Admin.GetClock(),
                 TimeLeftForDelivery = s_bl.Admin.GetConfig().MaxDeliveryTime,
                 Weight = 0,
-                Distance = 0,
+                // Distance = 0,
                 TypeOfOrder = BO.TypeOfOrder.STANDART,
                 ScheduleStatus = BO.ScheduleStatus.ONTYME,
-                EstimatedDeliveryTime = null,
-                MaxDeliveryTime = DateTime.Now + s_bl.Admin.GetConfig().MaxDeliveryTime
+                // EstimatedDeliveryTime = null,
+                MaxDeliveryTime = s_bl.Admin.GetClock() + s_bl.Admin.GetConfig().MaxDeliveryTime
 
             };
 
@@ -207,15 +190,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         try
         {
             s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID);
-            if (CurrentOrder.OrderStatus == BO.OrderStatus.DELIVERING)
-            {
-              var currentDelivery = CurrentOrder.DeliveryPerOrderInLists.LastOrDefault();
-                int courierId = currentDelivery.CourierId??0;
-               string mailCourior=  s_bl.Courier.Read(CURRENT_MANAGER_ID, courierId).Email;
-             Tools. SendEmail(mailCourior, "הזמנה בוטלה", $"הזמנה מספר {CurrentOrder.Id} בוטלה על ידי המנהל");
-
-
-            }
+           
             MessageBox.Show("הזמנה בוטלה בהצלחה");
 
             Close();

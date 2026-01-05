@@ -801,4 +801,5 @@ internal static class Tools
             throw new Exception($"שגיאה בשליחת מייל: {ex.Message}");
         }
     }
+
 }

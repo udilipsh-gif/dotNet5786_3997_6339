@@ -293,6 +293,19 @@ internal static class OrderManager
                     EndDelivery = DO.EndDelivery.CONCELLED,
                     TimeEndDelivery = AdminManager.Now
                 });
+                
+                {
+                    //BO.Order CurrentOrder = Read(orderId)?? throw new BO.BlDoesNotExistException("Order not found");
+
+                    //var currentDelivery = CurrentOrder.DeliveryPerOrderInLists.LastOrDefault()?? 
+                    //    throw new BO.BlDoesNotExistException("Delivery not found for the order");
+                  
+                    //int courierId = currentDelivery.CourierId;
+                    //string mailCourior = BO.Courier.Read(CURRENT_MANAGER_ID, courierId).Email;
+                    ////Tools. SendEmail(mailCourior, "הזמנה בוטלה", $"הזמנה מספר {CurrentOrder.Id} בוטלה על ידי המנהל");
+
+
+                }
                 Observer.NotifyItemUpdated(delivery.Id);
             }
             ,
