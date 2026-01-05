@@ -13,6 +13,7 @@
         MinHeight="520" MinWidth="350">
     
     <Window.Resources>
+        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
         <!-- Style for labels: Center-aligned vertically, right-aligned horizontally -->
         <Style TargetType="Label" x:Key="UniformLabel">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -102,7 +103,10 @@
                 <Label Grid.Row="5" Grid.Column="1" Content=":מרחק מקסימלי לשילוח" Style="{StaticResource UniformLabel}"/>
 
                 <!-- Row 6: Vehicle/shipment type selector - ComboBox with available vehicle types -->
-                <ComboBox Grid.Row="6" Grid.Column="0" ItemsSource="{Binding VehicleTypesList}" SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}" Style="{StaticResource UniformComboBox}"/>
+                <ComboBox Grid.Row="6" Grid.Column="0" ItemsSource="{Binding VehicleTypesList}" 
+                          SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay,
+                          Converter={StaticResource EnumDescriptionConverter}}" 
+                          Style="{StaticResource UniformComboBox}"/>
                 <Label Grid.Row="6" Grid.Column="1" Content=":סוג התניידות" Style="{StaticResource UniformLabel}"/>
 
                 <!-- Row 7: Active status checkbox - Indicates whether courier is currently active -->

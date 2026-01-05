@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
-        Height="800" Width="900" 
+        Height="600" Width="700" 
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="ניהול המערכת" MinHeight="300" MinWidth="450"
         Loaded="ManagerWindow_Loaded"
