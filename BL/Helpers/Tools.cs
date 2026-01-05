@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using System.Collections;
 using System.Net;
 using System.Net.Mail;
@@ -638,6 +639,10 @@ internal static class Tools
                 {
                     throw new Exception("Failed to get geocoding data.");
                 }
+            }
+            catch (BO.BlInvalidValueException ex)
+            {
+                throw new BO.BlInvalidValueException($"{ex.Message}");
             }
             catch (Exception ex)
             {
