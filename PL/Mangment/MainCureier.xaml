@@ -105,7 +105,7 @@
                     </StackPanel>
                 </StackPanel>
                 <Button Grid.Row="2"
-                        IsEnabled="{Binding CurrentUser.OrderInProgress, Converter={StaticResource NullToBooleanConverter}}"
+                        IsEnabled="{Binding CurrentUser.OrderInProgress, Mode=TwoWay, Converter={StaticResource NullToBooleanConverter}}"
                         Content="התחלת משלוח" Click="StartDelivery_Click" Width="100" Height="50"/>
             </Grid>
         </ScrollViewer>
@@ -174,7 +174,7 @@
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="זמן שנשאר למשלוח:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.StartDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.TimeRemaining}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="מצב הזמנה:" Style="{StaticResource UniformLabel}"/>

@@ -167,15 +167,19 @@ public enum TimeUnit
 public enum TheTypeShipment
 {
     /// <summary>Delivery by car.</summary>
+    [Description("רכב")]
     CAR,
 
     /// <summary>Delivery by motorcycle.</summary>
+    [Description("קטנוע")]
     MOTORCYCLE,
 
     /// <summary>Delivery by bike.</summary>
+    [Description("אופניים")]
     BIKE,
 
     /// <summary>Delivery on foot.</summary>
+    [Description("ברגל")]
     FOOT
 }
 

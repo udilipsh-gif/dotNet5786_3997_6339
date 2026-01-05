@@ -105,7 +105,7 @@
                 
                 <!-- Shipment Type Column: Displays the type of delivery vehicle (Car/Motorcycle/OnFoot) -->
                 <DataGridTextColumn Header="סוג משלוח" 
-                            Binding="{Binding TypeShipment}" 
+                            Binding="{Binding TypeShipment, Converter={StaticResource EnumDescriptionConverter}}" 
                             SortMemberPath="TypeShipment" 
                             Width="Auto"/>
 
