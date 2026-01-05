@@ -51,38 +51,5 @@ internal static class Tools
         e.Handled = !e.Text.All(char.IsDigit);
     }
 
-    public static void SendEmail(string toEmail, string subject, string body)
-    {
-        try
-        {
-            MailMessage mail = new MailMessage();
-            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
-
-            string fromEmail = "@gmail.com";
-            string password = "xxxx xxxx xxxx xxxx"; // סיסמת האפליקציה (16 תווים)
-
-            mail.From = new MailAddress(fromEmail);
-
-            // ולידציה בסיסית למקרה שהמייל ריק
-            if (string.IsNullOrWhiteSpace(toEmail))
-                throw new Exception("כתובת המייל של הנמען ריקה");
-
-            mail.To.Add(toEmail);
-            mail.Subject = subject;
-            mail.Body = body;
-
-
-            // הגדרות שרת
-            SmtpServer.Port = 587;
-            SmtpServer.Credentials = new NetworkCredential(fromEmail, password);
-            SmtpServer.EnableSsl = true;
-
-            SmtpServer.Send(mail);
-        }
-        catch (Exception ex)
-        {
-
-            throw new Exception($"שגיאה בשליחת מייל: {ex.Message}");
-        }
-    }
+   
 }

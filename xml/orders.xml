@@ -353,22 +353,6 @@
     <DistanceKmWalk />
   </Order>
   <Order>
-    <Id>100024</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 23</Details>
-    <Addres>המסגר 20 רמת גן</Addres>
-    <Latitude>32.0624089</Latitude>
-    <Longitude>34.7854347</Longitude>
-    <Name>Customer23</Name>
-    <Phone>0579542072</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2025-01-12T01:43:25.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>4.953305046102234</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100021</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>כככככככככככככככככככככככככככ</Details>
@@ -845,6 +829,54 @@
     <OrderDate>2025-11-15T01:43:25.0000000</OrderDate>
     <OrderStatus>CONCELLED</OrderStatus>
     <DistanceKm>0.4909251746821105</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100054</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>בדיקה</Details>
+    <Addres>אברבנאל 117 בני ברק</Addres>
+    <Latitude>32.0964982</Latitude>
+    <Longitude>34.8334325</Longitude>
+    <Name>דווויד</Name>
+    <Phone>0548454307</Phone>
+    <Weight>76</Weight>
+    <OrderDate>2026-01-02T01:43:25.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100055</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>חחחחחח</Details>
+    <Addres>ירושלים 18</Addres>
+    <Latitude>32.1745771</Latitude>
+    <Longitude>34.9055665</Longitude>
+    <Name>ודה</Name>
+    <Phone>123456789</Phone>
+    <Weight>0</Weight>
+    <OrderDate>2026-01-02T01:43:25.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100024</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 23</Details>
+    <Addres>המסגר 20 רמת גן</Addres>
+    <Latitude>32.0624089</Latitude>
+    <Longitude>34.7854347</Longitude>
+    <Name>Customer23</Name>
+    <Phone>0579542072</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2025-01-12T01:43:25.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>4.953305046102234</DistanceKm>
     <DistanceKmRoad />
     <DistanceKmWalk />
   </Order>
