@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,17 @@ public partial class StartDeliveryWindow : Window
 
     private readonly int courierId;
 
-    private BO.TypeOfOrder filter;
+    public ICommand SelectOrderCommand { get; private set; }
 
-    private BO.OpenOrderInListField sort;
+    private BO.OpenOrderInListField SelctedSort
+    {
+        get => (BO.OpenOrderInListField)GetValue(SelctedSortProperty);
+        set => SetValue(SelctedSortProperty, value);
+    }
+
+    public static readonly DependencyProperty SelctedSortProperty =
+        DependencyProperty.Register("SelctedSort", typeof(BO.OpenOrderInListField),
+            typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
     public BO.TypeOfOrder SelctedFilter
     {
@@ -36,7 +45,18 @@ public partial class StartDeliveryWindow : Window
     }
     public static readonly DependencyProperty SelctedFilterProperty =
         DependencyProperty.Register("SelctedFilter", typeof(BO.TypeOfOrder),
-            typeof(StartDeliveryWindow), new PropertyMetadata(BO.TypeOfOrder.All));
+            typeof(StartDeliveryWindow), new PropertyMetadata(null));
+
+    public List<BO.OpenOrderInList> DeliveryListView
+    {
+        get => (List<BO.OpenOrderInList>)GetValue(DeliveryListViewProperty);
+        set => SetValue(DeliveryListViewProperty, value);
+    }
+
+    public static readonly DependencyProperty DeliveryListViewProperty =
+        DependencyProperty.Register("DeliveryListView", typeof(List<BO.OpenOrderInList>),
+            typeof(StartDeliveryWindow), new PropertyMetadata(null));
+
 
     public StartDeliveryWindow(int userId, int courierId)
     {
@@ -44,17 +64,68 @@ public partial class StartDeliveryWindow : Window
 
         this.courierId = courierId;
 
+        // אתחול ה-Command לפני InitializeComponent
+        SelectOrderCommand = new RelayCommand<BO.OpenOrderInList>(ExecuteSelectOrder, CanSelectOrder);
+
         InitializeComponent();
     }
 
     private void StartDeliveryWindow_Loaded(object sender, RoutedEventArgs e)
     {
-       DeliveryListView = s_bl.Order.GetOpen(
+        s_bl.Order.AddObserver(orderListObserver);
+        UpdateOrdersList();
+        
     }
+
+    private void orderListObserver()
+        => UpdateOrdersList();
 
     private void StartDeliveryWindow_Closed(object sender, EventArgs e)
     {
-        Application.Current.MainWindow!.Show();
+        s_bl.Order.RemoveObserver(orderListObserver);
     }
 
+    private void UpdateOrdersList()
+    {
+        DeliveryListView = [.. s_bl.Order.GetOpen(userId, courierId, SelctedFilter, SelctedSort)];
+    }
+
+    private void ComboBox_FilterSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        SelctedFilter = (BO.TypeOfOrder)((ComboBox)sender).SelectedItem;
+        UpdateOrdersList();
+    }
+
+    private void ComboBox_SortSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        SelctedSort = (BO.OpenOrderInListField)((ComboBox)sender).SelectedItem;
+        UpdateOrdersList();
+    }
+
+    private bool CanSelectOrder(BO.OpenOrderInList? selectedOrder)
+    {
+        // תמיד מאפשר ביצוע אם יש הזמנה נבחרת
+        return selectedOrder != null;
+    }
+
+    private void ExecuteSelectOrder(BO.OpenOrderInList? selectedOrder)
+    {
+        try
+        {
+            if (selectedOrder == null)
+                throw new BO.BlInvalidOperationException("סיבת סיום המשלוח לא תקפה");
+
+            s_bl.Order.StartDelivery(userId, courierId, selectedOrder.OrderId);
+
+            MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+
+            this.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"שגיאה בהתחלת המשלוח: {ex.Message}", "שגיאה",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
 }

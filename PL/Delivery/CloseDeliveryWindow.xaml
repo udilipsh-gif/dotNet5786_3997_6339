@@ -4,10 +4,15 @@
         xmlns:local="clr-namespace:PL"
         FlowDirection="RightToLeft"
         Title="סיום משלוח" 
-        Height="200" Width="250"
+        Height="220" Width="250"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
+    <Window.Resources>
+        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
+    </Window.Resources>
+    
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,30 +29,37 @@
 
         <!-- רשימת בחירה -->
         <ComboBox Grid.Row="1" 
-                  x:Name="EndDeliveryComboBox"
-                  ItemsSource="{Binding EndDeliveryOptions}"
-                  SelectedItem="{Binding SelectedEndDelivery}"
-                  FontSize="14"
-                  Padding="10"
-                  VerticalAlignment="Top"/>
+          x:Name="EndDeliveryComboBox"
+          ItemsSource="{Binding EndDeliveryOptions}"
+          SelectedItem="{Binding SelectedEndDelivery, Mode=TwoWay}"
+          FontSize="14"    
+          VerticalAlignment="Top">
+            <!-- תבנית להצגת פריטים ברשימה הנפתחת -->
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <!-- כפתורי אישור וביטול -->
         <StackPanel Grid.Row="2" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Center"
                     Margin="0,20,0,0">
+            <Button Content="ביטול" 
+                    Width="90" 
+                    Height="35"
+                    Margin="5"
+                    Click="CancelButton_Click"
+                    IsCancel="True"/>     
             <Button Content="אישור" 
-                    Width="100" 
+                    Width="90" 
                     Height="35"
                     Margin="5"
                     Click="OkButton_Click"
                     IsDefault="True"/>
-            <Button Content="ביטול" 
-                    Width="100" 
-                    Height="35"
-                    Margin="5"
-                    Click="CancelButton_Click"
-                    IsCancel="True"/>
+          
         </StackPanel>
     </Grid>
 </Window>

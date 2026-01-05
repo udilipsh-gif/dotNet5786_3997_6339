@@ -18,6 +18,7 @@
     <Window.Resources>
         <!-- CourierFieldFilter enumeration converter for ComboBox items -->
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
+        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
     </Window.Resources>
 
     <!-- Main Grid: Container for all window content, divided into 3 rows -->
@@ -57,9 +58,14 @@
                       ItemsSource="{Binding Source={StaticResource CourierFieldFilterKey}}" 
                       SelectedItem="{Binding CourierFilter}"
                       SelectionChanged="ComboBox_SelectionChanged"
-                      SelectedIndex="0"
                       ToolTip="בחר סינון: הכל, פעילים בלבד, או לא פעילים"
                       AutomationProperties.Name="תיבת בחירה לסינון שליחים">
+                <!-- תבנית להצגת פריטים ברשימה הנפתחת -->
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
             </ComboBox>
         </Grid>
         

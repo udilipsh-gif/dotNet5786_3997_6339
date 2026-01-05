@@ -85,7 +85,8 @@ public partial class CourierListWindow : Window
     /// Dependency property for the CourierFilter property.
     /// </summary>
     public static readonly DependencyProperty CourierFilterProperty =
-       DependencyProperty.Register(nameof(CourierFilter), typeof(BO.CourierFieldFilter), typeof(CourierListWindow), new PropertyMetadata(BO.CourierFieldFilter.All));
+       DependencyProperty.Register(nameof(CourierFilter), typeof(BO.CourierFieldFilter), 
+           typeof(CourierListWindow), new PropertyMetadata(BO.CourierFieldFilter.All));
 
     /// <summary>
     /// Handles the window loaded event, initializes the courier list and registers for updates.
@@ -161,7 +162,7 @@ public partial class CourierListWindow : Window
         };
 
         // Call business layer to get the filtered courier list
-        CourierInList = new ObservableCollection<BO.CourierInList>(s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id));
+        CourierInList = new ObservableCollection<BO.CourierInList>(s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id).Where(e => e.Id != 0));
     }
 
     /// <summary>
@@ -206,3 +207,4 @@ public partial class CourierListWindow : Window
         courierWindow.Show();
     }
 }
+

@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using DO;
 
 namespace Helpers;
 
@@ -83,9 +84,11 @@ internal static class DeliveryManager
         };
         s_dal.Delivery.Update(delivery);
         Observer.NotifyItemUpdated(deliveryId);
-        Observer.NotifyItemUpdated(delivery.OrderId);
-        Observer.NotifyItemUpdated(courierId);
+        OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
+        CourierManager.Observer.NotifyItemUpdated(courierId);
         Observer.NotifyListUpdated();
+        OrderManager.Observer.NotifyListUpdated();
+        CourierManager.Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -125,7 +128,11 @@ internal static class DeliveryManager
             TimeEndDelivery = null
         };
         s_dal.Delivery.Create(delivery);
+        OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
+        CourierManager.Observer.NotifyItemUpdated(courier.Id);
         Observer.NotifyListUpdated();
+        OrderManager.Observer.NotifyListUpdated();
+        CourierManager.Observer.NotifyListUpdated();
     }
 
 

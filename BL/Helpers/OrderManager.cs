@@ -332,7 +332,10 @@ internal static class OrderManager
             OrderStatus = DO.OrderStatus.DELIVERING
         });
         Observer.NotifyItemUpdated(orderId);
-        Observer.NotifyItemUpdated(courierId);
+        CourierManager.Observer.NotifyItemUpdated(courierId);
+        Observer.NotifyListUpdated();
+        CourierManager.Observer.NotifyListUpdated();
+        DeliveryManager.Observer.NotifyListUpdated();
     }
 
     /// <summary>

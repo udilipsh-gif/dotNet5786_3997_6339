@@ -23,12 +23,28 @@ public partial class CloseDeliveryWindow : Window
     /// <summary>
     /// Gets the list of available end delivery options from the enum
     /// </summary>
-    public List<BO.EndDelivery> EndDeliveryOptions { get; }
+    public List<BO.EndDelivery> EndDeliveryOptions
+    { 
+        get { return (List<BO.EndDelivery>)GetValue(EndDeliveryOptionsProperty); }
+        private set { SetValue(EndDeliveryOptionsProperty, value); }
+    }
+
+    public static readonly DependencyProperty EndDeliveryOptionsProperty =
+        DependencyProperty.Register("EndDeliveryOptions", typeof(List<BO.EndDelivery>),
+            typeof(CloseDeliveryWindow), new PropertyMetadata(null));
 
     /// <summary>
     /// Gets or sets the selected end delivery reason
     /// </summary>
-    public BO.EndDelivery? SelectedEndDelivery { get; set; }
+    public BO.EndDelivery? SelectedEndDelivery 
+    {
+        get { return (BO.EndDelivery?)GetValue(SelectedEndDeliveryProperty); }
+        set { SetValue(SelectedEndDeliveryProperty, value); }
+    }
+
+    public static readonly DependencyProperty SelectedEndDeliveryProperty =
+        DependencyProperty.Register("SelectedEndDelivery", typeof(BO.EndDelivery?),
+            typeof(CloseDeliveryWindow), new PropertyMetadata(null));
 
     /// <summary>
     /// Gets whether the user confirmed the selection
@@ -37,8 +53,6 @@ public partial class CloseDeliveryWindow : Window
 
     public CloseDeliveryWindow()
     {
-        InitializeComponent();
-
         this.DataContext = this;
 
         // מילוי הרשימה מה-Enum (ללא CANCELLED אם רוצים להגביל אפשרויות)
@@ -47,7 +61,9 @@ public partial class CloseDeliveryWindow : Window
                                    .Where(e => e != BO.EndDelivery.CANCELLED)
                                    .ToList();
 
-        SelectedEndDelivery = EndDeliveryOptions.FirstOrDefault();
+        SelectedEndDelivery = null;
+
+        InitializeComponent();
     }
 
     private void OkButton_Click(object sender, RoutedEventArgs e)

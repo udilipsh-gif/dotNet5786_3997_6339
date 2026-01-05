@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -50,6 +51,27 @@ public class NullToBooleanConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return value == null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class EnumDescriptionConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value == null) return string.Empty;
+
+        var fieldInfo = value.GetType().GetField(value.ToString()!);
+        if (fieldInfo == null)
+            return value.ToString() ?? string.Empty;
+
+        var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+        return attributes.Length > 0 ? attributes[0].Description : value.ToString() ?? string.Empty;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

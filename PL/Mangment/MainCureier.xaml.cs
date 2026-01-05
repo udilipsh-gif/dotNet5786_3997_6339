@@ -99,10 +99,8 @@ public partial class MainCureier : Window
         }
 
         // פתיחת חלון בחירת סיבת סיום
-        var selectionWindow = new CloseDeliveryWindow()
-        {
-            Owner = this // נעילת החלון הנוכחי
-        };
+        var selectionWindow = new CloseDeliveryWindow();
+        
 
         // הצגת החלון כ-Modal Dialog
         bool? result = selectionWindow.ShowDialog();
@@ -113,10 +111,18 @@ public partial class MainCureier : Window
 
             try
             {
-                s_bl.Order.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, endDelivery: (BO.EndDelivery)selectedReason);
+                if (selectedReason is BO.EndDelivery status)
+                {
+                    // המשתנה 'status' זמין כאן והוא בטוח לשימוש
+                    s_bl.Order.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, status);
 
                 MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
-                GetCurier(); // רענון הנתונים
+                
+                }
+                else
+                {
+                    throw new BO.BlInvalidOperationException("סיבת הסיום שנבחרה אינה תקפה.");
+                }
             }
             catch (Exception ex)
             {
@@ -128,6 +134,17 @@ public partial class MainCureier : Window
 
     private void StartDelivery_Click(object sender, RoutedEventArgs e)
     {
+        if(CurrentUser?.OrderInProgress != null)
+        {
+            MessageBox.Show("יש משלוח פעיל לסיום", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        // פתיחת חלון בחירת סיבת סיום
+        var startDeliverWindow = new StartDeliveryWindow(USERID, USERID);
         
+
+        // הצגת החלון כ-Modal Dialog
+        startDeliverWindow.Show();
     }
 }

@@ -85,7 +85,7 @@
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="מרחק מירבי:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.MaxDistanceDelivery}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Text="{Binding CurrentUser.MaxDistanceDelivery, StringFormat=N2}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="אמצעי ניידות:" Style="{StaticResource UniformLabel}"/>

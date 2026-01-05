@@ -253,25 +253,30 @@ public enum EndDelivery
     /// <summary>
     /// The delivery was successfully completed.
     /// </summary>
+    [Description("נמסר בהצלחה")]
     DELIVERED,
 
     /// <summary>
     /// The delivery was refused by the recipient.
     /// </summary>
+    [Description("סורב על ידי הלקוח")]
     REFUSED,
 
     /// <summary>
     /// The delivery was cancelled.
     /// </summary>
+    [Description("בוטל")]
     CANCELLED,
 
     /// <summary>
     /// The delivery address or recipient was not found.
     /// </summary>
+    [Description("כתובת/לקוח לא נמצא")]
     NOTFOUND,
 
     /// <summary>
     /// The delivery failed for other reasons.
     /// </summary>
+    [Description("נכשל")]
     FAILED
 }
