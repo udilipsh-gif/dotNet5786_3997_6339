@@ -31,6 +31,22 @@ public partial class MainCureier : Window
         InitializeComponent();
     }
 
+    /// <summary>
+    /// List of all vehicle/shipment types for the ComboBox.
+    /// </summary>
+    public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
+     Enum.GetValues(typeof(BO.TheTypeShipment)).Cast<BO.TheTypeShipment>();
+
+
+    public bool IsEditMode
+    {
+        get => (bool)GetValue(IsEditModeProperty);
+        set => SetValue(IsEditModeProperty, value);
+    }
+
+    public static readonly DependencyProperty IsEditModeProperty =
+        DependencyProperty.Register("IsEditMode", typeof(bool),
+        typeof(MainCureier), new PropertyMetadata(false));
 
     public BO.Courier? CurrentUser
     {
@@ -146,5 +162,53 @@ public partial class MainCureier : Window
 
         // הצגת החלון כ-Modal Dialog
         startDeliverWindow.Show();
+    }
+
+    private void EditCureier_Click(object sender, RoutedEventArgs e)
+    {
+        IsEditMode = true;
+    }
+
+    private void CloseCureierEdit_Click(object sender, RoutedEventArgs e)
+    {
+        IsEditMode = false;
+        GetCurier();
+    }
+
+    /// <summary>
+    /// Handles the add/update button click event, validates and saves courier data.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">Event arguments.</param>
+    /// <remarks>
+    /// Performs basic validation before submitting data to the business logic layer.
+    /// Creates a new courier if in add mode, updates existing courier if in update mode.
+    /// Closes the window upon successful operation.
+    /// </remarks>
+    private void btnSaveUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (CurrentUser == null || string.IsNullOrEmpty(CurrentUser.Name))
+        {
+            MessageBox.Show("Please enter a name");
+            return;
+        }
+        try
+        {
+                s_bl.Courier.Update(USERID, CurrentUser);
+                MessageBox.Show("הפרטים נשמרו בהצלחה!");
+                IsEditMode = false;
+        }
+        catch (BO.BlInvalidValueException ex)
+        {
+            MessageBox.Show($"Invalid data: {ex.Message}");
+        }
+        catch (BO.BlAlreadyExistsException ex)
+        {
+            MessageBox.Show($"Error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"General error: {ex.Message}");
+        }
     }
 }

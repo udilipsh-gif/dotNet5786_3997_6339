@@ -6,14 +6,17 @@
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
-        Height="800" Width="900" 
+        Height="550" Width="600" 
         Loaded="MainCureier_Loaded"
         Closed="MainCureier_Closed"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="ניהול שליח" MinHeight="300" MinWidth="450">
     <Window.Resources>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:NullToBooleanConverter x:Key="NullToBooleanConverter"/>
+        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
+        
         <Style TargetType="Label" x:Key="UniformMAinLabel">
             <Setter Property="VerticalAlignment" Value="Bottom"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
@@ -24,17 +27,35 @@
             <Setter Property="VerticalAlignment" Value="Bottom"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontSize" Value="12"/>
         </Style>
         <Style TargetType="TextBlock" x:Key="UniformTextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Height" Value="Auto"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="UniformTextBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="Height" Value="Auto"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="UniformTextBoxNom" BasedOn="{StaticResource UniformTextBox}" >
+            <Setter Property="local:Tools.NumericOnly" Value="True"/>
         </Style>
         <Style TargetType="StackPanel" x:Key="UniformStackPanel">
             <Setter Property="Orientation" Value="Horizontal"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="ComboBox" x:Key="UniformComboBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
     </Window.Resources>
 
@@ -51,7 +72,10 @@
                     <RowDefinition Height="150*"/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Content="הפרטים שלי" Style="{StaticResource UniformMAinLabel}"/>
-                <StackPanel Grid.Row="1">
+                <StackPanel Grid.Row="1" 
+                            Visibility="{Binding IsEditMode,
+                            Converter={StaticResource BoolToVisibilityConverter},
+                            ConverterParameter=Invert}">
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="שם:" Style="{StaticResource UniformLabel}"/>
                         <TextBlock Text="{Binding CurrentUser.Name}"  Style="{StaticResource UniformTextBlock}"/>
@@ -104,9 +128,63 @@
                         <TextBlock Text="{Binding CurrentUser.DeliveryLate}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                 </StackPanel>
-                <Button Grid.Row="2"
+                <StackPanel Grid.Row="2" Style="{StaticResource UniformStackPanel}"
+                            Visibility="{Binding IsEditMode,
+                            Converter={StaticResource BoolToVisibilityConverter},
+                            ConverterParameter=Invert}">
+                <Button Visibility="{Binding CurrentUser.Active, Converter={StaticResource BoolToVisibilityConverter}}"
                         IsEnabled="{Binding CurrentUser.OrderInProgress, Mode=TwoWay, Converter={StaticResource NullToBooleanConverter}}"
-                        Content="התחלת משלוח" Click="StartDelivery_Click" Width="100" Height="50"/>
+                        Content="התחלת משלוח" Click="StartDelivery_Click" Width="100" Height="50" Margin="2"/>
+
+                    <Button Content="עריכת פרטים" Click="EditCureier_Click" Width="100" Height="50" Margin="2"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" 
+                            Visibility="{Binding IsEditMode,
+                            Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="שם:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox Text="{Binding CurrentUser.Name, Mode=TwoWay}"  Style="{StaticResource UniformTextBox}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="טלפון:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox Text="{Binding CurrentUser.Phone, Mode=TwoWay}"  Style="{StaticResource UniformTextBoxNom}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מייל:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox Text="{Binding CurrentUser.Email, Mode=TwoWay}"  Style="{StaticResource UniformTextBox}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="סיסמה:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox Text="{Binding CurrentUser.Password, Mode=TwoWay}"  Style="{StaticResource UniformTextBox}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="מרחק מירבי:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox Text="{Binding CurrentUser.MaxDistanceDelivery, Mode=TwoWay}"  Style="{StaticResource UniformTextBoxNom}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource UniformStackPanel}">
+                        <Label  Content="סוג שילוח:" Style="{StaticResource UniformLabel}"/>
+                        <ComboBox ItemsSource="{Binding VehicleTypesList}" 
+                                  SelectedItem="{Binding CurrentUser.TypeShipment, Mode=TwoWay}" 
+                                  Style="{StaticResource UniformComboBox}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Style="{StaticResource UniformStackPanel}"
+                            Visibility="{Binding IsEditMode,
+                            Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Button Content="שמירה" Click="btnSaveUpdate_Click" Width="100" Height="50" Margin="2"/>
+
+                    <Button Content="ביטול" Click="CloseCureierEdit_Click" Width="100" Height="50" Margin="2"/>
+                </StackPanel>
+
             </Grid>
         </ScrollViewer>
         <ScrollViewer Grid.Column="1"
