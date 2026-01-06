@@ -1,6 +1,7 @@
 ﻿using BO;
 using DalApi;
 using System.Collections;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Mail;
 using System.Reflection;
@@ -774,14 +775,16 @@ internal static class Tools
             MailMessage mail = new MailMessage();
             SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
 
-            string fromEmail = "@gmail.com";
-            string password = "xxxx xxxx xxxx xxxx"; // סיסמת האפליקציה (16 תווים)
+            string fromEmail = "aaaaaaaaa@gmail.com";
+            string password = "1234 5678 @#$% Asdf"; // סיסמת האפליקציה (16 תווים)
 
             mail.From = new MailAddress(fromEmail);
 
             // ולידציה בסיסית למקרה שהמייל ריק
             if (string.IsNullOrWhiteSpace(toEmail))
-                throw new Exception("כתובת המייל של הנמען ריקה");
+                //throw new Exception("כתובת המייל של הנמען ריקה");
+                throw new SmtpException("כתובת נמען ריקה");
+
 
             mail.To.Add(toEmail);
             mail.Subject = subject;
@@ -795,11 +798,17 @@ internal static class Tools
 
             SmtpServer.Send(mail);
         }
-        catch (Exception ex)
-        {
+        //catch (Exception ex)
+        //{
            
-            throw new Exception($"שגיאה בשליחת מייל: {ex.Message}");
+        //    throw new Exception($"שגיאה בשליחת מייל: {ex.Message}");
+        //}
+        catch (SmtpException ex)
+        {
+            Debug.WriteLine($"Email failed: {ex}");
+            
         }
+
     }
 
 }

@@ -305,22 +305,6 @@
     <DistanceKmWalk />
   </Order>
   <Order>
-    <Id>100033</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 32</Details>
-    <Addres>הירקון 30 בני ברק</Addres>
-    <Latitude>32.0965213</Latitude>
-    <Longitude>34.827465</Longitude>
-    <Name>Customer32</Name>
-    <Phone>0561350393</Phone>
-    <Weight>5</Weight>
-    <OrderDate>2025-12-03T01:43:25.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>0.5341381762965827</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100027</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 26</Details>
@@ -539,22 +523,6 @@
     <Phone>0561232167</Phone>
     <Weight>7</Weight>
     <OrderDate>2025-09-27T01:43:25.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm />
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
-    <Id>100028</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 27</Details>
-    <Addres>שד' ירושלים 45 רמת גן</Addres>
-    <Latitude>32.0830304</Latitude>
-    <Longitude>34.8290221</Longitude>
-    <Name>Customer27</Name>
-    <Phone>0547969350</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2025-04-23T01:43:25.0000000</OrderDate>
     <OrderStatus>OPEN</OrderStatus>
     <DistanceKm />
     <DistanceKmRoad />
@@ -801,22 +769,6 @@
     <DistanceKmWalk />
   </Order>
   <Order>
-    <Id>100053</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>חחחח</Details>
-    <Addres>רבי עקיבא 67 בני ברק</Addres>
-    <Latitude>32.08637</Latitude>
-    <Longitude>34.8302969</Longitude>
-    <Name>hfh</Name>
-    <Phone>0548461159</Phone>
-    <Weight>560</Weight>
-    <OrderDate>2026-01-02T01:43:25.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm />
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100015</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 14</Details>
@@ -877,6 +829,54 @@
     <OrderDate>2025-01-12T01:43:25.0000000</OrderDate>
     <OrderStatus>CONCELLED</OrderStatus>
     <DistanceKm>4.953305046102234</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100033</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 32</Details>
+    <Addres>הירקון 30 בני ברק</Addres>
+    <Latitude>32.0965213</Latitude>
+    <Longitude>34.827465</Longitude>
+    <Name>Customer32</Name>
+    <Phone>0561350393</Phone>
+    <Weight>5</Weight>
+    <OrderDate>2025-12-03T01:43:25.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>0.5341381762965827</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100028</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 27</Details>
+    <Addres>שד' ירושלים 45 רמת גן</Addres>
+    <Latitude>32.0830304</Latitude>
+    <Longitude>34.8290221</Longitude>
+    <Name>Customer27</Name>
+    <Phone>0547969350</Phone>
+    <Weight>12</Weight>
+    <OrderDate>2025-04-23T01:43:25.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100053</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>חחחח</Details>
+    <Addres>רבי עקיבא 67 בני ברק</Addres>
+    <Latitude>32.08637</Latitude>
+    <Longitude>34.8302969</Longitude>
+    <Name>hfh</Name>
+    <Phone>0548461159</Phone>
+    <Weight>560</Weight>
+    <OrderDate>2026-01-02T01:43:25.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm />
     <DistanceKmRoad />
     <DistanceKmWalk />
   </Order>

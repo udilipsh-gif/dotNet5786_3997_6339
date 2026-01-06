@@ -76,14 +76,14 @@ internal static class OrderManager
     /// Validates all required fields and geocodes the delivery address before creation.
     /// </remarks>
     public static void Create(BO.Order boOrder)
-    {   
-        if(string.IsNullOrEmpty(boOrder.Details))
+    {
+        if (string.IsNullOrEmpty(boOrder.Details))
             throw new BO.BlInvalidValueException("Order details cannot be empty.");
 
         if (string.IsNullOrEmpty(boOrder.Addres))
             throw new BO.BlInvalidValueException("Order address cannot be empty.");
 
-        if(string.IsNullOrEmpty(boOrder.Name))
+        if (string.IsNullOrEmpty(boOrder.Name))
             throw new BO.BlInvalidValueException("Order name cannot be empty.");
 
         if (!Tools.IsValidPhone(boOrder.Phone))
@@ -293,26 +293,37 @@ internal static class OrderManager
                     EndDelivery = DO.EndDelivery.CONCELLED,
                     TimeEndDelivery = AdminManager.Now
                 });
-                
-                {
-                    //BO.Order CurrentOrder = Read(orderId)?? throw new BO.BlDoesNotExistException("Order not found");
-
-                    //var currentDelivery = CurrentOrder.DeliveryPerOrderInLists.LastOrDefault()?? 
-                    //    throw new BO.BlDoesNotExistException("Delivery not found for the order");
-                  
-                    //int courierId = currentDelivery.CourierId;
-                    //string mailCourior = BO.Courier.Read(CURRENT_MANAGER_ID, courierId).Email;
-                    ////Tools. SendEmail(mailCourior, "הזמנה בוטלה", $"הזמנה מספר {CurrentOrder.Id} בוטלה על ידי המנהל");
 
 
-                }
+                var courier = s_dal.Courier.Read(delivery.CourierId)
+                     ?? throw new BO.BlDoesNotExistException("Courier not found");
+
+                Tools.SendEmail(
+                    courier.Email,
+                    "הזמנה בוטלה",
+                    $"הזמנה מספר {orderId} בוטלה על ידי המנהל"
+                );
+
+
+
+                //BO.Order CurrentOrder = Read(orderId)?? throw new BO.BlDoesNotExistException("Order not found");
+
+                //var currentDelivery = CurrentOrder.DeliveryPerOrderInLists.LastOrDefault()?? 
+                //    throw new BO.BlDoesNotExistException("Delivery not found for the order");
+
+                //int courierId = currentDelivery.CourierId;
+                //string mailCourior = BO.Courier.Read(CURRENT_MANAGER_ID, courierId).Email;
+                ////Tools. SendEmail(mailCourior, "הזמנה בוטלה", $"הזמנה מספר {CurrentOrder.Id} בוטלה על ידי המנהל");
+
+
+
                 Observer.NotifyItemUpdated(delivery.Id);
             }
             ,
             _ => throw new BO.BlInvalidOperationException("Invalid order status.")
         };
 
-        action();  
+        action();
     }
 
     /// <summary>

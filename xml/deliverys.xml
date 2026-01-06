@@ -610,4 +610,34 @@
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>2026-01-02T01:43:25.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200062</Id>
+    <OrderId>100033</OrderId>
+    <CourierId>241720432</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2026-01-02T01:43:25.0000000</OrderDate>
+    <ActualDistance>0.729</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-02T01:43:25.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200063</Id>
+    <OrderId>100028</OrderId>
+    <CourierId>241720432</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2026-01-02T01:43:25.0000000</OrderDate>
+    <ActualDistance>1.539</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-02T01:43:25.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200064</Id>
+    <OrderId>100053</OrderId>
+    <CourierId>241720432</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2026-01-02T01:43:25.0000000</OrderDate>
+    <ActualDistance>1.175</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-02T01:43:25.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>

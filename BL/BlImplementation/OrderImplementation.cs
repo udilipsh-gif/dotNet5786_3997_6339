@@ -76,7 +76,7 @@ internal class OrderImplementation : IOrder
     /// <exception cref="BO.BlDoesNotExistException">Always thrown as orders cannot be deleted in this system.</exception>
     /// <remarks>
     /// Order deletion is not permitted in this system regardless of authorization.
-    /// Orders should be cancelled instead using the <see cref="Cancel"/> method.
+    /// Orders should be cancelled instead using the <see cref="Delete"/> method.
     /// </remarks>
     public void Delete(int id, int orderId)
     {
