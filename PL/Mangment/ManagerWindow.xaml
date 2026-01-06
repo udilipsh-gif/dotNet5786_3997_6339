@@ -158,7 +158,7 @@
         </Grid>
 
         <!-- Top menu bar: Main navigation and action buttons -->
-        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="10,10">
+        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,10">
             <!-- Reset database button - Clears all data -->
             <Button  Content="איפוס מערכת" Margin="10" Padding="5" Click="ResetDB"/>
             <!-- Initialize database button - Populates with sample data -->
