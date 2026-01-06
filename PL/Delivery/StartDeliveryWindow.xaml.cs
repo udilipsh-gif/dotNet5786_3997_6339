@@ -28,6 +28,26 @@ public partial class StartDeliveryWindow : Window
 
     public ICommand SelectOrderCommand { get; private set; }
 
+    public IEnumerable<object> EnumForSoring
+    {
+        get
+        {
+            var list = new List<object>
+            {
+                new { Id = (BO.TypeOfOrder?)null, Name = "הצג הכל / ללא סינון" }
+            };
+            var enumValues = Enum.GetValues(typeof(BO.TypeOfOrder))
+                                 .Cast<BO.TypeOfOrder>()
+                                 .Select(e => new
+                                 {
+                                     Id = (BO.TypeOfOrder?)e,
+                                     Name = Tools.GetDescription(e),
+                                 });
+            return list.Concat(enumValues);
+
+        }
+    }
+
     private BO.OpenOrderInListField SelctedSort
     {
         get => (BO.OpenOrderInListField)GetValue(SelctedSortProperty);
@@ -38,13 +58,13 @@ public partial class StartDeliveryWindow : Window
         DependencyProperty.Register("SelctedSort", typeof(BO.OpenOrderInListField),
             typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
-    public BO.TypeOfOrder SelctedFilter
+    public BO.TypeOfOrder? SelctedFilter
     {
-        get => (BO.TypeOfOrder)GetValue(SelctedFilterProperty);
+        get => (BO.TypeOfOrder?)GetValue(SelctedFilterProperty);
         set => SetValue(SelctedFilterProperty, value);
     }
     public static readonly DependencyProperty SelctedFilterProperty =
-        DependencyProperty.Register("SelctedFilter", typeof(BO.TypeOfOrder),
+        DependencyProperty.Register("SelctedFilter", typeof(BO.TypeOfOrder?),
             typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
     public List<BO.OpenOrderInList> DeliveryListView
@@ -74,7 +94,13 @@ public partial class StartDeliveryWindow : Window
     {
         s_bl.Order.AddObserver(orderListObserver);
         UpdateOrdersList();
-        
+
+    }
+
+    private void StartDeliveryWindow_Closed(object sender, RoutedEventArgs e)
+    {
+        s_bl.Order.RemoveObserver(orderListObserver);
+        this.Close();
     }
 
     private void orderListObserver()
@@ -128,4 +154,11 @@ public partial class StartDeliveryWindow : Window
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+
+    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var Selcte = SelctedFilter;
+        orderListObserver();
+    }
+
 }

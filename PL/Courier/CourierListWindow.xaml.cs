@@ -1,8 +1,6 @@
-﻿using BO;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Configuration;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,8 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel; 
 
-namespace PL.Courier;
+namespace PL;
 
 /// <summary>
 /// Interaction logic for CourierListWindow.xaml - displays and manages a list of couriers.
@@ -41,11 +40,19 @@ public partial class CourierListWindow : Window
     /// </summary>
     private int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId;
 
+    public ICommand SelectCourierCommand { get; private set; }
+
+    public ICommand AddCourierCommand { get; private set; }
+
+
     /// <summary>
     /// Initializes a new instance of the CourierListWindow class.
     /// </summary>
     public CourierListWindow()
     {
+        SelectCourierCommand = new RelayCommand<BO.CourierInList>(Add_Edit_Courier_Click, CanSelectCourier);
+        AddCourierCommand = new RelayCommand(_ => Add_Edit_Courier_Click(null));
+
         InitializeComponent();
     }
 
@@ -58,15 +65,16 @@ public partial class CourierListWindow : Window
     /// </remarks>
     public ObservableCollection<BO.CourierInList> CourierInList
     {
-        get { return (ObservableCollection<BO.CourierInList>)GetValue(CourierInListProperty); }
-        set { SetValue(CourierInListProperty, value); }
+        get => (ObservableCollection<BO.CourierInList>)GetValue(CourierInListProperty);
+        set => SetValue(CourierInListProperty, value);
     }
 
     /// <summary>
     /// Dependency property for the CourierInList collection.
     /// </summary>
     public static readonly DependencyProperty CourierInListProperty =
-        DependencyProperty.Register(nameof(CourierInList), typeof(ObservableCollection<BO.CourierInList>), typeof(CourierListWindow), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(CourierInList), typeof(ObservableCollection<BO.CourierInList>),
+            typeof(CourierListWindow), new PropertyMetadata(null));
 
     /// <summary>
     /// Gets or sets the current filter selection (All/Active/Inactive).
@@ -102,8 +110,8 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        UpdateCourierList();
         s_bl.Courier.AddObserver(courierListObserver);
+        UpdateCourierList();
     }
 
     /// <summary>
@@ -135,7 +143,10 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void courierListObserver()
     {
-        UpdateCourierList();
+        Dispatcher.Invoke(() =>
+        {
+            UpdateCourierList();
+        });
     }
 
     /// <summary>
@@ -179,6 +190,11 @@ public partial class CourierListWindow : Window
         UpdateCourierList();
     }
 
+    private bool CanSelectCourier(BO.CourierInList? selectedCourier)
+    {
+        return selectedCourier != null;
+    }
+
     /// <summary>
     /// Handles the add/edit courier button and DataGrid double-click events.
     /// </summary>
@@ -192,19 +208,27 @@ public partial class CourierListWindow : Window
     /// </list>
     /// The CourierWindow is displayed as a non-modal window, allowing multiple courier windows to be open simultaneously.
     /// </remarks>
-    private void Add_Edit_Courier_Click(object sender, RoutedEventArgs e)
+    private void Add_Edit_Courier_Click(BO.CourierInList? selectedCourier)
     {
-        CourierWindow courierWindow;
-        if (sender is DataGrid dataGrid
-            && dataGrid.SelectedItem is BO.CourierInList courierInList)
+        try
         {
-            courierWindow = new CourierWindow(courierInList.Id);
+            CourierWindow courierWindow;
+
+            if (selectedCourier != null)
+            {
+                courierWindow = new CourierWindow(selectedCourier.Id);
+            }
+            else
+            {
+                courierWindow = new CourierWindow(0);
+            }
+            courierWindow.Show();
         }
-        else
+        catch (Exception ex)
         {
-            courierWindow = new CourierWindow(0);
+            MessageBox.Show($"שגיאה בפתיחת החלון: {ex.Message}", "שגיאה",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
-        courierWindow.Show();
     }
 }
 

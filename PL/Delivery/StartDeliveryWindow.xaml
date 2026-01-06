@@ -9,9 +9,10 @@
         mc:Ignorable="d" 
         Title="בחירת הזמנה"
         Loaded="StartDeliveryWindow_Loaded"
-        Height="800" Width="900">
+        Closed="StartDeliveryWindow_Closed"
+        Height="450" Width="720">
     <Window.Resources>
-        <local:EnumToBooleanConverter x:Key="MyEnumConverter" />
+        <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
 
         <!-- Style לתאים עם Wrap -->
         <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
@@ -61,12 +62,17 @@
                    FontWeight="Bold"
                    Margin="5"/>
             <ComboBox Grid.Column="1" x:Name="DeliveryTypeComboBox"
-                   ItemsSource="{Binding DeliveryTypeOptions}"
-                   SelectedItem="{Binding SelectedDeliveryType, Mode=TwoWay}"
+                   ItemsSource="{Binding EnumForSoring}"
+                   DisplayMemberPath="Name"
+                   SelectedValuePath="Id"
+                   SelectedValue="{Binding SelctedFilter, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                   SelectedIndex="0"
                    FontSize="14"
                    Width="150"
                    Margin="5"
-                   ToolTip="בחר סוג משלוח להצגה בטבלה"/>
+                   ToolTip="בחר סוג משלוח להצגה בטבלה"
+                   SelectionChanged="ComboBox_SelectionChanged">
+            </ComboBox>
             <Label Grid.Column="2" Content="סינון לפי סטטוס הזמנה:" 
                    FontSize="16" 
                    FontWeight="Bold"
@@ -77,7 +83,13 @@
                    FontSize="14"
                    Width="150"
                    Margin="5"
-                   ToolTip="בחר סטטוס הזמנה לסינון הטבלה"/>
+                   ToolTip="בחר סטטוס הזמנה לסינון הטבלה">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Id, Converter={StaticResource EnumDescriptionConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
         </Grid>
      
 
@@ -96,11 +108,9 @@
           EnableRowVirtualization="False"
           EnableColumnVirtualization="False">
             <DataGrid.InputBindings>
-
                 <MouseBinding Gesture="LeftDoubleClick" 
                       Command="{Binding SelectOrderCommand}"
                       CommandParameter="{Binding ElementName=OrdersGrid, Path=SelectedItem}" />
-
             </DataGrid.InputBindings>
 
             <DataGrid.Columns>
@@ -108,6 +118,7 @@
                             Binding="{Binding OrderId}"
                             SortMemberPath="OrderId"
                             Width="Auto"
+                            ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="סטטוס הזמנה"

@@ -188,8 +188,6 @@ public enum TheTypeShipment
 /// </summary>
 public enum TypeOfOrder
 {
-
-
     /// <summary>Standard delivery - all shipment types are available.</summary>
     [Description("רגיל")]
     STANDART,

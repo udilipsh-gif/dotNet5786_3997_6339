@@ -6,7 +6,7 @@ using System.Diagnostics.Metrics;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PL.Courier;
+namespace PL;
 
 /// <summary>
 /// Interaction logic for CourierWindow.xaml - provides CRUD operations for courier management.

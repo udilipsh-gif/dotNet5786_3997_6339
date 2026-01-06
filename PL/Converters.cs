@@ -82,6 +82,23 @@ public class NullToBooleanConverter : IValueConverter
     }
 }
 
+public class BooleanToHebrewConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool b)
+            return b ? "פעיל" : "לא פעיל";
+        return "לא ידוע";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string s)
+            return s == "פעיל";
+        return false;
+    }
+}
+
 public class EnumDescriptionConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -95,6 +112,24 @@ public class EnumDescriptionConverter : IValueConverter
         var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
         return attributes.Length > 0 ? attributes[0].Description : value.ToString() ?? string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class TotalHoursConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is TimeSpan timeSpan)
+        {
+            // המרה ל-(int) חותכת את השארית ומחזירה רק שעות שלמות כולל ימים
+            return (int)timeSpan.TotalHours;
+        }
+        return 0;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
