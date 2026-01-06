@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -203,10 +204,16 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         {
             MessageBox.Show(ex.Message);
         }
+        catch (SmtpException ex)
+        {
+            MessageBox.Show($" הזמנה בוטלה בהצלחה ({ex.Message})");
+            Close();
+        }
         catch (Exception ex)
         {
             MessageBox.Show($"שגיאה בביטול: {ex.Message}");
         }
+       
     }
     private void OrderObserver()
     {

@@ -805,10 +805,8 @@ internal static class Tools
         //}
         catch (SmtpException ex)
         {
-            Debug.WriteLine($"Email failed: {ex}");
-            
+            throw new SmtpException($"שגיאה בשליחת מייל: {ex.Message}");
         }
-
     }
 
 }

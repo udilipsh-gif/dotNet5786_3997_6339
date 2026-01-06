@@ -191,15 +191,19 @@ public enum TypeOfOrder
 
 
     /// <summary>Standard delivery - all shipment types are available.</summary>
+    [Description("רגיל")]
     STANDART,
 
     /// <summary>Fast delivery - only motorcycle or car available.</summary>
+    [Description("מהיר")]
     FAST_DELIVERY,
 
     /// <summary>Immediate delivery - only motorcycle available.</summary>
+    [Description("מיידי")]
     DELIVER_IMMEDIATELY,
 
     /// <summary>the order type includes all possible types. </summary>
+    [Description("הכל")]
     ALL
 
 }
@@ -210,18 +214,23 @@ public enum TypeOfOrder
 public enum OrderStatus
 {
     /// <summary>The order is open and waiting to be processed.</summary>
+    [Description("פתוח")]
     OPEN,
 
     /// <summary>The order is currently being delivered.</summary>
+    [Description("במשלוח")]
     DELIVERING,
 
     /// <summary>The order has been completed successfully.</summary>
+    [Description("נמסר")]
     COMPLETED,
 
     /// <summary>The order was refused.</summary>
+    [Description("סורב על ידי הלקוח")]
     REFUSED,
 
     /// <summary>The order was cancelled.</summary>
+    [Description("בוטל")]
     CANCELLED
 }
 
@@ -231,19 +240,24 @@ public enum OrderStatus
 public enum ScheduleStatus
 {
     /// <summary>The delivery is on time.</summary>
+    [Description("בזמן")]
     ONTYME,
 
     /// <summary>The delivery is at risk of being late.</summary>
+    [Description("בסיכון")]
     INRISK,
 
     /// <summary>The delivery is late.</summary>
+    [Description("באיחור")]
     LATE,
 
     /// <summary>The order is canceled.</summary>
+    [Description("בוטל")]
     CANCELLED,
 
 
     /// <summary>the delivery status includes all possible states.</summary>
+    [Description("הכל")]
     ALL
 
 
