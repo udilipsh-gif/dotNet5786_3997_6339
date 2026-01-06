@@ -1,5 +1,4 @@
-﻿using PL.Courier;
-using PL.Order;
+﻿using PL.Order;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
@@ -147,9 +146,8 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">Event arguments.</param>
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
-    {
-        OpenOrActivateWindow<CourierListWindow>();
-    }
+        => Tools.OpenOrActivateWindow<CourierListWindow>();
+    
 
     /// <summary>
     /// Handles the clock forward button clicks, advances the system clock by the specified time unit.
@@ -423,32 +421,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void btnOrderList_Click(object sender, RoutedEventArgs e)
-        => OpenOrActivateWindow<OrderListWindow>();
-
-    private void OpenOrActivateWindow<T>() where T : Window, new()
-    {
-        // חיפוש חלון פתוח מהסוג המבוקש באוסף החלונות של האפליקציה
-        var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();
-
-        if (existingWindow != null)
-        {
-            // אם החלון כבר קיים:
-            // 1. אם הוא ממוזער - נחזיר אותו למצב רגיל
-            if (existingWindow.WindowState == WindowState.Minimized)
-            {
-                existingWindow.WindowState = WindowState.Normal;
-            }
-
-            // 2. נביא אותו לקדמת המסך (פוקוס)
-            existingWindow.Activate();
-        }
-        else
-        {
-            // אם החלון לא קיים - ניצור מופע חדש ונציג אותו
-            var newWindow = new T();
-            newWindow.Show(); // שימוש ב-Show לא חוסם את החלון הראשי
-        }
-    }
+        => Tools.OpenOrActivateWindow<OrderListWindow>();
 }
 
 /// <summary>

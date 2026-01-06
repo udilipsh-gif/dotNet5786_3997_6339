@@ -1,4 +1,4 @@
-﻿<Window x:Class="PL.Courier.CourierWindow"
+﻿<Window x:Class="PL.CourierWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -104,8 +104,7 @@
 
                 <!-- Row 6: Vehicle/shipment type selector - ComboBox with available vehicle types -->
                 <ComboBox Grid.Row="6" Grid.Column="0" ItemsSource="{Binding VehicleTypesList}" 
-                          SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay,
-                          Converter={StaticResource EnumDescriptionConverter}}" 
+                          SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}" 
                           Style="{StaticResource UniformComboBox}"/>
                 <Label Grid.Row="6" Grid.Column="1" Content=":סוג התניידות" Style="{StaticResource UniformLabel}"/>
 

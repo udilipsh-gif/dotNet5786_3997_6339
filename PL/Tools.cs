@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -51,5 +46,45 @@ internal static class Tools
         e.Handled = !e.Text.All(char.IsDigit);
     }
 
-   
+    internal static string GetDescription(this Enum value)
+    {
+        if(value.GetType().GetField(value.ToString()) is FieldInfo field)
+        {
+            if (field == null) return value.ToString();
+
+            var attribute = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
+
+            return attribute == null ? value.ToString() : attribute.Description;
+
+        }
+        else
+        {
+            return string.Empty;
+        }   
+    }
+
+    internal static void OpenOrActivateWindow<T>(params object[] args) where T : Window
+    {
+        // חיפוש חלון פתוח מהסוג המבוקש באוסף החלונות של האפליקציה
+        var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();
+
+        if (existingWindow != null)
+        {
+            if (existingWindow.WindowState == WindowState.Minimized)
+            {
+                existingWindow.WindowState = WindowState.Normal;
+            }
+
+            // 2. נביא אותו לקדמת המסך (פוקוס)
+            existingWindow.Activate();
+        }
+        else
+        {
+            // אם החלון לא קיים - ניצור מופע חדש ונציג אותו
+            // Activator.CreateInstance מקבל מערך של פרמטרים
+            var newWindow = (T)Activator.CreateInstance(typeof(T), args)!;
+            newWindow.Show(); // שימוש ב-Show לא חוסם את החלון הראשי
+        }
+    }
+
 }

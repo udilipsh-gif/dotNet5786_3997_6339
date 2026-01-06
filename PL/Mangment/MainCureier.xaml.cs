@@ -1,5 +1,4 @@
-﻿using PL.Courier;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -73,9 +72,9 @@ public partial class MainCureier : Window
 
     private void MainCureier_Loaded(object sender, RoutedEventArgs e)
     {
-        GetCurier();
         s_bl.Courier.AddObserver(GetCurier);
         IsOrderInProgress = false;
+        GetCurier();
     }
 
     private void MainCureier_Closed(object sender, EventArgs e)
@@ -129,7 +128,6 @@ public partial class MainCureier : Window
             {
                 if (selectedReason is BO.EndDelivery status)
                 {
-                    // המשתנה 'status' זמין כאן והוא בטוח לשימוש
                     s_bl.Order.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, status);
 
                 MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -156,12 +154,7 @@ public partial class MainCureier : Window
             return;
         }
 
-        // פתיחת חלון בחירת סיבת סיום
-        var startDeliverWindow = new StartDeliveryWindow(USERID, USERID);
-        
-
-        // הצגת החלון כ-Modal Dialog
-        startDeliverWindow.Show();
+        Tools.OpenOrActivateWindow<StartDeliveryWindow>(USERID, USERID);
     }
 
     private void EditCureier_Click(object sender, RoutedEventArgs e)

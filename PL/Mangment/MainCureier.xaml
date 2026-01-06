@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
-        Height="550" Width="600" 
+        Height="400" Width="680" 
         Loaded="MainCureier_Loaded"
         Closed="MainCureier_Closed"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
@@ -16,31 +16,47 @@
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:NullToBooleanConverter x:Key="NullToBooleanConverter"/>
         <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
-        
+        <local:TotalHoursConverter x:Key="TotalHoursConverter" />
+
+        <Style TargetType="Control" x:Key="controler">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
         <Style TargetType="Label" x:Key="UniformMAinLabel">
             <Setter Property="VerticalAlignment" Value="Bottom"/>
             <Setter Property="VerticalContentAlignment" Value="Bottom"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="FontSize" Value="20"/>
         </Style>
-        <Style TargetType="Label" x:Key="UniformLabel">
-            <Setter Property="VerticalAlignment" Value="Bottom"/>
-            <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="12"/>
+        <Style TargetType="TextBlock" x:Key="UniformBoolTextBlock">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="150"/>
+            <Setter Property="Text" Value="לא"/>
+            <Setter Property="Foreground" Value="Red"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CurrentUser.Active}" Value="True">
+                    <Setter Property="Text" Value="כן"/>
+                    <Setter Property="Foreground" Value="Green"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
-        <Style TargetType="TextBlock" x:Key="UniformTextBlock">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Height" Value="Auto"/>
-            <Setter Property="FontSize" Value="12"/>
+        <Style TargetType="Label" x:Key="UniformLabel" BasedOn="{StaticResource controler}">
+            <Setter Property="Width" Value="130"/>
         </Style>
-        <Style TargetType="TextBox" x:Key="UniformTextBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Style TargetType="TextBox" x:Key="UniformTextBox" BasedOn="{StaticResource controler}">
             <Setter Property="BorderThickness" Value="0,0,0,2"/>
-            <Setter Property="Height" Value="Auto"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Width" Value="150"/>
+        </Style>
+        <Style TargetType="TextBox" x:Key="UniformTextBoxVue" BasedOn="{StaticResource UniformTextBox}">
+            <Setter Property="IsReadOnly" Value="True"/>
         </Style>
         <Style TargetType="TextBox" x:Key="UniformTextBoxNom" BasedOn="{StaticResource UniformTextBox}" >
             <Setter Property="local:Tools.NumericOnly" Value="True"/>
@@ -49,13 +65,49 @@
             <Setter Property="Orientation" Value="Horizontal"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
-        <Style TargetType="ComboBox" x:Key="UniformComboBox">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Width" Value="100"/>
-            <Setter Property="Margin" Value="5"/>
+        <Style TargetType="Grid" x:Key="UniformGrid">
             <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="ComboBox" x:Key="UniformComboBox" BasedOn="{StaticResource controler}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="150"/>
+        </Style> 
+        <Style TargetType="TextBlock" x:Key="UniformTextBlock">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Width" Value="150"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Language" Value="he-IL"/>
+        </Style>
+        <Style TargetType="Button" x:Key="UniformButton">
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="UniformScheduleStatus" BasedOn="{StaticResource UniformTextBlock}">
+            <Style.Triggers>
+            <DataTrigger Binding="{Binding CurrentUser.OrderInProgress.ScheduleStatus}" Value="ONTYME">
+                <Setter Property="Text" Value="בזמן"/>
+                <Setter Property="Foreground" Value="Green"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+            </DataTrigger>
+                <DataTrigger Binding="{Binding CurrentUser.OrderInProgress.ScheduleStatus}" Value="LATE">
+                    <Setter Property="Text" Value="בזמן"/>
+                    <Setter Property="Foreground" Value="Green"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding CurrentUser.OrderInProgress.ScheduleStatus}" Value="INRISK">
+                    <Setter Property="Text" Value="בסיכון"/>
+                    <Setter Property="Foreground" Value="Orange"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding CurrentUser.OrderInProgress.ScheduleStatus}" Value="LATE">
+                    <Setter Property="Text" Value="בסיכון"/>
+                    <Setter Property="Foreground" Value="Red"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
@@ -65,78 +117,99 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <ScrollViewer Grid.Column="0">
-            <Grid>
+            <Grid  Background="WhiteSmoke">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="150*"/>
+                    <RowDefinition Height="30*"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="150*"/>
+                    <RowDefinition Height="30*"/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Content="הפרטים שלי" Style="{StaticResource UniformMAinLabel}"/>
                 <StackPanel Grid.Row="1" 
                             Visibility="{Binding IsEditMode,
                             Converter={StaticResource BoolToVisibilityConverter},
                             ConverterParameter=Invert}">
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="שם:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.Name}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="טלפון:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.Phone}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="מייל:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.Email}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="פעיל:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock>
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock" BasedOn="{StaticResource UniformTextBlock}">
-                                    <Setter Property="Text" Value="לא"/>
-                                    <Setter Property="Foreground" Value="Red"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding CurrentUser.Active}" Value="True">
-                                            <Setter Property="Text" Value="כן"/>
-                                            <Setter Property="Foreground" Value="Green"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="מרחק מירבי:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.MaxDistanceDelivery, StringFormat=N2}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="אמצעי ניידות:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.TypeShipment}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="עובד מאז:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.WorkingSince}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="משלוחים בזמן:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.DeliveryOnTime}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
-                    <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="משלוחים באיחור:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.DeliveryLate}"  Style="{StaticResource UniformTextBlock}"/>
-                    </StackPanel>
+                    <Grid Style="{StaticResource UniformGrid}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*"/>
+                            <ColumnDefinition Width="80*" />
+                        </Grid.ColumnDefinitions>
+                        <Label   Grid.Column="0"  Content="שם:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox Grid.Column="1" Text="{Binding CurrentUser.Name}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
+                    <Grid Style="{StaticResource UniformGrid}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*"/>
+                            <ColumnDefinition Width="80*" />
+                        </Grid.ColumnDefinitions>
+                        <Label    Grid.Column="0" Content="טלפון:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox  Grid.Column="1" Text="{Binding CurrentUser.Phone}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
+                    <Grid Style="{StaticResource UniformGrid}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*"/>
+                            <ColumnDefinition Width="80*" />
+                        </Grid.ColumnDefinitions>
+                        <Label    Grid.Column="0" Content="מייל:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox  Grid.Column="1"  Text="{Binding CurrentUser.Email}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
+                    <Grid Style="{StaticResource UniformGrid}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*"/>
+                            <ColumnDefinition Width="80*" />
+                        </Grid.ColumnDefinitions>
+                        <Label      Grid.Column="0" Content="פעיל:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock  Grid.Column="1"  Style="{StaticResource UniformBoolTextBlock}"/>
+                    </Grid>
+                <Grid Style="{StaticResource UniformGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30*"/>
+                        <ColumnDefinition Width="80*" />
+                    </Grid.ColumnDefinitions>
+                     <Label      Grid.Column="0" Content="מרחק מירבי:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox  Grid.Column="1"  Text="{Binding CurrentUser.MaxDistanceDelivery, StringFormat=N2}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
+                    <Grid Style="{StaticResource UniformGrid}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*"/>
+                            <ColumnDefinition Width="80*" />
+                        </Grid.ColumnDefinitions>
+                         <Label      Grid.Column="0" Content="אמצעי ניידות:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox  Grid.Column="1"  Text="{Binding CurrentUser.TypeShipment}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
+                        <Grid Style="{StaticResource UniformGrid}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30*"/>
+                                <ColumnDefinition Width="80*" />
+                            </Grid.ColumnDefinitions>
+                         <Label      Grid.Column="0" Content="עובד מאז:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox  Grid.Column="1" Text="{Binding CurrentUser.WorkingSince}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
+                            <Grid Style="{StaticResource UniformGrid}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="30*"/>
+                                    <ColumnDefinition Width="80*" />
+                                </Grid.ColumnDefinitions>
+                        <Label      Grid.Column="0" Content="משלוחים בזמן:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox  Grid.Column="1"  Text="{Binding CurrentUser.DeliveryOnTime}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
+                                <Grid Style="{StaticResource UniformGrid}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30*"/>
+                                        <ColumnDefinition Width="80*" />
+                                    </Grid.ColumnDefinitions>
+                        <Label      Grid.Column="0" Content="משלוחים באיחור:" Style="{StaticResource UniformLabel}"/>
+                        <TextBox  Grid.Column="1" Text="{Binding CurrentUser.DeliveryLate}"  Style="{StaticResource UniformTextBoxVue}"/>
+                    </Grid>
                 </StackPanel>
                 <StackPanel Grid.Row="2" Style="{StaticResource UniformStackPanel}"
                             Visibility="{Binding IsEditMode,
                             Converter={StaticResource BoolToVisibilityConverter},
                             ConverterParameter=Invert}">
-                <Button Visibility="{Binding CurrentUser.Active, Converter={StaticResource BoolToVisibilityConverter}}"
+                    <Button Visibility="{Binding CurrentUser.Active, Converter={StaticResource BoolToVisibilityConverter}}"
                         IsEnabled="{Binding CurrentUser.OrderInProgress, Mode=TwoWay, Converter={StaticResource NullToBooleanConverter}}"
-                        Content="התחלת משלוח" Click="StartDelivery_Click" Width="100" Height="50" Margin="2"/>
+                        Content="התחלת משלוח" Click="StartDelivery_Click" Style="{StaticResource UniformButton}"/>
 
-                    <Button Content="עריכת פרטים" Click="EditCureier_Click" Width="100" Height="50" Margin="2"/>
+                    <Button Content="עריכת פרטים" Click="EditCureier_Click" Style="{StaticResource UniformButton}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1" 
@@ -160,7 +233,8 @@
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="מרחק מירבי:" Style="{StaticResource UniformLabel}"/>
-                        <TextBox Text="{Binding CurrentUser.MaxDistanceDelivery, Mode=TwoWay}"  Style="{StaticResource UniformTextBoxNom}"/>
+                        <TextBox Text="{Binding CurrentUser.MaxDistanceDelivery, Mode=TwoWay, StringFormat=N2}" 
+                                 Style="{StaticResource UniformTextBoxNom}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="סוג שילוח:" Style="{StaticResource UniformLabel}"/>
@@ -180,24 +254,24 @@
                 <StackPanel Grid.Row="2" Style="{StaticResource UniformStackPanel}"
                             Visibility="{Binding IsEditMode,
                             Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Button Content="שמירה" Click="btnSaveUpdate_Click" Width="100" Height="50" Margin="2"/>
+                    <Button Content="שמירה" Click="btnSaveUpdate_Click" Style="{StaticResource UniformButton}"/>
 
-                    <Button Content="ביטול" Click="CloseCureierEdit_Click" Width="100" Height="50" Margin="2"/>
+                    <Button Content="ביטול" Click="CloseCureierEdit_Click" Style="{StaticResource UniformButton}"/>
                 </StackPanel>
 
             </Grid>
         </ScrollViewer>
-        <ScrollViewer Grid.Column="1"
+        <Grid Grid.Column="1" Background="WhiteSmoke"
                       Visibility="{Binding CurrentUser.OrderInProgress, 
                       Converter={StaticResource NullToVisibilityConverter}}">
-            <Grid Margin="20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="150*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="150*"/>
-                </Grid.RowDefinitions>
-                <Label Grid.Row="0" Content="משלוח פעיל" Style="{StaticResource UniformMAinLabel}"/>
-                <StackPanel Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="200*"/>
+                <RowDefinition Height="40*"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="משלוח פעיל" Style="{StaticResource UniformMAinLabel}"/>
+            <ScrollViewer Grid.Row="1">
+                <StackPanel >
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="מספר משלוח:" Style="{StaticResource UniformLabel}"/>
                         <TextBlock Text="{Binding CurrentUser.OrderInProgress.DeliveryId}"  Style="{StaticResource UniformTextBlock}"/>
@@ -236,32 +310,35 @@
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="הזמנה מתאריך:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.OrderTime}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.OrderTime}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="משלוח התחיל ב:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.StartDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.StartDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="צפי אספקה:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.EstimatedDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.EstimatedDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
-                        <Label  Content="התחיבות למשלוח עד ל:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.MaxDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
+                        <Label  Content="התחיבות למשלוח עד:" Style="{StaticResource UniformLabel}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.MaxDeliveryTime}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="זמן שנשאר למשלוח:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Language="he-IL" Text="{Binding CurrentUser.OrderInProgress.TimeRemaining}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Style="{StaticResource UniformTextBlock}">
+                            <Run Text="{Binding CurrentUser.OrderInProgress.TimeRemaining.Minutes, StringFormat=D2, Mode=OneWay}" />
+                            <Run Text=":" />
+                            <Run Text="{Binding CurrentUser.OrderInProgress.TimeRemaining, Converter={StaticResource TotalHoursConverter}, Mode=OneWay}" />
+                        </TextBlock>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="מצב הזמנה:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.TimeRemaining}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.ScheduleStatus}"  Style="{StaticResource UniformScheduleStatus}"/>
                     </StackPanel>
                 </StackPanel>
-                <Button Grid.Row="2"  Content="דווח הזמנה" Click="ReportDelivery_Click" Width="100" Height="50"/>
-            </Grid>
-        </ScrollViewer>
-
+            </ScrollViewer>
+            <Button Grid.Row="2"  Content="דווח הזמנה" Click="ReportDelivery_Click" Style="{StaticResource UniformButton}"/>
+        </Grid>
     </Grid>
 </Window>

@@ -1,6 +1,4 @@
-﻿using BO;
-using PL.Courier;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,18 +29,8 @@ public partial class OrderListWindow : Window
     public BO.ScheduleStatus ScheduleStatusFilter { get; set; } = BO.ScheduleStatus.ALL;
 
 
-    public BO.TypeOfOrder TypeOfOrderFilter { get; set; } = BO.TypeOfOrder.ALL;
+    public BO.TypeOfOrder? TypeOfOrderFilter { get; set; } = null;
 
-
-    //private Visibility _cancelButtonVisibility = Visibility.Visible;
-    //public Visibility CancelButtonVisibility
-    //{
-    //    get { return _cancelButtonVisibility; }
-    //    set
-    //    {
-    //        _cancelButtonVisibility = value;
-    //    }
-    //}
 
     private void LoadOrders()
     {
@@ -52,7 +40,7 @@ public partial class OrderListWindow : Window
         // 2. ביצוע סינון כפול בעזרת LINQ
         var filteredResults = allOrders.Where(order =>
             (ScheduleStatusFilter == BO.ScheduleStatus.ALL || order.ScheduleStatus == ScheduleStatusFilter) &&
-            (TypeOfOrderFilter == BO.TypeOfOrder.ALL || order.TypeOfOrder == TypeOfOrderFilter)
+            (TypeOfOrderFilter == null || order.TypeOfOrder == TypeOfOrderFilter)
         );
 
         // 3. עדכון הרשימה המוצגת במסך

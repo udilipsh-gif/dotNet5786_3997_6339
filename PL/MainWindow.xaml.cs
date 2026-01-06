@@ -88,7 +88,7 @@ public partial class MainWindow : Window
 
             if (user == "Manager")
             {
-                OpenOrActivateWindow<ManagerWindow>(userId);
+                Tools.OpenOrActivateWindow<ManagerWindow>(userId);
                 return;
             }
             else if (user == "Courier")
@@ -129,31 +129,6 @@ public partial class MainWindow : Window
             {
                 window.Close();
             }
-        }
-    }
-
-    private void OpenOrActivateWindow<T>(int userId) where T : Window
-    {
-        // חיפוש חלון פתוח מהסוג המבוקש באוסף החלונות של האפליקציה
-        var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();
-
-        if (existingWindow != null)
-        {
-            // אם החלון כבר קיים:
-            // 1. אם הוא ממוזער - נחזיר אותו למצב רגיל
-            if (existingWindow.WindowState == WindowState.Minimized)
-            {
-                existingWindow.WindowState = WindowState.Normal;
-            }
-
-            // 2. נביא אותו לקדמת המסך (פוקוס)
-            existingWindow.Activate();
-        }
-        else
-        {
-            // אם החלון לא קיים - ניצור מופע חדש ונציג אותו
-            var newWindow = (T)Activator.CreateInstance(typeof(T), userId)!;
-            newWindow.Show(); // שימוש ב-Show לא חוסם את החלון הראשי
         }
     }
 

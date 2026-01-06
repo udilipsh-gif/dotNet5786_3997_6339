@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
-        Height="600" Width="700" 
+        Height="550" Width="500" 
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="ניהול המערכת" MinHeight="300" MinWidth="450"
         Loaded="ManagerWindow_Loaded"
@@ -54,16 +54,13 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="80*"/>
+            <RowDefinition Height="120*"/>
+            <RowDefinition Height="400*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="270"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
 
         <!-- Top-left section: Store name, clock display, and time advance buttons -->
-        <Grid Grid.Row="0" Grid.Column="0"  >
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -95,7 +92,7 @@
         </Grid>
 
         <!-- Left section: Configuration editor with scrollable form -->
-        <Grid Grid.Column="0" Grid.Row="1" Margin="20">
+        <Grid Grid.Row="2" Margin="20">
             <ScrollViewer>
                 <StackPanel>
                     <!-- Configuration section title -->
@@ -161,7 +158,7 @@
         </Grid>
 
         <!-- Top menu bar: Main navigation and action buttons -->
-        <Menu Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="10,10">
+        <StackPanel Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Margin="10,10">
             <!-- Reset database button - Clears all data -->
             <Button  Content="איפוס מערכת" Margin="10" Padding="5" Click="ResetDB"/>
             <!-- Initialize database button - Populates with sample data -->
@@ -171,7 +168,7 @@
             <!-- Order management button - To be implemented -->
             <Button  Content="ניהול הזמנות" ToolTip="טבלת הזמנות - הצג רשימה, מיין וסנן מידע על הזמנות" Margin="10" Padding="5" Click="btnOrderList_Click"/>
             <!-- Delivery management button - To be implemented -->
-            <Button  Content="ניהול משלוחים" Margin="10" Padding="5" />
-        </Menu>
+            <!-- Button  Content="ניהול משלוחים" Margin="10" Padding="5" / -->
+        </StackPanel>
     </Grid>
 </Window>

@@ -374,7 +374,7 @@ internal static class CourierManager
             MaxDeliveryTime = maxDeliveryTime,
             OrderStatus = BO.OrderStatus.DELIVERING,
             ScheduleStatus = Tools.GetScheduleStatus(order, delivery),
-            TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - DateTime.Now)
+            TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - AdminManager.Now)
         };
         return orderInProgress;
     }

@@ -188,20 +188,17 @@ public enum TheTypeShipment
 /// </summary>
 public enum TypeOfOrder
 {
-
-
     /// <summary>Standard delivery - all shipment types are available.</summary>
+    [Description("רגיל")]
     STANDART,
 
     /// <summary>Fast delivery - only motorcycle or car available.</summary>
+    [Description("מהיר")]
     FAST_DELIVERY,
 
     /// <summary>Immediate delivery - only motorcycle available.</summary>
+    [Description("מיידי")] 
     DELIVER_IMMEDIATELY,
-
-    /// <summary>the order type includes all possible types. </summary>
-    ALL
-
 }
 
 /// <summary>
