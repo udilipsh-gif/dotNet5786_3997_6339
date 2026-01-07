@@ -5,13 +5,13 @@
   <Clock>02/01/2026 01:43:25</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
-  <StoreAddress>bar cochva, 21, Bney Braq</StoreAddress>
-  <Latitude>32.0936195</Latitude>
-  <Longitude>34.8229463</Longitude>
+  <StoreAddress>קדושת אהרן 8 בית שמש</StoreAddress>
+  <Latitude>31.736148</Latitude>
+  <Longitude>34.990049</Longitude>
   <MaxDeliveryRange>50</MaxDeliveryRange>
   <AvgSpeedCar>60</AvgSpeedCar>
   <AvgSpeedMotorcycle>40</AvgSpeedMotorcycle>
-  <AvgSpeedBike>15</AvgSpeedBike>
+  <AvgSpeedBike>14</AvgSpeedBike>
   <AvgSpeedFoot>5</AvgSpeedFoot>
   <MaxDeliveryTime>5.00:00:00</MaxDeliveryTime>
   <RiskRange>4.00:00:00</RiskRange>
