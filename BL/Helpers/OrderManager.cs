@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using System.Net.Mail;
 
 
 namespace Helpers;
@@ -297,12 +298,19 @@ internal static class OrderManager
 
                 var courier = s_dal.Courier.Read(delivery.CourierId)
                      ?? throw new BO.BlDoesNotExistException("Courier not found");
-
-                Tools.SendEmail(
-                    courier.Email,
-                    "הזמנה בוטלה",
-                    $"הזמנה מספר {orderId} בוטלה על ידי המנהל"
-                );
+                try
+                {
+                    Tools.SendEmail(
+                        courier.Email,
+                        "הזמנה בוטלה",
+                        $"הזמנה מספר {orderId} בוטלה על ידי המנהל"
+                    );
+                }
+                catch (SmtpException ex)
+                {
+                    // Log the exception or handle it as needed
+                    throw new SmtpException($" שליחת מייל נכשלה: {ex.Message}");
+                }
 
 
 
