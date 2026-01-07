@@ -29,18 +29,18 @@ public partial class OrderListWindow : Window
     public BO.ScheduleStatus ScheduleStatusFilter { get; set; } = BO.ScheduleStatus.ALL;
 
 
-    public BO.TypeOfOrder? TypeOfOrderFilter { get; set; } = null;
+    public BO.TypeOfOrder? TypeOfOrderFilter { get; set; } = BO.TypeOfOrder.ALL;
 
 
     private void LoadOrders()
     {
         // 1. שליפת כל הנתונים מה-BL ללא סינון ראשוני כלל
-        var allOrders = s_bl.Order.ReadAll(CURRENT_MANAGER_ID, null, null, null);
+        var allOrders = s_bl.Order.ReadAll(CURRENT_MANAGER_ID, null, null, BO.OrderInListField.OrderId);
 
         // 2. ביצוע סינון כפול בעזרת LINQ
         var filteredResults = allOrders.Where(order =>
             (ScheduleStatusFilter == BO.ScheduleStatus.ALL || order.ScheduleStatus == ScheduleStatusFilter) &&
-            (TypeOfOrderFilter == null || order.TypeOfOrder == TypeOfOrderFilter)
+            (TypeOfOrderFilter == BO.TypeOfOrder.ALL || order.TypeOfOrder == TypeOfOrderFilter)
         );
 
         // 3. עדכון הרשימה המוצגת במסך

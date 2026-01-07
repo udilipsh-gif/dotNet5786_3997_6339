@@ -1,22 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfOrder>
   <Order>
-    <Id>100003</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 2</Details>
-    <Addres>המסגר 20 רמת גן</Addres>
-    <Latitude>32.0624089</Latitude>
-    <Longitude>34.7854347</Longitude>
-    <Name>Customer2</Name>
-    <Phone>0562228316</Phone>
-    <Weight>8</Weight>
-    <OrderDate>2025-02-01T00:48:42.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>4.953305046102234</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100013</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 12</Details>
@@ -797,6 +781,22 @@
     <OrderDate>2025-01-10T00:48:42.0000000</OrderDate>
     <OrderStatus>REFUSED</OrderStatus>
     <DistanceKm>6.066540775137364</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100003</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 2</Details>
+    <Addres>המסגר 20 רמת גן</Addres>
+    <Latitude>32.0624089</Latitude>
+    <Longitude>34.7854347</Longitude>
+    <Name>Customer2</Name>
+    <Phone>0562228316</Phone>
+    <Weight>8</Weight>
+    <OrderDate>2025-02-01T00:48:42.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>4.953305046102234</DistanceKm>
     <DistanceKmRoad />
     <DistanceKmWalk />
   </Order>

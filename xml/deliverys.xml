@@ -500,4 +500,14 @@
     <EndDelivery>REFUSED</EndDelivery>
     <TimeEndDelivery>2026-01-07T02:07:42.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200051</Id>
+    <OrderId>100003</OrderId>
+    <CourierId>0</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2026-01-07T00:48:42.0000000</OrderDate>
+    <ActualDistance>0</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-07T00:48:42.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
