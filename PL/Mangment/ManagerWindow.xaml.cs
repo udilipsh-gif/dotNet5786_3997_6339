@@ -1,12 +1,7 @@
-﻿using PL.Order;
-using System.Collections.ObjectModel;
+﻿using BO;
 using System.ComponentModel;
-using System.Configuration;
 using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -26,10 +21,62 @@ namespace PL;
 /// </list>
 /// Implements INotifyPropertyChanged for data binding support.
 /// </remarks>
-public partial class ManagerWindow : Window, INotifyPropertyChanged
+public partial class ManagerWindow : Window
 {
 
     int UserId = 0;
+
+    public class StatisticItem
+    {
+        public object Id { get; set; } = 0;
+        public string Name { get; set; } = string.Empty;
+        public int Value { get; set; }
+    }
+
+
+    public IEnumerable<StatisticItem> EnumForStatistic
+    {
+        get
+        {
+            var combinedList = new List<StatisticItem>(); // שינינו ל-StatisticItem
+
+            var orderValues = Enum.GetValues(typeof(BO.OrderStatus))
+                                  .Cast<BO.OrderStatus>()
+                                  .Select(e => new StatisticItem // יצירת המופע האמיתי
+                                  {
+                                      Id = e,
+                                      Name = "סטטוס הזמנה: " + Tools.GetDescription(e),
+                                      Value = 0 
+                                  });
+
+            combinedList.AddRange(orderValues);
+
+            var scheduleValues = Enum.GetValues(typeof(BO.ScheduleStatus))
+                                     .Cast<BO.ScheduleStatus>()
+                                     .Select(e => new StatisticItem // יצירת המופע האמיתי
+                                     {
+                                         Id = e,
+                                         Name = "סטטוס לו\"ז: " + Tools.GetDescription(e),
+                                         Value = 0
+                                     });
+
+            combinedList.AddRange(scheduleValues);
+
+            return combinedList;
+        }
+    }
+
+    public IEnumerable<StatisticItem> CombinedStatistics
+    {
+        get { return (IEnumerable<StatisticItem>)GetValue(CombinedStatisticsProperty); }
+        set { SetValue(CombinedStatisticsProperty, value); }
+    }
+
+    public static readonly DependencyProperty CombinedStatisticsProperty =
+        DependencyProperty.Register(nameof(CombinedStatistics),
+            typeof(IEnumerable<StatisticItem>),
+            typeof(ManagerWindow));
+
 
     /// <summary>
     /// Initializes a new instance of the ManagerWindow class.
@@ -67,7 +114,6 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     public static readonly DependencyProperty CurrentTimeProperty =
         DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(ManagerWindow));
 
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
     /// Handles the window close event, performs cleanup operations.
@@ -86,6 +132,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     {
         CloseAllWindowsExceptMain();
         s_bl.Admin.RemoveClockObserver(ClockObserver);
+        s_bl.Order.RemoveObserver(StatisticObserver);
     }
 
     /// <summary>
@@ -104,14 +151,45 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// </remarks>
     private void ManagerWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        CurrentTime = s_bl.Admin.GetClock();
+        ClockObserver();
+        StatisticObserver();
         s_bl.Admin.AddClockObserver(ClockObserver);
+        s_bl.Order.AddObserver(StatisticObserver);
     }
 
     /// <summary>
     /// Observer callback method for clock changes, updates the displayed time.
     /// </summary>
     private void ClockObserver() => CurrentTime = s_bl.Admin.GetClock();
+
+    private void StatisticObserver()
+    {
+        int[]? newStats = null;
+        try
+        {
+             newStats = s_bl.Order.GetAllOrderStatistic(UserId);
+        }
+        catch(BlNoAccessException)
+        {
+            MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
+            CloseAllWindowsExceptMain();
+            this.Close();
+        }
+        var enumList = EnumForStatistic; // שומרים למשתנה כדי לא לחשב פעמיים
+
+        if (enumList != null && newStats != null)
+        {
+            // Zip מחבר בין הפריטים. כעת labelObj הוא מסוג StatisticItem מוכר
+            var resultList = enumList.Zip(newStats, (labelObj, count) => new StatisticItem
+            {
+                Id = labelObj.Id,     // אין צורך ב-dynamic
+                Name = labelObj.Name, // אין צורך ב-dynamic
+                Value = count         // העדכון מהסטטיסטיקה
+            }).ToList();
+
+            CombinedStatistics = resultList;
+        }
+    }
 
     /// <summary>
     /// Handles the courier list button click event, opens the courier management window.
@@ -120,7 +198,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// <param name="e">Event arguments.</param>
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
         => Tools.OpenOrActivateWindow<CourierListWindow>();
-    
+
 
     /// <summary>
     /// Handles the clock forward button clicks, advances the system clock by the specified time unit.
@@ -201,6 +279,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
             finally
             {
                 Mouse.OverrideCursor = null;
+                StatisticObserver();
             }
         }
 
@@ -237,6 +316,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
             finally
             {
                 Mouse.OverrideCursor = null;
+                StatisticObserver();
             }
         }
 

@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PL.Order;
+namespace PL;
 
 public partial class OrderListWindow : Window
 {

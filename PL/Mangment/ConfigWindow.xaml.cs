@@ -24,8 +24,8 @@ public partial class ConfigWindow : Window
     /// </remarks>
     public BO.Config Configuration
     {
-        get { return (BO.Config)GetValue(ConfigurationProperty); }
-        set { SetValue(ConfigurationProperty, value); }
+        get => (BO.Config)GetValue(ConfigurationProperty);
+        set => SetValue(ConfigurationProperty, value); 
     }
 
     /// <summary>

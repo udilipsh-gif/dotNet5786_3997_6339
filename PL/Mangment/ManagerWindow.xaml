@@ -63,13 +63,40 @@
             </WrapPanel>
         </Grid>
 
-        <!-- Left section: Configuration editor with scrollable form -->
-        <Grid Grid.Row="2" Margin="20">
+        <ListBox Grid.Row="2" 
+         ItemsSource="{Binding CombinedStatistics}" 
+         HorizontalAlignment="Center"
+         BorderThickness="0" 
+         Background="Transparent">
 
-        </Grid>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Button Margin="5,0" Padding="10,5"  Width="300">
+                        <!--Click="FilterButton_Click"-->
+                        <Button.Content>
+                            <TextBlock>
+                                <Run Text="{Binding Name}" /> 
+                                <Run Text=" (" />
+                                <Run Text="{Binding Value}" FontWeight="Bold"/>
+                                <Run Text=")" />        
+                            </TextBlock>
+                        </Button.Content>
+                        <Button.Tag>
+                            <Binding Path="Id" />
+                        </Button.Tag>
+                    </Button>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <!-- Top menu bar: Main navigation and action buttons -->
-        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,10">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,10">
        
             <!-- Courier management button - Opens courier list window -->
             <Button  Content="ניהול שליחים" Margin="10" Padding="5" Click="btnCourierList_Click"/>

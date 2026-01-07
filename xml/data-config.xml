@@ -1,17 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
   <NextOrderId>100051</NextOrderId>
-  <NextDeliveryId>200051</NextDeliveryId>
-  <Clock>07/01/2026 00:48:42</Clock>
+  <NextDeliveryId>200054</NextDeliveryId>
+  <Clock>07/01/2026 11:59:26</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
-  <StoreAddress>קדושת אהרן 8 בית שמש</StoreAddress>
-  <Latitude>31.736148</Latitude>
-  <Longitude>34.990049</Longitude>
+  <StoreAddress>bar cochva, 21, Bney Braq</StoreAddress>
+  <Latitude>32.0936195</Latitude>
+  <Longitude>34.8229463</Longitude>
   <MaxDeliveryRange>50</MaxDeliveryRange>
   <AvgSpeedCar>60</AvgSpeedCar>
   <AvgSpeedMotorcycle>40</AvgSpeedMotorcycle>
-  <AvgSpeedBike>14</AvgSpeedBike>
+  <AvgSpeedBike>15</AvgSpeedBike>
   <AvgSpeedFoot>5</AvgSpeedFoot>
   <MaxDeliveryTime>5.00:00:00</MaxDeliveryTime>
   <RiskRange>4.00:00:00</RiskRange>
