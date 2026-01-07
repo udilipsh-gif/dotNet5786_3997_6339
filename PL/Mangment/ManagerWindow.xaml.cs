@@ -1,12 +1,7 @@
-﻿using PL.Order;
-using System.Collections.ObjectModel;
+﻿using BO;
 using System.ComponentModel;
-using System.Configuration;
 using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -26,10 +21,62 @@ namespace PL;
 /// </list>
 /// Implements INotifyPropertyChanged for data binding support.
 /// </remarks>
-public partial class ManagerWindow : Window, INotifyPropertyChanged
+public partial class ManagerWindow : Window
 {
 
     int UserId = 0;
+
+    public class StatisticItem
+    {
+        public object Id { get; set; } = 0;
+        public string Name { get; set; } = string.Empty;
+        public int Value { get; set; }
+    }
+
+
+    public IEnumerable<StatisticItem> EnumForStatistic
+    {
+        get
+        {
+            var combinedList = new List<StatisticItem>(); // שינינו ל-StatisticItem
+
+            var orderValues = Enum.GetValues(typeof(BO.OrderStatus))
+                                  .Cast<BO.OrderStatus>()
+                                  .Select(e => new StatisticItem // יצירת המופע האמיתי
+                                  {
+                                      Id = e,
+                                      Name = "סטטוס הזמנה: " + Tools.GetDescription(e),
+                                      Value = 0 
+                                  });
+
+            combinedList.AddRange(orderValues);
+
+            var scheduleValues = Enum.GetValues(typeof(BO.ScheduleStatus))
+                                     .Cast<BO.ScheduleStatus>()
+                                     .Select(e => new StatisticItem // יצירת המופע האמיתי
+                                     {
+                                         Id = e,
+                                         Name = "סטטוס לו\"ז: " + Tools.GetDescription(e),
+                                         Value = 0
+                                     });
+
+            combinedList.AddRange(scheduleValues);
+
+            return combinedList;
+        }
+    }
+
+    public IEnumerable<StatisticItem> CombinedStatistics
+    {
+        get { return (IEnumerable<StatisticItem>)GetValue(CombinedStatisticsProperty); }
+        set { SetValue(CombinedStatisticsProperty, value); }
+    }
+
+    public static readonly DependencyProperty CombinedStatisticsProperty =
+        DependencyProperty.Register(nameof(CombinedStatistics),
+            typeof(IEnumerable<StatisticItem>),
+            typeof(ManagerWindow));
+
 
     /// <summary>
     /// Initializes a new instance of the ManagerWindow class.
@@ -67,24 +114,6 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     public static readonly DependencyProperty CurrentTimeProperty =
         DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(ManagerWindow));
 
-    /// <summary>
-    /// Gets or sets the current system configuration.
-    /// </summary>
-    /// <remarks>
-    /// This property is bound to the configuration editing UI controls.
-    /// Changes to configuration fields are tracked and users are prompted to save before losing focus.
-    /// </remarks>
-    public BO.Config Configuration
-    {
-        get { return (BO.Config)GetValue(ConfigurationProperty); }
-        set { SetValue(ConfigurationProperty, value); }
-    }
-
-    /// <summary>
-    /// Dependency property for the Configuration property.
-    /// </summary>
-    public static readonly DependencyProperty ConfigurationProperty =
-        DependencyProperty.Register("Configuration", typeof(BO.Config), typeof(ManagerWindow));
 
     /// <summary>
     /// Handles the window close event, performs cleanup operations.
@@ -103,7 +132,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     {
         CloseAllWindowsExceptMain();
         s_bl.Admin.RemoveClockObserver(ClockObserver);
-        s_bl.Admin.RemoveConfigObserver(ConfigObserver);
+        s_bl.Order.RemoveObserver(StatisticObserver);
     }
 
     /// <summary>
@@ -122,11 +151,10 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// </remarks>
     private void ManagerWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        CurrentTime = s_bl.Admin.GetClock();
+        ClockObserver();
+        StatisticObserver();
         s_bl.Admin.AddClockObserver(ClockObserver);
-
-        Configuration = s_bl.Admin.GetConfig();
-        s_bl.Admin.AddConfigObserver(ConfigObserver);
+        s_bl.Order.AddObserver(StatisticObserver);
     }
 
     /// <summary>
@@ -134,11 +162,34 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// </summary>
     private void ClockObserver() => CurrentTime = s_bl.Admin.GetClock();
 
-    /// <summary>
-    /// Observer callback method for configuration changes, updates the displayed configuration.
-    /// </summary>
-    private void ConfigObserver() => Configuration = s_bl.Admin.GetConfig();
+    private void StatisticObserver()
+    {
+        int[]? newStats = null;
+        try
+        {
+             newStats = s_bl.Order.GetAllOrderStatistic(UserId);
+        }
+        catch(BlNoAccessException)
+        {
+            MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
+            CloseAllWindowsExceptMain();
+            this.Close();
+        }
+        var enumList = EnumForStatistic; // שומרים למשתנה כדי לא לחשב פעמיים
 
+        if (enumList != null && newStats != null)
+        {
+            // Zip מחבר בין הפריטים. כעת labelObj הוא מסוג StatisticItem מוכר
+            var resultList = enumList.Zip(newStats, (labelObj, count) => new StatisticItem
+            {
+                Id = labelObj.Id,     // אין צורך ב-dynamic
+                Name = labelObj.Name, // אין צורך ב-dynamic
+                Value = count         // העדכון מהסטטיסטיקה
+            }).ToList();
+
+            CombinedStatistics = resultList;
+        }
+    }
 
     /// <summary>
     /// Handles the courier list button click event, opens the courier management window.
@@ -147,7 +198,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// <param name="e">Event arguments.</param>
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
         => Tools.OpenOrActivateWindow<CourierListWindow>();
-    
+
 
     /// <summary>
     /// Handles the clock forward button clicks, advances the system clock by the specified time unit.
@@ -228,6 +279,7 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
             finally
             {
                 Mouse.OverrideCursor = null;
+                StatisticObserver();
             }
         }
 
@@ -264,49 +316,12 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
             finally
             {
                 Mouse.OverrideCursor = null;
+                StatisticObserver();
             }
         }
 
     }
 
-    /// <summary>
-    /// Flag indicating whether the user has made unsaved changes to configuration fields.
-    /// </summary>
-    private bool _isDirty = false;
-
-    /// <summary>
-    /// Handles the text box got focus event, resets the dirty flag.
-    /// </summary>
-    /// <param name="sender">The TextBox control that received focus.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// Resets the dirty tracking flag when a user enters a configuration field.
-    /// This allows tracking of actual user changes versus programmatic updates.
-    /// </remarks>
-    private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-    {
-        _isDirty = false;
-    }
-
-
-
-    /// <summary>
-    /// Handles the text box text changed event, sets the dirty flag when user types.
-    /// </summary>
-    /// <param name="sender">The TextBox control whose text changed.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// Only sets the dirty flag if the TextBox has focus, ensuring that programmatic
-    /// updates (such as binding refreshes) don't incorrectly mark the field as modified.
-    /// This distinguishes between user input and automatic system updates.
-    /// </remarks>
-    private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (e.OriginalSource is TextBox tb && tb.IsFocused)
-        {
-            _isDirty = true;
-        }
-    }
 
     /// <summary>
     /// Closes all open windows except the main window (MainWindow).
@@ -325,93 +340,6 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
                 window.Close();
             }
         }
-    }
-
-
-    /// <summary>
-    /// Handles the text box lost focus event, prompts to save changes if modifications were made.
-    /// </summary>
-    /// <param name="sender">The TextBox control that lost focus.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// When the user leaves a configuration field that has been modified:
-    /// <list type="bullet">
-    /// <item><description>Prompts the user to save or discard changes</description></item>
-    /// <item><description>If "Yes": Saves the configuration to the business layer and displays success message</description></item>
-    /// <item><description>If "No": Reloads the original configuration, discarding user changes</description></item>
-    /// <item><description>On error: Displays error message and restores original configuration</description></item>
-    /// <item><description>Resets the dirty flag after handling</description></item>
-    /// </list>
-    /// The binding typically updates the Configuration property before this event fires.
-    /// </remarks>
-    private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-    {
-        if (_isDirty)
-        {
-            var result = MessageBox.Show("הנתונים השתנו. לשמור?", "שמירת שינויים",
-                                         MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                try
-                {
-                    s_bl.Admin.SetConfig(Configuration);
-                    MessageBox.Show("הנתונים נשמרו בהצלחה.");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: " + ex.Message);
-                    Configuration = s_bl.Admin.GetConfig();
-                }
-            }
-            else
-            {
-                Configuration = s_bl.Admin.GetConfig();
-            }
-        }
-
-        _isDirty = false;
-    }
-
-    /// <summary>
-    /// Event raised when a property value changes, enabling data binding updates.
-    /// </summary>
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    /// <summary>
-    /// Handles text input validation for numeric-only fields.
-    /// </summary>
-    /// <param name="sender">The TextBox control receiving input.</param>
-    /// <param name="e">Event arguments containing the input text.</param>
-    /// <remarks>
-    /// Only allows digit characters (0-9) to be entered into the field.
-    /// Used for configuration fields that require integer values (e.g., Manager ID, speeds).
-    /// Non-digit characters are automatically rejected.
-    /// </remarks>
-    private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
-    {
-        e.Handled = !e.Text.All(char.IsDigit);
-    }
-
-    /// <summary>
-    /// Raises the PropertyChanged event for the specified property.
-    /// </summary>
-    /// <param name="propertyName">
-    /// The name of the property that changed. Automatically populated by the compiler when called from a property setter.
-    /// </param>
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    /// <summary>
-    /// Handles preview text input event for text boxes.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// Currently not implemented. Reserved for future input validation or preprocessing logic.
-    /// </remarks>
-    private void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-    {
 
     }
 
@@ -422,6 +350,9 @@ public partial class ManagerWindow : Window, INotifyPropertyChanged
     /// <param name="e"></param>
     private void btnOrderList_Click(object sender, RoutedEventArgs e)
         => Tools.OpenOrActivateWindow<OrderListWindow>();
+
+    private void btnConfig_Click(object sender, RoutedEventArgs e)
+        => Tools.OpenOrActivateWindow<ConfigWindow>();
 }
 
 /// <summary>

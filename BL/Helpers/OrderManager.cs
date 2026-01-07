@@ -59,6 +59,7 @@ internal static class OrderManager
         {
             results[item.Index] = item.Count;
         }
+
         return results;
     }
 

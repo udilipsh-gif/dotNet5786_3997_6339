@@ -99,7 +99,7 @@ internal static class Config
     /// <summary>
     /// Gets or sets the manager's password.
     /// </summary>
-    internal static string PasswordManager { get; set; } = "Admin1234$";
+    internal static string PasswordManager { get; set; } = "1";
 
     /// <summary>
     /// Gets or sets the store address.
