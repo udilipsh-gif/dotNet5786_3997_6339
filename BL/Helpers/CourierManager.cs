@@ -84,7 +84,7 @@ internal static class CourierManager
         if (!Tools.IsValidEmail(boCourier.Email))
             throw new BO.BlInvalidValueException("Invalid email address.");
         if (!Tools.IsStrongPassword(boCourier.Password))
-            throw new BO.BlInvalidValueException("Password is not strong enough.");
+            throw new BO.BlInvalidValueException("סיסמה חלשה מידי. הכנס 8 תווים בהם אות גדולה, קטנה, ספרה וסימן.");
 
         DO.Courier doCourier = new DO.Courier
         {

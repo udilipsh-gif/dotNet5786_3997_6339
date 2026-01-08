@@ -560,4 +560,44 @@
     <EndDelivery></EndDelivery>
     <TimeEndDelivery></TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200056</Id>
+    <OrderId>100005</OrderId>
+    <CourierId>328332663</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <ActualDistance>6.623</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2026-01-07T11:59:26.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200057</Id>
+    <OrderId>100001</OrderId>
+    <CourierId>328332663</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <ActualDistance>6.169</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2026-01-07T11:59:26.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200058</Id>
+    <OrderId>100010</OrderId>
+    <CourierId>328332663</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <ActualDistance>7.789</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2026-01-07T11:59:26.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200059</Id>
+    <OrderId>100053</OrderId>
+    <CourierId>328332663</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <ActualDistance>2.249</ActualDistance>
+    <EndDelivery></EndDelivery>
+    <TimeEndDelivery></TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
