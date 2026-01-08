@@ -363,16 +363,6 @@ internal static class OrderManager
             throw new BO.BlInvalidOperationException("Order is not open for selection");
 
         DeliveryManager.Create(doOrder, doCourier);
-
-        s_dal.Order.Update(doOrder with
-        {
-            OrderStatus = DO.OrderStatus.DELIVERING
-        });
-        Observer.NotifyItemUpdated(orderId);
-        CourierManager.Observer.NotifyItemUpdated(courierId);
-        Observer.NotifyListUpdated();
-        CourierManager.Observer.NotifyListUpdated();
-        DeliveryManager.Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -499,7 +489,8 @@ internal static class OrderManager
                                  orderby d.Id descending
                                  select d).FirstOrDefault();
 
-        var orderStatus = Tools.GetOrderStatus(doOrder, delivery);
+        //var orderStatus = Tools.GetOrderStatus(doOrder, delivery);
+        var orderStatus = (BO.OrderStatus)doOrder.OrderStatus;
 
         return new BO.OrderInList
         {

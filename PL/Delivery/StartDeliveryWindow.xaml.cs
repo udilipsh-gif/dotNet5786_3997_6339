@@ -1,20 +1,7 @@
-﻿using BO;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using static PL.Tools;
 
 namespace PL;
 
@@ -62,10 +49,10 @@ public partial class StartDeliveryWindow : Window
         get { return (ObservableCollection<BO.OpenOrderInList>)GetValue(DeliveryListViewProperty); }
         set { SetValue(DeliveryListViewProperty, value); }
     }
-  
+
     public static readonly DependencyProperty DeliveryListViewProperty =
-        DependencyProperty.Register("DeliveryListView", typeof(List<BO.OpenOrderInList>),
-            typeof(StartDeliveryWindow), new PropertyMetadata(null));
+    DependencyProperty.Register("DeliveryListView", typeof(ObservableCollection<BO.OpenOrderInList>),
+        typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
 
     public StartDeliveryWindow(int userId, int courierId)
@@ -117,10 +104,6 @@ public partial class StartDeliveryWindow : Window
                 DeliveryListView.Add(item); // הוספת החדשים
             }
         }
-
-
-
-       
     }
 
     private void ComboBox_FilterSelectionChanged(object sender, SelectionChangedEventArgs e)

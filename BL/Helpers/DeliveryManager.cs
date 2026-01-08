@@ -1,5 +1,4 @@
 ﻿using DalApi;
-using DO;
 
 namespace Helpers;
 
@@ -82,7 +81,24 @@ internal static class DeliveryManager
             EndDelivery = (DO.EndDelivery)endDelivery,
             TimeEndDelivery = AdminManager.Now
         };
+
         s_dal.Delivery.Update(delivery);
+
+        DO.Order order = s_dal.Order.Read(delivery.OrderId)
+                ?? throw new BO.BlDoesNotExistException($"Order with ID {delivery.OrderId} not found");
+        s_dal.Order.Update(order with
+        {
+            OrderStatus = endDelivery switch
+            {
+                BO.EndDelivery.DELIVERED => DO.OrderStatus.COMPLETED,
+                BO.EndDelivery.CANCELLED => DO.OrderStatus.CONCELLED,
+                BO.EndDelivery.REFUSED => DO.OrderStatus.REFUSED,
+                BO.EndDelivery.FAILED => DO.OrderStatus.OPEN,
+                BO.EndDelivery.NOTFOUND => DO.OrderStatus.OPEN,
+                _ => order.OrderStatus
+            }
+        });
+
         Observer.NotifyItemUpdated(deliveryId);
         OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
         CourierManager.Observer.NotifyItemUpdated(courierId);
@@ -129,7 +145,7 @@ internal static class DeliveryManager
 
         };
         s_dal.Delivery.Create(delivery);
-       // s_dal.Order.Update(order with { OrderStatus = OrderStatus.DELIVERING });
+        s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
         OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
         CourierManager.Observer.NotifyItemUpdated(courier.Id);
         Observer.NotifyListUpdated();

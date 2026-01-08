@@ -176,7 +176,7 @@ internal static class Tools
                 DO.EndDelivery.DELIVERED => BO.OrderStatus.COMPLETED,
                 DO.EndDelivery.REFUSED => BO.OrderStatus.REFUSED,
                 DO.EndDelivery.CONCELLED => BO.OrderStatus.CANCELLED,
-                DO.EndDelivery.FAILED => BO.OrderStatus.CANCELLED,
+                DO.EndDelivery.FAILED => BO.OrderStatus.OPEN,
                 DO.EndDelivery.NOTFOUND => BO.OrderStatus.OPEN,
                 null => BO.OrderStatus.OPEN,
                 _ => throw new Exception("Unknown delivery status"),
