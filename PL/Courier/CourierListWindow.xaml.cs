@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel; 
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Collections.ObjectModel; 
 
 namespace PL;
 
@@ -173,7 +173,20 @@ public partial class CourierListWindow : Window
         };
 
         // Call business layer to get the filtered courier list
-        CourierInList = new ObservableCollection<BO.CourierInList>(s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id).Where(e => e.Id != 0));
+        var newList = s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id).Where(e => e.Id != 0);
+
+        if (CourierInList == null)
+        {
+            CourierInList = new ObservableCollection<BO.CourierInList>(newList);
+        }
+        else
+        {
+            CourierInList.Clear();
+            foreach (var item in newList)
+            {
+                CourierInList.Add(item);
+            }
+        }
     }
 
     /// <summary>

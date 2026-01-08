@@ -1,5 +1,7 @@
-﻿using System;
+﻿using BO;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -12,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static PL.Tools;
 
 namespace PL;
 
@@ -28,27 +31,14 @@ public partial class StartDeliveryWindow : Window
 
     public ICommand SelectOrderCommand { get; private set; }
 
-    public IEnumerable<object> EnumForSoring
+    public IEnumerable<Tools.SelectionItem> EnumForSoring
     {
-        get
-        {
-            var list = new List<object>
-            {
-                new { Id = (BO.TypeOfOrder?)null, Name = "הצג הכל / ללא סינון" }
-            };
-            var enumValues = Enum.GetValues(typeof(BO.TypeOfOrder))
-                                 .Cast<BO.TypeOfOrder>()
-                                 .Select(e => new
-                                 {
-                                     Id = (BO.TypeOfOrder?)e,
-                                     Name = Tools.GetDescription(e),
-                                 });
-            return list.Concat(enumValues);
-
-        }
+        get => Tools.GetEnumList<BO.TypeOfOrder>("הכל");
     }
 
-    private BO.OpenOrderInListField SelctedSort
+
+
+    public BO.OpenOrderInListField SelctedSort
     {
         get => (BO.OpenOrderInListField)GetValue(SelctedSortProperty);
         set => SetValue(SelctedSortProperty, value);
@@ -67,12 +57,12 @@ public partial class StartDeliveryWindow : Window
         DependencyProperty.Register("SelctedFilter", typeof(BO.TypeOfOrder?),
             typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
-    public List<BO.OpenOrderInList> DeliveryListView
+    public ObservableCollection<BO.OpenOrderInList> DeliveryListView
     {
-        get => (List<BO.OpenOrderInList>)GetValue(DeliveryListViewProperty);
-        set => SetValue(DeliveryListViewProperty, value);
+        get { return (ObservableCollection<BO.OpenOrderInList>)GetValue(DeliveryListViewProperty); }
+        set { SetValue(DeliveryListViewProperty, value); }
     }
-
+  
     public static readonly DependencyProperty DeliveryListViewProperty =
         DependencyProperty.Register("DeliveryListView", typeof(List<BO.OpenOrderInList>),
             typeof(StartDeliveryWindow), new PropertyMetadata(null));
@@ -113,7 +103,24 @@ public partial class StartDeliveryWindow : Window
 
     private void UpdateOrdersList()
     {
-        DeliveryListView = [.. s_bl.Order.GetOpen(userId, courierId, SelctedFilter, SelctedSort)];
+        var DeliveryList = s_bl.Order.GetOpen(userId, courierId, SelctedFilter, SelctedSort);
+
+        if (DeliveryListView == null)
+        {
+            DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList); 
+        }
+        else
+        {
+            DeliveryListView.Clear(); // מחיקת הישנים
+            foreach (var item in DeliveryList)
+            {
+                DeliveryListView.Add(item); // הוספת החדשים
+            }
+        }
+
+
+
+       
     }
 
     private void ComboBox_FilterSelectionChanged(object sender, SelectionChangedEventArgs e)

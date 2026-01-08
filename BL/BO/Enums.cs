@@ -200,10 +200,6 @@ public enum TypeOfOrder
     [Description("מיידי")]
     DELIVER_IMMEDIATELY,
 
-    /// <summary>the order type includes all possible types. </summary>
-    [Description("הכל")]
-    ALL
-
 }
 
 /// <summary>
@@ -252,12 +248,6 @@ public enum ScheduleStatus
     /// <summary>The order is canceled.</summary>
     [Description("בוטל")]
     CANCELLED,
-
-
-    /// <summary>the delivery status includes all possible states.</summary>
-    [Description("הכל")]
-    ALL
-
 
 }
 

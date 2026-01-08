@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace PL;
 
-internal static class Tools
+public static class Tools
 {
     // Attached Property for numeric-only validation
     public static readonly DependencyProperty NumericOnlyProperty =
@@ -85,6 +85,34 @@ internal static class Tools
             var newWindow = (T)Activator.CreateInstance(typeof(T), args)!;
             newWindow.Show(); // שימוש ב-Show לא חוסם את החלון הראשי
         }
+    }
+
+    public static IEnumerable<SelectionItem> GetEnumList<T>(string defaultText = "הכל") where T : struct, Enum
+    {
+        // 1. יצירת רשימה והוספת פריט ברירת המחדל
+        var list = new List<SelectionItem>
+        {
+            new SelectionItem { Id = null, Name = defaultText }
+        };
+
+        // 2. שליפת ערכי ה-Enum והמרתם
+        var enumValues = Enum.GetValues(typeof(T))
+                             .Cast<T>()
+                             .Select(e => new SelectionItem
+                             {
+                                 Id = e, // ה-Id יקבל את ערך ה-Enum
+                                 Name = GetDescription(e) // שימוש בפונקציה הקיימת שלך לתיאור
+                             });
+
+        // 3. איחוד והחזרה
+        list.AddRange(enumValues);
+        return list;
+    }
+
+    public class SelectionItem
+    {
+        public object? Id { get; set; }
+        public required string Name { get; set; }
     }
 
 }

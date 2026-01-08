@@ -132,7 +132,7 @@ internal static class OrderManager
         var query = from doOrder in s_dal.Order.ReadAll()
                     let boOrder = s_convertToBoOrderInList(doOrder)
                     where filterPredicate(boOrder)
-                    orderby sortSelector(boOrder)
+                    orderby sortSelector(boOrder) descending
                     select boOrder;
         return [.. query];
     }

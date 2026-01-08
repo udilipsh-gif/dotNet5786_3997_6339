@@ -56,8 +56,9 @@ internal class CourierFieldFilter : IEnumerable
 }
 internal class OrderFilterScheduleStatus : IEnumerable
 {
-    static readonly IEnumerable<BO.ScheduleStatus> s_enums =
-(Enum.GetValues(typeof(BO.ScheduleStatus)) as IEnumerable<BO.ScheduleStatus>)!;
+    static readonly IEnumerable<BO.ScheduleStatus?> s_enums =
+        new BO.ScheduleStatus?[] { null }
+        .Concat(Enum.GetValues<BO.ScheduleStatus>().Cast<BO.ScheduleStatus?>());
 
     IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
 }
@@ -65,9 +66,16 @@ internal class OrderFilterScheduleStatus : IEnumerable
 internal class OrderFilterTypeOfOrder : IEnumerable
 {
     static readonly IEnumerable<BO.TypeOfOrder> s_enums =
-(Enum.GetValues(typeof(BO.TypeOfOrder)) as IEnumerable<BO.TypeOfOrder>)!;
+        (Enum.GetValues(typeof(BO.TypeOfOrder)) as IEnumerable<BO.TypeOfOrder>)!;
 
     IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
 }
+
+internal class SelectionItem
+{
+    public object? Id { get; set; }
+    public required string Name { get; set; }
+};
+
 
 
