@@ -64,22 +64,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
 
 
-    //private Visibility _cancelButtonVisibility = Visibility.Collapsed;
-
-
-    //public Visibility CancelButtonVisibility
-    //{
-    //    get => _cancelButtonVisibility;
-    //    set
-    //    {
-    //        _cancelButtonVisibility = value;
-    //        OnPropertyChanged(nameof(CancelButtonVisibility));
-    //    }
-    //}
-
-
-
-
+   
 
     //שיניתי את הערכים לצפייה בלבד אז אין צורך למשוך אינום
     //public IEnumerable<BO.ScheduleStatus> ScheduleStatusValues
@@ -261,15 +246,15 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         }
         catch (BO.BlInvalidValueException ex)
         {
-            MessageBox.Show($"Invalid data: {ex.Message}");
+            MessageBox.Show($"ערך חסר או לא חוקי: {ex.Message}");
         }
         catch (BO.BlAlreadyExistsException ex)
         {
-            MessageBox.Show($"Error: {ex.Message}");
+            MessageBox.Show($"שגיאה מסוג: {ex.Message}");
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"General error: {ex.Message}");
+            MessageBox.Show($"שגיאה כללית: {ex.Message}");
         }
     }
 

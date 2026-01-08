@@ -768,6 +768,13 @@ internal static class Tools
         }
         return null;
     }
+    /// <summary>
+    ///  Sends an email using SMTP via Gmail's SMTP server.
+    /// </summary>
+    /// <param name="toEmail"></param>
+    /// <param name="subject"></param>
+    /// <param name="body"></param>
+    /// <exception cref="SmtpException"></exception>
     public static void SendEmail(string toEmail, string subject, string body)
     {
         try
@@ -782,7 +789,7 @@ internal static class Tools
 
             // ולידציה בסיסית למקרה שהמייל ריק
             if (string.IsNullOrWhiteSpace(toEmail))
-                //throw new Exception("כתובת המייל של הנמען ריקה");
+               
                 throw new SmtpException("כתובת נמען ריקה");
 
 

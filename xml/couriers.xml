@@ -231,4 +231,15 @@
     <TypeShipment>FOOT</TypeShipment>
     <WorkingSince>2025-08-01T11:59:26.0000000</WorkingSince>
   </Courier>
+  <Courier>
+    <Id>328332663</Id>
+    <Name>יוסף</Name>
+    <Phone>0587700801</Phone>
+    <Email>yz7700801@gmail.com</Email>
+    <Password>12345YYYYffff@#$%^</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>20</MaxDistanceDelivery>
+    <TypeShipment>CAR</TypeShipment>
+    <WorkingSince>2026-01-07T11:59:26.0000000</WorkingSince>
+  </Courier>
 </ArrayaOfCouriers>

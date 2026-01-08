@@ -79,17 +79,17 @@ internal static class OrderManager
     /// </remarks>
     public static void Create(BO.Order boOrder)
     {
-        if (string.IsNullOrEmpty(boOrder.Details))
-            throw new BO.BlInvalidValueException("Order details cannot be empty.");
-
-        if (string.IsNullOrEmpty(boOrder.Addres))
-            throw new BO.BlInvalidValueException("Order address cannot be empty.");
-
         if (string.IsNullOrEmpty(boOrder.Name))
             throw new BO.BlInvalidValueException("Order name cannot be empty.");
 
         if (!Tools.IsValidPhone(boOrder.Phone))
             throw new BO.BlInvalidValueException("Invalid phone number.");
+
+        if (string.IsNullOrEmpty(boOrder.Addres))
+            throw new BO.BlInvalidValueException("Order address cannot be empty.");
+       
+        if (string.IsNullOrEmpty(boOrder.Details))
+            throw new BO.BlInvalidValueException("Order details cannot be empty.");
 
         var adressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
 
@@ -192,17 +192,21 @@ internal static class OrderManager
     /// </remarks>
     public static void Update(BO.Order boOrder)
     {
-        if (string.IsNullOrEmpty(boOrder.Details))
-            throw new BO.BlInvalidValueException("Order details cannot be empty.");
-
-        if (string.IsNullOrEmpty(boOrder.Addres))
-            throw new BO.BlInvalidValueException("Order address cannot be empty.");
 
         if (string.IsNullOrEmpty(boOrder.Name))
             throw new BO.BlInvalidValueException("Order name cannot be empty.");
 
         if (!Tools.IsValidPhone(boOrder.Phone))
             throw new BO.BlInvalidValueException("Invalid phone number.");
+
+        if (string.IsNullOrEmpty(boOrder.Addres))
+            throw new BO.BlInvalidValueException("Order address cannot be empty.");
+
+        if (string.IsNullOrEmpty(boOrder.Details))
+            throw new BO.BlInvalidValueException("Order details cannot be empty.");
+
+             
+
 
         var adressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
 

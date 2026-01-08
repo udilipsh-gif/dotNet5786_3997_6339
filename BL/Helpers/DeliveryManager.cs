@@ -79,7 +79,7 @@ internal static class DeliveryManager
             throw new BO.BlInvalidValueException($"Courier with ID {courierId} is not assigned to this delivery  ");
         delivery = delivery with
         {
-           EndDelivery = (DO.EndDelivery)endDelivery,
+            EndDelivery = (DO.EndDelivery)endDelivery,
             TimeEndDelivery = AdminManager.Now
         };
         s_dal.Delivery.Update(delivery);
@@ -113,7 +113,7 @@ internal static class DeliveryManager
     /// </remarks>
     public static void Create(DO.Order order, DO.Courier courier)
     {
-        if(order.DistanceKm > courier.MaxDistanceDelivery)
+        if (order.DistanceKm > courier.MaxDistanceDelivery)
             throw new BO.BlInvalidValueException($"Courier with ID {courier.Id} cannot deliver to distance {order.DistanceKm} km");
 
         DO.Delivery delivery = new DO.Delivery
@@ -126,8 +126,10 @@ internal static class DeliveryManager
             ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
             EndDelivery = null,
             TimeEndDelivery = null
+
         };
         s_dal.Delivery.Create(delivery);
+       // s_dal.Order.Update(order with { OrderStatus = OrderStatus.DELIVERING });
         OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
         CourierManager.Observer.NotifyItemUpdated(courier.Id);
         Observer.NotifyListUpdated();

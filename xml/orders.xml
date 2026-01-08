@@ -1,38 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfOrder>
   <Order>
-    <Id>100001</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 0</Details>
-    <Addres>שד' בן גוריון 55 רמת גן</Addres>
-    <Latitude>32.0843651</Latitude>
-    <Longitude>34.774976</Longitude>
-    <Name>Customer0</Name>
-    <Phone>0532079970</Phone>
-    <Weight>3</Weight>
-    <OrderDate>2025-06-03T11:59:26.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>4.634818324704076</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
-    <Id>100005</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 4</Details>
-    <Addres>סוקלוב 30 תל אביב</Addres>
-    <Latitude>32.0887754</Latitude>
-    <Longitude>34.777855</Longitude>
-    <Name>Customer4</Name>
-    <Phone>0541496530</Phone>
-    <Weight>2</Weight>
-    <OrderDate>2025-02-02T11:59:26.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>4.28182861098156</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100007</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 6</Details>
@@ -705,22 +673,6 @@
     <DistanceKmWalk />
   </Order>
   <Order>
-    <Id>100010</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 9</Details>
-    <Addres>העצמאות 45 בני ברק</Addres>
-    <Latitude>32.07434</Latitude>
-    <Longitude>34.876951</Longitude>
-    <Name>Customer9</Name>
-    <Phone>0563211761</Phone>
-    <Weight>7</Weight>
-    <OrderDate>2025-11-12T11:59:26.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>5.521098911353561</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100043</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 42</Details>
@@ -844,6 +796,70 @@
     <Weight>0</Weight>
     <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
     <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100005</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 4</Details>
+    <Addres>סוקלוב 30 תל אביב</Addres>
+    <Latitude>32.0887754</Latitude>
+    <Longitude>34.777855</Longitude>
+    <Name>Customer4</Name>
+    <Phone>0541496530</Phone>
+    <Weight>2</Weight>
+    <OrderDate>2025-02-02T11:59:26.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
+    <DistanceKm>4.28182861098156</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100001</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 0</Details>
+    <Addres>שד' בן גוריון 55 רמת גן</Addres>
+    <Latitude>32.0843651</Latitude>
+    <Longitude>34.774976</Longitude>
+    <Name>Customer0</Name>
+    <Phone>0532079970</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2025-06-03T11:59:26.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
+    <DistanceKm>4.634818324704076</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100010</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 9</Details>
+    <Addres>העצמאות 45 בני ברק</Addres>
+    <Latitude>32.07434</Latitude>
+    <Longitude>34.876951</Longitude>
+    <Name>Customer9</Name>
+    <Phone>0563211761</Phone>
+    <Weight>7</Weight>
+    <OrderDate>2025-11-12T11:59:26.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
+    <DistanceKm>5.521098911353561</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100053</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>ג</Details>
+    <Addres>פוניבז בני ברק</Addres>
+    <Latitude>32.0832117</Latitude>
+    <Longitude>34.8327558</Longitude>
+    <Name>ג</Name>
+    <Phone>12345678</Phone>
+    <Weight>0</Weight>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
     <DistanceKm />
     <DistanceKmRoad />
     <DistanceKmWalk />
