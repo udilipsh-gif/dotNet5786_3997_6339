@@ -9,7 +9,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת שליחים" 
         Height="450" 
-        Width="720"
+        Width="800"
         Loaded="Window_Loaded"
         Closed="Window_Close">
 
@@ -33,6 +33,7 @@
         <Style TargetType="DataGridRow">
             <Setter Property="Height" Value="Auto"/>
             <Setter Property="MinHeight" Value="32"/>
+            
         </Style>
 
         <!-- Style לכותרות עם Wrap -->
@@ -149,7 +150,7 @@
                 <DataGridTextColumn Header="שם" 
                             Binding="{Binding Name}" 
                             SortMemberPath="Name" 
-                            Width="Auto"
+                            Width="*"
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 

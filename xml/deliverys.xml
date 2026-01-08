@@ -540,4 +540,24 @@
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>2026-01-07T00:48:42.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200054</Id>
+    <OrderId>100051</OrderId>
+    <CourierId>0</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <ActualDistance>0</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-07T11:59:26.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200055</Id>
+    <OrderId>100052</OrderId>
+    <CourierId>376181896</CourierId>
+    <TypeShipment>BIKE</TypeShipment>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <ActualDistance>0.107</ActualDistance>
+    <EndDelivery></EndDelivery>
+    <TimeEndDelivery></TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>

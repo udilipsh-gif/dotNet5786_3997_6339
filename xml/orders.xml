@@ -816,4 +816,36 @@
     <DistanceKmRoad />
     <DistanceKmWalk />
   </Order>
+  <Order>
+    <Id>100051</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>יח</Details>
+    <Addres>מכון לב</Addres>
+    <Latitude>31.7650471</Latitude>
+    <Longitude>35.1911197</Longitude>
+    <Name>ייי</Name>
+    <Phone>0548461157</Phone>
+    <Weight>0</Weight>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100052</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>כככ</Details>
+    <Addres>מכללת מבחר</Addres>
+    <Latitude>32.0936962</Latitude>
+    <Longitude>34.8232792</Longitude>
+    <Name>משה</Name>
+    <Phone>123456789</Phone>
+    <Weight>0</Weight>
+    <OrderDate>2026-01-07T11:59:26.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
 </ArrayOfOrder>

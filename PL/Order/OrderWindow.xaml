@@ -14,6 +14,7 @@
         ResizeMode="CanResize">
     <Window.Resources>
         <local:EnumToBooleanConverter x:Key="MyEnumConverter" />
+        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
 
         <Style TargetType="Label" x:Key="UniformLabel">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -100,7 +101,7 @@
                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CourierName}" FontSize="14"/>
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="סוג התניידות:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TypeShipment}" FontSize="14"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding TypeShipment, Converter={StaticResource EnumDescriptionConverter}}" FontSize="14"/>
 
                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="התחלה:" FontSize="14" FontWeight="Bold" Margin="0,0,5,0"/>
                                         <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding OrderDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" FontSize="14"/>
@@ -152,7 +153,7 @@
             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CurrentOrder.Addres, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
             <Label Grid.Row="2" Grid.Column="0" Content="כתובת:" Style="{StaticResource UniformLabel}"/>
 
-            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft" HorizontalAlignment="left" VerticalAlignment="Center">
                 <RadioButton Content="רגיל" Margin="2" IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=STANDART, Mode=TwoWay}" />
                 <RadioButton Content="מהיר" Margin="2" IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=FAST_DELIVERY, Mode=TwoWay}" />
                 <RadioButton Content="מיידי" Margin="2" IsChecked="{Binding CurrentOrder.TypeOfOrder, Converter={StaticResource MyEnumConverter}, ConverterParameter=DELIVER_IMMEDIATELY, Mode=TwoWay}" />
@@ -178,10 +179,10 @@
             <TextBox Grid.Row="2" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy}'}" Style="{StaticResource UniformTextBox}"/>
             <Label Grid.Row="2" Grid.Column="3" Content="זמן מירבי לאספקה:" Style="{StaticResource UniformLabel}"/>
 
-            <TextBox Grid.Row="3" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.OrderStatus}" Style="{StaticResource UniformTextBox}"/>
+            <TextBox Grid.Row="3" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.OrderStatus,Converter={StaticResource EnumDescriptionConverter}}" Style="{StaticResource UniformTextBox}"/>
             <Label Grid.Row="3" Grid.Column="3" Content="סטטוס:" Style="{StaticResource UniformLabel}"/>
 
-            <TextBox Grid.Row="4" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus}" Style="{StaticResource UniformTextBox}"/>
+            <TextBox Grid.Row="4" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus,Converter={StaticResource EnumDescriptionConverter}}" Style="{StaticResource UniformTextBox}"/>
             <Label Grid.Row="4" Grid.Column="3" Content="עמידה בזמנים:" Style="{StaticResource UniformLabel}"/>
 
             <TextBox Grid.Row="5" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery}" Style="{StaticResource UniformTextBox}"/>
