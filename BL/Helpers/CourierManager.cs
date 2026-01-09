@@ -44,7 +44,7 @@ internal static class CourierManager
                 throw new BO.BlIncorrectPasswordException();
         }
 
-        DO.Courier? doCourier = s_dal.Courier.Read(id) 
+        DO.Courier? doCourier = s_dal.Courier.Read(id)
             ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does Not exist");
 
         if (doCourier.Password == password)
@@ -205,7 +205,7 @@ internal static class CourierManager
         {
             throw new BO.BlDoesNotExistException($"courier with id {boCourier.Id} is not found", ex);
         }
-        
+
     }
 
     /// <summary>
@@ -228,12 +228,30 @@ internal static class CourierManager
         if (courier == null)
             throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist, you can't delete");
 
-        IEnumerable<DO.Delivery> activeDeliveries = s_dal.Delivery.ReadAll(d =>
-            d.CourierId == id &&
-            (d.EndDelivery == null || d.EndDelivery != DO.EndDelivery.DELIVERED)
+        //IEnumerable<DO.Delivery> activeDeliveries = s_dal.Delivery.ReadAll(d =>
+        //d.CourierId == id &&
+        //(d.EndDelivery == null || d.EndDelivery != DO.EndDelivery.DELIVERED)
+        //);
+        //if (activeDeliveries.Any())
+        //throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
+
+        IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
+            d.CourierId == id
         );
-        if (activeDeliveries.Any())
-            throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
+        if (allDeliveries.Any())
+            foreach (var item in allDeliveries)
+            {
+                var order = s_dal.Order.Read(item.OrderId);
+                if (order != null && order.OrderStatus == DO.OrderStatus.DELIVERING)
+                    throw new BO.BlInvalidOperationException("קיים משלוח פעיל ");
+                else
+                    throw new BO.BlInvalidOperationException("בוצעו משלוחים בעבר ");
+
+            }
+
+
+
+
 
         s_dal.Courier.Delete(id);
         Observer.NotifyItemUpdated(id);

@@ -160,12 +160,16 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
 
     }
-
+    /// <summary>
+    /// btnCancel_Click - Handles the click event for the Cancel button to cancel the current order.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void btnCancel_Click(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show(
             "האם אתה רוצה לבטל את ההזמנה הזו?",
-            "הזמנה בוטלה",
+            "אישור ביטול הזמנה",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
@@ -176,7 +180,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         {
             s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID);
            
-            MessageBox.Show("הזמנה בוטלה בהצלחה");
+            MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה");
 
             Close();
         }
@@ -190,7 +194,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         }
         catch (SmtpException ex)
         {
-            MessageBox.Show($" הזמנה בוטלה בהצלחה ({ex.Message})");
+            MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה ({ex.Message})");
             Close();
         }
         catch (Exception ex)
@@ -199,6 +203,9 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         }
        
     }
+    /// <summary>
+    /// orderObserver - Observes changes to the current order and updates the UI accordingly.
+    /// </summary>
     private void OrderObserver()
     {
         try
@@ -215,12 +222,22 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
             MessageBox.Show(ex.Message);
         }
     }
+    /// <summary>
+    /// cleans up observers when the window is closed.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OrderWindow_Closed(object sender, EventArgs e)
     {
         if (CurrentID != 0)
             s_bl.Order.RemoveObserver(CurrentID, OrderObserver);
     }
 
+    /// <summary>
+    /// btnAddUpdate_Click - Handles the click event for the Add/Update button to add or update an order.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
     {
         if (CurrentOrder == null || string.IsNullOrEmpty(CurrentOrder.Name))
@@ -257,10 +274,6 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
             MessageBox.Show($"שגיאה כללית: {ex.Message}");
         }
     }
-
-
-
-
 
 }
 

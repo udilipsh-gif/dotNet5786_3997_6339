@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Net.Mail;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -136,6 +137,19 @@ public partial class OrderListWindow : Window
             {
                 s_bl.Order.Cancel(CURRENT_MANAGER_ID, orderInList.OrderId);
                 MessageBox.Show($"הזמנה מס' {orderInList.OrderId} בוטלה בהצלחה");
+            }
+            catch (BO.BlDoesNotExistException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            catch (BO.BlInvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            catch (SmtpException ex)
+            {
+                MessageBox.Show($"הזמנה מס' {orderInList.OrderId} בוטלה בהצלחה ({ex.Message})");
+                //Close();
             }
             catch (Exception ex)
             {

@@ -311,10 +311,10 @@ internal static class OrderManager
                         $"הזמנה מספר {orderId} בוטלה על ידי המנהל"
                     );
                 }
-                catch (SmtpException ex)
+                catch (SmtpException )
                 {
                     // Log the exception or handle it as needed
-                    throw new SmtpException($" שליחת מייל נכשלה: {ex.Message}");
+                    throw new SmtpException($" שליחת מייל נכשלה:");
                 }
 
 

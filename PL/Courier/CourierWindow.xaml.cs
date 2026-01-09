@@ -67,20 +67,21 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     public static readonly DependencyProperty CurrentCourierProperty =
         DependencyProperty.Register("CurrentCourier", typeof(BO.Courier),
             typeof(CourierWindow), new PropertyMetadata(new BO.Courier()
-        {
-            Id = 0,
-            Name = "",
-            Phone = "",
-            Email = "",
-            Password = "",
-            Active = true,
-            MaxDistanceDelivery = 0,
-            TypeShipment = TheTypeShipment.CAR,
-            WorkingSince = s_bl.Admin.GetClock(),
-            DeliveryLate = 0,
-            DeliveryOnTime = 0
+            {
+                Id = 0,
+                Name = "",
+                Phone = "",
+                Email = "",
+                Password = "",
+                Active = true,
+                MaxDistanceDelivery = 0,
+                TypeShipment = TheTypeShipment.CAR,
+                WorkingSince = s_bl.Admin.GetClock(),
+                DeliveryLate = 0,
+                DeliveryOnTime = 0,
+                
 
-        }));
+            }));
 
     /// <summary>
     /// Gets or sets the text displayed on the action button ("Add" or "Update").
@@ -195,7 +196,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     {
         var result = MessageBox.Show(
             "האם אתה רוצה למחוק את השליח הזה?",
-            "השליח נמחק",
+            "אישור מחיקה",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
@@ -213,9 +214,9 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
         {
             MessageBox.Show($"שליח לא נמצא למחיקה");
         }
-        catch (BO.BlInvalidOperationException)
+        catch (BO.BlInvalidOperationException ex)
         {
-            MessageBox.Show("לא ניתן למחוק שליח עם הזמנה בתהליך");
+            MessageBox.Show($"לא ניתן למחוק מסיבת: {ex.Message}");
         }
         catch (Exception ex)
         {
@@ -316,7 +317,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
             CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
                         ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
         }
-        catch(BO.BlDoesNotExistException)
+        catch (BO.BlDoesNotExistException)
         {
             Close();
         }
@@ -328,7 +329,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
 
 
-    }   
+    }
 
     /// <summary>
     /// Handles text input validation for numeric-only fields.
