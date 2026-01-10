@@ -38,7 +38,8 @@ public partial class CourierListWindow : Window
     /// <summary>
     /// The ID of the currently logged-in manager performing operations.
     /// </summary>
-    private int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId;
+    private int CURRENT_MANAGER_ID = Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().ManagerId);
+        
 
     public ICommand SelectCourierCommand { get; private set; }
 
@@ -110,7 +111,7 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        s_bl.Courier.AddObserver(courierListObserver);
+        Tools.RunSafe(() => s_bl.Courier.AddObserver(courierListObserver));
         UpdateCourierList();
     }
 
@@ -125,7 +126,7 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void Window_Close(object? sender, EventArgs e)
     {
-        s_bl.Courier.RemoveObserver(courierListObserver);
+       Tools.RunSafe(() =>  s_bl.Courier.RemoveObserver(courierListObserver));
     }
 
     /// <summary>
@@ -173,7 +174,8 @@ public partial class CourierListWindow : Window
         };
 
         // Call business layer to get the filtered courier list
-        var newList = s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id).Where(e => e.Id != 0);
+        var newList = Tools.GetSafeFromBl(() => 
+                s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id).Where(e => e.Id != 0));
 
         if (CourierInList == null)
         {

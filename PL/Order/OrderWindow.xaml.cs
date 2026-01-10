@@ -41,7 +41,8 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     /// <summary>
     /// The ID of the currently logged-in manager.
     /// </summary>
-    private readonly int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId!;
+    private readonly int CURRENT_MANAGER_ID = 
+            Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().ManagerId);
 
     public bool IsUpdateMode => ButtonText == "Update";
 
@@ -145,14 +146,14 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
                 Addres = "",
                 // Details = "",
                 OrderStatus = BO.OrderStatus.OPEN,
-                OrderDate = s_bl.Admin.GetClock(),
-                TimeLeftForDelivery = s_bl.Admin.GetConfig().MaxDeliveryTime,
+                OrderDate = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock()),
+                TimeLeftForDelivery = Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().MaxDeliveryTime),
                 Weight = 0,
                 // Distance = 0,
                 TypeOfOrder = BO.TypeOfOrder.STANDART,
                 ScheduleStatus = BO.ScheduleStatus.ONTYME,
                 // EstimatedDeliveryTime = null,
-                MaxDeliveryTime = s_bl.Admin.GetClock() + s_bl.Admin.GetConfig().MaxDeliveryTime
+                MaxDeliveryTime = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock() + s_bl.Admin.GetConfig().MaxDeliveryTime)
 
             };
 
@@ -230,7 +231,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     private void OrderWindow_Closed(object sender, EventArgs e)
     {
         if (CurrentID != 0)
-            s_bl.Order.RemoveObserver(CurrentID, OrderObserver);
+            Tools.RunSafe(() => s_bl.Order.RemoveObserver(CurrentID, OrderObserver));
     }
 
     /// <summary>

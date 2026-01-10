@@ -81,7 +81,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            string? user = s_bl.Courier.Login(userId, passwordBox.Password);
+            string? user = Tools.GetSafeFromBl(() => s_bl.Courier.Login(userId, passwordBox.Password));
 
             UserId = string.Empty;
             passwordBox.Clear();
@@ -146,18 +146,18 @@ public partial class MainWindow : Window
         return true;
     }
 
-    private void ClockObserver() => CurrentTime = s_bl.Admin.GetClock();
+    private void ClockObserver() => CurrentTime = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock());
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         ClockObserver();
-        s_bl.Admin.AddClockObserver(ClockObserver);
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
     }
 
     private void MainWindow_Close(object sender, System.EventArgs e)
     {
         CloseAllWindowsExceptMain();
-        s_bl.Admin.RemoveClockObserver(ClockObserver);
+        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
 
     }
 

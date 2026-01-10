@@ -131,8 +131,8 @@ public partial class ManagerWindow : Window
     private void ManagerWindow_Close(object? sender, EventArgs e)
     {
         CloseAllWindowsExceptMain();
-        s_bl.Admin.RemoveClockObserver(ClockObserver);
-        s_bl.Order.RemoveObserver(StatisticObserver);
+        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
+        Tools.RunSafe(() => s_bl.Order.RemoveObserver(StatisticObserver));
     }
 
     /// <summary>
@@ -153,8 +153,8 @@ public partial class ManagerWindow : Window
     {
         ClockObserver();
         StatisticObserver();
-        s_bl.Admin.AddClockObserver(ClockObserver);
-        s_bl.Order.AddObserver(StatisticObserver);
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
+        Tools.RunSafe(() => s_bl.Order.AddObserver(StatisticObserver));
     }
 
     /// <summary>
