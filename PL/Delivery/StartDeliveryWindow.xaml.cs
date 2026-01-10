@@ -35,19 +35,19 @@ public partial class StartDeliveryWindow : Window
         DependencyProperty.Register("SelctedSort", typeof(BO.OpenOrderInListField),
             typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
-    public BO.OrderStatus SelectedOrderStatusFilter
-    {
-        get => (BO.OrderStatus)GetValue(SelectedOrderStatusFilterProperty);
-        set => SetValue(SelectedOrderStatusFilterProperty, value);
-    }
-    public static readonly DependencyProperty SelectedOrderStatusFilterProperty =
-        DependencyProperty.Register("SelectedOrderStatusFilter", typeof(BO.OrderStatus?),
-            typeof(StartDeliveryWindow), new PropertyMetadata(null));
+   // public BO.OrderStatus SelectedOrderStatusFilter
+   // {
+   //     get => (BO.OrderStatus)GetValue(SelectedOrderStatusFilterProperty);
+   //     set => SetValue(SelectedOrderStatusFilterProperty, value);
+   // }
+   // public static readonly DependencyProperty SelectedOrderStatusFilterProperty =
+   //     DependencyProperty.Register("SelectedOrderStatusFilter", typeof(BO.OrderStatus?),
+   //         typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
-   public static IEnumerable<BO.OrderStatus> OrderStatusFilterOptions
-    {
-        get => Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>();
-    }
+   //public static IEnumerable<BO.OrderStatus> OrderStatusFilterOptions
+   // {
+   //     get => Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>();
+   // }
 
     public BO.TypeOfOrder? SelctedFilter
     {

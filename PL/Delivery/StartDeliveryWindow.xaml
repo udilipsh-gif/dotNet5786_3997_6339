@@ -73,11 +73,11 @@
                    ToolTip="בחר סוג משלוח להצגה בטבלה"
                    SelectionChanged="ComboBox_SelectionChanged">
             </ComboBox>
-            <Label Grid.Column="2" Content="סינון לפי סטטוס הזמנה:" 
+            <!--<Label Grid.Column="2" Content="סינון לפי סטטוס הזמנה:" 
                    FontSize="16" 
                    FontWeight="Bold"
-                   Margin="5"/>
-            <ComboBox Grid.Column="3" x:Name="OrderStatusFilterComboBox"
+                   Margin="5"/>-->
+            <!--<ComboBox Grid.Column="3" x:Name="OrderStatusFilterComboBox"
                    ItemsSource="{Binding OrderStatusFilterOptions}"
                    SelectedItem="{Binding SelectedOrderStatusFilter, Mode=TwoWay}"
                    SelectionChanged="ComboBox_SelectionChanged"
@@ -85,12 +85,13 @@
                    Width="150"
                    Margin="5"
                    ToolTip="בחר סטטוס הזמנה לסינון הטבלה">
-                <!--<ComboBox.ItemTemplate>
+                
+                --><!--<ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Id, Converter={StaticResource EnumDescriptionConverter}}" />
                     </DataTemplate>
-                </ComboBox.ItemTemplate>-->
-            </ComboBox>
+                </ComboBox.ItemTemplate>--><!--
+            </ComboBox>-->
         </Grid>
      
 
@@ -122,18 +123,18 @@
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                <DataGridTextColumn Header="סטטוס הזמנה"
+                <!--<DataGridTextColumn Header="סטטוס הזמנה"
                             Binding="{Binding OrderStatus}"
                             SortMemberPath="OrderStatus"
                             Width="Auto"
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>-->
 
-                <DataGridTextColumn Header="מזהה משלוח"
+                <!--<DataGridTextColumn Header="מזהה משלוח"
                             Binding="{Binding DeliveryId}"
                             SortMemberPath="DeliveryId"
                             Width="Auto"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>-->
 
                 <DataGridTextColumn Header="סוג הזמנה"
                             Binding="{Binding TypeOfOrder}"
@@ -141,12 +142,37 @@
                             Width="Auto"
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                
 
-                <DataGridTextColumn Header="מרחק"
+                <DataGridTextColumn Header=" מרחק אווירי"
                                 Binding="{Binding DistanceKm, StringFormat=N2}"
                                 SortMemberPath="DistanceKm"
                                 Width="Auto"
                                 HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="מרחק בפועל"
+                            Binding="{Binding ActualDistance}"
+                            SortMemberPath="TypeOfOrder"
+                            Width="Auto"
+                            ElementStyle="{StaticResource WrappedTextCellStyle}"
+                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+
+                <DataGridTextColumn Header="משקל"
+                            Binding="{Binding Weight}"
+                            SortMemberPath="TypeOfOrder"
+                            Width="Auto"
+                            ElementStyle="{StaticResource WrappedTextCellStyle}"
+                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="הערכת זמן"
+                            Binding="{Binding EstimatedDeliveryTime}"
+                            SortMemberPath="TypeOfOrder"
+                            Width="Auto"
+                            ElementStyle="{StaticResource WrappedTextCellStyle}"
+                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+
 
                 <DataGridTextColumn Header="סטטוס עמידה בזמנים"
                             Binding="{Binding ScheduleStatus}"
@@ -167,11 +193,11 @@
                                 Width="Auto"
                                 HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                <DataGridTextColumn Header="מספר ניסיונות משלוח"
+                <!--<DataGridTextColumn Header="מספר ניסיונות משלוח"
                                 Binding="{Binding NumberOfDeliveryAttempts}"
                                 SortMemberPath="NumberOfDeliveryAttempts"
                                 Width="Auto"
-                                HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                HeaderStyle="{StaticResource WrappedHeaderStyle}"/>-->
 
             </DataGrid.Columns>
         </DataGrid>
