@@ -70,6 +70,13 @@ internal class OrderFilterTypeOfOrder : IEnumerable
 
     IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
 }
+internal class OrderStatusFilterOptions : IEnumerable
+{
+    static readonly IEnumerable<BO.OrderStatus?> s_enums =
+        new BO.OrderStatus?[] { null }
+        .Concat(Enum.GetValues<BO.OrderStatus>().Cast<BO.OrderStatus?>());
+    IEnumerator IEnumerable.GetEnumerator() => s_enums.GetEnumerator();
+}
 
 internal class SelectionItem
 {
