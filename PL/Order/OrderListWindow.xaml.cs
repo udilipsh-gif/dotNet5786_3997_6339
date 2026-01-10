@@ -10,7 +10,7 @@ public partial class OrderListWindow : Window
 {
     static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-    private int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId;
+    private int CURRENT_MANAGER_ID = Tools.GetSafeFromBl<int>(() => s_bl.Admin.GetConfig().ManagerId);
 
     public OrderListWindow()
     {
@@ -71,7 +71,7 @@ public partial class OrderListWindow : Window
     private void LoadOrders()
     {
         // 1. שליפת כל הנתונים מה-BL ללא סינון ראשוני כלל
-        var allOrders = s_bl.Order.ReadAll(CURRENT_MANAGER_ID, null, null, BO.OrderInListField.OrderId);
+        var allOrders = Tools.GetSafeFromBl<IEnumerable<BO.OrderInList>>(() => s_bl.Order.ReadAll(CURRENT_MANAGER_ID, null, null, BO.OrderInListField.OrderId));
 
         // 2. ביצוע סינון כפול בעזרת LINQ
         var filteredResults = allOrders.Where(order =>
@@ -99,12 +99,12 @@ public partial class OrderListWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        s_bl.Order.AddObserver(orderListObserver);
+        Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
         orderListObserver();
     }
 
     private void Window_Closed(object sender, EventArgs e)
-        => s_bl.Order.RemoveObserver(orderListObserver);
+        => Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
 
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         => orderListObserver();

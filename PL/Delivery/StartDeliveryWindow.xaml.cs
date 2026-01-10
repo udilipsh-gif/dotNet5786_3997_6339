@@ -83,14 +83,14 @@ public partial class StartDeliveryWindow : Window
 
     private void StartDeliveryWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        s_bl.Order.AddObserver(orderListObserver);
+        Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
         UpdateOrdersList();
 
     }
 
     private void StartDeliveryWindow_Closed(object sender, RoutedEventArgs e)
     {
-        s_bl.Order.RemoveObserver(orderListObserver);
+        Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
         this.Close();
     }
 
@@ -99,13 +99,16 @@ public partial class StartDeliveryWindow : Window
 
     private void StartDeliveryWindow_Closed(object sender, EventArgs e)
     {
-        s_bl.Order.RemoveObserver(orderListObserver);
+        Tools.RunSafe(() =>  s_bl.Order.RemoveObserver(orderListObserver));
     }
 
     private void UpdateOrdersList()
     {
-        var DeliveryList = s_bl.Order.GetOpen(userId, courierId, SelctedFilter, SelctedSort);
+        var DeliveryList = Tools.GetSafeFromBl(() =>  
+                s_bl.Order.GetOpen(userId, courierId, SelctedFilter, SelctedSort),
+                new List<BO.OpenOrderInList>());
 
+        
         if (DeliveryListView == null)
         {
             DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList); 
@@ -145,7 +148,7 @@ public partial class StartDeliveryWindow : Window
             if (selectedOrder == null)
                 throw new BO.BlInvalidOperationException("סיבת סיום המשלוח לא תקפה");
 
-            s_bl.Order.StartDelivery(userId, courierId, selectedOrder.OrderId);
+            Tools.RunSafe(() =>  s_bl.Order.StartDelivery(userId, courierId, selectedOrder.OrderId));
 
             MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
                 MessageBoxButton.OK, MessageBoxImage.Information);

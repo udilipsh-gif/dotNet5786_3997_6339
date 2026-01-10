@@ -115,4 +115,34 @@ public static class Tools
         public required string Name { get; set; }
     }
 
+    public static T GetSafeFromBl<T>(Func<T> functionToRun, T defaultValue = default)
+    {
+        try
+        {
+            // כאן אנחנו מפעילים את הפונקציה שנשלחה
+            return functionToRun();
+        }
+        catch (Exception ex)
+        {
+            // הצגת הודעה למשתמש
+            MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            // במקרה של שגיאה, חייבים להחזיר משהו.
+            // default(T) יחזיר 0 למספרים, או null לאובייקטים.
+            return defaultValue;
+        }
+    }
+
+    public static void RunSafe(Action actionToRun)
+    {
+        try
+        {
+            actionToRun();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error: {ex.Message}");
+        }
+    }
+
 }

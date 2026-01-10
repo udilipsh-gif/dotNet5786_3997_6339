@@ -36,13 +36,13 @@ public partial class ConfigWindow : Window
 
     private void ConfigWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        s_bl.Admin.AddConfigObserver(ConfigObserver);
+        Tools.RunSafe(() => s_bl.Admin.AddConfigObserver(ConfigObserver));
         ConfigObserver();
     }
 
     private void ConfigWindow_Close(object? sender, EventArgs e)
     {
-        s_bl.Admin.RemoveConfigObserver(ConfigObserver);
+        Tools.RunSafe(() => s_bl.Admin.RemoveConfigObserver(ConfigObserver));
     }
 
     private void BtnCancel_Click(object? sender, EventArgs e)
@@ -73,7 +73,6 @@ public partial class ConfigWindow : Window
         
     }
 
-    private void ConfigObserver() => Configuration = s_bl.Admin.GetConfig();
-
+    private void ConfigObserver() => Tools.RunSafe(() => Configuration = s_bl.Admin.GetConfig());
 
 }

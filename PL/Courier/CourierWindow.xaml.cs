@@ -40,7 +40,8 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     /// <summary>
     /// The ID of the currently logged-in manager.
     /// </summary>
-    private readonly int CURRENT_MANAGER_ID = s_bl.Admin.GetConfig().ManagerId!;
+    private readonly int CURRENT_MANAGER_ID = Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().ManagerId);
+
 
     /// <summary>
     /// The ID of the courier being viewed or edited. 0 indicates add mode.
@@ -76,7 +77,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                 Active = true,
                 MaxDistanceDelivery = 0,
                 TypeShipment = TheTypeShipment.CAR,
-                WorkingSince = s_bl.Admin.GetClock(),
+                WorkingSince = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock()),
                 DeliveryLate = 0,
                 DeliveryOnTime = 0,
                 
@@ -149,7 +150,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
             try
             {
                 CourierObserver();
-                s_bl.Courier.AddObserver(CourierObserver);
+                Tools.RunSafe(() => s_bl.Courier.AddObserver(CourierObserver));
             }
             catch (Exception ex)
             {
@@ -172,7 +173,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                 Active = true,
                 MaxDistanceDelivery = 0,
                 TypeShipment = TheTypeShipment.CAR,
-                WorkingSince = s_bl.Admin.GetClock(),
+                WorkingSince = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock()),
                 DeliveryLate = 0,
                 DeliveryOnTime = 0
 
@@ -205,7 +206,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
         try
         {
-            s_bl.Courier.Delete(CURRENT_MANAGER_ID, CURRENT_ID);
+            Tools.RunSafe(() => s_bl.Courier.Delete(CURRENT_MANAGER_ID, CURRENT_ID));
             MessageBox.Show("השליח נמחק בהצלחה");
 
             Close();
