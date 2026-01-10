@@ -235,24 +235,34 @@ internal static class CourierManager
         //if (activeDeliveries.Any())
         //throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
 
-        IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
-            d.CourierId == id
-        );
-        if (allDeliveries.Any())
-            foreach (var item in allDeliveries)
+        //IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
+        //    d.CourierId == id
+        //);
+        //if (allDeliveries.Any())
+        //    foreach (var item in allDeliveries)
+        //    {
+        //        var order = s_dal.Order.Read(item.OrderId);
+        //        if (order != null && order.OrderStatus == DO.OrderStatus.DELIVERING)
+        //            throw new BO.BlInvalidOperationException("קיים משלוח פעיל ");
+        //        else
+        //            throw new BO.BlInvalidOperationException("בוצעו משלוחים בעבר ");
+
+        //    }
+
+        var courierDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == id);
+        if (courierDeliveries.Any())
+        {
+
+            bool hasActiveDelivery = courierDeliveries.Any(d =>
             {
-                var order = s_dal.Order.Read(item.OrderId);
-                if (order != null && order.OrderStatus == DO.OrderStatus.DELIVERING)
-                    throw new BO.BlInvalidOperationException("קיים משלוח פעיל ");
-                else
-                    throw new BO.BlInvalidOperationException("בוצעו משלוחים בעבר ");
+                var order = s_dal.Order.Read(d.OrderId);
+                return order?.OrderStatus == DO.OrderStatus.DELIVERING;
+            });
 
-            }
-
-
-
-
-
+            if (hasActiveDelivery)
+                throw new BO.BlInvalidOperationException(" .קיים משלוח פעיל לשליח זה");
+            throw new BO.BlInvalidOperationException(" .לשליח זה בוצעו משלוחים בעבר");
+        }
         s_dal.Courier.Delete(id);
         Observer.NotifyItemUpdated(id);
         Observer.NotifyListUpdated();
