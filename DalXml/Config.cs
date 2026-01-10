@@ -223,11 +223,11 @@ internal static class Config
         MaxDeliveryRange = 20;
         AvgSpeedCar = 30;
         AvgSpeedMotorcycle = 50;
-        AvgSpeedBike = 20;
+        AvgSpeedBike = 15;
         AvgSpeedFoot = 5;
-        MaxDeliveryTime = TimeSpan.FromHours(2);
-        RiskRange = TimeSpan.FromMinutes(30);
-        MaxTimeInactivity = TimeSpan.FromMinutes(15);
+        MaxDeliveryTime = TimeSpan.FromDays(5);
+        RiskRange = TimeSpan.FromDays(1);
+        MaxTimeInactivity = TimeSpan.FromDays(100);
         GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
     }
 }

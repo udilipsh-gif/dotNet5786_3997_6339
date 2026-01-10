@@ -108,26 +108,6 @@ public static class Initialization
     }
 
     /// <summary>
-    /// Initializes the configuration settings for the system with default values.
-    /// Sets up clock, manager credentials, store location (college address), delivery parameters, and operational settings.
-    /// </summary>
-    private static void CreateConfig()
-    {
-        s_dal!.Config!.Clock = DateTime.Now;
-        s_dal!.Config.StoreAddress = "bar cochva, 21, Bney Braq";
-        s_dal!.Config.Latitude = 32.0936195;
-        s_dal!.Config.Longitude = 34.8229463;
-        s_dal!.Config.MaxDeliveryRange = 50.0;
-        s_dal!.Config.AvgSpeedCar = 60.0;
-        s_dal!.Config.AvgSpeedMotorcycle = 40.0;
-        s_dal!.Config.AvgSpeedBike = 15.0;
-        s_dal!.Config.AvgSpeedFoot = 5.0;
-        s_dal!.Config.MaxDeliveryTime = TimeSpan.FromDays(5);
-        s_dal!.Config.RiskRange = TimeSpan.FromDays(4);
-        s_dal!.Config.MaxTimeInactivity = TimeSpan.FromDays(14);
-    }
-
-    /// <summary>
     /// Creates and initializes a collection of 20 couriers with randomized data.
     /// </summary>
     /// <remarks>
@@ -278,9 +258,7 @@ public static class Initialization
                 Details = "Order details for order " + i,
                 OrderDate = s_dal.Config.Clock.AddDays(-s_rand.Next(0, 366)),
                 DistanceKm = DistanceKm,
-                //DistanceKmWalk = (double)s_addresses[adressIndex][4],
-                //DistanceKmRoad = (double)s_addresses[adressIndex][5],
-                OrderStatus = OrderStatus.OPEN,   //getRandomOrderStatus(num_of_order),
+                OrderStatus = OrderStatus.OPEN,  
             });
         }
     }
@@ -345,12 +323,14 @@ public static class Initialization
             };
         }
 
-        var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
-             ?.ToList()
-            ?? throw new DalisNotAvailable("Order");
+       
 
         for (int i = 0; i < 50; i++)
         {
+            var list_order = s_dal?.Order?.ReadAll(o => o.OrderStatus == OrderStatus.OPEN)// קלבת ההזמנות הפתוחות בלבד, לינקיו שלב 2
+            ?.ToList()
+           ?? throw new DalisNotAvailable("Order");
+
             //var randomOrder = list_order[s_rand.Next(list_order.Count)];//הגרלת הזמנה אקראית מתוך הרשימה שלב 1
             var randomOrder = list_order[s_rand.Next(list_order.Count)];//הגרלת הזמנה אקראית מתוך הרשימה שלב 2
 
@@ -361,12 +341,9 @@ public static class Initialization
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
 
-
-            var randomCourier = list_courier[s_rand.Next(list_courier.Count)];//בחירת שליח אקראי מתוך רשימת השליחים המסוננת
-            var selectedCourier = randomCourier;
+            var selectedCourier = list_courier[s_rand.Next(list_courier.Count)];//בחירת שליח אקראי מתוך רשימת השליחים המסוננת
             randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה 
             s_dal?.Order.Update(randomOrder);
-            list_order.Remove(randomOrder);
 
             double? getActualDistance =
                 (selectedCourier.TypeShipment is TheTypeShipment.CAR or TheTypeShipment.MOTORCYCLE)
@@ -387,7 +364,7 @@ public static class Initialization
 
             DateTime orderData = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
 
-            EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 4);
+            EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 8);
 
             if (getEndDelivery == EndDelivery.DELIVERED)
                 s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.COMPLETED });
@@ -439,8 +416,6 @@ public static class Initialization
         Console.WriteLine("Reset Configuration values and List values...");
         s_dal.ResetDB(); // stage 2
 
-        Console.WriteLine("Creating Configuration values...");
-        CreateConfig();
         Console.WriteLine("Creating Courier values...");
         CreateCourier();
         Console.WriteLine("Creating Order values...");
