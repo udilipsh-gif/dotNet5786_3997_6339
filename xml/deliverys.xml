@@ -530,4 +530,14 @@
     <EndDelivery>DELIVERED</EndDelivery>
     <TimeEndDelivery>2026-01-10T23:01:14.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200054</Id>
+    <OrderId>100038</OrderId>
+    <CourierId>45</CourierId>
+    <TypeShipment>BIKE</TypeShipment>
+    <OrderDate>2026-01-10T23:01:14.0000000</OrderDate>
+    <ActualDistance>5.489</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2026-01-10T23:01:14.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>

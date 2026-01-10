@@ -433,22 +433,6 @@
     <DistanceKmWalk />
   </Order>
   <Order>
-    <Id>100038</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 37</Details>
-    <Addres>שד' בן גוריון 55 רמת גן</Addres>
-    <Latitude>32.0843651</Latitude>
-    <Longitude>34.774976</Longitude>
-    <Name>Customer37</Name>
-    <Phone>0535146233</Phone>
-    <Weight>4</Weight>
-    <OrderDate>2025-02-21T23:01:14.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>4.634818324704076</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100044</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 43</Details>
@@ -797,6 +781,22 @@
     <OrderDate>2025-12-13T23:01:14.0000000</OrderDate>
     <OrderStatus>COMPLETED</OrderStatus>
     <DistanceKm>0.5341381762965827</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100038</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 37</Details>
+    <Addres>שד' בן גוריון 55 רמת גן</Addres>
+    <Latitude>32.0843651</Latitude>
+    <Longitude>34.774976</Longitude>
+    <Name>Customer37</Name>
+    <Phone>0535146233</Phone>
+    <Weight>4</Weight>
+    <OrderDate>2025-02-21T23:01:14.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>4.634818324704076</DistanceKm>
     <DistanceKmRoad />
     <DistanceKmWalk />
   </Order>

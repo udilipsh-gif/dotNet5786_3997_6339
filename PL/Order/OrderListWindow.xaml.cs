@@ -23,12 +23,12 @@ public partial class OrderListWindow : Window
         set { SetValue(OrderListProperty, value); }
     }
 
-    public IEnumerable<Tools.SelectionItem> ScheduleStatusList // שיניתי מ-Filter ל-List
+    public IEnumerable<Tools.SelectionItem> ScheduleStatusList 
     {
         get => Tools.GetEnumList<BO.ScheduleStatus>("הכל");
     }
 
-    public IEnumerable<Tools.SelectionItem> TypeOfOrderList // שיניתי מ-Filter ל-List
+    public IEnumerable<Tools.SelectionItem> TypeOfOrderList 
     {
         get => Tools.GetEnumList<BO.TypeOfOrder>("הכל");
     }
@@ -85,10 +85,10 @@ public partial class OrderListWindow : Window
         } 
         else
         {
-            OrderList.Clear(); // מחיקת הישנים
+            OrderList.Clear(); 
             foreach (var item in filteredResults)
             {
-                OrderList.Add(item); // הוספת החדשים
+                OrderList.Add(item); 
             }
         }
            

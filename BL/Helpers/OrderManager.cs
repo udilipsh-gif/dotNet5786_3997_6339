@@ -170,7 +170,7 @@ internal static class OrderManager
             Distance = Tools.GetDistance(doOrder),
             EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(doOrder),
             MaxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime,
-            OrderStatus = Tools.GetOrderStatus(doOrder),
+            OrderStatus = (BO.OrderStatus)doOrder.OrderStatus,   //Tools.GetOrderStatus(doOrder),
             ScheduleStatus = Tools.GetScheduleStatus(doOrder),
             TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder),
             DeliveryPerOrderInLists = s_createDeliveryPerOrderInList(doOrder.Id)
