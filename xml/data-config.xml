@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
-  <NextOrderId>100054</NextOrderId>
-  <NextDeliveryId>200060</NextDeliveryId>
-  <Clock>07/01/2026 11:59:26</Clock>
+  <NextOrderId>100052</NextOrderId>
+  <NextDeliveryId>200053</NextDeliveryId>
+  <Clock>10/01/2026 21:25:06</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
   <StoreAddress>bar cochva, 21, Bney Braq</StoreAddress>

@@ -395,6 +395,12 @@ public static class Initialization
                 s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.REFUSED });
             if (getEndDelivery == EndDelivery.CONCELLED)
                 s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.CONCELLED });
+            //הוספתי בשלב 6 את שתי התנאים הבאים
+            if(getEndDelivery == EndDelivery.FAILED)
+                s_dal?.Order.Update(randomOrder with { OrderStatus=OrderStatus.OPEN });
+            if (getEndDelivery== EndDelivery.NOTFOUND)
+                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.OPEN });
+
 
             s_dal?.Delivery!.Create(new()
             {

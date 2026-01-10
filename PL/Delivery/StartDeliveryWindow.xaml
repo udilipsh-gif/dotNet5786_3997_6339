@@ -80,15 +80,16 @@
             <ComboBox Grid.Column="3" x:Name="OrderStatusFilterComboBox"
                    ItemsSource="{Binding OrderStatusFilterOptions}"
                    SelectedItem="{Binding SelectedOrderStatusFilter, Mode=TwoWay}"
+                   SelectionChanged="ComboBox_SelectionChanged"
                    FontSize="14"
                    Width="150"
                    Margin="5"
                    ToolTip="בחר סטטוס הזמנה לסינון הטבלה">
-                <ComboBox.ItemTemplate>
+                <!--<ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Id, Converter={StaticResource EnumDescriptionConverter}}" />
                     </DataTemplate>
-                </ComboBox.ItemTemplate>
+                </ComboBox.ItemTemplate>-->
             </ComboBox>
         </Grid>
      

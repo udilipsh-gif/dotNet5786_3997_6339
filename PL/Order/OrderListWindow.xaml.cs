@@ -36,7 +36,9 @@ public partial class OrderListWindow : Window
     public static readonly DependencyProperty OrderListProperty =
         DependencyProperty.Register(nameof(OrderList), typeof(ObservableCollection<BO.OrderInList>), typeof(OrderListWindow), new PropertyMetadata(null));
 
-
+    /// <summary>
+    /// סינון לי עמידה בזמנים
+    /// </summary>
     public BO.ScheduleStatus? SelectedScheduleFilter
     {
         get { return (BO.ScheduleStatus?)GetValue(SelectedScheduleFilterProperty); }
@@ -49,7 +51,9 @@ public partial class OrderListWindow : Window
     public static readonly DependencyProperty SelectedScheduleFilterProperty =
         DependencyProperty.Register(nameof(SelectedScheduleFilter), typeof(BO.ScheduleStatus?), typeof(OrderListWindow), new PropertyMetadata(null));
 
-
+    /// <summary>
+    /// סינון לפי סוג הזמנה
+    /// </summary>
 
     public BO.TypeOfOrder? SelectedTypeFilter
     {
