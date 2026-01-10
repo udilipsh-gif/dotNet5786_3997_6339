@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using DO;
 using System.Net.Mail;
 
 
@@ -280,7 +281,6 @@ internal static class OrderManager
 
                 };
                 s_dal.Delivery.Create(delivery);
-                Observer.NotifyListUpdated();
 
             }
             ,
@@ -300,6 +300,7 @@ internal static class OrderManager
                     TimeEndDelivery = AdminManager.Now
                 });
 
+              
 
                 var courier = s_dal.Courier.Read(delivery.CourierId)
                      ?? throw new BO.BlDoesNotExistException("Courier not found");
@@ -316,27 +317,22 @@ internal static class OrderManager
                     // Log the exception or handle it as needed
                     throw new SmtpException($" שליחת מייל נכשלה:");
                 }
+                finally
+                {
+                    DeliveryManager.Observer.NotifyItemUpdated(delivery.Id);
+                    CourierManager.Observer.NotifyItemUpdated(delivery.CourierId);
+                    Observer.NotifyItemUpdated(orderId);
+                    Observer.NotifyListUpdated();
+                }
 
-
-
-                //BO.Order CurrentOrder = Read(orderId)?? throw new BO.BlDoesNotExistException("Order not found");
-
-                //var currentDelivery = CurrentOrder.DeliveryPerOrderInLists.LastOrDefault()?? 
-                //    throw new BO.BlDoesNotExistException("Delivery not found for the order");
-
-                //int courierId = currentDelivery.CourierId;
-                //string mailCourior = BO.Courier.Read(CURRENT_MANAGER_ID, courierId).Email;
-                ////Tools. SendEmail(mailCourior, "הזמנה בוטלה", $"הזמנה מספר {CurrentOrder.Id} בוטלה על ידי המנהל");
-
-
-
-                Observer.NotifyItemUpdated(delivery.Id);
             }
             ,
             _ => throw new BO.BlInvalidOperationException("Invalid order status.")
         };
 
         action();
+        Observer.NotifyItemUpdated(orderId);
+        Observer.NotifyListUpdated();
     }
 
     /// <summary>
