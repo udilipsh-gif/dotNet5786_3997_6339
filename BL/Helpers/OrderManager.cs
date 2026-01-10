@@ -434,7 +434,7 @@ internal static class OrderManager
         DO.Courier doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN || o.OrderStatus == DO.OrderStatus.REFUSED)
+        var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
                     let distense = Tools.GetDistance(doOrder)
                     where ((filter == null || (BO.TypeOfOrder)doOrder.TypeOfOrder == filter) && (distense <= doCourier.MaxDistanceDelivery))
                     select new BO.OpenOrderInList
