@@ -150,7 +150,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
             try
             {
                 CourierObserver();
-                Tools.RunSafe(() => s_bl.Courier.AddObserver(CourierObserver));
+                Tools.RunSafe(() => s_bl.Courier.AddObserver(CURRENT_ID, CourierObserver));
             }
             catch (Exception ex)
             {
