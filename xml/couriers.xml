@@ -144,6 +144,17 @@
     <WorkingSince>2025-08-01T11:59:26.0000000</WorkingSince>
   </Courier>
   <Courier>
+    <Id>45</Id>
+    <Name>Noa Ben-David</Name>
+    <Phone>0550916551</Phone>
+    <Email>noa.ben-david@courier.com</Email>
+    <Password>45</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>2.969452399224802</MaxDistanceDelivery>
+    <TypeShipment>FOOT</TypeShipment>
+    <WorkingSince>2025-08-01T11:59:26.0000000</WorkingSince>
+  </Courier>
+  <Courier>
     <Id>288620970</Id>
     <Name>Yaniv Shapiro</Name>
     <Phone>0509537604</Phone>
