@@ -231,12 +231,12 @@ public static class Initialization
                 addres = (string)s_addresses[adressIndex][0];
                 try
                 {
-                   // Console.WriteLine($"Getting geocoding for order {i} address: {addres}");
+                    // Console.WriteLine($"Getting geocoding for order {i} address: {addres}");
                     adressCoordinates = s_getGeocodingSync(addres);
                 }
                 catch //(Exception ex)
                 {
-                  // Console.WriteLine($"Error retrieving geocoding: {ex.Message}");
+                    // Console.WriteLine($"Error retrieving geocoding: {ex.Message}");
                 }
             }
             double lat = adressCoordinates?.Lat ?? throw new DO.DalValueIsNotValid("Latitude is missing.");
@@ -245,7 +245,7 @@ public static class Initialization
             double storeLng = s_dal?.Config.Longitude ?? throw new InvalidOperationException("Store longitude is not set.");
             double DistanceKm = s_getDistance(lat, lng, storeLat, storeLng);
 
-                        s_dal?.Order.Create(new()
+            s_dal?.Order.Create(new()
             {
                 Id = 0,
                 TypeOfOrder = (TypeOfOrder)s_rand.Next(0, 2),
@@ -258,7 +258,7 @@ public static class Initialization
                 Details = "Order details for order " + i,
                 OrderDate = s_dal.Config.Clock.AddDays(-s_rand.Next(0, 366)),
                 DistanceKm = DistanceKm,
-                OrderStatus = OrderStatus.OPEN,  
+                OrderStatus = OrderStatus.OPEN,
             });
         }
     }
@@ -323,7 +323,10 @@ public static class Initialization
             };
         }
 
-       
+
+        DateTime? timeEndDelivery;
+        DateTime globalMaxTime = DateTime.MinValue;
+        DateTime maxTime= DateTime.MinValue;
 
         for (int i = 0; i < 50; i++)
         {
@@ -337,7 +340,7 @@ public static class Initialization
             //סינון שליחים לפי שלב 2 באמצעות תנאי מסנן אחד
             var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
             MatchTypeShipmentAndOrder(Courier.TypeShipment, randomOrder.TypeOfOrder) &&
-            Courier.MaxDistanceDelivery >= randomOrder.DistanceKm)
+            Courier.MaxDistanceDelivery >= randomOrder.DistanceKm)//לבדוק את המרחק של ההזמנה
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
 
@@ -361,10 +364,30 @@ public static class Initialization
                 _ => 1.0
             }))
     : TimeSpan.FromHours(1);
+            DateTime orderDate;
 
-            DateTime orderData = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
+            var delivery = s_dal!.Delivery.ReadAll(d => d.OrderId == randomOrder.Id).ToList();//מציאת משלוחים על ההזמנה הזו
+
+
+            maxTime = (maxTime > globalMaxTime) ? maxTime : globalMaxTime;//שמירת הזמן המקסימלי
+            // בדיקה אם יש בכלל משלוחים קודמים
+            if (delivery.Count > 0)
+            {
+                DateTime maxEndTime = delivery.Max(d => d.TimeEndDelivery)??DateTime.MinValue ;
+                globalMaxTime = maxEndTime;
+                // קביעת הזמן החדש לזמן הסיום האחרון + 10 דק 
+                orderDate = maxEndTime.AddMinutes(10);
+            }
+            else
+            {
+               orderDate = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
+            }
+
+
 
             EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 6);
+
+            timeEndDelivery = getTimeEndDelivery(orderDate, duration, getEndDelivery);
 
             s_dal?.Order.Update(randomOrder with
             {
@@ -389,11 +412,12 @@ public static class Initialization
                 TypeShipment = selectedCourier.TypeShipment,
                 ActualDistance = getActualDistance,
                 CourierId = selectedCourier.Id,
-                OrderDate = orderData,
+                OrderDate = orderDate,
                 EndDelivery = endDelivery,
-                TimeEndDelivery = getTimeEndDelivery(orderData, duration, getEndDelivery)
+                TimeEndDelivery = timeEndDelivery
             });
         }
+        s_dal!.Config!.Clock = maxTime;
     }
 
     /// <summary>
