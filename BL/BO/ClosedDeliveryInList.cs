@@ -50,7 +50,7 @@ public class ClosedDeliveryInList
     /// This represents the real distance traveled by the courier, which may differ from
     /// the estimated straight-line distance.
     /// </remarks>
-    public double? AqualDistens { get; init; } = null;
+    public double? ActualDistens { get; init; } = null;
 
     /// <summary>
     /// Gets the total time taken to complete the delivery.

@@ -152,7 +152,7 @@
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                     <DataGridTextColumn Header="מרחק"
-                                     Binding="{Binding AqualDistens, StringFormat=N2}"
+                                     Binding="{Binding ActualDistens, StringFormat=N2}"
                                      SortMemberPath="DistanceKm"
                                      Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"

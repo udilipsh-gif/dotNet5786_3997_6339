@@ -503,7 +503,7 @@ internal static class OrderManager
                         OrderType = (BO.TypeOfOrder)order.TypeOfOrder,
                         Address = order.Addres,
                         ShipmentType = (BO.TheTypeShipment)doDelivery.TypeShipment,
-                        AqualDistens = doDelivery.ActualDistance,
+                        ActualDistens = doDelivery.ActualDistance,
                         DelyveryTime = (TimeSpan)(doDelivery.TimeEndDelivery! - doDelivery.OrderDate),
                         EndDelivery = (BO.EndDelivery)doDelivery.EndDelivery!
                     };
@@ -516,7 +516,7 @@ internal static class OrderManager
             BO.ClosedDeliveryInListField.TypeOfOrder => uniqueQuery.OrderBy(x => x.OrderType),
             BO.ClosedDeliveryInListField.Address => uniqueQuery.OrderBy(x => x.Address),
             BO.ClosedDeliveryInListField.ShipmentType => uniqueQuery.OrderBy(x => x.ShipmentType),
-            BO.ClosedDeliveryInListField.AqualDistens => uniqueQuery.OrderBy(x => x.AqualDistens),
+            BO.ClosedDeliveryInListField.AqualDistens => uniqueQuery.OrderBy(x => x.ActualDistens),
             BO.ClosedDeliveryInListField.DelyveryTime => uniqueQuery.OrderBy(x => x.DelyveryTime),
             BO.ClosedDeliveryInListField.EndDelivery => uniqueQuery.OrderBy(x => x.EndDelivery),
             _ => uniqueQuery.OrderBy(x => x.OrderType) // ברירת מחדל
