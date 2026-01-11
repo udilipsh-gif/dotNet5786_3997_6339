@@ -143,8 +143,8 @@ internal static class OrderManager
         // 3. ה-LINQ שלך (עם המיון וההמרה)
         var query = from doOrder in s_dal.Order.ReadAll()
                     let boOrder = s_convertToBoOrderInList(doOrder)
-                    where filter(boOrder) // הפעלת הפילטר שהגיע מבחוץ!
-                    orderby sortSelector(boOrder) // מיון דיפולטיבי (אפשר לשנות)
+                    where filter(boOrder) 
+                    orderby sortSelector(boOrder) 
                     select boOrder;
 
         return [.. query];
@@ -501,18 +501,25 @@ internal static class OrderManager
         //var orderStatus = Tools.GetOrderStatus(doOrder, delivery);
         var orderStatus = (BO.OrderStatus)doOrder.OrderStatus;
 
-        return new BO.OrderInList
+        var distanceKm = doOrder.DistanceKm;
+        if(distanceKm == null || distanceKm == 0)
         {
-            DeliveryId = delivery?.Id,
-            OrderId = doOrder.Id,
-            TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
-            DistanceKm = Tools.GetDistance(doOrder),
-            OrderStatus = orderStatus,
-            ScheduleStatus = Tools.GetScheduleStatus(doOrder, delivery),
-            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
-            TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, delivery),
-            NumberOfDeliveryAttempts = Tools.GetCuntOfDelivery(doOrder.Id)
-        };
+            distanceKm = Tools.GetDistance(doOrder);
+            s_dal.Order.Update(doOrder with { DistanceKm = distanceKm });
+        }
+
+            return new BO.OrderInList
+            {
+                DeliveryId = delivery?.Id,
+                OrderId = doOrder.Id,
+                TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
+                DistanceKm = (double)distanceKm,
+                OrderStatus = orderStatus,
+                ScheduleStatus = Tools.GetScheduleStatus(doOrder, delivery),
+                TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
+                TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, delivery),
+                NumberOfDeliveryAttempts = Tools.GetCuntOfDelivery(doOrder.Id)
+            };
     }
 
     /// <summary>
