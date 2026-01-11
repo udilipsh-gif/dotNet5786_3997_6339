@@ -157,6 +157,13 @@ public partial class MainCureier : Window
         Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, USERID, USERID);
     }
 
+    private void CureierDeliveryHistory_Click(object sender, RoutedEventArgs e)
+    {
+        CourierDeliveryHistoryWindow courierDeliveryHistoryWindow= new CourierDeliveryHistoryWindow(USERID);
+
+        courierDeliveryHistoryWindow.Show();
+    }
+
     private void EditCureier_Click(object sender, RoutedEventArgs e)
     {
         IsEditMode = true;
@@ -203,5 +210,10 @@ public partial class MainCureier : Window
         {
             MessageBox.Show($"General error: {ex.Message}");
         }
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+
     }
 }

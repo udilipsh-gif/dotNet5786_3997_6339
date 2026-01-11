@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using DO;
 using System;
 using System.Net.Mail;
@@ -240,6 +241,22 @@ internal static class OrderManager
         s_dal.Order.Update(doOrder);
         Observer.NotifyItemUpdated(boOrder.Id);
         Observer.NotifyListUpdated();
+        //try
+        //{
+        //    DO.Delivery? delivery = s_dal.Delivery.Read(d => d.OrderId == boOrder.Id);
+
+        //    if (delivery != null)
+        //    {
+        //        Observer.NotifyItemUpdated(delivery.CourierId);
+        //    }
+        //}
+        //catch (DO.DalDoesNotExistException)
+        //{
+
+        //}
+        
+           
+        
     }
 
     /// <summary>
@@ -418,7 +435,7 @@ internal static class OrderManager
             BO.ClosedDeliveryInListField.EndDelivery => uniqueQuery.OrderBy(x => x.EndDelivery),
             _ => uniqueQuery.OrderBy(x => x.OrderType) // ברירת מחדל
         };
-
+       
         return [.. sortedQuery];
     }
 

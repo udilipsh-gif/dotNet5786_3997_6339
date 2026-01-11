@@ -139,7 +139,7 @@
             <DataGrid.Columns>
 
                 <!-- ID Column: Displays unique courier identifier -->
-                <DataGridTextColumn Header="מזהה הזמנה"
+                <DataGridTextColumn Header="מזהה שליח"
                             Binding="{Binding Id}"
                             SortMemberPath="OrderId"
                             Width="Auto"

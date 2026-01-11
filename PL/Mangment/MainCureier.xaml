@@ -210,6 +210,8 @@
                         Content="התחלת משלוח" Click="StartDelivery_Click" Style="{StaticResource UniformButton}"/>
 
                     <Button Content="עריכת פרטים" Click="EditCureier_Click" Style="{StaticResource UniformButton}"/>
+                    
+                    <Button Content="היסטוריית משלוחים" Click="CureierDeliveryHistory_Click" Style="{StaticResource UniformButton}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1" 

@@ -67,21 +67,6 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
    
 
-    //שיניתי את הערכים לצפייה בלבד אז אין צורך למשוך אינום
-    //public IEnumerable<BO.ScheduleStatus> ScheduleStatusValues
-    //{
-    //    get
-    //    {
-    //        return Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>();
-    //    }
-    //}
-    //public IEnumerable<BO.OrderStatus> OrderStatusValues
-    //{
-    //    get
-    //    {
-    //        return Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>();
-    //    }
-    //}
     public OrderWindow(int id = 0)
     {
         InitializeComponent();
@@ -97,22 +82,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
          DependencyProperty.Register("CurrentOrder", typeof(BO.Order),
              typeof(OrderWindow), new PropertyMetadata(null));
 
-    //public BO.DeliveryPerOrderInList deliveryPerOrderInList
-    //{
-    //    get => (BO.DeliveryPerOrderInList)GetValue(deliveryPerOrderInListProperty);
-    //    set => SetValue(deliveryPerOrderInListProperty, value);
-    //}
-    //public static readonly DependencyProperty deliveryPerOrderInListProperty =
-    //     DependencyProperty.Register("deliveryPerOrderInList", typeof(BO.DeliveryPerOrderInList),
-    //         typeof(OrderWindow), new PropertyMetadata(new BO.DeliveryPerOrderInList()
-    //         {
-
-    //              DeliveryId = 0,
-    //                CourierId = 0,
-    //               CourierName = "",
-    //               TypeShipment = BO.TheTypeShipment.CAR,
-    //               OrderDate = DateTime.Now,
-    //         }));
+   
 
 
     private void OrderWindow_Loaded(object sender, EventArgs e)
