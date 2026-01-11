@@ -140,7 +140,7 @@
                     <DataGridTextColumn Header=" כתובת"
                                  Binding="{Binding Address}"
                                  SortMemberPath="DeliveryId"
-                                 Width="*"
+                                 Width="auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
@@ -168,7 +168,7 @@
                     
 
                     <DataGridTextColumn Header="סך זמן השלמת הטיפול"
-                                     Binding="{Binding TotalTimeOfDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                     Binding="{Binding TotalTimeOfDelivery}"
                                      SortMemberPath="TotalTimeOfDelivery"
                                      Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"

@@ -99,7 +99,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            throw new BlNoAccessException("לא הצלחנו לחבר אותך");
+            //throw new BlNoAccessException("לא הצלחנו לחבר אותך");
         }
         catch (BlIncorrectPasswordException)
         {

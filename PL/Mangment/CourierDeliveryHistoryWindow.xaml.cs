@@ -54,7 +54,7 @@ public partial class CourierDeliveryHistoryWindow : Window
         try
         {
             OrderObserver();
-            s_bl.Order.AddObserver(userId, OrderObserver);
+            s_bl.Order.AddObserver(OrderObserver);
         }
         catch (Exception ex)
         {
@@ -68,7 +68,7 @@ public partial class CourierDeliveryHistoryWindow : Window
     {
         try
         {
-            s_bl.Order.RemoveObserver(userId, OrderObserver);
+            s_bl.Order.RemoveObserver(OrderObserver);
         }
         catch (Exception)
         {
