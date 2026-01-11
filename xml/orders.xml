@@ -497,22 +497,6 @@
     <DistanceKmWalk />
   </Order>
   <Order>
-    <Id>100019</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 18</Details>
-    <Addres>שד' ירושלים 45 רמת גן</Addres>
-    <Latitude>32.0830304</Latitude>
-    <Longitude>34.8290221</Longitude>
-    <Name>Customer18</Name>
-    <Phone>0556380922</Phone>
-    <Weight>17</Weight>
-    <OrderDate>2025-10-05T14:26:12.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>1.3092079347867056</DistanceKm>
-    <DistanceKmRoad />
-    <DistanceKmWalk />
-  </Order>
-  <Order>
     <Id>100040</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 39</Details>
@@ -797,6 +781,22 @@
     <OrderDate>2025-04-14T14:26:12.0000000</OrderDate>
     <OrderStatus>REFUSED</OrderStatus>
     <DistanceKm>4.28182861098156</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100019</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 18</Details>
+    <Addres>שד' ירושלים 45 רמת גן</Addres>
+    <Latitude>32.0830304</Latitude>
+    <Longitude>34.8290221</Longitude>
+    <Name>Customer18</Name>
+    <Phone>0556380922</Phone>
+    <Weight>17</Weight>
+    <OrderDate>2025-10-05T14:26:12.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.3092079347867056</DistanceKm>
     <DistanceKmRoad />
     <DistanceKmWalk />
   </Order>

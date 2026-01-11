@@ -1,4 +1,5 @@
-﻿using PL;
+﻿
+using PL;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
@@ -81,7 +82,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            string? user = Tools.GetSafeFromBl(() => s_bl.Courier.Login(userId, passwordBox.Password));
+            string? user = s_bl.Courier.Login(userId, passwordBox.Password);
 
             UserId = string.Empty;
             passwordBox.Clear();

@@ -96,6 +96,11 @@ internal static class OrderManager
 
         var adressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
 
+        var distense = Tools.GetDistance(adressCoordinates?.Lat ?? 0, adressCoordinates?.Lng ?? 0, s_dal.Config.Latitude ?? 0, s_dal.Config.Longitude ?? 0);
+
+        if (distense == 0 || distense > s_dal.Config.MaxDeliveryRange)
+            throw new BO.BlInvalidOperationException($"המרחק {distense} KM עולה על טווח השילוח {s_dal.Config.MaxDeliveryRange} KM");
+
         DO.Order doOrder = new DO.Order
         {
             Id = 0,
@@ -547,7 +552,7 @@ internal static class OrderManager
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
-                    let distense = Tools.GetDistance(doOrder)
+                    let distense = Tools.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)
                     where ((filter == null || (BO.TypeOfOrder)doOrder.TypeOfOrder == filter) && (distense <= doCourier.MaxDistanceDelivery))
                     select new BO.OpenOrderInList
                     {
@@ -555,8 +560,8 @@ internal static class OrderManager
                         TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
                         Weight = doOrder.Weight,
                         Address = doOrder.Addres,
-                        ActualDistance = null,//לא מחושב עדיין
-                        DistanceKm = distense,
+                        DistanceKm = doOrder.DistanceKm ?? 0,
+                        ActualDistance = distense,
                         EstimatedDeliveryTime = null,
                         ScheduleStatus = Tools.GetScheduleStatus(doOrder),
                         TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder),

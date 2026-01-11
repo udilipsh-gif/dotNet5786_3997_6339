@@ -34,6 +34,17 @@
     <WorkingSince>2025-06-20T14:26:12.0000000</WorkingSince>
   </Courier>
   <Courier>
+    <Id>45</Id>
+    <Name>Eli A45mar</Name>
+    <Phone>0535419079</Phone>
+    <Email>eli.amar@courier.com</Email>
+    <Password>45</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>5</MaxDistanceDelivery>
+    <TypeShipment>CAR</TypeShipment>
+    <WorkingSince>2025-06-20T14:26:12.0000000</WorkingSince>
+  </Courier>
+  <Courier>
     <Id>306136695</Id>
     <Name>Yair Cohen</Name>
     <Phone>0562522828</Phone>
