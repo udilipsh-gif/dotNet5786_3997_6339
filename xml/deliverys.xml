@@ -500,4 +500,14 @@
     <EndDelivery></EndDelivery>
     <TimeEndDelivery></TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200051</Id>
+    <OrderId>100019</OrderId>
+    <CourierId>45</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-11T14:26:12.0000000</OrderDate>
+    <ActualDistance>1.998</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2026-01-11T14:26:12.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
