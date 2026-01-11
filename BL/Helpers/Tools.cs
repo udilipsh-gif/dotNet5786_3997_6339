@@ -432,7 +432,8 @@ internal static class Tools
     /// </remarks>
     public static DateTime GetEstimatedDeliveryTime(DO.Delivery delivery)
     {
-
+        if(delivery.EndDelivery is null)
+        {
         DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
               ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
 
@@ -466,6 +467,12 @@ internal static class Tools
         estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
 
         return estimatedDeliveryTime;
+        }
+        else
+        {
+            return delivery.TimeEndDelivery ?? DateTime.MinValue; // למקרה של שגיאה שזמן המלוח לא נשמר
+        }
+
     }
 
     /// <summary>
