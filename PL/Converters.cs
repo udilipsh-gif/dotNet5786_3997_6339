@@ -150,3 +150,67 @@ public class TotalHoursConverter : IValueConverter
 
 
 }
+
+
+/// <summary>
+/// Converts between TimeSpan values and their string representation in "days:hours" format for UI binding.
+/// </summary>
+/// <remarks>
+/// This converter enables two-way binding between TimeSpan properties in the business logic
+/// and user-friendly string representations in TextBox controls. The format used is "DD:HH"
+/// where DD represents days and HH represents hours (both zero-padded to 2 digits).
+/// Used for configuration fields like MaxDeliveryTime, RiskRange, and MaxTimeInactivity.
+/// </remarks>
+public class SpanTimeConverter : IValueConverter
+{
+    /// <summary>
+    /// Converts a TimeSpan value to a string in "DD:HH" format for display.
+    /// </summary>
+    /// <param name="value">The TimeSpan value to convert.</param>
+    /// <param name="targetType">The type of the binding target property (typically string).</param>
+    /// <param name="parameter">Optional parameter (not used in this converter).</param>
+    /// <param name="culture">Culture information for formatting.</param>
+    /// <returns>
+    /// A string in "DD:HH" format representing days and hours, or "00:00" if the value is not a TimeSpan.
+    /// </returns>
+    /// <remarks>
+    /// Example: A TimeSpan of 2 days and 5 hours converts to "02:05".
+    /// </remarks>
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is TimeSpan ts)
+        {
+            return $"{ts.Days:00}:{ts.Hours:00}";
+        }
+        return "00:00";
+    }
+
+    /// <summary>
+    /// Converts a string in "DD:HH" format back to a TimeSpan value.
+    /// </summary>
+    /// <param name="value">The string value to convert (expected format: "DD:HH").</param>
+    /// <param name="targetType">The type of the binding target property (typically TimeSpan).</param>
+    /// <param name="parameter">Optional parameter (not used in this converter).</param>
+    /// <param name="culture">Culture information for parsing.</param>
+    /// <returns>
+    /// A TimeSpan value representing the parsed days and hours, or TimeSpan.Zero if parsing fails.
+    /// </returns>
+    /// <remarks>
+    /// Example: The string "02:05" converts to a TimeSpan of 2 days and 5 hours.
+    /// If the string format is invalid or cannot be parsed, returns TimeSpan.Zero.
+    /// </remarks>
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string input)
+        {
+            var parts = input.Split(':');
+            if (parts.Length == 2 &&
+                int.TryParse(parts[0], out int days) &&
+                int.TryParse(parts[1], out int hours))
+            {
+                return new TimeSpan(days, hours, 0, 0);
+            }
+        }
+        return TimeSpan.Zero;
+    }
+}

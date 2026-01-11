@@ -1,5 +1,6 @@
 ﻿using DalApi;
 using DO;
+using System;
 using System.Net.Mail;
 
 
@@ -128,15 +129,27 @@ internal static class OrderManager
     {
         Func<BO.OrderInList, bool> filterPredicate = s_getFilterFunc(filter, filterValue);
 
+        return ReadAll(filterPredicate, orderBy);
+    }
+
+    public static List<BO.OrderInList> ReadAll(Func<BO.OrderInList, bool>? customPredicate = null,
+        BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
+    {
+        // 2. שימוש בפרדיקט שהגיע מבחוץ (או ברירת מחדל שמחזירה תמיד אמת)
+        Func<BO.OrderInList, bool> filter = customPredicate ?? (x => true);
+
         Func<BO.OrderInList, object> sortSelector = s_getSortFunc(orderBy);
 
+        // 3. ה-LINQ שלך (עם המיון וההמרה)
         var query = from doOrder in s_dal.Order.ReadAll()
                     let boOrder = s_convertToBoOrderInList(doOrder)
-                    where filterPredicate(boOrder)
-                    orderby sortSelector(boOrder) descending
+                    where filter(boOrder) // הפעלת הפילטר שהגיע מבחוץ!
+                    orderby sortSelector(boOrder) // מיון דיפולטיבי (אפשר לשנות)
                     select boOrder;
+
         return [.. query];
     }
+
 
     /// <summary>
     /// Retrieves a specific order by its unique identifier.

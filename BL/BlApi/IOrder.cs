@@ -68,8 +68,10 @@ public interface IOrder : IObservable
     /// <exception cref="BO.BlNoAccessException">Thrown when the user does not have manager privileges.</exception>
     /// <remarks>
     /// Only managers can view all orders.
-    /// </remarks>
+    /// </remarks>IEnumerable<BO.OrderInList> ReadAll(Func<BO.OrderInList, bool>? filter = null);
     IEnumerable<BO.OrderInList> ReadAll(int id, BO.OrderInListField? filter, object? value, BO.OrderInListField? sort);
+
+    IEnumerable<BO.OrderInList> ReadAll(int id, Func<BO.OrderInList, bool>? filter = null, BO.OrderInListField? sort = null);
 
     /// <summary>
     /// Updates an existing order in the system.

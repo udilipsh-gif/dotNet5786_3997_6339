@@ -61,17 +61,16 @@
                    FontSize="16" 
                    FontWeight="Bold"
                    Margin="5"/>
-            <ComboBox Grid.Column="1" x:Name="DeliveryTypeComboBox"
+            <ComboBox Grid.Column="1"
                    ItemsSource="{Binding EnumForSoring}"
                    DisplayMemberPath="Name"
                    SelectedValuePath="Id"
-                   SelectedValue="{Binding SelctedFilter, RelativeSource={RelativeSource AncestorType=Window}, Mode=TwoWay}"
+                   SelectedValue="{Binding SelctedFilter}"
                    SelectedIndex="0"
                    FontSize="14"
                    Width="150"
                    Margin="5"
-                   ToolTip="בחר סוג משלוח להצגה בטבלה"
-                   SelectionChanged="ComboBox_SelectionChanged">
+                   ToolTip="בחר סוג משלוח להצגה בטבלה">
             </ComboBox>
             <!--<Label Grid.Column="2" Content="סינון לפי סטטוס הזמנה:" 
                    FontSize="16" 

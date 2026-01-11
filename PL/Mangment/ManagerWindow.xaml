@@ -77,7 +77,7 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Button Margin="5,0" Padding="10,5"  Width="300">
+                    <Button Margin="5,0" Padding="10,5"  Width="300" Click="btnStatistic_Click">
                         <!--Click="FilterButton_Click"-->
                         <Button.Content>
                             <TextBlock>

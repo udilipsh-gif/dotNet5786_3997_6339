@@ -132,6 +132,16 @@ internal class OrderImplementation : IOrder
         return OrderManager.ReadAll(filter, value, sort);
     }
 
+    public IEnumerable<BO.OrderInList> ReadAll(
+       int id,
+       Func<BO.OrderInList, bool>? filter = null,
+       BO.OrderInListField? sort = null)
+    {
+        if (!Tools.CheckManger(id))
+            throw new BO.BlNoAccessException();
+        return OrderManager.ReadAll(filter, sort);
+    }
+
     /// <summary>
     /// Marks a delivery as completed with a specific outcome.
     /// </summary>

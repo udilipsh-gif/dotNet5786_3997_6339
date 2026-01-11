@@ -63,27 +63,37 @@ public static class Tools
         }   
     }
 
-    internal static void OpenOrActivateWindow<T>(params object[] args) where T : Window
+    // גרסה 1: ללא תנאי (כמו שהיה לך עד עכשיו - שומר על תאימות לאחור)
+    internal static void OpenOrActivateWindow<T>(params object?[] args) where T : Window
     {
-        // חיפוש חלון פתוח מהסוג המבוקש באוסף החלונות של האפליקציה
-        var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault();
+        OpenOrActivateWindow<T>(null, args);
+    }
+
+    // גרסה 2: עם תנאי סינון (הפונקציה הראשית)
+    internal static void OpenOrActivateWindow<T>(Predicate<T>? matchPredicate, params object?[] args) where T : Window
+    {
+        // חיפוש חלון: גם מהסוג הנכון וגם (אם נשלח תנאי) עומד בתנאי
+        var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault(window =>
+            matchPredicate == null || matchPredicate(window));
 
         if (existingWindow != null)
         {
             if (existingWindow.WindowState == WindowState.Minimized)
-            {
                 existingWindow.WindowState = WindowState.Normal;
-            }
 
-            // 2. נביא אותו לקדמת המסך (פוקוס)
             existingWindow.Activate();
+
+            // עדכון מצב אם החלון תומך בזה (כפי שעשינו קודם)
+            if (existingWindow is IWindowUpdater updaterWindow)
+            {
+                updaterWindow.UpdateState(args);
+            }
         }
         else
         {
-            // אם החלון לא קיים - ניצור מופע חדש ונציג אותו
-            // Activator.CreateInstance מקבל מערך של פרמטרים
+            // יצירת חלון חדש
             var newWindow = (T)Activator.CreateInstance(typeof(T), args)!;
-            newWindow.Show(); // שימוש ב-Show לא חוסם את החלון הראשי
+            newWindow.Show();
         }
     }
 
@@ -145,4 +155,9 @@ public static class Tools
         }
     }
 
+}
+
+public interface IWindowUpdater
+{
+    void UpdateState(params object?[] args);
 }

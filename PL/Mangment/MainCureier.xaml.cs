@@ -154,7 +154,7 @@ public partial class MainCureier : Window
             return;
         }
 
-        Tools.OpenOrActivateWindow<StartDeliveryWindow>(USERID, USERID);
+        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, USERID, USERID);
     }
 
     private void EditCureier_Click(object sender, RoutedEventArgs e)

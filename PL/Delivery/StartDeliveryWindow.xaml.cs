@@ -12,9 +12,9 @@ public partial class StartDeliveryWindow : Window
 {
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-    private readonly int userId;
+    public int UserId { get; private init; }
 
-    private readonly int courierId;
+    public int courierId { get; private init; }
 
     public ICommand SelectOrderCommand { get; private set; }
 
@@ -52,7 +52,11 @@ public partial class StartDeliveryWindow : Window
     public BO.TypeOfOrder? SelctedFilter
     {
         get => (BO.TypeOfOrder?)GetValue(SelctedFilterProperty);
-        set => SetValue(SelctedFilterProperty, value);
+        set
+        { 
+            SetValue(SelctedFilterProperty, value); 
+            UpdateOrdersList(); 
+        }
     }
     public static readonly DependencyProperty SelctedFilterProperty =
         DependencyProperty.Register("SelctedFilter", typeof(BO.TypeOfOrder?),
@@ -71,7 +75,7 @@ public partial class StartDeliveryWindow : Window
 
     public StartDeliveryWindow(int userId, int courierId)
     {
-        this.userId = userId;
+        this.UserId = userId;
 
         this.courierId = courierId;
 
@@ -105,7 +109,7 @@ public partial class StartDeliveryWindow : Window
     private void UpdateOrdersList()
     {
         var DeliveryList = Tools.GetSafeFromBl(() =>  
-                s_bl.Order.GetOpen(userId, courierId, SelctedFilter, SelctedSort),
+                s_bl.Order.GetOpen(UserId, courierId, SelctedFilter, SelctedSort),
                 new List<BO.OpenOrderInList>());
 
         
@@ -123,18 +127,6 @@ public partial class StartDeliveryWindow : Window
         }
     }
 
-    private void ComboBox_FilterSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SelctedFilter = (BO.TypeOfOrder)((ComboBox)sender).SelectedItem;
-        UpdateOrdersList();
-    }
-
-    private void ComboBox_SortSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SelctedSort = (BO.OpenOrderInListField)((ComboBox)sender).SelectedItem;
-        UpdateOrdersList();
-    }
-
     private bool CanSelectOrder(BO.OpenOrderInList? selectedOrder)
     {
         // תמיד מאפשר ביצוע אם יש הזמנה נבחרת
@@ -148,7 +140,7 @@ public partial class StartDeliveryWindow : Window
             if (selectedOrder == null)
                 throw new BO.BlInvalidOperationException("סיבת סיום המשלוח לא תקפה");
 
-            Tools.RunSafe(() =>  s_bl.Order.StartDelivery(userId, courierId, selectedOrder.OrderId));
+            Tools.RunSafe(() =>  s_bl.Order.StartDelivery(UserId, courierId, selectedOrder.OrderId));
 
             MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
                 MessageBoxButton.OK, MessageBoxImage.Information);
@@ -162,10 +154,10 @@ public partial class StartDeliveryWindow : Window
         }
     }
 
-    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        var Selcte = SelctedFilter;
-        orderListObserver();
-    }
+    //private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    //{
+    //    var Selcte = SelctedFilter;
+    //    orderListObserver();
+    //}
 
 }

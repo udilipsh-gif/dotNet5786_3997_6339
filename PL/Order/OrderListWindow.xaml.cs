@@ -7,22 +7,31 @@ using System.Windows.Controls;
 
 namespace PL;
 
-public partial class OrderListWindow : Window
+public partial class OrderListWindow : Window, IWindowUpdater
 {
     static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
     private int CURRENT_MANAGER_ID = Tools.GetSafeFromBl<int>(() => s_bl.Admin.GetConfig().ManagerId);
 
-    public OrderListWindow()
+    public OrderListWindow(BO.OrderStatus? orderStatus, BO.ScheduleStatus? scheduleStatus, BO.TypeOfOrder? typeOfOrder)
     {
+        SelectedScheduleFilter = scheduleStatus;
+        SelectedTypeFilter = typeOfOrder;
+        SelectedOrderStatusFilter = orderStatus;
+
         InitializeComponent();
     }
+
+    public OrderListWindow() : this(null, null, null) { }
 
     public ObservableCollection<BO.OrderInList> OrderList
     {
         get { return (ObservableCollection<BO.OrderInList>)GetValue(OrderListProperty); }
         set { SetValue(OrderListProperty, value); }
     }
+
+    public static readonly DependencyProperty OrderListProperty =
+    DependencyProperty.Register(nameof(OrderList), typeof(ObservableCollection<BO.OrderInList>), typeof(OrderListWindow), new PropertyMetadata(null));
 
     public IEnumerable<Tools.SelectionItem> ScheduleStatusList
     {
@@ -34,8 +43,11 @@ public partial class OrderListWindow : Window
         get => Tools.GetEnumList<BO.TypeOfOrder>("הכל");
     }
 
-    public static readonly DependencyProperty OrderListProperty =
-        DependencyProperty.Register(nameof(OrderList), typeof(ObservableCollection<BO.OrderInList>), typeof(OrderListWindow), new PropertyMetadata(null));
+    public IEnumerable<Tools.SelectionItem> TypeOfOrderStatusList
+    {
+        get => Tools.GetEnumList<BO.OrderStatus>("הכל");
+    }
+
 
     /// <summary>
     /// סינון לי עמידה בזמנים
@@ -50,12 +62,12 @@ public partial class OrderListWindow : Window
     }
 
     public static readonly DependencyProperty SelectedScheduleFilterProperty =
-        DependencyProperty.Register(nameof(SelectedScheduleFilter), typeof(BO.ScheduleStatus?), typeof(OrderListWindow), new PropertyMetadata(null));
+        DependencyProperty.Register(nameof(SelectedScheduleFilter), typeof(BO.ScheduleStatus?),
+            typeof(OrderListWindow), new PropertyMetadata(null));
 
     /// <summary>
     /// סינון לפי סוג הזמנה
     /// </summary>
-
     public BO.TypeOfOrder? SelectedTypeFilter
     {
         get { return (BO.TypeOfOrder?)GetValue(SelectedTypeFilterProperty); }
@@ -69,40 +81,59 @@ public partial class OrderListWindow : Window
     public static readonly DependencyProperty SelectedTypeFilterProperty =
         DependencyProperty.Register(nameof(SelectedTypeFilter), typeof(BO.TypeOfOrder?), typeof(OrderListWindow), new PropertyMetadata(null));
 
+    /// <summary>
+    /// סינון לפי סטטוס הזמנה
+    /// </summary>
+    public BO.OrderStatus? SelectedOrderStatusFilter
+    {
+        get { return (BO.OrderStatus?)GetValue(SelectedOrderStatusFilterProperty); }
+        set
+        {
+            SetValue(SelectedOrderStatusFilterProperty, value);
+            LoadOrders(); // ריענון אוטומטי
+        }
+    }
+
+    public static readonly DependencyProperty SelectedOrderStatusFilterProperty =
+        DependencyProperty.Register(nameof(SelectedOrderStatusFilter), typeof(BO.OrderStatus?),
+            typeof(OrderListWindow), new PropertyMetadata(null));
+
     private void LoadOrders()
     {
-        // 1. שליפת כל הנתונים מה-BL ללא סינון ראשוני כלל
-
-        // 2. ביצוע סינון כפול בעזרת LINQ
-        try
-        {
-        var allOrders = Tools.GetSafeFromBl<IEnumerable<BO.OrderInList>>(() => 
-            s_bl.Order.ReadAll(CURRENT_MANAGER_ID, null, null, BO.OrderInListField.OrderId),
-            new List<BO.OrderInList>() );
-            var filteredResults = allOrders.Where(order =>
+        Func<BO.OrderInList, bool> filterPredicate = order =>
             (SelectedScheduleFilter == null || order.ScheduleStatus == SelectedScheduleFilter) &&
-            (SelectedTypeFilter == null || order.TypeOfOrder == SelectedTypeFilter)
+            (SelectedTypeFilter == null || order.TypeOfOrder == SelectedTypeFilter) &&
+            (SelectedOrderStatusFilter == null || order.OrderStatus == SelectedOrderStatusFilter);
+
+        var filteredResults = Tools.GetSafeFromBl<IEnumerable<BO.OrderInList>>(() =>
+            s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId),
+            new List<BO.OrderInList>()
         );
-            if (OrderList == null)
-            {
-                OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
-            }
-            else
-            {
-                OrderList.Clear();
-                foreach (var item in filteredResults)
-                {
-                    OrderList.Add(item);
-                }
-            }
-        }
-        catch (Exception ex)
+
+        if (OrderList == null)
         {
-            MessageBox.Show($"שגיאה בסינון הכפול ({ex.Message})");
+            OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
         }
+        else
+        {
+            OrderList.Clear();
+            foreach (var item in filteredResults)
+            {
+                OrderList.Add(item);
+            }
+        }
+    }
 
+    public void UpdateState(params object?[] args)
+    {
+        if (args != null && args.Length >= 3)
+        {
+            SelectedOrderStatusFilter = args[0] as BO.OrderStatus?;
+            SelectedScheduleFilter = args[1] as BO.ScheduleStatus?;
+            SelectedTypeFilter = args[2] as BO.TypeOfOrder?;
 
-
+            LoadOrders();
+        }
     }
 
     private void orderListObserver()

@@ -364,7 +364,7 @@ public static class Initialization
 
             DateTime orderData = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
 
-            EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 8);
+            EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 6);
 
             s_dal?.Order.Update(randomOrder with
             {
