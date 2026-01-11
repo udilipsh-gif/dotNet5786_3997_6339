@@ -233,15 +233,17 @@ internal static class Tools
         DateTime maxDeliveryTime = order.OrderDate + AdminManager.GetConfig()?.MaxDeliveryTime ??
             throw new Exception("Max Delivery Time");
 
-        if (delivery == null)
-        {
-            delivery = (from deliver in DeliveryManager.ReadAll()
-                        where deliver.OrderId == order.Id
-                        select deliver).FirstOrDefault();
-        }
+        
 
         if (order.OrderStatus is DO.OrderStatus.COMPLETED)
         {
+            if (delivery == null)
+            {
+                delivery = (from deliver in DeliveryManager.ReadAll()
+                            where deliver.OrderId == order.Id
+                            select deliver).FirstOrDefault();
+            }
+
             DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
                 throw new Exception("order completed but not fonud delivry");
 
@@ -257,6 +259,13 @@ internal static class Tools
 
         if (order.OrderStatus is DO.OrderStatus.DELIVERING)
         {
+            if (delivery == null)
+            {
+                delivery = (from deliver in DeliveryManager.ReadAll()
+                            where deliver.OrderId == order.Id
+                            select deliver).FirstOrDefault();
+            }
+
             if (delivery is null) throw new Exception("order start but not fonud delivry");
 
             TimeSpan timeBuffer = maxDeliveryTime - GetEstimatedDeliveryTime(delivery);
