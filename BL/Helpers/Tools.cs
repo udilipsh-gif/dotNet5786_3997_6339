@@ -47,7 +47,7 @@ internal static class Tools
 
         Type type = t.GetType();
         PropertyInfo[] properties = type.GetProperties();
-       // sb.Append(type.Name + " Details:\n");
+        // sb.Append(type.Name + " Details:\n");
         foreach (PropertyInfo prop in properties)
         {
             // שליפת הערך של המאפיין מתוך האובייקט t
@@ -56,17 +56,17 @@ internal static class Tools
 
             if (value != null)
             {
-                  if (value is IEnumerable collection && !(value is string))
+                if (value is IEnumerable collection && !(value is string))
                 {
                     var items = collection.Cast<object>()
                                           .Select(item => item?.ToString() ?? "null");
 
-    
+
                     strValue = $"[{string.Join(", ", items)}]";
                 }
                 else
                 {
-                   
+
                     strValue = value.ToString();
                     if (prop.Name is "password" or "Password")
                         strValue = "******";
@@ -79,7 +79,7 @@ internal static class Tools
 
         return sb.ToString();
     }
-    
+
 
     /// <summary>
     /// Calculates the distance between two geographic coordinates using the Haversine formula.
@@ -94,7 +94,7 @@ internal static class Tools
     /// between two points on Earth's surface. The Earth's radius is assumed to be 6371 km.
     /// Implementation based on GIMINI algorithm.
     /// </remarks>
-    public static double GetDistance(double lat1, double lon1, double lat2, double lon2) 
+    public static double GetDistance(double lat1, double lon1, double lat2, double lon2)
     {
         const double R = 6371;
 
@@ -233,15 +233,17 @@ internal static class Tools
         DateTime maxDeliveryTime = order.OrderDate + AdminManager.GetConfig()?.MaxDeliveryTime ??
             throw new Exception("Max Delivery Time");
 
-        if (delivery == null)
-        {
-            delivery = (from deliver in DeliveryManager.ReadAll()
-                        where deliver.OrderId == order.Id
-                        select deliver).FirstOrDefault();
-        }
+        
 
         if (order.OrderStatus is DO.OrderStatus.COMPLETED)
         {
+            if (delivery == null)
+            {
+                delivery = (from deliver in DeliveryManager.ReadAll()
+                            where deliver.OrderId == order.Id
+                            select deliver).FirstOrDefault();
+            }
+
             DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
                 throw new Exception("order completed but not fonud delivry");
 
@@ -257,6 +259,13 @@ internal static class Tools
 
         if (order.OrderStatus is DO.OrderStatus.DELIVERING)
         {
+            if (delivery == null)
+            {
+                delivery = (from deliver in DeliveryManager.ReadAll()
+                            where deliver.OrderId == order.Id
+                            select deliver).FirstOrDefault();
+            }
+
             if (delivery is null) throw new Exception("order start but not fonud delivry");
 
             TimeSpan timeBuffer = maxDeliveryTime - GetEstimatedDeliveryTime(delivery);
@@ -340,14 +349,14 @@ internal static class Tools
     /// </remarks>
     public static bool IsValidPhone(string phone)
     {
-        if (phone.Length<7 ||phone.Length>10)
+        if (phone.Length < 7 || phone.Length > 10)
             return false;
-        for (int i=0; i<phone.Length; i++)//בעיקרון ניתן להגביל ל10 תווים
+        for (int i = 0; i < phone.Length; i++)//בעיקרון ניתן להגביל ל10 תווים
         {
             if (phone[i] < '0' || phone[i] > '9')
-            
+
                 return false;
-            
+
         }
         return true;
     }
@@ -432,31 +441,46 @@ internal static class Tools
     /// </remarks>
     public static DateTime GetEstimatedDeliveryTime(DO.Delivery delivery)
     {
+        if(delivery.EndDelivery is null)
+        {
+        DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
+              ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
+
+        double actualDistance;
         DateTime estimatedDeliveryTime;
         if (delivery.ActualDistance.HasValue)
         {
-            // שליפת המהירות הממוצעת לפי סוג הרכב
-            DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
-                ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
-            double avgSpeed = courier.TypeShipment switch
-            {
-                DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
-                DO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
-                DO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
-                DO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
-                _ => 1.0
-            };
-
-            // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
-            double estimatedHours = delivery.ActualDistance.Value / avgSpeed;
-            estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
+            actualDistance = delivery.ActualDistance.Value;
         }
         else
         {
-            // אם אין מרחק בפועל, משתמשים בזמן המקסימלי המוגדר
-            estimatedDeliveryTime = delivery.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
+                DO.Order order = s_dal.Order.Read(delivery.OrderId)
+                  ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does Not exist");
+
+                actualDistance = GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
+
+                s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
         }
+
+        double avgSpeed = courier.TypeShipment switch
+        {
+            DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
+            DO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
+            DO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
+            DO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
+            _ => 1.0
+        };
+
+        // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
+        double estimatedHours = actualDistance / avgSpeed;
+        estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
+
         return estimatedDeliveryTime;
+        }
+        else
+        {
+            return delivery.TimeEndDelivery ?? DateTime.MinValue; // למקרה של שגיאה שזמן המלוח לא נשמר
+        }
 
     }
 
@@ -537,7 +561,7 @@ internal static class Tools
     {
         if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED)
         {
-            if(delivery!.TimeEndDelivery is DateTime timeEndDelivery)
+            if (delivery!.TimeEndDelivery is DateTime timeEndDelivery)
             {
                 return order.OrderDate - timeEndDelivery;
             }
@@ -545,7 +569,7 @@ internal static class Tools
             {
                 throw new BlInvalidValueException("המשלוח הסתיים אבל אין תאריך סיום");
             }
-            
+
         }
 
         return TimeSpan.FromDays(1);
@@ -617,8 +641,8 @@ internal static class Tools
                     string? status = doc.Element("GeocodeResponse")?.Element("status")?.Value;
 
                     if (status == "ZERO_RESULTS")
-                        throw new BO.BlInvalidValueException ("הכתובת לא נמצאה במאגר של גוגל.");
-                    
+                        throw new BO.BlInvalidValueException("הכתובת לא נמצאה במאגר של גוגל.");
+
 
                     if (status == "OK")
                     {
@@ -628,7 +652,7 @@ internal static class Tools
                         var locationType = geometry?.Element("location_type")?.Value;
                         if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETRIC_CENTER")
                             throw new BO.BlInvalidValueException("הכתובת שהוזנה לא מדויקת, נא להזין כתובת מלאה יותר.");
-                        
+
                         var locationElement = geometry?.Element("location");
 
                         if (locationElement != null)
@@ -737,7 +761,7 @@ internal static class Tools
             try
             {
                 HttpResponseMessage response = client.GetAsync(url).GetAwaiter().GetResult();
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                     XDocument doc = XDocument.Parse(xmlContent);
@@ -797,14 +821,14 @@ internal static class Tools
 
             // ולידציה בסיסית למקרה שהמייל ריק
             if (string.IsNullOrWhiteSpace(toEmail))
-               
+
                 throw new SmtpException("כתובת נמען ריקה");
 
 
             mail.To.Add(toEmail);
             mail.Subject = subject;
             mail.Body = body;
-           
+
 
             // הגדרות שרת
             SmtpServer.Port = 587;
@@ -815,7 +839,7 @@ internal static class Tools
         }
         //catch (Exception ex)
         //{
-           
+
         //    throw new Exception($"שגיאה בשליחת מייל: {ex.Message}");
         //}
         catch (SmtpException ex)

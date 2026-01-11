@@ -125,8 +125,8 @@ internal static class OrderManager
     /// applies the specified filter predicate, and sorts by the requested field.
     /// </remarks>
     public static List<BO.OrderInList> ReadAll(BO.OrderInListField? filter,
-        Object? filterValue,
-        BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
+    Object? filterValue,
+    BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
     {
         Func<BO.OrderInList, bool> filterPredicate = s_getFilterFunc(filter, filterValue);
 
@@ -134,22 +134,86 @@ internal static class OrderManager
     }
 
     public static List<BO.OrderInList> ReadAll(Func<BO.OrderInList, bool>? customPredicate = null,
-        BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
+    BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
     {
-        // 2. שימוש בפרדיקט שהגיע מבחוץ (או ברירת מחדל שמחזירה תמיד אמת)
-        Func<BO.OrderInList, bool> filter = customPredicate ?? (x => true);
+        // 1. שליפה מוקדמת של כל המשלוחים (פעולת IO אחת בלבד!)
+        var allDeliveries = s_dal.Delivery.ReadAll();
 
+        // 2. יצירת מילון שממפה מזהה הזמנה -> לרשימת המשלוחים שלה
+        // זה מאפשר שליפה מהירה בטירוף ללא צורך לרוץ על הרשימה שוב ושוב
+        var deliveriesMap = allDeliveries
+            .GroupBy(d => d.OrderId)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
+
+        // 3. הכנת הפילטרים והממיינים
+        Func<BO.OrderInList, bool> filter = customPredicate ?? (x => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortFunc(orderBy);
 
-        // 3. ה-LINQ שלך (עם המיון וההמרה)
+        // 4. הרצת השאילתה - שימוש בפונקציית המרה מותאמת שמקבלת את המידע המוכן
         var query = from doOrder in s_dal.Order.ReadAll()
-                    let boOrder = s_convertToBoOrderInList(doOrder)
-                    where filter(boOrder) // הפעלת הפילטר שהגיע מבחוץ!
-                    orderby sortSelector(boOrder) // מיון דיפולטיבי (אפשר לשנות)
+                    let boOrder = ConvertToBoOrderOptimized(doOrder, deliveriesMap) // שימוש בגרסה המהירה
+                    where filter(boOrder)
+                    orderby sortSelector(boOrder)
                     select boOrder;
 
-        return [.. query];
+        return [.. query]; // המרה לרשימה רק בסוף
     }
+
+
+    private static BO.OrderInList ConvertToBoOrderOptimized(DO.Order doOrder, Dictionary<int, List<DO.Delivery>> deliveriesMap)
+    {
+        // שליפה מהירה מהמילון (במקום לקרוא XML)
+        List<DO.Delivery> orderDeliveries = deliveriesMap.TryGetValue(doOrder.Id, out var deliveries)
+                                            ? deliveries
+                                            : new List<DO.Delivery>();
+
+        // המשלוח האחרון הוא הראשון ברשימה (כי מיינו ביצירת המילון)
+        DO.Delivery? latestDelivery = orderDeliveries.FirstOrDefault();
+
+        // המרה ל-Enum
+        var orderStatus = (BO.OrderStatus)doOrder.OrderStatus;
+
+        // חישוב מרחק - רק בזיכרון! לא שומרים ל-XML בזמן קריאה כדי לא לתקוע את המערכת
+        double distanceKm = doOrder.DistanceKm ?? Tools.GetDistance(doOrder);
+
+        return new BO.OrderInList
+        {
+            OrderId = doOrder.Id,
+            DeliveryId = latestDelivery?.Id, // מזהה המשלוח האחרון
+            TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
+            DistanceKm = distanceKm,
+            OrderStatus = orderStatus,
+
+            // העברת המשלוח שנמצא ל-Tools כדי שלא יחפש אותו שוב
+            ScheduleStatus = Tools.GetScheduleStatus(doOrder, latestDelivery),
+
+            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
+            TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, latestDelivery),
+
+            // חישוב כמות הניסיונות ישירות מהרשימה בזיכרון (במקום Tools.GetCuntOfDelivery)
+            NumberOfDeliveryAttempts = orderDeliveries.Count
+        };
+    }
+
+
+
+    //public static List<BO.OrderInList> ReadAll(Func<BO.OrderInList, bool>? customPredicate = null,
+    //    BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
+    //{
+    //    // 2. שימוש בפרדיקט שהגיע מבחוץ (או ברירת מחדל שמחזירה תמיד אמת)
+    //    Func<BO.OrderInList, bool> filter = customPredicate ?? (x => true);
+
+    //    Func<BO.OrderInList, object> sortSelector = s_getSortFunc(orderBy);
+
+    //    // 3. ה-LINQ שלך (עם המיון וההמרה)
+    //    var query = from doOrder in s_dal.Order.ReadAll()
+    //                let boOrder = s_convertToBoOrderInList(doOrder)
+    //                where filter(boOrder) 
+    //                orderby sortSelector(boOrder) 
+    //                select boOrder;
+
+    //    return [.. query];
+    //}
 
 
     /// <summary>
@@ -378,18 +442,40 @@ internal static class OrderManager
     /// </remarks>
     public static void StartDelivery(int courierId, int orderId)
     {
+        // 1. שליפת ההזמנה והשליח (נשאר אותו דבר)
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
 
         DO.Courier? doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);
-        if (boOrderInList.OrderStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED))
+        // 2. בדיקת סטטוס יעילה
+        // במקום להמיר את כל האובייקט (s_convertToBoOrderInList) שהוא כבד,
+        // אנחנו בודקים רק את מה שרלוונטי ללוגיקה: הסטטוס הנוכחי.
+        BO.OrderStatus currentStatus = Tools.GetOrderStatus(doOrder); //
+
+        // 3. ביצוע הוולידציה
+        if (currentStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED))
             throw new BO.BlInvalidOperationException("Order is not open for selection");
 
+        // 4. יצירת המשלוח
         DeliveryManager.Create(doOrder, doCourier);
     }
+
+    //public static void StartDelivery(int courierId, int orderId)
+    //{
+    //    DO.Order doOrder = s_dal.Order.Read(orderId)
+    //        ?? throw new BO.BlDoesNotExistException("Order not found");
+
+    //    DO.Courier? doCourier = s_dal.Courier.Read(courierId)
+    //        ?? throw new BO.BlDoesNotExistException("Courier not found");
+
+    //    BO.OrderInList boOrderInList = s_convertToBoOrderInList(doOrder);
+    //    if (boOrderInList.OrderStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED))
+    //        throw new BO.BlInvalidOperationException("Order is not open for selection");
+
+    //    DeliveryManager.Create(doOrder, doCourier);
+    //}
 
     /// <summary>
     /// Retrieves all completed deliveries for a specific courier with optional filtering and sorting.
@@ -518,18 +604,25 @@ internal static class OrderManager
         //var orderStatus = Tools.GetOrderStatus(doOrder, delivery);
         var orderStatus = (BO.OrderStatus)doOrder.OrderStatus;
 
-        return new BO.OrderInList
+        var distanceKm = doOrder.DistanceKm;
+        if(distanceKm == null || distanceKm == 0)
         {
-            DeliveryId = delivery?.Id,
-            OrderId = doOrder.Id,
-            TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
-            DistanceKm = Tools.GetDistance(doOrder),
-            OrderStatus = orderStatus,
-            ScheduleStatus = Tools.GetScheduleStatus(doOrder, delivery),
-            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
-            TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, delivery),
-            NumberOfDeliveryAttempts = Tools.GetCuntOfDelivery(doOrder.Id)
-        };
+            distanceKm = Tools.GetDistance(doOrder);
+            s_dal.Order.Update(doOrder with { DistanceKm = distanceKm });
+        }
+
+            return new BO.OrderInList
+            {
+                DeliveryId = delivery?.Id,
+                OrderId = doOrder.Id,
+                TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
+                DistanceKm = (double)distanceKm,
+                OrderStatus = orderStatus,
+                ScheduleStatus = Tools.GetScheduleStatus(doOrder, delivery),
+                TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
+                TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, delivery),
+                NumberOfDeliveryAttempts = Tools.GetCuntOfDelivery(doOrder.Id)
+            };
     }
 
     /// <summary>

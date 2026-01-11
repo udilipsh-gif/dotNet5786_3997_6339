@@ -363,17 +363,17 @@ public partial class ManagerWindow : Window
             {
                 // מקרה 1: ה-Tag הוא מסוג OrderStatus
                 case BO.OrderStatus orderStatus:
-                    Tools.OpenOrActivateWindow<OrderListWindow>(orderStatus, null, null);
+                    Tools.OpenOrActivateWindow<OrderListWindow>(orderStatus, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
                     break;
 
                 // מקרה 2: ה-Tag הוא מסוג ScheduleStatus
                 case BO.ScheduleStatus scheduleStatus:
-                    Tools.OpenOrActivateWindow<OrderListWindow>(null, scheduleStatus, null);
+                    Tools.OpenOrActivateWindow<OrderListWindow>((BO.OrderStatus?)null, scheduleStatus, (BO.TypeOfOrder?)null);
                     break;
 
                 // מקרה ברירת מחדל (למשל אם נלחץ משהו אחר או null)
                 default:
-                    Tools.OpenOrActivateWindow<OrderListWindow>(null, null, null);
+                    Tools.OpenOrActivateWindow<OrderListWindow>((BO.OrderStatus?)null, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
                     break;
             }
         }
