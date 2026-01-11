@@ -537,10 +537,18 @@ internal static class Tools
     {
         if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED)
         {
-            return delivery!.TimeEndDelivery!.Value - order.OrderDate;
+            if(delivery!.TimeEndDelivery is DateTime timeEndDelivery)
+            {
+                return order.OrderDate - timeEndDelivery;
+            }
+            else
+            {
+                throw new BlInvalidValueException("המשלוח הסתיים אבל אין תאריך סיום");
+            }
+            
         }
 
-        return TimeSpan.Zero; ;
+        return TimeSpan.FromDays(1);
     }
 
     /// <summary>

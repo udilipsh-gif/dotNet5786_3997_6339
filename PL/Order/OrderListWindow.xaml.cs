@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BO;
+using System;
 using System.Collections.ObjectModel;
 using System.Net.Mail;
 using System.Windows;
@@ -23,12 +24,12 @@ public partial class OrderListWindow : Window
         set { SetValue(OrderListProperty, value); }
     }
 
-    public IEnumerable<Tools.SelectionItem> ScheduleStatusList 
+    public IEnumerable<Tools.SelectionItem> ScheduleStatusList
     {
         get => Tools.GetEnumList<BO.ScheduleStatus>("הכל");
     }
 
-    public IEnumerable<Tools.SelectionItem> TypeOfOrderList 
+    public IEnumerable<Tools.SelectionItem> TypeOfOrderList
     {
         get => Tools.GetEnumList<BO.TypeOfOrder>("הכל");
     }
@@ -71,27 +72,37 @@ public partial class OrderListWindow : Window
     private void LoadOrders()
     {
         // 1. שליפת כל הנתונים מה-BL ללא סינון ראשוני כלל
-        var allOrders = Tools.GetSafeFromBl<IEnumerable<BO.OrderInList>>(() => s_bl.Order.ReadAll(CURRENT_MANAGER_ID, null, null, BO.OrderInListField.OrderId));
 
         // 2. ביצוע סינון כפול בעזרת LINQ
-        var filteredResults = allOrders.Where(order =>
-        (SelectedScheduleFilter == null || order.ScheduleStatus == SelectedScheduleFilter) &&
-        (SelectedTypeFilter == null || order.TypeOfOrder == SelectedTypeFilter)
-    );
-
-        if (OrderList == null)
+        try
         {
-            OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
-        } 
-        else
-        {
-            OrderList.Clear(); 
-            foreach (var item in filteredResults)
+        var allOrders = Tools.GetSafeFromBl<IEnumerable<BO.OrderInList>>(() => 
+            s_bl.Order.ReadAll(CURRENT_MANAGER_ID, null, null, BO.OrderInListField.OrderId),
+            new List<BO.OrderInList>() );
+            var filteredResults = allOrders.Where(order =>
+            (SelectedScheduleFilter == null || order.ScheduleStatus == SelectedScheduleFilter) &&
+            (SelectedTypeFilter == null || order.TypeOfOrder == SelectedTypeFilter)
+        );
+            if (OrderList == null)
             {
-                OrderList.Add(item); 
+                OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
+            }
+            else
+            {
+                OrderList.Clear();
+                foreach (var item in filteredResults)
+                {
+                    OrderList.Add(item);
+                }
             }
         }
-           
+        catch (Exception ex)
+        {
+            MessageBox.Show($"שגיאה בסינון הכפול ({ex.Message})");
+        }
+
+
+
     }
 
     private void orderListObserver()

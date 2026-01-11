@@ -310,13 +310,13 @@ public static class Initialization
         /// A DateTime representing when the delivery ended, or null if the delivery was cancelled.
         /// For refused/not found/failed deliveries, adds additional delay time.
         /// </returns>
-        static DateTime? getTimeEndDelivery(DateTime orderDate, TimeSpan duration, EndDelivery endDelivery)
+        static DateTime? getTimeEndDelivery(DateTime orderDate, TimeSpan duration, EndDelivery? endDelivery)
         {
             return endDelivery switch
             {
                 EndDelivery.DELIVERED => orderDate.Add(duration),
                 EndDelivery.REFUSED => orderDate.Add(duration).AddMinutes(s_rand.Next(5, 31)),
-                EndDelivery.CONCELLED => null,
+                EndDelivery.CONCELLED => orderDate,
                 EndDelivery.NOTFOUND => orderDate.Add(duration).AddMinutes(s_rand.Next(10, 61)),
                 EndDelivery.FAILED => orderDate.Add(duration).AddMinutes(s_rand.Next(15, 91)),
                 _ => null,
@@ -366,17 +366,20 @@ public static class Initialization
 
             EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 8);
 
-            if (getEndDelivery == EndDelivery.DELIVERED)
-                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.COMPLETED });
-            if (getEndDelivery == EndDelivery.REFUSED)
-                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.REFUSED });
-            if (getEndDelivery == EndDelivery.CONCELLED)
-                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.CONCELLED });
-            //הוספתי בשלב 6 את שתי התנאים הבאים
-            if(getEndDelivery == EndDelivery.FAILED)
-                s_dal?.Order.Update(randomOrder with { OrderStatus=OrderStatus.OPEN });
-            if (getEndDelivery== EndDelivery.NOTFOUND)
-                s_dal?.Order.Update(randomOrder with { OrderStatus = OrderStatus.OPEN });
+            s_dal?.Order.Update(randomOrder with
+            {
+                OrderStatus = getEndDelivery switch
+                {
+                    EndDelivery.DELIVERED => OrderStatus.COMPLETED,
+                    EndDelivery.REFUSED => OrderStatus.REFUSED,
+                    EndDelivery.CONCELLED => OrderStatus.CONCELLED,
+                    EndDelivery.FAILED => OrderStatus.OPEN,
+                    EndDelivery.NOTFOUND => OrderStatus.OPEN,
+                    _ => randomOrder.OrderStatus // keep current status
+                }
+            });
+
+            EndDelivery? endDelivery = (int)getEndDelivery > 4 ? null : getEndDelivery;
 
 
             s_dal?.Delivery!.Create(new()
@@ -387,8 +390,8 @@ public static class Initialization
                 ActualDistance = getActualDistance,
                 CourierId = selectedCourier.Id,
                 OrderDate = orderData,
-                EndDelivery = getEndDelivery,
-                TimeEndDelivery = getTimeEndDelivery(orderData, duration, getEndDelivery) ?? default
+                EndDelivery = endDelivery,
+                TimeEndDelivery = getTimeEndDelivery(orderData, duration, getEndDelivery)
             });
         }
     }
