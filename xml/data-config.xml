@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
   <NextOrderId>100051</NextOrderId>
-  <NextDeliveryId>200052</NextDeliveryId>
-  <Clock>11/01/2026 14:26:12</Clock>
+  <NextDeliveryId>200051</NextDeliveryId>
+  <Clock>28/01/2026 06:58:38</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
   <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
   <Latitude>32.0936195</Latitude>
   <Longitude>34.8229463</Longitude>
-  <MaxDeliveryRange>20</MaxDeliveryRange>
+  <MaxDeliveryRange>25</MaxDeliveryRange>
   <AvgSpeedCar>30</AvgSpeedCar>
   <AvgSpeedMotorcycle>50</AvgSpeedMotorcycle>
   <AvgSpeedBike>15</AvgSpeedBike>

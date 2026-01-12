@@ -170,7 +170,7 @@ internal static class Config
         StoreAddress = "בר כוכבא 21 בני ברק";
         Latitude = 32.0936195;
         Longitude = 34.8229463;
-        MaxDeliveryRange = 20;
+        MaxDeliveryRange = 25;
         PasswordManager = "1";
         AvgSpeedCar = 30;
         AvgSpeedMotorcycle = 50;

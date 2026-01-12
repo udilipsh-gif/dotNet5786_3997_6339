@@ -154,10 +154,4 @@ public partial class StartDeliveryWindow : Window
         }
     }
 
-    //private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    //{
-    //    var Selcte = SelctedFilter;
-    //    orderListObserver();
-    //}
-
 }

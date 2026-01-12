@@ -9,7 +9,7 @@
         Loaded="ConfigWindow_Loaded"
         Closed="ConfigWindow_Close"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="ConfigWindow" Height="450" Width="250">
+        Title="ConfigWindow" Height="450" Width="450">
     <Window.Resources>
         <local:SpanTimeConverter x:Key="SpanTimeConverter" />
 
@@ -17,6 +17,7 @@
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="VerticalContentAlignment" Value="Top"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="170"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
 
@@ -26,7 +27,7 @@
             <Setter Property="Padding" Value="5"/>
             <Setter Property="Width" Value="Auto"/>
         </Style>
-        
+
         <!-- Style for text boxes: Center-aligned vertically, stretches horizontally -->
         <Style x:Key="CommonInputStyle" TargetType="Control">
             <Setter Property="VerticalAlignment" Value="Stretch"/>
@@ -34,6 +35,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Height" Value="Auto"/>
+            <Setter Property="Width" Value="Auto"/>
             <Setter Property="FontSize" Value="16"/>
         </Style>
 
@@ -43,6 +45,9 @@
             <Setter Property="local:Tools.NumericOnly" Value="True"/>
         </Style>
         <Style TargetType="local:TimeSpanInput" x:Key="UniformSpanTime" >
+        </Style>
+        <Style x:Key="FormRow" TargetType="DockPanel">
+            <Setter Property="Margin" Value="0,5"/>
         </Style>
     </Window.Resources>
     <Grid Background="WhiteSmoke">
@@ -60,60 +65,75 @@
         <ScrollViewer Grid.Row="2" Padding="10">
             <StackPanel>
                 <!-- Manager ID field - Numeric only, max 9 digits -->
-                <Label Content="מזהה מנהל:" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.ManagerId, Mode=TwoWay }"
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="מזהה מנהל:" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.ManagerId, Mode=TwoWay }"
                        Style="{StaticResource UniformTextBoxNom}"
                        MaxLength="9"/>
-
+                </DockPanel>
                 <!-- Store address field -->
-                <Label Content="כתובת חנות:" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.StoreAddress, Mode=TwoWay}" 
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="כתובת חנות:" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.StoreAddress, Mode=TwoWay}" 
                              Style="{StaticResource UniformTextBox}"/>
-
-                <!-- Latitude field - Read-only, populated from address lookup -->
-                <Label Content="קו רוחב:" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.Latitude, Mode=TwoWay}" 
+                </DockPanel>
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="סיסמת מנהל:" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.PasswordManager, Mode=TwoWay}" 
                              Style="{StaticResource UniformTextBox}" IsReadOnly="True"/>
-
+                </DockPanel>
                 <!-- Longitude field - Read-only, populated from address lookup -->
-                <Label Content="קו אורך:" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.Longitude, Mode=TwoWay}" 
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="מרחק מירבי להזמנה:" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.MaxDeliveryRange, Mode=TwoWay}" 
                              Style="{StaticResource UniformTextBox}" IsReadOnly="True"/>
-
+                </DockPanel>
                 <!-- Car average speed field - Numeric only, in km/h -->
-                <Label Content="מהירות רכב (קמ״ש):" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.AvgSpeedCar, Mode=TwoWay}" 
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="מהירות רכב (קמ״ש):" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedCar, Mode=TwoWay}" 
                       Style="{StaticResource UniformTextBoxNom}"/>
+                </DockPanel>
 
                 <!-- Motorcycle average speed field - Numeric only, in km/h -->
-                <Label Content="מהירות אופונוע (קמ״ש):" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle, Mode=TwoWay}"
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="מהירות אופונוע (קמ״ש):" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle, Mode=TwoWay}"
                       Style="{StaticResource UniformTextBoxNom}"/>
-
+                </DockPanel>
                 <!-- Bike average speed field - Numeric only, in km/h -->
-                <Label Content="מהירות אופניים (קמ״ש):" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.AvgSpeedBike, Mode=TwoWay}"
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="מהירות אופניים (קמ״ש):" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedBike, Mode=TwoWay}"
                       Style="{StaticResource UniformTextBoxNom}"/>
-
+                </DockPanel>
+                
                 <!-- Walking average speed field - Numeric only, in km/h -->
-                <Label Content="מהירות הליכה (קמ״ש):" Style="{StaticResource UniformLabel}"/>
-                <TextBox Text="{Binding Configuration.AvgSpeedFoot, Mode=TwoWay}"
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="מהירות הליכה (קמ״ש):" Style="{StaticResource UniformLabel}"/>
+                    <TextBox Text="{Binding Configuration.AvgSpeedFoot, Mode=TwoWay}"
                              Style="{StaticResource UniformTextBoxNom}"/>
-
+                </DockPanel>
                 <!-- Maximum delivery time field - Uses converter for DD:HH format -->
-                <Label Content="זמן משלוח מקסימלי (ימים:שעות):" Style="{StaticResource UniformLabel}"/>
-                <local:TimeSpanInput Value="{Binding Configuration.MaxDeliveryTime}" 
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="זמן משלוח מקסימלי:" Style="{StaticResource UniformLabel}"/>
+                    <local:TimeSpanInput Value="{Binding Configuration.MaxDeliveryTime}" 
                                          Style="{StaticResource UniformSpanTime}"/>
-
+                </DockPanel>
+                
                 <!-- Risk range field - Uses converter for DD:HH format -->
-                <Label Content="טווח סיכון (ימים:שעות):" Style="{StaticResource UniformLabel}"/>
-                <local:TimeSpanInput Value="{Binding Configuration.RiskRange}" 
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="טווח סיכון:" Style="{StaticResource UniformLabel}"/>
+                    <local:TimeSpanInput Value="{Binding Configuration.RiskRange}" 
                                          Style="{StaticResource UniformSpanTime}"/>
+                </DockPanel>
 
                 <!-- Maximum inactivity time for courier field - Uses converter for DD:HH format -->
-                <Label Content="זמן חוסר פעילות לשליח:" Style="{StaticResource UniformLabel}"/>
-                <local:TimeSpanInput Value="{Binding Configuration.MaxTimeInactivity}" 
+                <DockPanel Style="{StaticResource FormRow}">
+                    <Label Content="זמן חוסר פעילות לשליח:" Style="{StaticResource UniformLabel}"/>
+                    <local:TimeSpanInput Value="{Binding Configuration.MaxTimeInactivity}" 
                                          Style="{StaticResource UniformSpanTime}"/>
+                </DockPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>
