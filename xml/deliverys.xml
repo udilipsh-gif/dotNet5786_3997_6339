@@ -540,4 +540,14 @@
     <EndDelivery>DELIVERED</EndDelivery>
     <TimeEndDelivery>2026-01-24T08:39:38.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200055</Id>
+    <OrderId>100034</OrderId>
+    <CourierId>45</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-01-24T08:39:38.0000000</OrderDate>
+    <ActualDistance>1.741</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2026-01-24T08:39:38.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>

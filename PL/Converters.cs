@@ -48,6 +48,10 @@ public class NullToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        if (parameter != null && parameter.ToString() == "Invert")
+        {
+            return value == null ? Visibility.Visible : Visibility.Collapsed;
+        }
         return value != null ? Visibility.Visible : Visibility.Collapsed;
     }
 

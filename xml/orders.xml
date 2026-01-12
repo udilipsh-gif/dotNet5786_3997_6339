@@ -289,22 +289,6 @@
     <DistanceKmWalk>6310</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100034</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 33</Details>
-    <Addres> הראה 80, רמת גן</Addres>
-    <Latitude>32.0817288</Latitude>
-    <Longitude>34.8254736</Longitude>
-    <Name>Customer33</Name>
-    <Phone>0529394083</Phone>
-    <Weight>10</Weight>
-    <OrderDate>2026-01-10T02:04:38.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>1.343451793204207</DistanceKm>
-    <DistanceKmRoad>1741</DistanceKmRoad>
-    <DistanceKmWalk>1599</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100012</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 11</Details>
@@ -799,5 +783,21 @@
     <DistanceKm>1.510039737793367</DistanceKm>
     <DistanceKmRoad>2020</DistanceKmRoad>
     <DistanceKmWalk>1982</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100034</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 33</Details>
+    <Addres> הראה 80, רמת גן</Addres>
+    <Latitude>32.0817288</Latitude>
+    <Longitude>34.8254736</Longitude>
+    <Name>Customer33</Name>
+    <Phone>0529394083</Phone>
+    <Weight>10</Weight>
+    <OrderDate>2026-01-10T02:04:38.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm>1.343451793204207</DistanceKm>
+    <DistanceKmRoad>1741</DistanceKmRoad>
+    <DistanceKmWalk>1599</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

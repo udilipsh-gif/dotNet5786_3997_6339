@@ -81,7 +81,7 @@
             <Setter Property="Language" Value="he-IL"/>
         </Style>
         <Style TargetType="Button" x:Key="UniformButton">
-            <Setter Property="Width" Value="90"/>
+            <Setter Property="Width" Value="110"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="Margin" Value="5"/>
         </Style>
@@ -201,19 +201,21 @@
                         <TextBox  Grid.Column="1" Text="{Binding CurrentUser.DeliveryLate}"  Style="{StaticResource UniformTextBoxVue}"/>
                     </Grid>
                 </StackPanel>
+                <Border Grid.Row="2" Visibility="{Binding CurrentUser.Active, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel Grid.Row="2" Style="{StaticResource UniformStackPanel}"
                             Visibility="{Binding IsEditMode,
                             Converter={StaticResource BoolToVisibilityConverter},
                             ConverterParameter=Invert}">
-                    <Button Visibility="{Binding CurrentUser.Active, Converter={StaticResource BoolToVisibilityConverter}}"
-                        IsEnabled="{Binding CurrentUser.OrderInProgress, Mode=TwoWay, Converter={StaticResource NullToBooleanConverter}}"
+                        <Button Visibility="{Binding CurrentUser.OrderInProgress, 
+                                            Converter={StaticResource NullToVisibilityConverter},
+                                            ConverterParameter=Invert}"
                         Content="התחלת משלוח" Click="StartDelivery_Click" Style="{StaticResource UniformButton}"/>
 
                     <Button Content="עריכת פרטים" Click="EditCureier_Click" Style="{StaticResource UniformButton}"/>
                     
                     <Button Content="היסטוריית משלוחים" Click="CureierDeliveryHistory_Click" Style="{StaticResource UniformButton}"/>
                 </StackPanel>
-
+                </Border>
                 <StackPanel Grid.Row="1" 
                             Visibility="{Binding IsEditMode,
                             Converter={StaticResource BoolToVisibilityConverter}}">
