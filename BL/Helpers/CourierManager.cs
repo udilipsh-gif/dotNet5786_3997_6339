@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using System;
 
 namespace Helpers;
@@ -393,7 +394,7 @@ internal static class CourierManager
             Details = order.Details,
             Address = order.Addres,
             Distance = Tools.GetDistance(order),
-            ActualDistance = delivery.ActualDistance,
+            ActualDistance = Tools.GetActualDistance(order.Addres,(BO.TheTypeShipment) s_dal.Courier.Read(delivery.CourierId).TypeShipment),// delivery.ActualDistance,
             CustomerName = order.Name,
             CustomerPhone = order.Phone,
             OrderTime = order.OrderDate,
