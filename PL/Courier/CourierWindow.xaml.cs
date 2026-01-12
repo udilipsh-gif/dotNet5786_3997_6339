@@ -80,7 +80,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                 WorkingSince = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock()),
                 DeliveryLate = 0,
                 DeliveryOnTime = 0,
-                
+
 
             }));
 
@@ -342,9 +342,8 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     /// Used for ID and other numeric fields to prevent invalid input.
     /// </remarks>
     private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
-    {
-        e.Handled = !e.Text.All(char.IsDigit);
-    }
+        => e.Handled = !e.Text.All(char.IsDigit);
+
 }
 
 

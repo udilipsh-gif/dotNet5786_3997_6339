@@ -393,7 +393,8 @@ public static class Initialization
                 DateTime maxEndTime = delivery.Max(d => d.TimeEndDelivery) ?? DateTime.MinValue;
                 globalMaxTime = maxEndTime;
                 // קביעת הזמן החדש לזמן הסיום האחרון + 10 דק 
-                orderDate = maxEndTime.AddMinutes(10);
+                orderDate = maxEndTime.AddMinutes(s_rand.Next(10,100));
+              
             }
             else
             {

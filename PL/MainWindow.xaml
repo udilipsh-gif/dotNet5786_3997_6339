@@ -16,7 +16,11 @@
         <Style TargetType="Label" x:Key="UniformLabel">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="24"   />
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+
+
         </Style>
 
         <!-- Style for text boxes: Center-aligned vertically, stretches horizontally -->
@@ -30,6 +34,8 @@
             <Setter Property="Height" Value="Auto"/>
             <Setter Property="Background" Value="AliceBlue"/>
             <Setter Property="FontSize" Value="20"/>
+            
+
         </Style>
 
         <Style TargetType="TextBox" x:Key="UniformTextBox" BasedOn="{StaticResource CommonInputStyle}" />
@@ -47,6 +53,7 @@
         <Label Grid.Row="0" Content="חנות הספרים שלי" Style="{StaticResource UniformLabel}"/>
         <Border Grid.Row="1" Width="200" Height="250"
                 HorizontalAlignment="Center"
+                
                 VerticalAlignment="Center"
                 Background="AliceBlue">
 
@@ -59,14 +66,14 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Content=":תעודת זהות" Style="{StaticResource UniformLabel}"/>
+                <Label Grid.Row="0" Content=":תעודת זהות" FontSize="14" FontWeight="DemiBold"  Style="{StaticResource UniformLabel}"/>
                 <TextBox Grid.Row="1" 
                          Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" 
                          Style="{StaticResource UniformTextBox}"
                          MaxLength="9"
                          local:Tools.NumericOnly="True"/>
 
-                <Label Grid.Row="2" Content=":סיסמה" Style="{StaticResource UniformLabel}"/>
+                <Label Grid.Row="2" Content=":סיסמה" FontSize="14" FontWeight="DemiBold" Style="{StaticResource UniformLabel}"/>
                 <PasswordBox Grid.Row="3" 
                          x:Name="UserPasswordBox" 
                          Style="{StaticResource UniformPasswordBox}">
@@ -81,7 +88,7 @@
 
 
                 <Button Grid.Row="5" 
-                        Content="התחבר" 
+                        Content="התחבר" FontWeight="Bold" 
                         IsEnabled="{Binding LoginCommand}"
                         Command="{Binding LoginCommand}" 
                         CommandParameter="{Binding ElementName=UserPasswordBox}"

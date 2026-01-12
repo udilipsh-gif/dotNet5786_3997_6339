@@ -137,7 +137,7 @@
                                     <TextBlock Grid.Row="4" Grid.Column="0" Text="{Binding Distance, StringFormat=N3, Mode=TwoWay}" Style="{StaticResource RegularTextBlock}"/>
 
                                     <TextBlock Grid.Row="5" Grid.Column="1" Text=":מרחק בפועל" Style="{StaticResource UniformTextBlock}"/>
-                                    <TextBlock Grid.Row="5" Grid.Column="0"  Text="{Binding ActualDistance, Mode=TwoWay}" Style="{StaticResource RegularTextBlock}"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="0"  Text="{Binding ActualDistance,  StringFormat=N3, Mode=TwoWay}" Style="{StaticResource RegularTextBlock}"/>
 
                                     <TextBlock Grid.Row="6" Grid.Column="1" Text=":שם לקוח" Style="{StaticResource UniformTextBlock}"/>
                                     <TextBlock Grid.Row="6" Grid.Column="0" Text="{Binding CustomerName, Mode=TwoWay}" Style="{StaticResource RegularTextBlock}"/>
@@ -164,7 +164,7 @@
                                     <TextBlock Grid.Row="13" Grid.Column="0" Text="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}, Mode=TwoWay}" Style="{StaticResource RegularTextBlock}"/>
 
                                     <TextBlock Grid.Row="14" Grid.Column="1" Text=":סך זמן לסיום הזמנה" Style="{StaticResource UniformTextBlock}"/>
-                                    <TextBlock Grid.Row="14" Grid.Column="0" Text="{Binding TimeRemaining, Mode=TwoWay}" Style="{StaticResource RegularTextBlock}"/>
+                                    <TextBlock Grid.Row="14" Grid.Column="0" Text="{Binding TimeRemaining, StringFormat={}{0:dd\\:hh\\:mm}, Mode=TwoWay}" Style="{StaticResource RegularTextBlock}"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
