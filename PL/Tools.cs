@@ -94,6 +94,7 @@ public static class Tools
             // יצירת חלון חדש
             var newWindow = (T)Activator.CreateInstance(typeof(T), args)!;
             newWindow.Show();
+            newWindow.Activate();
         }
     }
 
