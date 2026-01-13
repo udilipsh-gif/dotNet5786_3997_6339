@@ -294,29 +294,32 @@ internal static class CourierManager
     /// </list>
     /// </remarks>
     internal static IEnumerable<BO.CourierInList> ReadAll(
-        int requesterId,
-        bool? isActive,
-        BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
+    int requesterId,
+    bool? isActive,
+    BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
-        return s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive)
-            .OrderBy(c => sort switch
-            {
-                BO.CourierFieldSort.Id => (IComparable)c.Id,
-                BO.CourierFieldSort.Name => (IComparable)c.Name,
-                BO.CourierFieldSort.Phone => (IComparable)c.Phone,
-                BO.CourierFieldSort.TypeShipment => (IComparable)c.TypeShipment,
-                _ => c.Id
-            }).Select(c => new BO.CourierInList
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Active = c.Active,
-                TypeShipment = (BO.TheTypeShipment)c.TypeShipment,
-                WorkingSince = c.WorkingSince,
-                DeliveryOnTime = s_getDeliveryOnTime(c),
-                DeliveryLate = s_getDeliveryLate(c),
-                DeliveryId = s_getOrderInProgres(c.Id)?.DeliveryId
-            });
+        var couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive);
+
+        // מיון לפי השדה הנבחר
+        var sortedCouriers = sort switch
+        {
+            BO.CourierFieldSort.Name => couriers.OrderBy(c => c.Name),
+            BO.CourierFieldSort.Phone => couriers.OrderBy(c => c.Phone),
+            BO.CourierFieldSort.TypeShipment => couriers.OrderBy(c => c.TypeShipment),
+            BO.CourierFieldSort.Id or null or _ => couriers.OrderBy(c => c.Id)
+        };
+
+        return sortedCouriers.Select(c => new BO.CourierInList
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Active = c.Active,
+            TypeShipment = (BO.TheTypeShipment)c.TypeShipment,
+            WorkingSince = c.WorkingSince,
+            DeliveryOnTime = s_getDeliveryOnTime(c),
+            DeliveryLate = s_getDeliveryLate(c),
+            DeliveryId = s_getOrderInProgres(c.Id)?.DeliveryId
+        });
     }
 
     /// <summary>
