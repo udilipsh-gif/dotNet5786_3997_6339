@@ -137,7 +137,7 @@ internal static class OrderManager
     }
 
     public static List<BO.OrderInList> ReadAll(Func<BO.OrderInList, bool>? customPredicate = null,
-    BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
+    BO.OrderInListField? orderBy = BO.OrderInListField.OrderId)
     {
         // 1. שליפה מוקדמת של כל המשלוחים (פעולת IO אחת בלבד!)
         var allDeliveries = s_dal.Delivery.ReadAll();
@@ -526,7 +526,7 @@ internal static class OrderManager
             BO.ClosedDeliveryInListField.AqualDistens => uniqueQuery.OrderBy(x => x.ActualDistens),
             BO.ClosedDeliveryInListField.DelyveryTime => uniqueQuery.OrderBy(x => x.DelyveryTime),
             BO.ClosedDeliveryInListField.EndDelivery => uniqueQuery.OrderBy(x => x.EndDelivery),
-            _ => uniqueQuery.OrderBy(x => x.OrderType) // ברירת מחדל
+            _ => uniqueQuery.OrderBy(x => x.OrderId) // ברירת מחדל
         };
 
         return [.. sortedQuery];

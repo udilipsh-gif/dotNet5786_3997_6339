@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel; 
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel; 
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
+
 
 namespace PL;
 
@@ -55,6 +47,7 @@ public partial class CourierListWindow : Window
         AddCourierCommand = new RelayCommand(_ => Add_Edit_Courier_Click(null));
 
         InitializeComponent();
+
     }
 
     /// <summary>
@@ -246,5 +239,6 @@ public partial class CourierListWindow : Window
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
+
 }
 
