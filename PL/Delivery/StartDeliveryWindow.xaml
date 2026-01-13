@@ -10,7 +10,7 @@
         Title="בחירת הזמנה"
         Loaded="StartDeliveryWindow_Loaded"
         Closed="StartDeliveryWindow_Closed"
-        Height="450" Width="720">
+        Height="450" Width="840">
     <Window.Resources>
         <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
 

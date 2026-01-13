@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace PL;
@@ -66,6 +68,7 @@ public partial class StartDeliveryWindow : Window
         Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
         UpdateOrdersList();
 
+
     }
 
     private void StartDeliveryWindow_Closed(object sender, RoutedEventArgs e)
@@ -85,7 +88,8 @@ public partial class StartDeliveryWindow : Window
     private void UpdateOrdersList()
     {
         var DeliveryList = Tools.GetSafeFromBl(() =>
-                s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null),
+                s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null)
+               .OrderByDescending(o => o.OrderId).ToList() ,
                 new List<BO.OpenOrderInList>());
 
 
