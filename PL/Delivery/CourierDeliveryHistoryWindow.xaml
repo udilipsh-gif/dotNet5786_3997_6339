@@ -123,6 +123,12 @@
 
 
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="מזהה משלוח"
+                                 Binding="{Binding DeliveryId}"
+                                 SortMemberPath="DeliveryId"
+                                 Width="Auto"
+                                 ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                 HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
                     <DataGridTextColumn Header="מזהה הזמנה"
                                  Binding="{Binding OrderId}"
                                  SortMemberPath="OrderId"
@@ -168,8 +174,8 @@
                     
 
                     <DataGridTextColumn Header="סך זמן השלמת הטיפול"
-                                     Binding="{Binding TotalTimeOfDelivery}"
-                                     SortMemberPath="TotalTimeOfDelivery"
+                                     Binding="{Binding DelyveryTime, Converter={StaticResource TimeSpanConverter}}"
+                                     SortMemberPath="DelyveryTime"
                                      Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                      HeaderStyle="{StaticResource WrappedHeaderStyle}"/>

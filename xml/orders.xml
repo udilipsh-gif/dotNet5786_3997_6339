@@ -225,22 +225,6 @@
     <DistanceKmWalk>1975</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100019</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 18</Details>
-    <Addres> הרצל 60, ראשון לציון</Addres>
-    <Latitude>31.9656402</Latitude>
-    <Longitude>34.8025163</Longitude>
-    <Name>Customer18</Name>
-    <Phone>0513832234</Phone>
-    <Weight>13</Weight>
-    <OrderDate>2026-01-13T16:03:23.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>14.36037775321585</DistanceKm>
-    <DistanceKmRoad>19145</DistanceKmRoad>
-    <DistanceKmWalk>18843</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100042</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 41</Details>
@@ -609,22 +593,6 @@
     <DistanceKmWalk>11734</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100029</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 28</Details>
-    <Addres> העצמאות 15, יהוד</Addres>
-    <Latitude>32.0745531</Latitude>
-    <Longitude>34.8811245</Longitude>
-    <Name>Customer28</Name>
-    <Phone>0502102170</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-01-11T16:03:23.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>5.876827277945478</DistanceKm>
-    <DistanceKmRoad>11185</DistanceKmRoad>
-    <DistanceKmWalk>7358</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100037</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 36</Details>
@@ -799,5 +767,37 @@
     <DistanceKm>1.7987018468542617</DistanceKm>
     <DistanceKmRoad>2233</DistanceKmRoad>
     <DistanceKmWalk>2159</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100019</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 18</Details>
+    <Addres> הרצל 60, ראשון לציון</Addres>
+    <Latitude>31.9656402</Latitude>
+    <Longitude>34.8025163</Longitude>
+    <Name>Customer18</Name>
+    <Phone>0513832234</Phone>
+    <Weight>13</Weight>
+    <OrderDate>2026-01-13T16:03:23.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>14.36037775321585</DistanceKm>
+    <DistanceKmRoad>19145</DistanceKmRoad>
+    <DistanceKmWalk>18843</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100029</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 28</Details>
+    <Addres> העצמאות 15, יהוד</Addres>
+    <Latitude>32.0745531</Latitude>
+    <Longitude>34.8811245</Longitude>
+    <Name>Customer28</Name>
+    <Phone>0502102170</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-11T16:03:23.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>5.876827277945478</DistanceKm>
+    <DistanceKmRoad>11185</DistanceKmRoad>
+    <DistanceKmWalk>7358</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

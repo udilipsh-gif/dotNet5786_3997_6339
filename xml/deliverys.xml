@@ -520,4 +520,24 @@
     <EndDelivery>DELIVERED</EndDelivery>
     <TimeEndDelivery>2026-01-31T18:34:23.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200053</Id>
+    <OrderId>100019</OrderId>
+    <CourierId>240456213</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-01-31T18:34:23.0000000</OrderDate>
+    <ActualDistance>19.145</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2026-01-31T20:34:23.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200054</Id>
+    <OrderId>100029</OrderId>
+    <CourierId>240456213</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-01-31T20:34:23.0000000</OrderDate>
+    <ActualDistance>11.185</ActualDistance>
+    <EndDelivery>DELIVERED</EndDelivery>
+    <TimeEndDelivery>2026-01-31T21:34:23.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
