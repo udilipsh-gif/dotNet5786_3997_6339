@@ -65,22 +65,6 @@
     <DistanceKmWalk>3252</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100046</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 45</Details>
-    <Addres> רמב''ם 10, גבעתיים</Addres>
-    <Latitude>32.0700634</Latitude>
-    <Longitude>34.8038533</Longitude>
-    <Name>Customer45</Name>
-    <Phone>0568288447</Phone>
-    <Weight>4</Weight>
-    <OrderDate>2026-01-11T17:15:58.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>3.177520887212316</DistanceKm>
-    <DistanceKmRoad>4371</DistanceKmRoad>
-    <DistanceKmWalk>3933</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100018</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 17</Details>
@@ -753,22 +737,6 @@
     <DistanceKmWalk>1697</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100024</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 23</Details>
-    <Addres> סוקולוב 20, רמת השרון</Addres>
-    <Latitude>32.1398478</Latitude>
-    <Longitude>34.8362248</Longitude>
-    <Name>Customer23</Name>
-    <Phone>0539327923</Phone>
-    <Weight>5</Weight>
-    <OrderDate>2026-01-10T17:15:58.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>5.290282870925684</DistanceKm>
-    <DistanceKmRoad>6149</DistanceKmRoad>
-    <DistanceKmWalk>6062</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100045</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 44</Details>
@@ -831,5 +799,37 @@
     <DistanceKm />
     <DistanceKmRoad />
     <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100046</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 45</Details>
+    <Addres> רמב''ם 10, גבעתיים</Addres>
+    <Latitude>32.0700634</Latitude>
+    <Longitude>34.8038533</Longitude>
+    <Name>Customer45</Name>
+    <Phone>0568288447</Phone>
+    <Weight>4</Weight>
+    <OrderDate>2026-01-11T17:15:58.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm>3.177520887212316</DistanceKm>
+    <DistanceKmRoad>4371</DistanceKmRoad>
+    <DistanceKmWalk>3933</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100024</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 23</Details>
+    <Addres> סוקולוב 20, רמת השרון</Addres>
+    <Latitude>32.1398478</Latitude>
+    <Longitude>34.8362248</Longitude>
+    <Name>Customer23</Name>
+    <Phone>0539327923</Phone>
+    <Weight>5</Weight>
+    <OrderDate>2026-01-10T17:15:58.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm>5.290282870925684</DistanceKm>
+    <DistanceKmRoad>6149</DistanceKmRoad>
+    <DistanceKmWalk>6062</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

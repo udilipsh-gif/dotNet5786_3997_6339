@@ -168,7 +168,8 @@ public partial class CourierListWindow : Window
 
         // Call business layer to get the filtered courier list
         var newList = Tools.GetSafeFromBl(() => 
-                s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id).Where(e => e.Id != 0),
+                s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive,
+                BO.CourierFieldSort.Id).Where(e => e.Id != 0),
                 new List<BO.CourierInList>());
 
         if (CourierInList == null)

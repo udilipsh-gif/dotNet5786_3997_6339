@@ -620,4 +620,34 @@
     <EndDelivery>DELIVERED</EndDelivery>
     <TimeEndDelivery>2026-02-09T14:14:58.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200065</Id>
+    <OrderId>100046</OrderId>
+    <CourierId>45</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-02-09T14:14:58.0000000</OrderDate>
+    <ActualDistance>4.371</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2026-02-09T14:14:58.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200066</Id>
+    <OrderId>100024</OrderId>
+    <CourierId>45</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-02-09T14:14:58.0000000</OrderDate>
+    <ActualDistance>6.149</ActualDistance>
+    <EndDelivery>FAILED</EndDelivery>
+    <TimeEndDelivery>2026-02-09T14:14:58.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200067</Id>
+    <OrderId>100024</OrderId>
+    <CourierId>45</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-02-09T14:14:58.0000000</OrderDate>
+    <ActualDistance>6.149</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2026-02-09T14:14:58.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>

@@ -96,8 +96,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
             (SelectedOrderStatusFilter == null || order.OrderStatus == SelectedOrderStatusFilter);
 
         var filteredResults = Tools.GetSafeFromBl<IEnumerable<BO.OrderInList>>(() =>
-            s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId)
-            .OrderByDescending(o => o.OrderId).ToList(),
+            s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId),
             new List<BO.OrderInList>()
         );
 

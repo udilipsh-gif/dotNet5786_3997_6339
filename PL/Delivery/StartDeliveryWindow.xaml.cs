@@ -89,8 +89,7 @@ public partial class StartDeliveryWindow : Window
     private void UpdateOrdersList()
     {
         var DeliveryList = Tools.GetSafeFromBl(() =>
-                s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null)
-               .OrderByDescending(o => o.OrderId).ToList() ,
+                s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null),
                 new List<BO.OpenOrderInList>());
 
 
