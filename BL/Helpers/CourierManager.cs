@@ -1,6 +1,4 @@
-﻿using BO;
-using DalApi;
-using System;
+﻿using DalApi;
 
 namespace Helpers;
 
@@ -225,16 +223,17 @@ internal static class CourierManager
     /// </remarks>
     internal static void Delete(int id)
     {
-        DO.Courier? courier = s_dal.Courier.Read(id);
-        if (courier == null)
-            throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist, you can't delete");
+        DO.Courier? courier = s_dal.Courier.Read(id)
+            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist, you can't delete");
+        // if (courier == null)
+
 
         //IEnumerable<DO.Delivery> activeDeliveries = s_dal.Delivery.ReadAll(d =>
         //d.CourierId == id &&
         //(d.EndDelivery == null || d.EndDelivery != DO.EndDelivery.DELIVERED)
         //);
         //if (activeDeliveries.Any())
-        //throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
+        //    throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
 
         //IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
         //    d.CourierId == id
@@ -254,11 +253,11 @@ internal static class CourierManager
         if (courierDeliveries.Any())
         {
 
-            bool hasActiveDelivery = courierDeliveries.Any(d =>
-            {
-                var order = s_dal.Order.Read(d.OrderId);
-                return order?.OrderStatus == DO.OrderStatus.DELIVERING;
-            });
+            bool hasActiveDelivery =// courierDeliveries.Any(d => s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING);
+                (from delivery in courierDeliveries
+                 let d = s_dal.Order.Read(delivery.Id)
+                 where d != null && d.OrderStatus == DO.OrderStatus.DELIVERING
+                 select d).Any();
 
             if (hasActiveDelivery)
                 throw new BO.BlInvalidOperationException(" .קיים משלוח פעיל לשליח זה");
@@ -394,7 +393,7 @@ internal static class CourierManager
             Details = order.Details,
             Address = order.Addres,
             Distance = Tools.GetDistance(order),
-            ActualDistance = Tools.GetActualDistance(order.Addres,(BO.TheTypeShipment) s_dal.Courier.Read(delivery.CourierId).TypeShipment),// delivery.ActualDistance,
+            ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)s_dal.Courier.Read(delivery.CourierId)!.TypeShipment),// delivery.ActualDistance,
             CustomerName = order.Name,
             CustomerPhone = order.Phone,
             OrderTime = order.OrderDate,
