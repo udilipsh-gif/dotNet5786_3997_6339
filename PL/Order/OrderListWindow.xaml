@@ -167,14 +167,14 @@
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                     <DataGridTextColumn Header="זמן לסיום"
-                                    Binding="{Binding TimeLeftForDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                    Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}"
                                     SortMemberPath="TimeLeftForDelivery"
                                     Width="Auto"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                     <DataGridTextColumn Header="סך זמן השלמת הטיפול"
-                                        Binding="{Binding TotalTimeOfDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                        Binding="{Binding TotalTimeOfDelivery, Converter={StaticResource TimeSpanConverter}}"
                                         SortMemberPath="TotalTimeOfDelivery"
                                         Width="Auto"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"

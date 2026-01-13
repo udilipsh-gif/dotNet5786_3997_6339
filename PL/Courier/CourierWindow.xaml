@@ -7,10 +7,10 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         mc:Ignorable="d"
         Title="שליח בודד"
-        Height="520" Width="600"
+        Height="600" Width="600"
         Loaded="CourierWindow_Loaded"
         Closed="CourierWindow_Closed"
-        MinHeight="700" MinWidth="600">
+        MinHeight="600" MinWidth="600">
 
     <Window.Resources>
         <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
@@ -60,13 +60,11 @@
         
     </Window.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
-        <Grid Grid.Column="0" Background="#F5F5F5">
+        <Grid Background="#F5F5F5" 
+              Visibility="{Binding CurrentCourier.OrderInProgress, 
+                      Converter={StaticResource NullToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -173,95 +171,93 @@
             </ScrollViewer>
         </Grid>
 
-        <ScrollViewer Grid.Column="1" Padding="10">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+        <Grid Width="Auto">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="{Binding IsUpdateMode}" Text="{Binding CurrentCourier.Id, Mode=TwoWay}" 
+            <TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="{Binding IsUpdateMode}" Text="{Binding CurrentCourier.Id, Mode=TwoWay}" 
                          PreviewTextInput="NumberValidationTextBox" MaxLength="9"  Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="0" Grid.Column="1" Content=":.ת.ז" Style="{StaticResource UniformLabel}"/>
+            <Label Grid.Row="0" Grid.Column="1" Content=":.ת.ז" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding CurrentCourier.Name, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="1" Grid.Column="1" Content=":שם" Style="{StaticResource UniformLabel}"/>
+            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding CurrentCourier.Name, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="1" Grid.Column="1" Content=":שם" Style="{StaticResource UniformLabel}"/>
 
-                <PasswordBox Grid.Row="2" Grid.Column="0" DataContext="{Binding CurrentCourier.Password, Mode=TwoWay}"
+            <PasswordBox Grid.Row="2" Grid.Column="0" DataContext="{Binding CurrentCourier.Password, Mode=TwoWay}"
                              PasswordChanged="PasswordChanged" Style="{StaticResource UniformPasswordBox}"/>
-                <Label Grid.Row="2" Grid.Column="1" Content=":סיסמה" Style="{StaticResource UniformLabel}"/>
+            <Label Grid.Row="2" Grid.Column="1" Content=":סיסמה" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding CurrentCourier.Phone, Mode=TwoWay}"
+            <TextBox Grid.Row="3" Grid.Column="0" Text="{Binding CurrentCourier.Phone, Mode=TwoWay}"
                          PreviewTextInput="NumberValidationTextBox" MaxLength="10" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="3" Grid.Column="1" Content=":טלפון" Style="{StaticResource UniformLabel}"/>
+            <Label Grid.Row="3" Grid.Column="1" Content=":טלפון" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding CurrentCourier.Email, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="4" Grid.Column="1" Content=":דוא״ל" Style="{StaticResource UniformLabel}"/>
+            <TextBox Grid.Row="4" Grid.Column="0" Text="{Binding CurrentCourier.Email, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="4" Grid.Column="1" Content=":דוא״ל" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}"
+            <TextBox Grid.Row="5" Grid.Column="0" Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}"
                          PreviewTextInput="NumberValidationTextBox" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="5" Grid.Column="1" Content=":מרחק מקסימלי לשילוח" Style="{StaticResource UniformLabel}"/>
+            <Label Grid.Row="5" Grid.Column="1" Content=":מרחק מקסימלי לשילוח" Style="{StaticResource UniformLabel}"/>
 
-                <ComboBox Grid.Row="6" Grid.Column="0" ItemsSource="{Binding VehicleTypesList}" 
+            <ComboBox Grid.Row="6" Grid.Column="0" ItemsSource="{Binding VehicleTypesList}" 
                           SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}" 
                           Style="{StaticResource UniformComboBox}"/>
-                <Label Grid.Row="6" Grid.Column="1" Content=":סוג התניידות" Style="{StaticResource UniformLabel}"/>
+            <Label Grid.Row="6" Grid.Column="1" Content=":סוג התניידות" Style="{StaticResource UniformLabel}"/>
 
-                <CheckBox Grid.Row="7" Grid.Column="0" IsChecked="{Binding CurrentCourier.Active, Mode=TwoWay}" Style="{StaticResource UniformCheckBox}"/>
-                <Label Grid.Row="7" Grid.Column="1" Content=":סטטוס שליח" Style="{StaticResource UniformLabel}"/>
+            <CheckBox Grid.Row="7" Grid.Column="0" IsChecked="{Binding CurrentCourier.Active, Mode=TwoWay}" Style="{StaticResource UniformCheckBox}"/>
+            <Label Grid.Row="7" Grid.Column="1" Content=":סטטוס שליח" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="8" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.WorkingSince, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="8" Grid.Column="1" Content=":פעיל החל מ" Style="{StaticResource UniformLabel}"/>
+            <TextBox Grid.Row="8" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.WorkingSince, StringFormat='{}{0:dd.MM.yyyy}', Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="8" Grid.Column="1" Content=":פעיל החל מ" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="9" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.DeliveryOnTime, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="9" Grid.Column="1" Content=":מספר משלוחים בזמן" Style="{StaticResource UniformLabel}"/>
+            <TextBox Grid.Row="9" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.DeliveryOnTime, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="9" Grid.Column="1" Content=":מספר משלוחים בזמן" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="10" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.DeliveryLate, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="10" Grid.Column="1" Content=":מספר משלוחים באיחור" Style="{StaticResource UniformLabel}"/>
+            <TextBox Grid.Row="10" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.DeliveryLate, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="10" Grid.Column="1" Content=":מספר משלוחים באיחור" Style="{StaticResource UniformLabel}"/>
 
-                <TextBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.OrderInProgress.OrderId, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
-                <Label Grid.Row="11" Grid.Column="1" Content=":מספר משלוח נוכחי" Style="{StaticResource UniformLabel}"/>
+            <TextBox Grid.Row="11" Grid.Column="0" IsReadOnly="True" Text="{Binding CurrentCourier.OrderInProgress.OrderId, Mode=TwoWay}" Style="{StaticResource UniformTextBox}"/>
+            <Label Grid.Row="11" Grid.Column="1" Content=":מספר משלוח נוכחי" Style="{StaticResource UniformLabel}"/>
 
-                <StackPanel Grid.Row="12"
+            <StackPanel Grid.Row="12"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     Margin="5">
 
-                    <Button Content="{Binding ButtonText}"
+                <Button Content="{Binding ButtonText}"
                         Click="btnAddUpdate_Click"
                         Height="30"
                         Width="100"
                         Margin="5"/>
 
-                    <Button Content="מחיקה"
+                <Button Content="מחיקה"
                         Click="btnDelete_Click"
                         Height="30"
                         Width="100"
                         Margin="5"
                         Background="Red"
                         Visibility="{Binding DeleteButtonVisibility}"/>
-                </StackPanel>
-            </Grid>
-        </ScrollViewer>
-    </Grid>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
 </Window>
 
 

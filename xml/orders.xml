@@ -321,22 +321,6 @@
     <DistanceKmWalk>5893</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100030</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 29</Details>
-    <Addres> אבא הלל 15, רמת גן</Addres>
-    <Latitude>32.085569</Latitude>
-    <Longitude>34.803969</Longitude>
-    <Name>Customer29</Name>
-    <Phone>0530302544</Phone>
-    <Weight>5</Weight>
-    <OrderDate>2026-01-11T16:03:23.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>1.9993763015851111</DistanceKm>
-    <DistanceKmRoad>2578</DistanceKmRoad>
-    <DistanceKmWalk>2267</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100048</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 47</Details>
@@ -561,22 +545,6 @@
     <DistanceKmWalk>7016</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100023</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 22</Details>
-    <Addres> סלומון 12, פתח תקווה</Addres>
-    <Latitude>32.0846599</Latitude>
-    <Longitude>34.8805418</Longitude>
-    <Name>Customer22</Name>
-    <Phone>0548295783</Phone>
-    <Weight>9</Weight>
-    <OrderDate>2026-01-13T16:03:23.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>5.516596018444514</DistanceKm>
-    <DistanceKmRoad>8231</DistanceKmRoad>
-    <DistanceKmWalk>6309</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100006</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 5</Details>
@@ -799,5 +767,53 @@
     <DistanceKm>5.876827277945478</DistanceKm>
     <DistanceKmRoad>11185</DistanceKmRoad>
     <DistanceKmWalk>7358</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100023</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 22</Details>
+    <Addres> סלומון 12, פתח תקווה</Addres>
+    <Latitude>32.0846599</Latitude>
+    <Longitude>34.8805418</Longitude>
+    <Name>Customer22</Name>
+    <Phone>0548295783</Phone>
+    <Weight>9</Weight>
+    <OrderDate>2026-01-13T16:03:23.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>5.516596018444514</DistanceKm>
+    <DistanceKmRoad>8231</DistanceKmRoad>
+    <DistanceKmWalk>6309</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100030</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 29</Details>
+    <Addres> אבא הלל 15, רמת גן</Addres>
+    <Latitude>32.085569</Latitude>
+    <Longitude>34.803969</Longitude>
+    <Name>Customer29</Name>
+    <Phone>0530302544</Phone>
+    <Weight>5</Weight>
+    <OrderDate>2026-01-11T16:03:23.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
+    <DistanceKm>1.9993763015851111</DistanceKm>
+    <DistanceKmRoad>2578</DistanceKmRoad>
+    <DistanceKmWalk>2267</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100051</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>555555</Details>
+    <Addres>בן יעקב 7 בני ברק</Addres>
+    <Latitude>32.0658706</Latitude>
+    <Longitude>34.7971926</Longitude>
+    <Name>nav jhho</Name>
+    <Phone>123456789</Phone>
+    <Weight>0</Weight>
+    <OrderDate>2026-01-31T21:34:23.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm>3.9253119521470916</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
   </Order>
 </ArrayOfOrder>
