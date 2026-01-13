@@ -1,6 +1,4 @@
-﻿using BO;
-using DalApi;
-using DO;
+﻿using DalApi;
 using System;
 using System.Net.Mail;
 
@@ -90,7 +88,7 @@ internal static class OrderManager
 
         if (string.IsNullOrEmpty(boOrder.Addres))
             throw new BO.BlInvalidValueException("Order address cannot be empty.");
-       
+
         if (string.IsNullOrEmpty(boOrder.Details))
             throw new BO.BlInvalidValueException("Order details cannot be empty.");
 
@@ -289,7 +287,7 @@ internal static class OrderManager
         if (string.IsNullOrEmpty(boOrder.Details))
             throw new BO.BlInvalidValueException("Order details cannot be empty.");
 
-             
+
 
 
         var adressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
@@ -323,9 +321,9 @@ internal static class OrderManager
         //{
 
         //}
-        
-           
-        
+
+
+
     }
 
     /// <summary>
@@ -399,7 +397,7 @@ internal static class OrderManager
                     TimeEndDelivery = AdminManager.Now
                 });
 
-              
+
 
                 var courier = s_dal.Courier.Read(delivery.CourierId)
                      ?? throw new BO.BlDoesNotExistException("Courier not found");
@@ -411,7 +409,7 @@ internal static class OrderManager
                         $"הזמנה מספר {orderId} בוטלה על ידי המנהל"
                     );
                 }
-                catch (SmtpException )
+                catch (SmtpException)
                 {
                     // Log the exception or handle it as needed
                     throw new SmtpException($" שליחת מייל נכשלה:");
@@ -526,7 +524,7 @@ internal static class OrderManager
             BO.ClosedDeliveryInListField.EndDelivery => uniqueQuery.OrderBy(x => x.EndDelivery),
             _ => uniqueQuery.OrderBy(x => x.OrderType) // ברירת מחדל
         };
-       
+
         return [.. sortedQuery];
     }
 
@@ -551,9 +549,35 @@ internal static class OrderManager
         DO.Courier doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
+        IEnumerable<DO.TypeOfOrder> permittedOrders = doCourier.TypeShipment switch
+        {
+            DO.TheTypeShipment.BIKE or DO.TheTypeShipment.FOOT =>
+                new[] { DO.TypeOfOrder.STANDART },
+
+            DO.TheTypeShipment.CAR =>
+                new[] { DO.TypeOfOrder.STANDART, DO.TypeOfOrder.FAST_DELIVERY },
+
+            DO.TheTypeShipment.MOTORCYCLE =>
+                new[] { DO.TypeOfOrder.STANDART, DO.TypeOfOrder.FAST_DELIVERY, DO.TypeOfOrder.DELIVER_IMMEDIATELY },
+
+            _ => Array.Empty<DO.TypeOfOrder>() // ברירת מחדל ליתר ביטחון
+        };
+
+        Func<DO.Order, bool> toFilter = (order) =>
+        {
+            // בדיקה א': האם השליח בכלל יכול לקחת הזמנה כזו?
+            bool isAllowedForCourier = permittedOrders.Contains(order.TypeOfOrder);
+
+            // בדיקה ב': האם זה תואם לפילטר שהמשתמש ביקש? (אם הפילטר ריק - הכל עובר)
+            bool matchesUserRequest = (filter == null) || (order.TypeOfOrder == (DO.TypeOfOrder)filter);
+
+            // מחזירים אמת רק אם שני התנאים מתקיימים
+            return isAllowedForCourier && matchesUserRequest;
+        };
+
         var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
                     let distense = Tools.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)
-                    where ((filter == null || (BO.TypeOfOrder)doOrder.TypeOfOrder == filter) && (distense <= doCourier.MaxDistanceDelivery))
+                    where (toFilter(doOrder) && (distense <= doCourier.MaxDistanceDelivery))
                     select new BO.OpenOrderInList
                     {
                         OrderId = doOrder.Id,
@@ -580,55 +604,55 @@ internal static class OrderManager
             BO.OpenOrderInListField.ScheduleStatus => query.OrderBy(x => x.ScheduleStatus),
             BO.OpenOrderInListField.TimeLeftForDelivery => query.OrderBy(x => x.TimeLeftForDelivery),
             BO.OpenOrderInListField.MaxDeliveryTime => query.OrderBy(x => x.MaxDeliveryTime),
-            _ => query.OrderBy(x => x.ScheduleStatus) // ברירת מחדל
+            _ => query.OrderBy(x => x.OrderId) // ברירת מחדל
         };
 
         return [.. sortedQuery];
     }
 
-    /// <summary>
-    /// Converts a data layer order to a business logic OrderInList object.
-    /// </summary>
-    /// <param name="doOrder">The data layer order to convert.</param>
-    /// <returns>
-    /// An OrderInList object with calculated fields including status, distance,
-    /// timing information, and delivery attempt count.
-    /// </returns>
-    /// <remarks>
-    /// This helper method enriches the order with calculated properties such as
-    /// order status (considering the most recent delivery), schedule status,
-    /// time remaining, and number of delivery attempts.
-    /// </remarks>
-    private static BO.OrderInList s_convertToBoOrderInList(DO.Order doOrder)
-    {
-        DO.Delivery? delivery = (from d in s_dal.Delivery?.ReadAll()
-                                 where d.OrderId == doOrder.Id
-                                 orderby d.Id descending
-                                 select d).FirstOrDefault();
+    ///// <summary>
+    ///// Converts a data layer order to a business logic OrderInList object.
+    ///// </summary>
+    ///// <param name="doOrder">The data layer order to convert.</param>
+    ///// <returns>
+    ///// An OrderInList object with calculated fields including status, distance,
+    ///// timing information, and delivery attempt count.
+    ///// </returns>
+    ///// <remarks>
+    ///// This helper method enriches the order with calculated properties such as
+    ///// order status (considering the most recent delivery), schedule status,
+    ///// time remaining, and number of delivery attempts.
+    ///// </remarks>
+    //private static BO.OrderInList s_convertToBoOrderInList(DO.Order doOrder)
+    //{
+    //    DO.Delivery? delivery = (from d in s_dal.Delivery?.ReadAll()
+    //                             where d.OrderId == doOrder.Id
+    //                             orderby d.Id descending
+    //                             select d).FirstOrDefault();
 
-        //var orderStatus = Tools.GetOrderStatus(doOrder, delivery);
-        var orderStatus = (BO.OrderStatus)doOrder.OrderStatus;
+    //    //var orderStatus = Tools.GetOrderStatus(doOrder, delivery);
+    //    var orderStatus = (BO.OrderStatus)doOrder.OrderStatus;
 
-        var distanceKm = doOrder.DistanceKm;
-        if(distanceKm == null || distanceKm == 0)
-        {
-            distanceKm = Tools.GetDistance(doOrder);
-            s_dal.Order.Update(doOrder with { DistanceKm = distanceKm });
-        }
+    //    var distanceKm = doOrder.DistanceKm;
+    //    if(distanceKm == null || distanceKm == 0)
+    //    {
+    //        distanceKm = Tools.GetDistance(doOrder);
+    //        s_dal.Order.Update(doOrder with { DistanceKm = distanceKm });
+    //    }
 
-            return new BO.OrderInList
-            {
-                DeliveryId = delivery?.Id,
-                OrderId = doOrder.Id,
-                TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
-                DistanceKm = (double)distanceKm,
-                OrderStatus = orderStatus,
-                ScheduleStatus = Tools.GetScheduleStatus(doOrder, delivery),
-                TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
-                TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, delivery),
-                NumberOfDeliveryAttempts = Tools.GetCuntOfDelivery(doOrder.Id)
-            };
-    }
+    //        return new BO.OrderInList
+    //        {
+    //            DeliveryId = delivery?.Id,
+    //            OrderId = doOrder.Id,
+    //            TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
+    //            DistanceKm = (double)distanceKm,
+    //            OrderStatus = orderStatus,
+    //            ScheduleStatus = Tools.GetScheduleStatus(doOrder, delivery),
+    //            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
+    //            TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, delivery),
+    //            NumberOfDeliveryAttempts = Tools.GetCuntOfDelivery(doOrder.Id)
+    //        };
+    //}
 
     /// <summary>
     /// Creates a filter predicate function based on the specified field and value.

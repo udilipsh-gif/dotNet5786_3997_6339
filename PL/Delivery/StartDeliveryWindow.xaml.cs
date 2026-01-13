@@ -16,50 +16,23 @@ public partial class StartDeliveryWindow : Window
 
     public int courierId { get; private init; }
 
-    public ICommand SelectOrderCommand { get; private set; }
-
-    public IEnumerable<Tools.SelectionItem> EnumForSoring
+    public IEnumerable<Tools.SelectionItem> EnumTypeOfOrder
     {
-        get => Tools.GetEnumList<BO.TypeOfOrder>("הכל");
+        get => (IEnumerable<Tools.SelectionItem>)GetValue(EnumTypeOfOrderProperty);
+        set => SetValue(EnumTypeOfOrderProperty, value);
     }
 
-
-
-    public BO.OpenOrderInListField SelctedSort
-    {
-        get => (BO.OpenOrderInListField)GetValue(SelctedSortProperty);
-        set => SetValue(SelctedSortProperty, value);
-    }
-
-    public static readonly DependencyProperty SelctedSortProperty =
-        DependencyProperty.Register("SelctedSort", typeof(BO.OpenOrderInListField),
+    public static readonly DependencyProperty EnumTypeOfOrderProperty =
+        DependencyProperty.Register(nameof(EnumTypeOfOrder), typeof(IEnumerable<Tools.SelectionItem>),
             typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
-   // public BO.OrderStatus SelectedOrderStatusFilter
-   // {
-   //     get => (BO.OrderStatus)GetValue(SelectedOrderStatusFilterProperty);
-   //     set => SetValue(SelectedOrderStatusFilterProperty, value);
-   // }
-   // public static readonly DependencyProperty SelectedOrderStatusFilterProperty =
-   //     DependencyProperty.Register("SelectedOrderStatusFilter", typeof(BO.OrderStatus?),
-   //         typeof(StartDeliveryWindow), new PropertyMetadata(null));
-
-   //public static IEnumerable<BO.OrderStatus> OrderStatusFilterOptions
-   // {
-   //     get => Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>();
-   // }
-
-    public BO.TypeOfOrder? SelctedFilter
+    public BO.TypeOfOrder? SelectedFilter
     {
-        get => (BO.TypeOfOrder?)GetValue(SelctedFilterProperty);
-        set
-        { 
-            SetValue(SelctedFilterProperty, value); 
-            UpdateOrdersList(); 
-        }
+        get => (BO.TypeOfOrder?)GetValue(SelectedFilterProperty);
+        set => SetValue(SelectedFilterProperty, value);
     }
-    public static readonly DependencyProperty SelctedFilterProperty =
-        DependencyProperty.Register("SelctedFilter", typeof(BO.TypeOfOrder?),
+    public static readonly DependencyProperty SelectedFilterProperty =
+        DependencyProperty.Register(nameof(SelectedFilter), typeof(BO.TypeOfOrder?),
             typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
     public ObservableCollection<BO.OpenOrderInList> DeliveryListView
@@ -73,14 +46,13 @@ public partial class StartDeliveryWindow : Window
         typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
 
-    public StartDeliveryWindow(int userId, int courierId)
+    public StartDeliveryWindow(int userId, int courierId, IEnumerable<Tools.SelectionItem>? enumTypeOfOrder)
     {
         this.UserId = userId;
 
         this.courierId = courierId;
 
-        // אתחול ה-Command לפני InitializeComponent
-        SelectOrderCommand = new RelayCommand<BO.OpenOrderInList>(ExecuteSelectOrder, CanSelectOrder);
+        this.EnumTypeOfOrder = enumTypeOfOrder ?? new List<Tools.SelectionItem>();
 
         InitializeComponent();
     }
@@ -108,8 +80,8 @@ public partial class StartDeliveryWindow : Window
 
     private void UpdateOrdersList()
     {
-        var DeliveryList = Tools.GetSafeFromBl(() =>  
-                s_bl.Order.GetOpen(UserId, courierId, SelctedFilter, SelctedSort),
+        var DeliveryList = Tools.GetSafeFromBl(() => 
+                s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null),
                 new List<BO.OpenOrderInList>());
 
         
@@ -127,30 +99,30 @@ public partial class StartDeliveryWindow : Window
         }
     }
 
-    private bool CanSelectOrder(BO.OpenOrderInList? selectedOrder)
+    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        => UpdateOrdersList();
+
+    private void CollectOrder_Click(object sender, RoutedEventArgs e)
     {
-        // תמיד מאפשר ביצוע אם יש הזמנה נבחרת
-        return selectedOrder != null;
-    }
-
-    private void ExecuteSelectOrder(BO.OpenOrderInList? selectedOrder)
-    {
-        try
+        if (sender is Button button && button.DataContext is BO.OpenOrderInList selectedOrder)
         {
-            if (selectedOrder == null)
-                throw new BO.BlInvalidOperationException("סיבת סיום המשלוח לא תקפה");
+            try
+            {
+                if (selectedOrder == null)
+                    throw new BO.BlInvalidOperationException("סיבת סיום המשלוח לא תקפה");
 
-            Tools.RunSafe(() =>  s_bl.Order.StartDelivery(UserId, courierId, selectedOrder.OrderId));
+                s_bl.Order.StartDelivery(UserId, courierId, selectedOrder.OrderId);
 
-            MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
-                MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
 
-            this.Close();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"שגיאה בהתחלת המשלוח: {ex.Message}", "שגיאה",
-                MessageBoxButton.OK, MessageBoxImage.Error);
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"שגיאה בהתחלת המשלוח: {ex.Message}", "שגיאה",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 

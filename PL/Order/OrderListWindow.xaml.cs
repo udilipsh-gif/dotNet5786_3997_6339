@@ -54,11 +54,9 @@ public partial class OrderListWindow : Window, IWindowUpdater
     /// </summary>
     public BO.ScheduleStatus? SelectedScheduleFilter
     {
-        get { return (BO.ScheduleStatus?)GetValue(SelectedScheduleFilterProperty); }
-        set
-        {
-            SetValue(SelectedScheduleFilterProperty, value);
-        }
+        get => (BO.ScheduleStatus?)GetValue(SelectedScheduleFilterProperty); 
+        set => SetValue(SelectedScheduleFilterProperty, value);
+        
     }
 
     public static readonly DependencyProperty SelectedScheduleFilterProperty =
@@ -70,12 +68,8 @@ public partial class OrderListWindow : Window, IWindowUpdater
     /// </summary>
     public BO.TypeOfOrder? SelectedTypeFilter
     {
-        get { return (BO.TypeOfOrder?)GetValue(SelectedTypeFilterProperty); }
-        set
-        {
-            SetValue(SelectedTypeFilterProperty, value);
-            LoadOrders(); // ריענון אוטומטי
-        }
+        get => (BO.TypeOfOrder?)GetValue(SelectedTypeFilterProperty);
+        set =>  SetValue(SelectedTypeFilterProperty, value);
     }
 
     public static readonly DependencyProperty SelectedTypeFilterProperty =
@@ -86,12 +80,8 @@ public partial class OrderListWindow : Window, IWindowUpdater
     /// </summary>
     public BO.OrderStatus? SelectedOrderStatusFilter
     {
-        get { return (BO.OrderStatus?)GetValue(SelectedOrderStatusFilterProperty); }
-        set
-        {
-            SetValue(SelectedOrderStatusFilterProperty, value);
-            LoadOrders(); // ריענון אוטומטי
-        }
+        get => (BO.OrderStatus?)GetValue(SelectedOrderStatusFilterProperty); 
+        set =>  SetValue(SelectedOrderStatusFilterProperty, value);
     }
 
     public static readonly DependencyProperty SelectedOrderStatusFilterProperty =
