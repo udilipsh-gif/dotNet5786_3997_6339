@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
+using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Data;
 
@@ -48,11 +50,19 @@ public class NullToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        bool isNullOrEmpty = value == null;
+        
+        // בדיקה אם זו רשימה ריקה
+        if (!isNullOrEmpty && value is ICollection collection)
+        {
+            isNullOrEmpty = collection.Count == 0;
+        }
+
         if (parameter != null && parameter.ToString() == "Invert")
         {
-            return value == null ? Visibility.Visible : Visibility.Collapsed;
+            return isNullOrEmpty ? Visibility.Visible : Visibility.Collapsed;
         }
-        return value != null ? Visibility.Visible : Visibility.Collapsed;
+        return isNullOrEmpty ? Visibility.Collapsed : Visibility.Visible;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -237,6 +247,40 @@ public class TimeSpanToShortStringConverter : IValueConverter
             return $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}";
         }
         return string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class NullToSizeConverter : IValueConverter
+{
+    public double NullSize { get; set; }
+    public double NotNullSize { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        // בדיקה אם הערך הוא Null
+        if (value == null)
+        {
+            return NullSize;
+        }
+
+        // בדיקה אם זו רשימה ריקה
+        if (value is ICollection collection && collection.Count == 0)
+        {
+            return NullSize;
+        }
+
+        // אופציונלי: אם זה סטרינג ריק
+        if (value is string str && string.IsNullOrEmpty(str))
+        {
+            return NullSize;
+        }
+
+        return NotNullSize;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

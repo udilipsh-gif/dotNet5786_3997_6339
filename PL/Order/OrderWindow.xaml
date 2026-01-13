@@ -9,9 +9,10 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         mc:Ignorable="d"
         Title="הזמנה בודדת"
-        Height="600" Width="1000"
-        WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResize">
+        ResizeMode="NoResize"
+        Height="600"
+        SizeToContent="Width"
+        WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <local:EnumToBooleanConverter x:Key="MyEnumConverter" />
         <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
@@ -31,15 +32,13 @@
         </Style>
     </Window.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Border Grid.Column="0"
-                Margin="10"
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        
+        <Border Margin="10"
                 Padding="10"
+                Width="300"
+                Visibility="{Binding CurrentOrder.DeliveryPerOrderInLists, 
+                    Converter={StaticResource NullToVisibilityConverter}}"
                 CornerRadius="10"
                 Background="#F5F5F5"
                 BorderBrush="#DDD"
@@ -122,7 +121,7 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Column="1" Margin="10" FlowDirection="RightToLeft">
+        <Grid Width="600"  Margin="10" FlowDirection="RightToLeft">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -224,5 +223,5 @@
             </StackPanel>
 
         </Grid>
-    </Grid>
+    </StackPanel>
 </Window>

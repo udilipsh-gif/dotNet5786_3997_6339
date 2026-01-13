@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
-        Height="400" Width="680" 
+        Height="400" 
+        SizeToContent="Width"
         Loaded="MainCureier_Loaded"
         Closed="MainCureier_Closed"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
@@ -113,8 +114,8 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="450*"/>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="450"/>
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <ScrollViewer Grid.Column="0">
             <Grid  Background="WhiteSmoke">
