@@ -169,7 +169,7 @@ public partial class MainCureier : Window
 
         var enumTypeOfOrder = Tools.GetEnumList(allowedTypes);
 
-        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, USERID, USERID, enumTypeOfOrder);
+        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, USERID, USERID, CurrentUser!.TypeShipment, enumTypeOfOrder);
     }
 
     private void CureierDeliveryHistory_Click(object sender, RoutedEventArgs e)

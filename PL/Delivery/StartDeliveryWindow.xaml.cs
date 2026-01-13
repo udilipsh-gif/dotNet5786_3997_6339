@@ -14,7 +14,9 @@ public partial class StartDeliveryWindow : Window
 
     public int UserId { get; private init; }
 
-    public int courierId { get; private init; }
+    private int courierId { get;  init; }
+
+    private BO.TheTypeShipment typeShipment { get;  init; }
 
     public IEnumerable<Tools.SelectionItem> EnumTypeOfOrder
     {
@@ -46,11 +48,13 @@ public partial class StartDeliveryWindow : Window
         typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
 
-    public StartDeliveryWindow(int userId, int courierId, IEnumerable<Tools.SelectionItem>? enumTypeOfOrder)
+    public StartDeliveryWindow(int userId, int courierId, BO.TheTypeShipment TypeShipment,  IEnumerable<Tools.SelectionItem>? enumTypeOfOrder)
     {
         this.UserId = userId;
 
         this.courierId = courierId;
+
+        this.typeShipment = TypeShipment;
 
         this.EnumTypeOfOrder = enumTypeOfOrder ?? new List<Tools.SelectionItem>();
 
@@ -75,19 +79,19 @@ public partial class StartDeliveryWindow : Window
 
     private void StartDeliveryWindow_Closed(object sender, EventArgs e)
     {
-        Tools.RunSafe(() =>  s_bl.Order.RemoveObserver(orderListObserver));
+        Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
     }
 
     private void UpdateOrdersList()
     {
-        var DeliveryList = Tools.GetSafeFromBl(() => 
+        var DeliveryList = Tools.GetSafeFromBl(() =>
                 s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null),
                 new List<BO.OpenOrderInList>());
 
-        
+
         if (DeliveryListView == null)
         {
-            DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList); 
+            DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
         }
         else
         {
@@ -102,27 +106,62 @@ public partial class StartDeliveryWindow : Window
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         => UpdateOrdersList();
 
+    // הוסף שדה לשמירת החלון הצף הפתוח
+    private MapPopupWindow? _currentPopup;
+
+    // הוסף את האירוע הזה
+    private void OrdersGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        // סגור חלון קודם אם פתוח
+        _currentPopup?.Close();
+        _currentPopup = null;
+
+        if (sender is DataGrid dataGrid && dataGrid.SelectedItem is BO.OpenOrderInList selectedOrder)
+        {
+            // קבל את מיקום העכבר על המסך
+            var mousePosition = System.Windows.Input.Mouse.GetPosition(this);
+            var screenPoint = PointToScreen(mousePosition);
+
+            // צור את החלון הצף
+            _currentPopup = new MapPopupWindow(UserId, selectedOrder, typeShipment)
+            {
+                Left = screenPoint.X + 20,
+                Top = screenPoint.Y - 50
+            };
+
+            // האזן לאירוע איסוף
+            _currentPopup.OnCollectClicked += (order) =>
+            {
+                CollectOrderInternal(order);
+            };
+
+            _currentPopup.Show();
+        }
+    }
+
     private void CollectOrder_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button button && button.DataContext is BO.OpenOrderInList selectedOrder)
         {
-            try
-            {
-                if (selectedOrder == null)
-                    throw new BO.BlInvalidOperationException("סיבת סיום המשלוח לא תקפה");
+            CollectOrderInternal(selectedOrder);
+        }
+    }
 
-                s_bl.Order.StartDelivery(UserId, courierId, selectedOrder.OrderId);
+    private void CollectOrderInternal(BO.OpenOrderInList selectedOrder)
+    {
+        try
+        {
+            s_bl.Order.StartDelivery(UserId, courierId, selectedOrder.OrderId);
 
-                MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
+                MessageBoxButton.OK, MessageBoxImage.Information);
 
-                this.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"שגיאה בהתחלת המשלוח: {ex.Message}", "שגיאה",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            this.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"שגיאה בהתחלת המשלוח: {ex.Message}", "שגיאה",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

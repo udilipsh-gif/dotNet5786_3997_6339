@@ -12,6 +12,17 @@
     <WorkingSince>0001-01-01T00:00:00.0000000</WorkingSince>
   </Courier>
   <Courier>
+    <Id>45</Id>
+    <Name>Dani 45 Levy</Name>
+    <Phone>0581903929</Phone>
+    <Email>dani.levy@courier.com</Email>
+    <Password>45</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>14</MaxDistanceDelivery>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <WorkingSince>2025-10-22T17:15:58.0000000</WorkingSince>
+  </Courier>
+  <Courier>
     <Id>251015438</Id>
     <Name>Dani Levy</Name>
     <Phone>0581903929</Phone>
@@ -21,28 +32,6 @@
     <MaxDistanceDelivery>14</MaxDistanceDelivery>
     <TypeShipment>MOTORCYCLE</TypeShipment>
     <WorkingSince>2025-10-22T17:15:58.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>289936373</Id>
-    <Name>Eli Amar</Name>
-    <Phone>0560005782</Phone>
-    <Email>eli.amar@courier.com</Email>
-    <Password>Pass#243772</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>2.6901457759208673</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-03-23T17:15:58.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>320649656</Id>
-    <Name>Yair Cohen</Name>
-    <Phone>0504798411</Phone>
-    <Email>yair.cohen@courier.com</Email>
-    <Password>Pass#209559</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>3.0121121085495473</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-04-09T17:15:58.0000000</WorkingSince>
   </Courier>
   <Courier>
     <Id>221766666</Id>
@@ -230,5 +219,27 @@
     <MaxDistanceDelivery>1</MaxDistanceDelivery>
     <TypeShipment>BIKE</TypeShipment>
     <WorkingSince>2025-07-04T17:15:58.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>320649656</Id>
+    <Name>Yair Cohen</Name>
+    <Phone>0504798411</Phone>
+    <Email>yair.cohen@courier.com</Email>
+    <Password>Pass#209559</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>3.0121121085495473</MaxDistanceDelivery>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <WorkingSince>2025-04-09T17:15:58.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>289936373</Id>
+    <Name>Eli Amar</Name>
+    <Phone>0560005782</Phone>
+    <Email>eli.amar@courier.com</Email>
+    <Password>Pass#243772</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>10</MaxDistanceDelivery>
+    <TypeShipment>FOOT</TypeShipment>
+    <WorkingSince>2025-03-23T17:15:58.0000000</WorkingSince>
   </Courier>
 </ArrayaOfCouriers>

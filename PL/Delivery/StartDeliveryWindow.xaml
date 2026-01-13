@@ -84,6 +84,7 @@
           ToolTip="טבלת הזמנות - הצג, מיין וסנן מידע על הזמנות"
           IsReadOnly="True"
           SelectionMode="Single"
+          SelectionChanged="OrdersGrid_SelectionChanged"
           CanUserAddRows="False"
           CanUserDeleteRows="False"
           HorizontalScrollBarVisibility="Auto"
