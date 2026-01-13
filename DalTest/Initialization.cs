@@ -274,8 +274,8 @@ public static class Initialization
                 OrderDate = s_dal.Config.Clock.AddDays(-s_rand.Next(0, 3)),
                 DistanceKm = s_getDistance(storeLat, storeLng, double.Parse((string)address[1]), double.Parse((string)address[2])),
                 OrderStatus = OrderStatus.OPEN,
-                DistanceKmRoad = double.Parse((string)address[3]),
-                DistanceKmWalk = double.Parse((string)address[4])
+                DistanceKmRoad = double.Parse((string)address[3]) / 1000.0,
+                DistanceKmWalk = double.Parse((string)address[4]) / 1000.0
             });
         }
     }
@@ -370,17 +370,24 @@ public static class Initialization
                 ? randomOrder.DistanceKmRoad
                 : randomOrder.DistanceKmWalk;
 
-            TimeSpan duration = getActualDistance.HasValue
-            ? TimeSpan.FromHours(getActualDistance.Value /
-            (selectedCourier.TypeShipment switch
+            double? distense = getActualDistance;
+
+            double avgSpeed = selectedCourier.TypeShipment switch
             {
                 TheTypeShipment.CAR => s_dal!.Config!.AvgSpeedCar,
                 TheTypeShipment.MOTORCYCLE => s_dal!.Config!.AvgSpeedMotorcycle,
                 TheTypeShipment.BIKE => s_dal!.Config!.AvgSpeedBike,
                 TheTypeShipment.FOOT => s_dal!.Config!.AvgSpeedFoot,
                 _ => 1.0
-            }))
-    : TimeSpan.FromHours(1);
+            };
+
+            TimeSpan duration = TimeSpan.Zero;
+            if (distense  is double dis)
+            {
+                duration = TimeSpan.FromHours(dis / avgSpeed);
+            }
+                
+
             DateTime orderDate;
 
             var delivery = s_dal!.Delivery.ReadAll(d => d.OrderId == randomOrder.Id).ToList();//מציאת משלוחים על ההזמנה הזו

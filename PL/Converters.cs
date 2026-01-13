@@ -237,7 +237,7 @@ public class TimeSpanToShortStringConverter : IValueConverter
         {
             // אם שלילי - לא להציג כלום
             if (timeSpan < TimeSpan.Zero)
-                return string.Empty;
+                return "00:00:00";
 
             // אם יותר מיום - הצג ימים
             if (timeSpan.TotalDays >= 1)

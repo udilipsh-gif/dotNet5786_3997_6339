@@ -543,7 +543,7 @@ internal static class Tools
 
             double? actualDistance = delivery.ActualDistance;
             if (actualDistance is null or 0)
-            { 
+            {
                 DO.Order order = s_dal.Order.Read(delivery.OrderId)
                   ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does Not exist");
 
@@ -577,7 +577,7 @@ internal static class Tools
     /// </remarks>
     public static TimeSpan GetTimeLeftForDelivery(DO.Order order, BO.OrderStatus status)
     {
-        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED)
+        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED or BO.OrderStatus.REFUSED)
         {
             return TimeSpan.Zero;
         }
@@ -614,22 +614,12 @@ internal static class Tools
     /// For COMPLETED or CANCELLED orders, calculates: TimeEndDelivery - OrderDate
     /// For active orders (OPEN, DELIVERING, REFUSED), returns zero as delivery is not complete.
     /// </remarks>
-    public static TimeSpan GetTotalTimeOfDelivery(DO.Order order, BO.OrderStatus status, DO.Delivery? delivery)
+    public static TimeSpan GetTotalTimeOfDelivery(DO.Order order, BO.OrderStatus status, DateTime? endDelivery)
     {
-        if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED)
-        {
-            if (delivery!.TimeEndDelivery is DateTime timeEndDelivery)
-            {
-                return order.OrderDate - timeEndDelivery;
-            }
-            else
-            {
-                throw new BlInvalidValueException("המשלוח הסתיים אבל אין תאריך סיום");
-            }
-
-        }
-
-        return TimeSpan.FromDays(1);
+        if (status == BO.OrderStatus.OPEN || status == BO.OrderStatus.DELIVERING)
+            return TimeSpan.Zero;
+        else
+            return endDelivery - order.OrderDate ?? TimeSpan.Zero;
     }
 
     /// <summary>

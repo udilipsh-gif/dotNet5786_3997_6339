@@ -192,7 +192,7 @@ internal static class OrderManager
             ScheduleStatus = Tools.GetScheduleStatus(doOrder, latestDelivery),
 
             TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
-            TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, latestDelivery),
+            TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, latestDelivery?.TimeEndDelivery),
 
             // חישוב כמות הניסיונות ישירות מהרשימה בזיכרון (במקום Tools.GetCuntOfDelivery)
             NumberOfDeliveryAttempts = orderDeliveries.Count

@@ -184,7 +184,7 @@
             <TextBox Grid.Row="4" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.ScheduleStatus,Converter={StaticResource EnumDescriptionConverter}}" Style="{StaticResource UniformTextBox}"/>
             <Label Grid.Row="4" Grid.Column="3" Content="עמידה בזמנים:" Style="{StaticResource UniformLabel}"/>
 
-            <TextBox Grid.Row="5" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery}" Style="{StaticResource UniformTextBox}"/>
+            <TextBox Grid.Row="5" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}" Style="{StaticResource UniformTextBox}"/>
             <Label Grid.Row="5" Grid.Column="3" Content="זמן שנותר:" Style="{StaticResource UniformLabel}"/>
 
             <TextBox Grid.Row="6" Grid.Column="4" IsReadOnly="True" Text="{Binding CurrentOrder.Id}" Style="{StaticResource UniformTextBox}"/>
