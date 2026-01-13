@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace PL;
 
@@ -110,17 +111,20 @@ public partial class StartDeliveryWindow : Window
     private MapPopupWindow? _currentPopup;
 
     // הוסף את האירוע הזה
-    private void OrdersGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void DataGridRow_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        // סגור חלון קודם אם פתוח
+        if (IsClickInsideButton(e.OriginalSource))
+        {
+            // אם זה כפתור, אל תפתח את הפופ-אפ ותן לאירוע להמשיך לכפתור האיסוף
+            return;
+        }
         _currentPopup?.Close();
         _currentPopup = null;
 
-        if (sender is DataGrid dataGrid && dataGrid.SelectedItem is BO.OpenOrderInList selectedOrder)
+        if (sender is DataGridRow row && row.Item is BO.OpenOrderInList selectedOrder)
         {
             // קבל את מיקום העכבר על המסך
-            var mousePosition = System.Windows.Input.Mouse.GetPosition(this);
-            var screenPoint = PointToScreen(mousePosition);
+            var screenPoint = PointToScreen(e.GetPosition(this));
 
             // צור את החלון הצף
             _currentPopup = new MapPopupWindow(UserId, selectedOrder, typeShipment)
@@ -137,6 +141,31 @@ public partial class StartDeliveryWindow : Window
 
             _currentPopup.Show();
         }
+    }
+
+    private bool IsClickInsideButton(object originalSource)
+    {
+        if(originalSource is DependencyObject depObj)
+        {
+            while (depObj != null)
+            {
+                // אם הגענו לכפתור - זה אומר שהלחיצה הייתה עליו
+                if (depObj is Button)
+                {
+                    return true;
+                }
+
+                // אם הגענו לשורה עצמה, סימן שלא מצאנו כפתור בדרך
+                if (depObj is DataGridRow)
+                {
+                    return false;
+                }
+
+                // עלייה למעלה בעץ הויזואלי
+                depObj = VisualTreeHelper.GetParent(depObj);
+            }
+        }
+        return false;
     }
 
     private void CollectOrder_Click(object sender, RoutedEventArgs e)

@@ -22,10 +22,11 @@
             <Setter Property="Margin" Value="4,2"/>
         </Style>
 
-        <!-- Style לשורות -->
+        <!-- Style לשורות עם אירוע לחיצה -->
         <Style TargetType="DataGridRow">
             <Setter Property="Height" Value="Auto"/>
             <Setter Property="MinHeight" Value="32"/>
+            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="DataGridRow_PreviewMouseLeftButtonUp"/>
         </Style>
 
         <!-- Style לכותרות עם Wrap -->
@@ -84,7 +85,6 @@
           ToolTip="טבלת הזמנות - הצג, מיין וסנן מידע על הזמנות"
           IsReadOnly="True"
           SelectionMode="Single"
-          SelectionChanged="OrdersGrid_SelectionChanged"
           CanUserAddRows="False"
           CanUserDeleteRows="False"
           HorizontalScrollBarVisibility="Auto"
