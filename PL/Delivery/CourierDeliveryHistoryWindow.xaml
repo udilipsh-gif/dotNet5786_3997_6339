@@ -171,17 +171,12 @@
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                    
-
-                    <DataGridTextColumn Header="סך זמן השלמת הטיפול"
+                    <DataGridTextColumn Header="סך זמן הטיפול"
                                      Binding="{Binding DelyveryTime, Converter={StaticResource TimeSpanConverter}}"
                                      SortMemberPath="DelyveryTime"
                                      Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                      HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                    
-
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
