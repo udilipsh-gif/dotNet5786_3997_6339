@@ -62,37 +62,19 @@
                    FontWeight="Bold"
                    Margin="5"/>
             <ComboBox Grid.Column="1"
-                   ItemsSource="{Binding EnumForSoring}"
+                   ItemsSource="{Binding EnumTypeOfOrder}"
                    DisplayMemberPath="Name"
                    SelectedValuePath="Id"
-                   SelectedValue="{Binding SelctedFilter}"
+                   SelectedValue="{Binding SelectedFilter}"
+                   SelectionChanged="ComboBox_SelectionChanged"
                    SelectedIndex="0"
                    FontSize="14"
                    Width="150"
                    Margin="5"
                    ToolTip="בחר סוג משלוח להצגה בטבלה">
             </ComboBox>
-            <!--<Label Grid.Column="2" Content="סינון לפי סטטוס הזמנה:" 
-                   FontSize="16" 
-                   FontWeight="Bold"
-                   Margin="5"/>-->
-            <!--<ComboBox Grid.Column="3" x:Name="OrderStatusFilterComboBox"
-                   ItemsSource="{Binding OrderStatusFilterOptions}"
-                   SelectedItem="{Binding SelectedOrderStatusFilter, Mode=TwoWay}"
-                   SelectionChanged="ComboBox_SelectionChanged"
-                   FontSize="14"
-                   Width="150"
-                   Margin="5"
-                   ToolTip="בחר סטטוס הזמנה לסינון הטבלה">
-                
-                --><!--<ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Id, Converter={StaticResource EnumDescriptionConverter}}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>--><!--
-            </ComboBox>-->
         </Grid>
-     
+
 
         <DataGrid Grid.Row="1"
           x:Name="OrdersGrid"
@@ -102,38 +84,37 @@
           ToolTip="טבלת הזמנות - הצג, מיין וסנן מידע על הזמנות"
           IsReadOnly="True"
           SelectionMode="Single"
+          SelectionChanged="OrdersGrid_SelectionChanged"
           CanUserAddRows="False"
           CanUserDeleteRows="False"
           HorizontalScrollBarVisibility="Auto"
           FlowDirection="RightToLeft"
           EnableRowVirtualization="False"
           EnableColumnVirtualization="False">
-            <DataGrid.InputBindings>
-                <MouseBinding Gesture="LeftDoubleClick" 
-                      Command="{Binding SelectOrderCommand}"
-                      CommandParameter="{Binding ElementName=OrdersGrid, Path=SelectedItem}" />
-            </DataGrid.InputBindings>
-
+            
             <DataGrid.Columns>
+                <DataGridTemplateColumn Header="איסוף" Width="Auto">
+                    
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="איסוף"
+                                    Click="CollectOrder_Click"
+                                    Padding="8,4"
+                                    Margin="2"
+                                    Background="#4CAF50"
+                                    Foreground="White"
+                                    Cursor="Hand"
+                                    ToolTip="לחץ לאיסוף ההזמנה"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
                 <DataGridTextColumn Header="מזהה הזמנה"
                             Binding="{Binding OrderId}"
                             SortMemberPath="OrderId"
                             Width="Auto"
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <!--<DataGridTextColumn Header="סטטוס הזמנה"
-                            Binding="{Binding OrderStatus}"
-                            SortMemberPath="OrderStatus"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>-->
-
-                <!--<DataGridTextColumn Header="מזהה משלוח"
-                            Binding="{Binding DeliveryId}"
-                            SortMemberPath="DeliveryId"
-                            Width="Auto"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>-->
 
                 <DataGridTextColumn Header="סוג הזמנה"
                             Binding="{Binding TypeOfOrder}"
@@ -156,7 +137,6 @@
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-
                 <DataGridTextColumn Header="משקל"
                             Binding="{Binding Weight}"
                             SortMemberPath="TypeOfOrder"
@@ -170,8 +150,6 @@
                             Width="Auto"
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-
 
                 <DataGridTextColumn Header="סטטוס עמידה בזמנים"
                             Binding="{Binding ScheduleStatus}"
@@ -191,13 +169,7 @@
                                 SortMemberPath="TotalTimeOfDelivery"
                                 Width="Auto"
                                 HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <!--<DataGridTextColumn Header="מספר ניסיונות משלוח"
-                                Binding="{Binding NumberOfDeliveryAttempts}"
-                                SortMemberPath="NumberOfDeliveryAttempts"
-                                Width="Auto"
-                                HeaderStyle="{StaticResource WrappedHeaderStyle}"/>-->
-
+                
             </DataGrid.Columns>
         </DataGrid>
 

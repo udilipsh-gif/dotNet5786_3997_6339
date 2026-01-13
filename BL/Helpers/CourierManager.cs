@@ -382,6 +382,9 @@ internal static class CourierManager
         DO.Order? order = s_dal.Order.Read(delivery.OrderId)
          ?? throw new BO.BlDoesNotExistException("Order not found");
 
+        DO.Courier? courier = s_dal.Courier.Read(delivery.CourierId)
+            ?? throw new BO.BlDoesNotExistException("Courier not found");
+
         var estimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(delivery);
         var maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
 
@@ -393,7 +396,7 @@ internal static class CourierManager
             Details = order.Details,
             Address = order.Addres,
             Distance = Tools.GetDistance(order),
-            ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)s_dal.Courier.Read(delivery.CourierId)!.TypeShipment),// delivery.ActualDistance,
+            ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),// delivery.ActualDistance,
             CustomerName = order.Name,
             CustomerPhone = order.Phone,
             OrderTime = order.OrderDate,

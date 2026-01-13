@@ -153,8 +153,23 @@ public partial class MainCureier : Window
             MessageBox.Show("יש משלוח פעיל לסיום", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
+        IEnumerable<BO.TypeOfOrder> allowedTypes = CurrentUser!.TypeShipment switch
+        {
+            BO.TheTypeShipment.BIKE or BO.TheTypeShipment.FOOT =>
+                new[] { BO.TypeOfOrder.STANDART },
 
-        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, USERID, USERID);
+            BO.TheTypeShipment.CAR =>
+                new[] { BO.TypeOfOrder.STANDART, BO.TypeOfOrder.FAST_DELIVERY },
+
+            BO.TheTypeShipment.MOTORCYCLE =>
+                new[] { BO.TypeOfOrder.STANDART, BO.TypeOfOrder.FAST_DELIVERY, BO.TypeOfOrder.DELIVER_IMMEDIATELY },
+
+            _ => Array.Empty<BO.TypeOfOrder>()
+        };
+
+        var enumTypeOfOrder = Tools.GetEnumList(allowedTypes);
+
+        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, USERID, USERID, CurrentUser!.TypeShipment, enumTypeOfOrder);
     }
 
     private void CureierDeliveryHistory_Click(object sender, RoutedEventArgs e)

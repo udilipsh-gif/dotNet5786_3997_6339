@@ -94,29 +94,34 @@ public static class Tools
             // יצירת חלון חדש
             var newWindow = (T)Activator.CreateInstance(typeof(T), args)!;
             newWindow.Show();
+            newWindow.Activate();
         }
+    }
+
+    public static IEnumerable<SelectionItem> GetEnumList<T>(IEnumerable<T> values, string defaultText = "הכל") where T : struct, Enum
+    {
+        // 1. יצירת רשימה והוספת פריט ברירת המחדל
+        var list = new List<SelectionItem>
+    {
+        new SelectionItem { Id = null, Name = defaultText }
+    };
+
+        // 2. המרת הרשימה שקיבלנו
+        var convertedItems = values.Select(e => new SelectionItem
+        {
+            Id = e,
+            Name = GetDescription(e)
+        });
+
+        // 3. איחוד והחזרה
+        list.AddRange(convertedItems);
+        return list;
     }
 
     public static IEnumerable<SelectionItem> GetEnumList<T>(string defaultText = "הכל") where T : struct, Enum
     {
-        // 1. יצירת רשימה והוספת פריט ברירת המחדל
-        var list = new List<SelectionItem>
-        {
-            new SelectionItem { Id = null, Name = defaultText }
-        };
-
-        // 2. שליפת ערכי ה-Enum והמרתם
-        var enumValues = Enum.GetValues(typeof(T))
-                             .Cast<T>()
-                             .Select(e => new SelectionItem
-                             {
-                                 Id = e, // ה-Id יקבל את ערך ה-Enum
-                                 Name = GetDescription(e) // שימוש בפונקציה הקיימת שלך לתיאור
-                             });
-
-        // 3. איחוד והחזרה
-        list.AddRange(enumValues);
-        return list;
+        var allValues = Enum.GetValues(typeof(T)).Cast<T>();
+        return GetEnumList(allValues, defaultText);
     }
 
     public class SelectionItem

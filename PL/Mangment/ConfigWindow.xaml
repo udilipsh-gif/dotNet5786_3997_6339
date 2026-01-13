@@ -80,13 +80,13 @@
                 <DockPanel Style="{StaticResource FormRow}">
                     <Label Content="סיסמת מנהל:" Style="{StaticResource UniformLabel}"/>
                     <TextBox Text="{Binding Configuration.PasswordManager, Mode=TwoWay}" 
-                             Style="{StaticResource UniformTextBox}" IsReadOnly="True"/>
+                             Style="{StaticResource UniformTextBox}"/>
                 </DockPanel>
                 <!-- Longitude field - Read-only, populated from address lookup -->
                 <DockPanel Style="{StaticResource FormRow}">
                     <Label Content="מרחק מירבי להזמנה:" Style="{StaticResource UniformLabel}"/>
                     <TextBox Text="{Binding Configuration.MaxDeliveryRange, Mode=TwoWay}" 
-                             Style="{StaticResource UniformTextBox}" IsReadOnly="True"/>
+                             Style="{StaticResource UniformTextBox}"/>
                 </DockPanel>
                 <!-- Car average speed field - Numeric only, in km/h -->
                 <DockPanel Style="{StaticResource FormRow}">

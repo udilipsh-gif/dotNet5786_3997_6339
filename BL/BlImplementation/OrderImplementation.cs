@@ -45,8 +45,8 @@ internal class OrderImplementation : IOrder
     /// </remarks>
     public BO.Order? Read(int id, int orderId)
     {
-        if (!Tools.CheckManger(id))
-            throw new BO.BlNoAccessException();
+        //if (!Tools.CheckManger(id))
+        //    throw new BO.BlNoAccessException();
         return OrderManager.Read(orderId);
     }
 
