@@ -1,5 +1,4 @@
 ﻿using DalApi;
-using System;
 using System.Net.Mail;
 
 
@@ -111,6 +110,7 @@ internal static class OrderManager
             Phone = boOrder.Phone,
             Weight = boOrder.Weight,
             OrderDate = AdminManager.Now,
+            DistanceKm = distense,
         };
         s_dal.Order.Create(doOrder);
         Observer.NotifyListUpdated();
@@ -496,6 +496,10 @@ internal static class OrderManager
     /// </remarks>
     public static List<BO.ClosedDeliveryInList> GetClosed(int courierId, BO.TypeOfOrder? filter, BO.ClosedDeliveryInListField? sort)
     {
+
+        DO.Courier? courier = s_dal.Courier.Read(courierId)
+            ?? throw new BO.BlDoesNotExistException("Courier not found");
+
         var query = from doDelivery in s_dal.Delivery.ReadAll(d => d.CourierId == courierId && d.EndDelivery != null)
                     let order = s_dal.Order.Read(doDelivery.OrderId)
                     where order != null && (filter == null || (BO.TypeOfOrder)order.TypeOfOrder == filter)
@@ -506,7 +510,7 @@ internal static class OrderManager
                         OrderType = (BO.TypeOfOrder)order.TypeOfOrder,
                         Address = order.Addres,
                         ShipmentType = (BO.TheTypeShipment)doDelivery.TypeShipment,
-                        ActualDistens = doDelivery.ActualDistance,
+                        ActualDistens = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),// doDelivery.ActualDistance,
                         DelyveryTime = (TimeSpan)(doDelivery.TimeEndDelivery! - doDelivery.OrderDate),
                         EndDelivery = (BO.EndDelivery)doDelivery.EndDelivery!
                     };

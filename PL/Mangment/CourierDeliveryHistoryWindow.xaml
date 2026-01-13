@@ -132,35 +132,35 @@
 
                     <DataGridTextColumn Header="סוג הזמנה"
                                  Binding="{Binding OrderType, Converter={StaticResource EnumDescriptionConverter}}"
-                                 SortMemberPath="OrderStatus"
+                                 SortMemberPath="OrderType"
                                  Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                     <DataGridTextColumn Header=" כתובת"
                                  Binding="{Binding Address}"
-                                 SortMemberPath="DeliveryId"
+                                 SortMemberPath="Address"
                                  Width="auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                     <DataGridTextColumn Header="סוג שילוח"
                                  Binding="{Binding ShipmentType, Converter={StaticResource EnumDescriptionConverter}}"
-                                 SortMemberPath="TypeOfOrder"
+                                 SortMemberPath="ShipmentType"
                                  Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                     <DataGridTextColumn Header="מרחק"
                                      Binding="{Binding ActualDistens, StringFormat=N2}"
-                                     SortMemberPath="DistanceKm"
+                                     SortMemberPath="ActualDistens"
                                      Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                      HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                     <DataGridTextColumn Header="סטטוס  סיום"
                                  Binding="{Binding EndDelivery, Converter={StaticResource EnumDescriptionConverter}}"
-                                 SortMemberPath="ScheduleStatus"
+                                 SortMemberPath="EndDelivery"
                                  Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
