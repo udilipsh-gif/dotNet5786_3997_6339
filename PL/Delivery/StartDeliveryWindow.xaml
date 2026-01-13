@@ -145,13 +145,13 @@
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="הערכת זמן"
-                            Binding="{Binding EstimatedDeliveryTime}"
+                            Binding="{Binding EstimatedDeliveryTime, Converter={StaticResource TimeSpanConverter}}"
                             SortMemberPath="TypeOfOrder"
                             Width="Auto"
                             ElementStyle="{StaticResource WrappedTextCellStyle}"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                <DataGridTextColumn Header="סטטוס עמידה בזמנים"
+                <DataGridTextColumn Header="סטטוס"
                             Binding="{Binding ScheduleStatus}"
                             SortMemberPath="ScheduleStatus"
                             Width="Auto"
@@ -159,14 +159,14 @@
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="זמן לסיום"
-                            Binding="{Binding TimeLeftForDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
+                            Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}"
                             SortMemberPath="TimeLeftForDelivery"
                             Width="Auto"
                             HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="סך זמן השלמת הטיפול"
-                                Binding="{Binding TotalTimeOfDelivery, StringFormat='{}{0:dd/MM/yyyy}'}"
-                                SortMemberPath="TotalTimeOfDelivery"
+                                Binding="{Binding MaxDeliveryTime, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                SortMemberPath="MaxDeliveryTime"
                                 Width="Auto"
                                 HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
                 

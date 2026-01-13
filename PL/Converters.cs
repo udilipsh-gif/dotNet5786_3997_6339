@@ -218,3 +218,29 @@ public class SpanTimeConverter : IValueConverter
         return TimeSpan.Zero;
     }
 }
+
+public class TimeSpanToShortStringConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is TimeSpan timeSpan)
+        {
+            // אם שלילי - לא להציג כלום
+            if (timeSpan < TimeSpan.Zero)
+                return string.Empty;
+
+            // אם יותר מיום - הצג ימים
+            if (timeSpan.TotalDays >= 1)
+                return $"{(int)timeSpan.TotalDays} ימים {timeSpan.Hours:D2}:{timeSpan.Minutes:D2}";
+
+            // אחרת הצג שעות:דקות
+            return $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}";
+        }
+        return string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

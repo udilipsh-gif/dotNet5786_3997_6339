@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using System.Net.Mail;
 
 
@@ -198,27 +199,6 @@ internal static class OrderManager
         };
     }
 
-
-
-    //public static List<BO.OrderInList> ReadAll(Func<BO.OrderInList, bool>? customPredicate = null,
-    //    BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
-    //{
-    //    // 2. שימוש בפרדיקט שהגיע מבחוץ (או ברירת מחדל שמחזירה תמיד אמת)
-    //    Func<BO.OrderInList, bool> filter = customPredicate ?? (x => true);
-
-    //    Func<BO.OrderInList, object> sortSelector = s_getSortFunc(orderBy);
-
-    //    // 3. ה-LINQ שלך (עם המיון וההמרה)
-    //    var query = from doOrder in s_dal.Order.ReadAll()
-    //                let boOrder = s_convertToBoOrderInList(doOrder)
-    //                where filter(boOrder) 
-    //                orderby sortSelector(boOrder) 
-    //                select boOrder;
-
-    //    return [.. query];
-    //}
-
-
     /// <summary>
     /// Retrieves a specific order by its unique identifier.
     /// </summary>
@@ -237,6 +217,17 @@ internal static class OrderManager
         if (doOrder is null)
             return null;
 
+        var deliveryPerOrderInLists = s_createDeliveryPerOrderInList(doOrder.Id);
+        DateTime? estimatedDeliveryTime = null;
+        if( deliveryPerOrderInLists is List<BO.DeliveryPerOrderInList> orderInProgresses)
+        {
+            var deliver = orderInProgresses.OrderByDescending(d => d.DeliveryId).FirstOrDefault(d => d.EndDelivery == null);
+            if (deliver != null)
+            {
+                estimatedDeliveryTime = deliver.OrderDate + Tools.GetEstimatedDeliveryTime(doOrder);
+            }
+        }
+
         BO.Order boOrder = new BO.Order
         {
             Id = doOrder.Id,
@@ -250,12 +241,12 @@ internal static class OrderManager
             Weight = doOrder.Weight,
             OrderDate = doOrder.OrderDate,
             Distance = Tools.GetDistance(doOrder),
-            EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(doOrder),
+            EstimatedDeliveryTime = estimatedDeliveryTime,
             MaxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime,
             OrderStatus = (BO.OrderStatus)doOrder.OrderStatus,   //Tools.GetOrderStatus(doOrder),
             ScheduleStatus = Tools.GetScheduleStatus(doOrder),
             TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder),
-            DeliveryPerOrderInLists = s_createDeliveryPerOrderInList(doOrder.Id)
+            DeliveryPerOrderInLists = deliveryPerOrderInLists
         };
         return boOrder;
     }
@@ -580,8 +571,9 @@ internal static class OrderManager
         };
 
         var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
-                    let distense = Tools.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)
+                    let distense = Tools.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)?? 0.1
                     where (toFilter(doOrder) && (distense <= doCourier.MaxDistanceDelivery))
+                    let maxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime
                     select new BO.OpenOrderInList
                     {
                         OrderId = doOrder.Id,
@@ -590,10 +582,10 @@ internal static class OrderManager
                         Address = doOrder.Addres,
                         DistanceKm = doOrder.DistanceKm ?? 0,
                         ActualDistance = distense,
-                        EstimatedDeliveryTime = null,
+                        EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime((BO.TheTypeShipment)doCourier.TypeShipment, distense),
                         ScheduleStatus = Tools.GetScheduleStatus(doOrder),
-                        TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder),
-                        MaxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime
+                        TimeLeftForDelivery = maxDeliveryTime - AdminManager.Now,
+                        MaxDeliveryTime = maxDeliveryTime
                     };
 
         IEnumerable<BO.OpenOrderInList> sortedQuery = sort switch

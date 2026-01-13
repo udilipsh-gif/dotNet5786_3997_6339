@@ -322,16 +322,8 @@ internal static class Tools
 
         if (order.OrderStatus is DO.OrderStatus.DELIVERING)
         {
-            if (delivery == null)
-            {
-                delivery = (from deliver in DeliveryManager.ReadAll()
-                            where deliver.OrderId == order.Id
-                            select deliver).FirstOrDefault();
-            }
-
-            if (delivery is null) throw new Exception("order start but not fonud delivry");
-
-            TimeSpan timeBuffer = maxDeliveryTime - GetEstimatedDeliveryTime(delivery);
+            TimeSpan estimatedTime = GetEstimatedDeliveryTime(order) ?? TimeSpan.Zero;
+            TimeSpan timeBuffer = (maxDeliveryTime - AdminManager.Now) - estimatedTime;
 
             if (timeBuffer > riskRange)
                 return BO.ScheduleStatus.ONTYME;
@@ -502,49 +494,20 @@ internal static class Tools
     /// If no actual distance is available, uses the maximum delivery time from configuration.
     /// The calculation assumes constant average speed for the vehicle type.
     /// </remarks>
-    public static DateTime GetEstimatedDeliveryTime(DO.Delivery delivery)
+    public static TimeSpan? GetEstimatedDeliveryTime(BO.TheTypeShipment typeShipment, double actualDistance)
     {
-        if (delivery.EndDelivery is null)
+        double avgSpeed = typeShipment switch
         {
-            DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
-                  ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
+            BO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
+            BO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
+            BO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
+            BO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
+            _ => 1.0
+        };
 
-            double actualDistance;
-            DateTime estimatedDeliveryTime;
-            if (delivery.ActualDistance.HasValue)
-            {
-                actualDistance = delivery.ActualDistance.Value;
-            }
-            else
-            {
-                DO.Order order = s_dal.Order.Read(delivery.OrderId)
-                  ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does Not exist");
+        double estimatedHours = actualDistance / avgSpeed;
 
-                actualDistance = GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
-
-                s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
-            }
-
-            double avgSpeed = courier.TypeShipment switch
-            {
-                DO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
-                DO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
-                DO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
-                DO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
-                _ => 1.0
-            };
-
-            // חישוב משך הזמן בשעות והוספה לזמן ההזמנה
-            double estimatedHours = actualDistance / avgSpeed;
-            estimatedDeliveryTime = delivery.OrderDate.AddHours(estimatedHours);
-
-            return estimatedDeliveryTime;
-        }
-        else
-        {
-            return delivery.TimeEndDelivery ?? DateTime.MinValue; // למקרה של שגיאה שזמן המלוח לא נשמר
-        }
-
+        return TimeSpan.FromHours(estimatedHours);
     }
 
     /// <summary>
@@ -558,7 +521,7 @@ internal static class Tools
     /// This overload automatically retrieves the most recent delivery for the order.
     /// See the main overload for calculation details.
     /// </remarks>
-    public static DateTime? GetEstimatedDeliveryTime(DO.Order order)
+    public static TimeSpan? GetEstimatedDeliveryTime(DO.Order order)
     {
         var delivery = (from deliver in DeliveryManager.ReadAll()
                         where deliver.OrderId == order.Id
@@ -567,6 +530,37 @@ internal static class Tools
 
         return delivery == null ? null : GetEstimatedDeliveryTime(delivery);
     }
+
+    public static TimeSpan? GetEstimatedDeliveryTime(DO.Delivery Delivery, DO.Courier? courier = null)
+    {
+        if (Delivery is DO.Delivery delivery && delivery.EndDelivery is null)
+        {
+            if (courier is null)
+            {
+                courier = s_dal.Courier.Read(delivery.CourierId)
+                  ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
+            }
+
+            double? actualDistance = delivery.ActualDistance;
+            if (actualDistance is null or 0)
+            { 
+                DO.Order order = s_dal.Order.Read(delivery.OrderId)
+                  ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does Not exist");
+
+                actualDistance = GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
+
+                s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
+            }
+            return GetEstimatedDeliveryTime((BO.TheTypeShipment)courier.TypeShipment, actualDistance ?? 0);
+        }
+        else
+        {
+            return null;
+        }
+
+    }
+
+
 
     /// <summary>
     /// Calculates the time remaining until an order reaches its maximum delivery deadline.

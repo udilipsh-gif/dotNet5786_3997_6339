@@ -6,5 +6,6 @@
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <local:TimeSpanToShortStringConverter x:Key="TimeSpanConverter"/>
     </Application.Resources>
 </Application>

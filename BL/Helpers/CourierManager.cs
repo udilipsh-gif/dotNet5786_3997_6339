@@ -388,7 +388,7 @@ internal static class CourierManager
         DO.Courier? courier = s_dal.Courier.Read(delivery.CourierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        var estimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(delivery);
+        TimeSpan estimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(delivery) ?? TimeSpan.Zero;
         var maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
 
         BO.OrderInProgress orderInProgress = new BO.OrderInProgress
@@ -404,7 +404,7 @@ internal static class CourierManager
             CustomerPhone = order.Phone,
             OrderTime = order.OrderDate,
             StartDeliveryTime = delivery.OrderDate,
-            EstimatedDeliveryTime = estimatedDeliveryTime,
+            EstimatedDeliveryTime = delivery.OrderDate + estimatedDeliveryTime,
             MaxDeliveryTime = maxDeliveryTime,
             OrderStatus = BO.OrderStatus.DELIVERING,
             ScheduleStatus = Tools.GetScheduleStatus(order, delivery),
