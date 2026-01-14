@@ -355,7 +355,7 @@ namespace DalTest
         //static readonly IDal s_dal = new DalXml(); //stage 3
         static readonly IDal s_dal = Factory.Get; //stage 4
 
-        private static int choice;
+ //       private static int choice;
 
         /// <summary>
         /// Generic method to retrieve an item from a list by prompting the user for an ID.

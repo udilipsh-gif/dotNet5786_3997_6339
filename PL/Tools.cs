@@ -15,7 +15,6 @@ public static class Tools
             typeof(bool),
             typeof(Tools),
             new PropertyMetadata(false, OnNumericOnlyChanged));
-    private static WindowState Minimized;
 
     public static bool GetNumericOnly(DependencyObject obj)
     {

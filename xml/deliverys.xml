@@ -551,16 +551,6 @@
     <TimeEndDelivery>2026-01-14T11:48:35.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
-    <Id>200056</Id>
-    <OrderId>100042</OrderId>
-    <CourierId>319963650</CourierId>
-    <TypeShipment>MOTORCYCLE</TypeShipment>
-    <OrderDate>2026-01-14T11:48:35.0000000</OrderDate>
-    <ActualDistance>9.225</ActualDistance>
-    <EndDelivery></EndDelivery>
-    <TimeEndDelivery></TimeEndDelivery>
-  </Delivery>
-  <Delivery>
     <Id>200057</Id>
     <OrderId>100047</OrderId>
     <CourierId>45</CourierId>
@@ -599,5 +589,15 @@
     <ActualDistance>1.993</ActualDistance>
     <EndDelivery></EndDelivery>
     <TimeEndDelivery></TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200056</Id>
+    <OrderId>100042</OrderId>
+    <CourierId>319963650</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-01-14T11:48:35.0000000</OrderDate>
+    <ActualDistance>9.225</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2026-01-14T11:48:35.0000000</TimeEndDelivery>
   </Delivery>
 </ArrayOfDeliverys>

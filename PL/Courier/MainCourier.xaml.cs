@@ -1,30 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace PL;
 
 /// <summary>
-/// Interaction logic for MainCureier.xaml
+/// Interaction logic for MainCourier.xaml
 /// </summary>
-public partial class MainCureier : Window
+public partial class MainCourier : Window
 {
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
     private readonly int USERID;
 
-    public MainCureier(int userId)
+    public MainCourier(int userId)
     {
         USERID = userId;
 
@@ -46,7 +33,7 @@ public partial class MainCureier : Window
 
     public static readonly DependencyProperty IsEditModeProperty =
         DependencyProperty.Register("IsEditMode", typeof(bool),
-        typeof(MainCureier), new PropertyMetadata(false));
+        typeof(MainCourier), new PropertyMetadata(false));
 
     public BO.Courier? CurrentUser
     {
@@ -59,7 +46,7 @@ public partial class MainCureier : Window
     /// </summary>
     public static readonly DependencyProperty CurrentUserProperty =
         DependencyProperty.Register("CurrentUser", typeof(BO.Courier),
-            typeof(MainCureier), new PropertyMetadata(null));
+            typeof(MainCourier), new PropertyMetadata(null));
 
     public bool IsOrderInProgress
     {
@@ -69,16 +56,16 @@ public partial class MainCureier : Window
 
     public static readonly DependencyProperty IsOrderInProgressProperty =
         DependencyProperty.Register("IsOrderInProgress", typeof(bool),
-            typeof(MainCureier), new PropertyMetadata(false));
+            typeof(MainCourier), new PropertyMetadata(false));
 
-    private void MainCureier_Loaded(object sender, RoutedEventArgs e)
+    private void MainCourier_Loaded(object sender, RoutedEventArgs e)
     {
         Tools.RunSafe(() => s_bl.Courier.AddObserver(USERID, GetCurier));
         IsOrderInProgress = false;
         GetCurier();
     }
 
-    private void MainCureier_Closed(object sender, EventArgs e)
+    private void MainCourier_Closed(object sender, EventArgs e)
     {
         if (USERID != 0)
             Tools.RunSafe(() => s_bl.Courier.RemoveObserver(GetCurier));

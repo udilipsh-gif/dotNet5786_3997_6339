@@ -1,18 +1,8 @@
 ﻿
-using PL;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Configuration;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Linq;
-using BO;
-using System.Diagnostics;
+
 
 namespace PL;
 
@@ -96,13 +86,18 @@ public partial class MainWindow : Window
             {
                 // אפשר לפתוח חלון שליח
                 if(userId != 0)
-                    new MainCureier(userId).Show();
+                {
+                    Window window = new MainCourier(userId);
+                    window.SetSoftOwner(this);
+                    window.Show();
+                }
+
                 return;
             }
 
             //throw new BlNoAccessException("לא הצלחנו לחבר אותך");
         }
-        catch (BlIncorrectPasswordException)
+        catch (BO.BlIncorrectPasswordException)
         {
             MessageBox.Show("הסיסמה לא נכונה");
         }

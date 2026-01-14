@@ -305,22 +305,6 @@
     <DistanceKmWalk>1.982</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100023</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 22</Details>
-    <Addres> יגאל אלון 60, תל אביב</Addres>
-    <Latitude>32.0619207</Latitude>
-    <Longitude>34.7927464</Longitude>
-    <Name>Customer22</Name>
-    <Phone>0535696073</Phone>
-    <Weight>14</Weight>
-    <OrderDate>2026-01-14T09:18:02.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>4.5299101150789465</DistanceKm>
-    <DistanceKmRoad>8.326</DistanceKmRoad>
-    <DistanceKmWalk>5.292</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100019</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 18</Details>
@@ -721,22 +705,6 @@
     <DistanceKmWalk>2.686</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100042</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 41</Details>
-    <Addres> הירקון 150, תל אביב</Addres>
-    <Latitude>32.0837404</Latitude>
-    <Longitude>34.7693911</Longitude>
-    <Name>Customer41</Name>
-    <Phone>0527526683</Phone>
-    <Weight>14</Weight>
-    <OrderDate>2026-01-12T09:18:02.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>5.163496006837668</DistanceKm>
-    <DistanceKmRoad>9.225</DistanceKmRoad>
-    <DistanceKmWalk>6.139</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100047</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 46</Details>
@@ -799,5 +767,37 @@
     <DistanceKm>1.4278410298393744</DistanceKm>
     <DistanceKmRoad>1.993</DistanceKmRoad>
     <DistanceKmWalk>1.853</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100023</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 22</Details>
+    <Addres> יגאל אלון 60, תל אביב</Addres>
+    <Latitude>32.0619207</Latitude>
+    <Longitude>34.7927464</Longitude>
+    <Name>Customer22</Name>
+    <Phone>0535696073</Phone>
+    <Weight>14</Weight>
+    <OrderDate>2026-01-14T09:18:02.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm />
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
+  <Order>
+    <Id>100042</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 41</Details>
+    <Addres> הירקון 150, תל אביב</Addres>
+    <Latitude>32.0837404</Latitude>
+    <Longitude>34.7693911</Longitude>
+    <Name>Customer41</Name>
+    <Phone>0527526683</Phone>
+    <Weight>14</Weight>
+    <OrderDate>2026-01-12T09:18:02.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>5.163496006837668</DistanceKm>
+    <DistanceKmRoad>9.225</DistanceKmRoad>
+    <DistanceKmWalk>6.139</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>
