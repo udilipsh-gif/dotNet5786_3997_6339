@@ -56,17 +56,6 @@
     <WorkingSince>2025-05-19T09:18:02.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>319963650</Id>
-    <Name>Dina Klein</Name>
-    <Phone>0546657253</Phone>
-    <Email>dina.klein@courier.com</Email>
-    <Password>Pass#474126</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>1.1674741357889893</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-05-24T09:18:02.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>399704225</Id>
     <Name>Shira Israelof</Name>
     <Phone>0575201907</Phone>
@@ -161,7 +150,7 @@
     <Email>yaniv.shapiro@courier.com</Email>
     <Password>45</Password>
     <Active>true</Active>
-    <MaxDistanceDelivery>1</MaxDistanceDelivery>
+    <MaxDistanceDelivery>5</MaxDistanceDelivery>
     <TypeShipment>BIKE</TypeShipment>
     <WorkingSince>2025-11-11T09:18:02.0000000</WorkingSince>
   </Courier>
@@ -241,5 +230,16 @@
     <MaxDistanceDelivery>3</MaxDistanceDelivery>
     <TypeShipment>MOTORCYCLE</TypeShipment>
     <WorkingSince>2025-02-24T09:18:02.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>319963650</Id>
+    <Name>Dina Klein</Name>
+    <Phone>0546657253</Phone>
+    <Email>dina.klein@courier.com</Email>
+    <Password>Pass#474126</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>30</MaxDistanceDelivery>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <WorkingSince>2025-05-24T09:18:02.0000000</WorkingSince>
   </Courier>
 </ArrayaOfCouriers>

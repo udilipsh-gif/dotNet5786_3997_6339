@@ -89,7 +89,7 @@ public partial class MainWindow : Window
 
             if (user == "Manager")
             {
-                Tools.OpenOrActivateWindow<ManagerWindow>(userId);
+                Tools.OpenOrActivateWindow<ManagerWindow>(this, userId);
                 return;
             }
             else if (user == "Courier")
@@ -112,25 +112,6 @@ public partial class MainWindow : Window
         }
         
 
-    }
-
-    /// <summary>
-    /// Closes all open windows except the main window (MainWindow).
-    /// </summary>
-    /// <remarks>
-    /// Iterates through all currently open application windows and closes any window
-    /// that is not the main window. Used when performing database operations to ensure
-    /// no stale data is displayed in other windows.
-    /// </remarks>
-    private void CloseAllWindowsExceptMain()
-    {
-        foreach (Window window in Application.Current.Windows)
-        {
-            if (window != this && window.GetType() != typeof(MainWindow))
-            {
-                window.Close();
-            }
-        }
     }
 
     private bool CanLogin(object? parameter)
@@ -157,13 +138,7 @@ public partial class MainWindow : Window
 
     private void MainWindow_Close(object sender, System.EventArgs e)
     {
-        CloseAllWindowsExceptMain();
         Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
-
-    }
-
-    private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-    {
 
     }
 }

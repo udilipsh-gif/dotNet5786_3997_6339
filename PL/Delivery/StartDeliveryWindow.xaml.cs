@@ -64,18 +64,13 @@ public partial class StartDeliveryWindow : Window
         InitializeComponent();
     }
 
-    private void StartDeliveryWindow_Loaded(object sender, RoutedEventArgs e)
+    private void StartDeliveryWindow_Loaded(object sender, EventArgs e)
     {
         Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
+        Tools.RunSafe(() => s_bl.Courier.AddObserver(UserId, orderListObserver));
         UpdateOrdersList();
 
 
-    }
-
-    private void StartDeliveryWindow_Closed(object sender, RoutedEventArgs e)
-    {
-        Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
-        this.Close();
     }
 
     private void orderListObserver()
@@ -84,6 +79,7 @@ public partial class StartDeliveryWindow : Window
     private void StartDeliveryWindow_Closed(object sender, EventArgs e)
     {
         Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
+        Tools.RunSafe(() => s_bl.Courier.RemoveObserver(UserId, orderListObserver));
     }
 
     private void UpdateOrdersList()

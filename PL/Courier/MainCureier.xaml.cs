@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -169,15 +170,11 @@ public partial class MainCureier : Window
 
         var enumTypeOfOrder = Tools.GetEnumList(allowedTypes);
 
-        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, USERID, USERID, CurrentUser!.TypeShipment, enumTypeOfOrder);
+        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, this, USERID, USERID, CurrentUser!.TypeShipment, enumTypeOfOrder);
     }
 
     private void CureierDeliveryHistory_Click(object sender, RoutedEventArgs e)
-    {
-        CourierDeliveryHistoryWindow courierDeliveryHistoryWindow= new CourierDeliveryHistoryWindow(USERID);
-
-        courierDeliveryHistoryWindow.Show();
-    }
+         => Tools.OpenOrActivateWindow<CourierDeliveryHistoryWindow>(window => window.UserId == USERID, this, USERID);
 
     private void EditCureier_Click(object sender, RoutedEventArgs e)
     {
@@ -225,10 +222,5 @@ public partial class MainCureier : Window
         {
             MessageBox.Show($"General error: {ex.Message}");
         }
-    }
-
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-
     }
 }

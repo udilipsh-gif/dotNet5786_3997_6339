@@ -14,19 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="NewFolder1\**" />
-    <EmbeddedResource Remove="NewFolder1\**" />
-    <None Remove="NewFolder1\**" />
-    <Page Remove="NewFolder1\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="AssemblyInfo.cs" />
-    <Compile Remove="Delivery\StertDeliveryWindow.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BL\BL.csproj" />
   </ItemGroup>
-
+  
 </Project>

@@ -15,6 +15,7 @@ public static class Tools
             typeof(bool),
             typeof(Tools),
             new PropertyMetadata(false, OnNumericOnlyChanged));
+    private static WindowState Minimized;
 
     public static bool GetNumericOnly(DependencyObject obj)
     {
@@ -64,15 +65,18 @@ public static class Tools
     }
 
     // גרסה 1: ללא תנאי (כמו שהיה לך עד עכשיו - שומר על תאימות לאחור)
-    internal static void OpenOrActivateWindow<T>(params object?[] args) where T : Window
+    internal static void OpenOrActivateWindow<T>(Window? Owner, params object?[] args) where T : Window
     {
-        OpenOrActivateWindow<T>(null, args);
+        OpenOrActivateWindow<T>(matchPredicate: null, owner: Owner, args: args);
     }
 
     // גרסה 2: עם תנאי סינון (הפונקציה הראשית)
-    internal static void OpenOrActivateWindow<T>(Predicate<T>? matchPredicate, params object?[] args) where T : Window
+    // הוספנו פרמטר אופציונלי 'owner'
+    internal static void OpenOrActivateWindow<T>(
+        Predicate<T>? matchPredicate,
+        Window? owner = null, 
+        params object?[] args) where T : Window
     {
-        // חיפוש חלון: גם מהסוג הנכון וגם (אם נשלח תנאי) עומד בתנאי
         var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault(window =>
             matchPredicate == null || matchPredicate(window));
 
@@ -83,7 +87,7 @@ public static class Tools
 
             existingWindow.Activate();
 
-            // עדכון מצב אם החלון תומך בזה (כפי שעשינו קודם)
+
             if (existingWindow is IWindowUpdater updaterWindow)
             {
                 updaterWindow.UpdateState(args);
@@ -91,8 +95,18 @@ public static class Tools
         }
         else
         {
-            // יצירת חלון חדש
             var newWindow = (T)Activator.CreateInstance(typeof(T), args)!;
+
+            // --- שינוי 2: הגדרת הבעלות ---
+            if (owner != null)
+            {
+                newWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+                newWindow.Left = -10000;
+                newWindow.Top = -10000;
+
+                newWindow.SetSoftOwner(owner);
+            }
+
             newWindow.Show();
             newWindow.Activate();
         }
@@ -158,6 +172,46 @@ public static class Tools
         {
             MessageBox.Show($"Error: {ex.Message}");
         }
+    }
+
+    public static void SetSoftOwner(this Window child, Window parent)
+    {
+        child.Loaded += (s, e) =>
+        {
+            double left = parent.Left + (parent.ActualWidth - child.ActualWidth) / 2;
+            double top = parent.Top + (parent.ActualHeight - child.ActualHeight) / 2;
+
+            if (left < 0) left = 0;
+            if (top < 0) top = 0;
+
+            child.Left = left;
+            child.Top = top;
+        };
+
+        EventHandler parentClosed = null!;
+        parentClosed = (s, e) =>
+        {
+            if (child.IsLoaded) child.Close();
+        };
+
+        EventHandler parentStateChanged = null!;
+        parentStateChanged = (s, e) =>
+        {
+            if (parent.WindowState == WindowState.Minimized)
+                child.WindowState = WindowState.Minimized;
+            else if (parent.WindowState != WindowState.Minimized &&
+                     child.WindowState == WindowState.Minimized)
+                child.WindowState = WindowState.Normal;
+        };
+
+        parent.Closed += parentClosed;
+        parent.StateChanged += parentStateChanged;
+
+        child.Closed += (s, e) =>
+        {
+            parent.Closed -= parentClosed;
+            parent.StateChanged -= parentStateChanged;
+        };
     }
 
 }

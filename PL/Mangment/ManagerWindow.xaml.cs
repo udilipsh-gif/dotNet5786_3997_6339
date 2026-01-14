@@ -130,7 +130,6 @@ public partial class ManagerWindow : Window
     /// </remarks>
     private void ManagerWindow_Close(object? sender, EventArgs e)
     {
-        CloseAllWindowsExceptMain();
         Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
         Tools.RunSafe(() => s_bl.Order.RemoveObserver(StatisticObserver));
     }
@@ -172,7 +171,6 @@ public partial class ManagerWindow : Window
         catch(BlNoAccessException)
         {
             MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
-            CloseAllWindowsExceptMain();
             this.Close();
         }
         var enumList = EnumForStatistic;
@@ -196,7 +194,7 @@ public partial class ManagerWindow : Window
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">Event arguments.</param>
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
-        => Tools.OpenOrActivateWindow<CourierListWindow>();
+        => Tools.OpenOrActivateWindow<CourierListWindow>(this);
 
 
     /// <summary>
@@ -348,7 +346,7 @@ public partial class ManagerWindow : Window
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void btnOrderList_Click(object sender, RoutedEventArgs e)
-        => Tools.OpenOrActivateWindow<OrderListWindow>();
+        => Tools.OpenOrActivateWindow<OrderListWindow>(this);
 
     private void btnStatistic_Click(object sender, RoutedEventArgs e)
     {
@@ -363,22 +361,22 @@ public partial class ManagerWindow : Window
             {
                 // מקרה 1: ה-Tag הוא מסוג OrderStatus
                 case BO.OrderStatus orderStatus:
-                    Tools.OpenOrActivateWindow<OrderListWindow>(orderStatus, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
+                    Tools.OpenOrActivateWindow<OrderListWindow>(this, orderStatus, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
                     break;
 
                 // מקרה 2: ה-Tag הוא מסוג ScheduleStatus
                 case BO.ScheduleStatus scheduleStatus:
-                    Tools.OpenOrActivateWindow<OrderListWindow>((BO.OrderStatus?)null, scheduleStatus, (BO.TypeOfOrder?)null);
+                    Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, scheduleStatus, (BO.TypeOfOrder?)null);
                     break;
 
                 // מקרה ברירת מחדל (למשל אם נלחץ משהו אחר או null)
                 default:
-                    Tools.OpenOrActivateWindow<OrderListWindow>((BO.OrderStatus?)null, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
+                    Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
                     break;
             }
         }
     }
 
     private void btnConfig_Click(object sender, RoutedEventArgs e)
-        => Tools.OpenOrActivateWindow<ConfigWindow>();
+        => Tools.OpenOrActivateWindow<ConfigWindow>(this);
 }

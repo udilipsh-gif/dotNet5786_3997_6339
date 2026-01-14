@@ -8,9 +8,7 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closed="Window_Closed"
-        
-       
-        Title="היסטוריית משלוחים" Height="450" Width="630">
+        Title="היסטוריית משלוחים" Height="450" Width="815">
     
 
         <Window.Resources>
@@ -67,47 +65,8 @@
 
 
                 </Grid.RowDefinitions>
-
-                <!--<StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="0,0,0,10">
-                    <StackPanel Margin="5,0">
-                        <TextBlock Text="סנן לפי סוג:" Margin="0,0,0,3"/>
-                        <ComboBox Width="150" 
-                       ItemsSource="{Binding ScheduleStatusList}"
-                       DisplayMemberPath="Name"
-                       SelectedValuePath="Id"
-                       SelectedValue="{Binding SelectedScheduleFilter}"
-                       SelectionChanged="ComboBox_SelectionChanged">
-                        </ComboBox>
-                    </StackPanel>
-
-                    <StackPanel Margin="5,0">
-                        <TextBlock Text="סנן לפי סוג הזמנה:" Margin="0,0,0,3"/>
-                        <ComboBox Width="150" 
-                       ItemsSource="{Binding TypeOfOrderList}"
-                       SelectedValue="{Binding SelectedTypeFilter}"
-                       SelectionChanged="ComboBox_SelectionChanged"
-                       DisplayMemberPath="Name"
-                       SelectedValuePath="Id">
-                        </ComboBox>
-                    </StackPanel>
-
-                    <StackPanel Margin="5,0">
-                        <TextBlock Text="סנן לפי סטטוס הזמנה:" Margin="0,0,0,3"/>
-                        <ComboBox Width="150" 
-                       ItemsSource="{Binding TypeOfOrderStatusList}"
-                       SelectedValue="{Binding SelectedOrderStatusFilter}"
-                       SelectionChanged="ComboBox_SelectionChanged"
-                       DisplayMemberPath="Name"
-                       SelectedValuePath="Id">
-                        </ComboBox>
-                    </StackPanel>-->
-
-                <!--</StackPanel>-->
-
-
-
-                <!-- DataGrid להצגת ההזמנות -->
-            <DataGrid Grid.Row="1"
+            
+           <DataGrid Grid.Row="1"
                AutoGenerateColumns="False"
                Margin="5"
                ItemsSource="{Binding DeliveriesHistory}"
@@ -117,9 +76,7 @@
                CanUserAddRows="False"
                CanUserDeleteRows="False"
                HorizontalScrollBarVisibility="Auto"
-               FlowDirection="RightToLeft"
-               EnableRowVirtualization="False"
-               EnableColumnVirtualization="False">
+               FlowDirection="RightToLeft">
 
 
                 <DataGrid.Columns>

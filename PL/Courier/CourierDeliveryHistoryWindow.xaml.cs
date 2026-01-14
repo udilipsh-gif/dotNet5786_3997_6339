@@ -11,7 +11,7 @@ public partial class CourierDeliveryHistoryWindow : Window
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
 
-    private readonly int userId;
+    public int UserId { get; private init; }
 
     private readonly int MANAGER_ID =
         Tools.GetSafeFromBl<int>(() => s_bl.Admin.GetConfig().ManagerId);
@@ -19,7 +19,7 @@ public partial class CourierDeliveryHistoryWindow : Window
 
     public CourierDeliveryHistoryWindow(int couriorId)
     {
-        userId = couriorId;
+        UserId = couriorId;
         InitializeComponent();
       
 
@@ -41,7 +41,7 @@ public partial class CourierDeliveryHistoryWindow : Window
         try
         {
             OrderObserver();
-            s_bl.Order.AddObserver(OrderObserver);
+            s_bl.Order.AddObserver(UserId, OrderObserver);
         }
         catch (Exception ex)
         {
@@ -70,8 +70,20 @@ public partial class CourierDeliveryHistoryWindow : Window
         try
         {
            
-            var tempList = s_bl.Order.GetClosed(MANAGER_ID, userId, null, null)
-                           ?? throw new BO.BlDoesNotExistException($"The list for id: {userId} does not exist");
+            var newList = s_bl.Order.GetClosed(MANAGER_ID, UserId, null, null)
+                           ?? throw new BO.BlDoesNotExistException($"The list for id: {UserId} does not exist");
+            if (DeliveriesHistory == null)
+            {
+                DeliveriesHistory = new ObservableCollection<BO.ClosedDeliveryInList>(newList);
+            }
+            else
+            {
+                DeliveriesHistory.Clear(); // מחיקת הישנים
+                foreach (var item in newList)
+                {
+                    DeliveriesHistory.Add(item); // הוספת החדשים
+                }
+            }
         }
         catch (BO.BlDoesNotExistException ex)
         {
