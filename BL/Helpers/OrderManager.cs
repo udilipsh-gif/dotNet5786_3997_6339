@@ -140,44 +140,36 @@ internal static class OrderManager
     public static List<BO.OrderInList> ReadAll(Func<BO.OrderInList, bool>? customPredicate = null,
     BO.OrderInListField? orderBy = BO.OrderInListField.OrderId)
     {
-        // 1. שליפה מוקדמת של כל המשלוחים (פעולת IO אחת בלבד!)
+
         var allDeliveries = s_dal.Delivery.ReadAll();
 
-        // 2. יצירת מילון שממפה מזהה הזמנה -> לרשימת המשלוחים שלה
-        // זה מאפשר שליפה מהירה בטירוף ללא צורך לרוץ על הרשימה שוב ושוב
         var deliveriesMap = allDeliveries
             .GroupBy(d => d.OrderId)
             .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
 
-        // 3. הכנת הפילטרים והממיינים
         Func<BO.OrderInList, bool> filter = customPredicate ?? (x => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortFunc(orderBy);
 
-        // 4. הרצת השאילתה - שימוש בפונקציית המרה מותאמת שמקבלת את המידע המוכן
         var query = from doOrder in s_dal.Order.ReadAll()
-                    let boOrder = ConvertToBoOrderOptimized(doOrder, deliveriesMap) // שימוש בגרסה המהירה
+                    let boOrder = ConvertToBoOrderOptimized(doOrder, deliveriesMap) 
                     where filter(boOrder)
                     orderby sortSelector(boOrder)
                     select boOrder;
 
-        return [.. query]; // המרה לרשימה רק בסוף
+        return [.. query]; 
     }
 
 
     private static BO.OrderInList ConvertToBoOrderOptimized(DO.Order doOrder, Dictionary<int, List<DO.Delivery>> deliveriesMap)
     {
-        // שליפה מהירה מהמילון (במקום לקרוא XML)
         List<DO.Delivery> orderDeliveries = deliveriesMap.TryGetValue(doOrder.Id, out var deliveries)
                                             ? deliveries
                                             : new List<DO.Delivery>();
 
-        // המשלוח האחרון הוא הראשון ברשימה (כי מיינו ביצירת המילון)
         DO.Delivery? latestDelivery = orderDeliveries.FirstOrDefault();
 
-        // המרה ל-Enum
         var orderStatus = (BO.OrderStatus)doOrder.OrderStatus;
 
-        // חישוב מרחק - רק בזיכרון! לא שומרים ל-XML בזמן קריאה כדי לא לתקוע את המערכת
         double distanceKm = doOrder.DistanceKm ?? Tools.GetDistance(doOrder);
 
         return new BO.OrderInList
@@ -188,13 +180,11 @@ internal static class OrderManager
             DistanceKm = distanceKm,
             OrderStatus = orderStatus,
 
-            // העברת המשלוח שנמצא ל-Tools כדי שלא יחפש אותו שוב
             ScheduleStatus = Tools.GetScheduleStatus(doOrder, latestDelivery),
 
             TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, orderStatus),
             TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, latestDelivery?.TimeEndDelivery),
 
-            // חישוב כמות הניסיונות ישירות מהרשימה בזיכרון (במקום Tools.GetCuntOfDelivery)
             NumberOfDeliveryAttempts = orderDeliveries.Count
         };
     }
@@ -555,18 +545,15 @@ internal static class OrderManager
             DO.TheTypeShipment.MOTORCYCLE =>
                 new[] { DO.TypeOfOrder.STANDART, DO.TypeOfOrder.FAST_DELIVERY, DO.TypeOfOrder.DELIVER_IMMEDIATELY },
 
-            _ => Array.Empty<DO.TypeOfOrder>() // ברירת מחדל ליתר ביטחון
+            _ => Array.Empty<DO.TypeOfOrder>() 
         };
 
         Func<DO.Order, bool> toFilter = (order) =>
         {
-            // בדיקה א': האם השליח בכלל יכול לקחת הזמנה כזו?
             bool isAllowedForCourier = permittedOrders.Contains(order.TypeOfOrder);
 
-            // בדיקה ב': האם זה תואם לפילטר שהמשתמש ביקש? (אם הפילטר ריק - הכל עובר)
             bool matchesUserRequest = (filter == null) || (order.TypeOfOrder == (DO.TypeOfOrder)filter);
 
-            // מחזירים אמת רק אם שני התנאים מתקיימים
             return isAllowedForCourier && matchesUserRequest;
         };
 
@@ -600,7 +587,7 @@ internal static class OrderManager
             BO.OpenOrderInListField.ScheduleStatus => query.OrderBy(x => x.ScheduleStatus),
             BO.OpenOrderInListField.TimeLeftForDelivery => query.OrderBy(x => x.TimeLeftForDelivery),
             BO.OpenOrderInListField.MaxDeliveryTime => query.OrderBy(x => x.MaxDeliveryTime),
-            _ => query.OrderBy(x => x.OrderId) // ברירת מחדל
+            _ => query.OrderBy(x => x.OrderId) 
         };
 
         return [.. sortedQuery];

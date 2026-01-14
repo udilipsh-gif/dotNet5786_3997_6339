@@ -150,8 +150,8 @@
     <Email>yaniv.shapiro@courier.com</Email>
     <Password>45</Password>
     <Active>true</Active>
-    <MaxDistanceDelivery>5</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
+    <MaxDistanceDelivery>15</MaxDistanceDelivery>
+    <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2025-11-11T09:18:02.0000000</WorkingSince>
   </Courier>
   <Courier>
