@@ -399,7 +399,7 @@ internal static class CourierManager
             Details = order.Details,
             Address = order.Addres,
             Distance = Tools.GetDistance(order),
-            ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),// delivery.ActualDistance,
+            ActualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),// delivery.ActualDistance,
             CustomerName = order.Name,
             CustomerPhone = order.Phone,
             OrderTime = order.OrderDate,

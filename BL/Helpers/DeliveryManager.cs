@@ -139,7 +139,7 @@ internal static class DeliveryManager
             CourierId = courier.Id,
             TypeShipment = courier.TypeShipment,
             OrderDate = AdminManager.Now,
-            ActualDistance = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
+            ActualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
             EndDelivery = null,
             TimeEndDelivery = null
 

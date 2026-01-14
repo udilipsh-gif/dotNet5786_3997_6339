@@ -501,7 +501,7 @@ internal static class OrderManager
                         OrderType = (BO.TypeOfOrder)order.TypeOfOrder,
                         Address = order.Addres,
                         ShipmentType = (BO.TheTypeShipment)doDelivery.TypeShipment,
-                        ActualDistens = Tools.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),// doDelivery.ActualDistance,
+                        ActualDistens = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),// doDelivery.ActualDistance,
                         DelyveryTime = (TimeSpan)(doDelivery.TimeEndDelivery! - doDelivery.OrderDate),
                         EndDelivery = (BO.EndDelivery)doDelivery.EndDelivery!
                     };
@@ -571,7 +571,7 @@ internal static class OrderManager
         };
 
         var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
-                    let distense = Tools.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)?? 0.1
+                    let distense = GoogleMapsService.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)?? 0.1
                     where (toFilter(doOrder) && (distense <= doCourier.MaxDistanceDelivery))
                     let maxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime
                     select new BO.OpenOrderInList
