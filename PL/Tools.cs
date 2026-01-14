@@ -161,8 +161,3 @@ public static class Tools
     }
 
 }
-
-public interface IWindowUpdater
-{
-    void UpdateState(params object?[] args);
-}

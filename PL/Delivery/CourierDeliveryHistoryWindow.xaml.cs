@@ -1,18 +1,5 @@
-﻿using BO;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PL;
 
@@ -85,20 +72,14 @@ public partial class CourierDeliveryHistoryWindow : Window
            
             var tempList = s_bl.Order.GetClosed(MANAGER_ID, userId, null, null)
                            ?? throw new BO.BlDoesNotExistException($"The list for id: {userId} does not exist");
-
-           
-            Dispatcher.Invoke(() =>
-            {
-                DeliveriesHistory = new ObservableCollection<BO.ClosedDeliveryInList>(tempList);
-            });
         }
-        catch (BO.BlDoesNotExistException)
+        catch (BO.BlDoesNotExistException ex)
         {
-            Dispatcher.Invoke(Close);
+            MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Dispatcher.Invoke(() => MessageBox.Show(ex.Message));
+            MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
         }
     }
 

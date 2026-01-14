@@ -1,6 +1,4 @@
-﻿using BO;
-using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Net.Mail;
 using System.Windows;
 using System.Windows.Controls;
