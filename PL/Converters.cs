@@ -236,15 +236,15 @@ public class TimeSpanToShortStringConverter : IValueConverter
         if (value is TimeSpan timeSpan)
         {
             // אם שלילי - לא להציג כלום
-            if (timeSpan < TimeSpan.Zero)
+            if (timeSpan == TimeSpan.Zero)
                 return "00:00:00";
 
             // אם יותר מיום - הצג ימים
             if (timeSpan.TotalDays >= 1)
-                return $"{(int)timeSpan.TotalDays} ימים {timeSpan.Hours:D2}:{timeSpan.Minutes:D2}";
+                return $"{(int)timeSpan.TotalDays} ימים, {timeSpan.Hours:D2} שעות ו{timeSpan.Minutes:D2} דקות";
 
             // אחרת הצג שעות:דקות
-            return $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}";
+            return $"{(int)timeSpan.TotalHours:D2} שעות ו {timeSpan.Minutes:D2} דקות";
         }
         return string.Empty;
     }
