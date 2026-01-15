@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="מיקום ההזמנה"
-        Width="420" Height="350"
+        Width="500" Height="450"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -29,15 +29,21 @@
             </Grid.RowDefinitions>
 
             <!-- כותרת -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <StackPanel Grid.Row="0" 
+               Background="RoyalBlue" 
+               Orientation="Horizontal" 
+               Margin="0,0,0,10"
+               MouseLeftButtonDown="Header_MouseDown">
                 <TextBlock Text="🗺️" FontSize="20" Margin="0,0,8,0"/>
                 <TextBlock Text="{Binding Order.OrderId, StringFormat='הזמנה מספר {0}'}" 
                            FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
                 <Button Content="✕" 
-                        HorizontalAlignment="Left" 
-                        Margin="10,0,0,0"
+                        HorizontalAlignment="Right" 
+                        Margin="30,0,0,0"
+                        Padding="5"
                         Background="Transparent" 
                         BorderThickness="0"
+                        FontWeight="Bold"
                         Cursor="Hand"
                         Click="CloseButton_Click"/>
             </StackPanel>

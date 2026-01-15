@@ -114,7 +114,6 @@ public partial class StartDeliveryWindow : Window
     {
         if (IsClickInsideButton(e.OriginalSource))
         {
-            // אם זה כפתור, אל תפתח את הפופ-אפ ותן לאירוע להמשיך לכפתור האיסוף
             return;
         }
         _currentPopup?.Close();

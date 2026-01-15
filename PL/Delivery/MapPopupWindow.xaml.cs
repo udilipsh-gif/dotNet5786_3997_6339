@@ -1,6 +1,6 @@
-﻿using System.Windows;
-using System.Windows.Media.Imaging;
-using BO;
+﻿using BO;
+using System.Windows;
+using System.Windows.Input;
 
 namespace PL;
 
@@ -82,5 +82,13 @@ public partial class MapPopupWindow : Window
     private void Window_Deactivated(object sender, EventArgs e)
     {
         if (!_isClosing) Close();
+    }
+
+    private void Header_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            this.DragMove();
+        }
     }
 }
