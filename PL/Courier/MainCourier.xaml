@@ -175,7 +175,7 @@
                             <ColumnDefinition Width="80*" />
                         </Grid.ColumnDefinitions>
                          <Label      Grid.Column="0" Content="אמצעי ניידות:" Style="{StaticResource UniformLabel}"/>
-                        <TextBox  Grid.Column="1"  Text="{Binding CurrentUser.TypeShipment}"  Style="{StaticResource UniformTextBoxVue}"/>
+                        <TextBox  Grid.Column="1"  Text="{Binding CurrentUser.TypeShipment, Converter={StaticResource EnumDescriptionConverter}}"  Style="{StaticResource UniformTextBoxVue}"/>
                     </Grid>
                         <Grid Style="{StaticResource UniformGrid}">
                             <Grid.ColumnDefinitions>
@@ -287,7 +287,7 @@
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="סוג הזמנה:" Style="{StaticResource UniformLabel}"/>
-                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.TypeOfOrder}"  Style="{StaticResource UniformTextBlock}"/>
+                        <TextBlock Text="{Binding CurrentUser.OrderInProgress.TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}}"  Style="{StaticResource UniformTextBlock}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource UniformStackPanel}">
                         <Label  Content="פרטי ההזמנה:" Style="{StaticResource UniformLabel}"/>

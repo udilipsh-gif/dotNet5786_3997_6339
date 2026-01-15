@@ -13,7 +13,6 @@
 
         <Window.Resources>
             <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
-
          
             <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
                 <Setter Property="TextWrapping" Value="Wrap"/>
@@ -31,12 +30,14 @@
 
             <!-- Style לכותרות עם Wrap -->
             <Style x:Key="WrappedHeaderStyle" TargetType="DataGridColumnHeader">
-                <Setter Property="ContentTemplate" >
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="ContentTemplate" >
                     <Setter.Value>
                         <DataTemplate>
                             <TextBlock Text="{Binding}"
                                 TextWrapping="Wrap"
                                 TextAlignment="Center"
+                                     
                                 VerticalAlignment="Center"
                                  FontSize="14"
                                 FontFamily="BOLD"
@@ -57,14 +58,11 @@
 
 
         <Grid>
-                <!--3 שורות, סינון, תוכן, כפתור -->
-                <Grid.RowDefinitions>
+            <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-
-
-                </Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             
            <DataGrid Grid.Row="1"
                AutoGenerateColumns="False"
@@ -86,6 +84,7 @@
                                  Width="Auto"
                                  ElementStyle="{StaticResource WrappedTextCellStyle}"
                                  HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                    
                     <DataGridTextColumn Header="מזהה הזמנה"
                                  Binding="{Binding OrderId}"
                                  SortMemberPath="OrderId"
