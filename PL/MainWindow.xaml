@@ -3,14 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PL"
         Title="כניסה למערכת"
-        Height="600" Width="650" 
+        Height="610" Width="650" 
         WindowStartupLocation="CenterScreen"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Loaded="MainWindow_Loaded"
         Closed="MainWindow_Close">
 
-    <Grid ShowGridLines="True">
+    <Grid ShowGridLines="False">
         
         <Grid.Background>
             <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill">
@@ -21,9 +21,9 @@
         </Grid.Background>
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="215"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="130"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
@@ -34,7 +34,7 @@
         <Border Grid.Row="1" 
                 Width="300"
                 VerticalAlignment="Top"
-                Background="#50FFFFFF"
+                Background="#50CCCCCC"
                 BorderBrush="{StaticResource BorderColor}"
                 BorderThickness="1"
                 CornerRadius="8"
@@ -47,17 +47,19 @@
             </Border.Effect>
 
             <StackPanel>
-                <Label Content="תעודת זהות:"/>
+                <Label Content="תעודת זהות:" />
                 <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" 
                          MaxLength="9"
-                         Background="#50CCCCCC"
+                         Background="#70CCCCCC"
+                         
                        
                          local:Tools.NumericOnly="True"/>
 
-                <Label Content="סיסמה:" Margin="0,15,0,0"/>
-                <PasswordBox x:Name="UserPasswordBox">
+                <Label Content="סיסמה:"   Margin="0,15,0,0"/>
+                <PasswordBox x:Name="UserPasswordBox" Background="#70CCCCCC">
                     <PasswordBox.InputBindings>
                         <KeyBinding Key="Enter" 
+                                    
                                     Command="{Binding LoginCommand}" 
                                     CommandParameter="{Binding ElementName=UserPasswordBox}"/>
                     </PasswordBox.InputBindings>
