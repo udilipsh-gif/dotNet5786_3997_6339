@@ -1,13 +1,10 @@
 ﻿using BO;
 using DalApi;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Mail;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
-using System.Xml.Linq;
 
 namespace Helpers;
 
@@ -18,11 +15,19 @@ namespace Helpers;
 /// <remarks>
 /// This static class contains helper methods used throughout the business logic layer,
 /// including geographic calculations, data validation, order status tracking,
-/// and geocoding services.
+/// and communication services.
 /// </remarks>
 internal static class Tools
 {
-    private static readonly IDal s_dal = Factory.Get; //stage 4
+    /// <summary>
+    /// Data access layer instance for database operations.
+    /// </summary>
+    private static readonly IDal s_dal = Factory.Get;
+
+    /// <summary>
+    /// Earth's radius in kilometers for distance calculations.
+    /// </summary>
+    private const double EarthRadiusKm = 6371;
 
     /// <summary>
     /// Converts an object to its string representation with property details.
@@ -34,52 +39,53 @@ internal static class Tools
     /// Returns "null" if the object is null.
     /// </returns>
     /// <remarks>
-    /// This method uses reflection to iterate through all public properties of the object.
-    /// For collection properties (except strings), displays items in a comma-separated list format.
-    /// Password fields are masked with asterisks for security.
-    /// Each property is displayed on a new line with indentation.
+    /// <para>This method uses reflection to iterate through all public properties of the object.</para>
+    /// <para>For collection properties (except strings), displays items in a comma-separated list format.</para>
+    /// <para>Password fields are masked with asterisks for security.</para>
     /// </remarks>
     public static string ToStringProperty<T>(this T t)
     {
         if (t == null) return "null";
 
         StringBuilder sb = new StringBuilder();
-
         Type type = t.GetType();
         PropertyInfo[] properties = type.GetProperties();
-        // sb.Append(type.Name + " Details:\n");
+
         foreach (PropertyInfo prop in properties)
         {
-            // שליפת הערך של המאפיין מתוך האובייקט t
             var value = prop.GetValue(t);
-            string strValue = "null";
-
-            if (value != null)
-            {
-                if (value is IEnumerable collection && !(value is string))
-                {
-                    var items = collection.Cast<object>()
-                                          .Select(item => item?.ToString() ?? "null");
-
-
-                    strValue = $"[{string.Join(", ", items)}]";
-                }
-                else
-                {
-
-                    strValue = value?.ToString() ?? string.Empty;
-                    if (prop.Name is "password" or "Password")
-                        strValue = "******";
-                }
-            }
-
-            // 5. הוספת שם המאפיין והערך שלו למחרוזת הסופית
+            string strValue = s_formatPropertyValue(prop.Name, value);
             sb.AppendLine($"        {prop.Name}: {strValue}");
         }
 
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Formats a property value for display, handling collections and sensitive data.
+    /// </summary>
+    /// <param name="propertyName">The name of the property.</param>
+    /// <param name="value">The value to format.</param>
+    /// <returns>A formatted string representation of the value.</returns>
+    private static string s_formatPropertyValue(string propertyName, object? value)
+    {
+        if (value == null)
+            return "null";
+
+        // Mask password fields
+        if (propertyName.Equals("password", StringComparison.OrdinalIgnoreCase))
+            return "******";
+
+        // Format collections
+        if (value is IEnumerable collection && value is not string)
+        {
+            var items = collection.Cast<object>()
+                                  .Select(item => item?.ToString() ?? "null");
+            return $"[{string.Join(", ", items)}]";
+        }
+
+        return value.ToString() ?? string.Empty;
+    }
 
     /// <summary>
     /// Calculates the distance between two geographic coordinates using the Haversine formula.
@@ -92,22 +98,19 @@ internal static class Tools
     /// <remarks>
     /// This method uses the Haversine formula to calculate the great-circle distance
     /// between two points on Earth's surface. The Earth's radius is assumed to be 6371 km.
-    /// Implementation based on GIMINI algorithm.
     /// </remarks>
     public static double GetDistance(double lat1, double lon1, double lat2, double lon2)
     {
-        const double R = 6371;
-
-        double dLat = s_toRadians(lat2 - lat1);
-        double dLon = s_toRadians(lon2 - lon1);
+        double dLat = s_degreesToRadians(lat2 - lat1);
+        double dLon = s_degreesToRadians(lon2 - lon1);
 
         double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                   Math.Cos(s_toRadians(lat1)) * Math.Cos(s_toRadians(lat2)) *
+                   Math.Cos(s_degreesToRadians(lat1)) * Math.Cos(s_degreesToRadians(lat2)) *
                    Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
 
         double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-        return R * c;
+        return EarthRadiusKm * c;
     }
 
     /// <summary>
@@ -122,7 +125,7 @@ internal static class Tools
     /// This overload retrieves the store's coordinates from the system configuration
     /// and calculates the distance to the order's delivery location.
     /// </remarks>
-    public static double GetDistance(DO.Order order) //פונקציית העמסה למרחק מהחנות להזמנה
+    public static double GetDistance(DO.Order order)
     {
         double storeLatitude = AdminManager.GetConfig().Latitude ??
             throw new InvalidOperationException("Latitude is not set in configuration.");
@@ -136,14 +139,11 @@ internal static class Tools
     /// <summary>
     /// Converts an angle from degrees to radians.
     /// </summary>
-    /// <param name="angleIn10thofaDegree">The angle in degrees to convert.</param>
+    /// <param name="degrees">The angle in degrees to convert.</param>
     /// <returns>The angle converted to radians.</returns>
-    /// <remarks>
-    /// This is a helper method used by the Haversine distance calculation.
-    /// </remarks>
-    private static double s_toRadians(double angleIn10thofaDegree)
+    private static double s_degreesToRadians(double degrees)
     {
-        return (angleIn10thofaDegree * Math.PI) / 180;
+        return degrees * Math.PI / 180;
     }
 
     /// <summary>
@@ -153,35 +153,29 @@ internal static class Tools
     /// <param name="delivery">The delivery record associated with the order, or null if no delivery exists.</param>
     /// <returns>
     /// The business logic order status:
-    /// - OPEN if no delivery exists or delivery ended with NOTFOUND status
-    /// - COMPLETED if delivery ended with DELIVERED status
-    /// - REFUSED if delivery ended with REFUSED status
-    /// - CANCELLED if delivery ended with CONCELLED or FAILED status
+    /// <list type="bullet">
+    ///   <item><description>OPEN - No delivery exists or delivery ended with NOTFOUND/FAILED status</description></item>
+    ///   <item><description>COMPLETED - Delivery ended with DELIVERED status</description></item>
+    ///   <item><description>REFUSED - Delivery ended with REFUSED status</description></item>
+    ///   <item><description>CANCELLED - Delivery ended with CANCELLED status</description></item>
+    /// </list>
     /// </returns>
     /// <exception cref="Exception">Thrown when the delivery has an unknown status.</exception>
-    /// <remarks>
-    /// This method maps data layer delivery end statuses to business logic order statuses.
-    /// Orders with NOTFOUND delivery status are returned to OPEN status for retry attempts.
-    /// </remarks>
-    public static BO.OrderStatus GetOrderStatus(DO.Order order, DO.Delivery? delivery)
+    public static BO.OrderStatus s_getOrderStatus(DO.Order order, DO.Delivery? delivery)
     {
         if (delivery is null)
-        {
             return BO.OrderStatus.OPEN;
-        }
-        else
+
+        return delivery.EndDelivery switch
         {
-            return (delivery.EndDelivery) switch
-            {
-                DO.EndDelivery.DELIVERED => BO.OrderStatus.COMPLETED,
-                DO.EndDelivery.REFUSED => BO.OrderStatus.REFUSED,
-                DO.EndDelivery.CONCELLED => BO.OrderStatus.CANCELLED,
-                DO.EndDelivery.FAILED => BO.OrderStatus.OPEN,
-                DO.EndDelivery.NOTFOUND => BO.OrderStatus.OPEN,
-                null => BO.OrderStatus.OPEN,
-                _ => throw new Exception("Unknown delivery status"),
-            };
-        }
+            DO.EndDelivery.DELIVERED => BO.OrderStatus.COMPLETED,
+            DO.EndDelivery.REFUSED => BO.OrderStatus.REFUSED,
+            DO.EndDelivery.CONCELLED => BO.OrderStatus.CANCELLED,
+            DO.EndDelivery.FAILED => BO.OrderStatus.OPEN,
+            DO.EndDelivery.NOTFOUND => BO.OrderStatus.OPEN,
+            null => BO.OrderStatus.OPEN,
+            _ => throw new Exception("Unknown delivery status")
+        };
     }
 
     /// <summary>
@@ -189,17 +183,10 @@ internal static class Tools
     /// </summary>
     /// <param name="order">The order to evaluate.</param>
     /// <returns>The business logic order status based on the most recent delivery attempt.</returns>
-    /// <remarks>
-    /// This overload automatically retrieves the most recent delivery for the order
-    /// and determines the status. If no delivery exists, the order is considered OPEN.
-    /// </remarks>
-    public static BO.OrderStatus GetOrderStatus(DO.Order order)
+    public static BO.OrderStatus s_getOrderStatus(DO.Order order)
     {
-        var delivery = (from deliver in DeliveryManager.ReadAll()
-                        where deliver.OrderId == order.Id
-                        orderby deliver.Id descending
-                        select deliver).FirstOrDefault();
-        return GetOrderStatus(order, delivery);
+        var delivery = s_getLatestDelivery(order.Id);
+        return s_getOrderStatus(order, delivery);
     }
 
     /// <summary>
@@ -209,84 +196,32 @@ internal static class Tools
     /// <param name="delivery">The delivery record associated with the order, or null to retrieve automatically.</param>
     /// <returns>
     /// The schedule status:
-    /// - ONTYME: Delivery is on track to meet the deadline
-    /// - INRISK: Delivery is at risk of being late (within the risk range buffer)
-    /// - LATE: Delivery has missed or will miss the deadline
-    /// - CANCELLED: Order has been cancelled or refused
+    /// <list type="bullet">
+    ///   <item><description>ONTYME - Delivery is on track to meet the deadline</description></item>
+    ///   <item><description>INRISK - Delivery is at risk of being late (within the risk range buffer)</description></item>
+    ///   <item><description>LATE - Delivery has missed or will miss the deadline</description></item>
+    ///   <item><description>CANCELLED - Order has been cancelled or refused</description></item>
+    /// </list>
     /// </returns>
     /// <exception cref="Exception">
     /// Thrown when risk range or max delivery time is not configured,
-    /// or when a completed/delivering order has no associated delivery record.
+    /// or when a completed order has no associated delivery record.
     /// </exception>
-    /// <remarks>
-    /// For COMPLETED orders: Compares actual delivery time against the maximum allowed time.
-    /// For DELIVERING orders: Calculates estimated delivery time and compares against deadline.
-    /// For OPEN orders: Estimates time needed based on distance (using 4 km/h average) and compares against deadline.
-    /// For CANCELLED/REFUSED orders: Returns CANCELLED status.
-    /// The risk range buffer helps identify orders that may become late soon.
-    /// </remarks>
     public static BO.ScheduleStatus GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
     {
         TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ??
             throw new Exception("Risk range not configured");
 
-        DateTime maxDeliveryTime = order.OrderDate + AdminManager.GetConfig()?.MaxDeliveryTime ??
-            throw new Exception("Max Delivery Time");
+        DateTime maxDeliveryTime = order.OrderDate + (AdminManager.GetConfig()?.MaxDeliveryTime ??
+            throw new Exception("Max Delivery Time not configured"));
 
-
-
-        if (order.OrderStatus is DO.OrderStatus.COMPLETED)
+        return order.OrderStatus switch
         {
-            if (delivery == null)
-            {
-                delivery = (from deliver in DeliveryManager.ReadAll()
-                            where deliver.OrderId == order.Id
-                            select deliver).FirstOrDefault();
-            }
-
-            DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
-                throw new Exception("order completed but not fonud delivry");
-
-            if (maxDeliveryTime >= timeEndDelivery)
-            {
-                return BO.ScheduleStatus.ONTYME;
-            }
-            else
-            {
-                return BO.ScheduleStatus.LATE;
-            }
-        }
-
-        if (order.OrderStatus is DO.OrderStatus.DELIVERING)
-        {
-            TimeSpan estimatedTime = GetEstimatedDeliveryTime(order) ?? TimeSpan.Zero;
-            TimeSpan timeBuffer = (maxDeliveryTime - AdminManager.Now) - estimatedTime;
-
-            if (timeBuffer > riskRange)
-                return BO.ScheduleStatus.ONTYME;
-
-            if (timeBuffer >= TimeSpan.Zero) // כלומר: בין 0 ל-riskRange
-                return BO.ScheduleStatus.INRISK;
-
-            return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
-        }
-
-        if (order.OrderStatus is DO.OrderStatus.OPEN)
-        {
-            TimeSpan timeLaft = maxDeliveryTime - AdminManager.Now;
-            TimeSpan timeBuffer = timeLaft - TimeSpan.FromHours((GetDistance(order) / 4));
-
-            if (timeBuffer > riskRange)
-                return BO.ScheduleStatus.ONTYME;
-
-            if (timeBuffer >= TimeSpan.Zero) // כלומר: בין 0 ל-riskRange
-                return BO.ScheduleStatus.INRISK;
-
-            return BO.ScheduleStatus.LATE; // הזמן המשוער הוא אחרי זמן המקסימום (שלילי)
-        }
-
-        return BO.ScheduleStatus.CANCELLED;
-
+            DO.OrderStatus.COMPLETED => GetCompletedOrderScheduleStatus(order, delivery, maxDeliveryTime),
+            DO.OrderStatus.DELIVERING => GetDeliveringOrderScheduleStatus(order, maxDeliveryTime, riskRange),
+            DO.OrderStatus.OPEN => GetOpenOrderScheduleStatus(order, maxDeliveryTime, riskRange),
+            _ => BO.ScheduleStatus.CANCELLED
+        };
     }
 
     /// <summary>
@@ -294,18 +229,74 @@ internal static class Tools
     /// </summary>
     /// <param name="order">The order to evaluate.</param>
     /// <returns>The schedule status based on timing constraints and current progress.</returns>
-    /// <remarks>
-    /// This overload automatically retrieves the most recent delivery for the order
-    /// and determines the schedule status. See the main overload for detailed logic.
-    /// </remarks>
     public static BO.ScheduleStatus GetScheduleStatus(DO.Order order)
     {
-        var delivery = (from deliver in DeliveryManager.ReadAll()
-                        where deliver.OrderId == order.Id
-                        orderby deliver.Id descending
-                        select deliver).FirstOrDefault();
-
+        var delivery = s_getLatestDelivery(order.Id);
         return GetScheduleStatus(order, delivery);
+    }
+
+    /// <summary>
+    /// Gets the schedule status for a completed order.
+    /// </summary>
+    private static BO.ScheduleStatus GetCompletedOrderScheduleStatus(
+        DO.Order order,
+        DO.Delivery? delivery,
+        DateTime maxDeliveryTime)
+    {
+        delivery ??= s_getLatestDelivery(order.Id);
+
+        DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
+            throw new Exception("Order completed but delivery not found");
+
+        return maxDeliveryTime >= timeEndDelivery
+            ? BO.ScheduleStatus.ONTYME
+            : BO.ScheduleStatus.LATE;
+    }
+
+    /// <summary>
+    /// Gets the schedule status for an order currently being delivered.
+    /// </summary>
+    private static BO.ScheduleStatus GetDeliveringOrderScheduleStatus(
+        DO.Order order,
+        DateTime maxDeliveryTime,
+        TimeSpan riskRange)
+    {
+        TimeSpan estimatedTime = GetEstimatedDeliveryTime(order) ?? TimeSpan.Zero;
+        TimeSpan timeBuffer = (maxDeliveryTime - AdminManager.Now) - estimatedTime;
+
+        return EvaluateTimeBuffer(timeBuffer, riskRange);
+    }
+
+    /// <summary>
+    /// Gets the schedule status for an open order.
+    /// </summary>
+    private static BO.ScheduleStatus GetOpenOrderScheduleStatus(
+        DO.Order order,
+        DateTime maxDeliveryTime,
+        TimeSpan riskRange)
+    {
+        TimeSpan timeLeft = maxDeliveryTime - AdminManager.Now;
+        // Estimate time based on average walking speed of 4 km/h
+        TimeSpan timeBuffer = timeLeft - TimeSpan.FromHours(GetDistance(order) / 4);
+
+        return EvaluateTimeBuffer(timeBuffer, riskRange);
+    }
+
+    /// <summary>
+    /// Evaluates the time buffer to determine schedule status.
+    /// </summary>
+    /// <param name="timeBuffer">The available time buffer.</param>
+    /// <param name="riskRange">The risk threshold range.</param>
+    /// <returns>The appropriate schedule status.</returns>
+    private static BO.ScheduleStatus EvaluateTimeBuffer(TimeSpan timeBuffer, TimeSpan riskRange)
+    {
+        if (timeBuffer > riskRange)
+            return BO.ScheduleStatus.ONTYME;
+
+        if (timeBuffer >= TimeSpan.Zero)
+            return BO.ScheduleStatus.INRISK;
+
+        return BO.ScheduleStatus.LATE;
     }
 
     /// <summary>
@@ -320,7 +311,7 @@ internal static class Tools
     {
         try
         {
-            var addr = new System.Net.Mail.MailAddress(email);
+            var addr = new MailAddress(email);
             return addr.Address == email;
         }
         catch
@@ -335,22 +326,14 @@ internal static class Tools
     /// <param name="phone">The phone number to validate.</param>
     /// <returns>True if the phone number is valid; otherwise, false.</returns>
     /// <remarks>
-    /// Accepts two formats:
-    /// - Israeli format: Starts with 0 followed by 8-9 digits (e.g., 0501234567)
-    /// - International format: Optional + followed by country code and 1-14 digits (e.g., +972501234567)
+    /// Accepts Israeli phone numbers: 7-10 digits, all numeric characters.
     /// </remarks>
     public static bool IsValidPhone(string phone)
     {
-        if (phone.Length < 7 || phone.Length > 10)
+        if (string.IsNullOrEmpty(phone) || phone.Length < 7 || phone.Length > 10)
             return false;
-        for (int i = 0; i < phone.Length; i++)//בעיקרון ניתן להגביל ל10 תווים
-        {
-            if (phone[i] < '0' || phone[i] > '9')
 
-                return false;
-
-        }
-        return true;
+        return phone.All(char.IsDigit);
     }
 
     /// <summary>
@@ -360,24 +343,24 @@ internal static class Tools
     /// <returns>True if the password meets all strength requirements; otherwise, false.</returns>
     /// <remarks>
     /// A strong password must:
-    /// - Be at least 8 characters long
-    /// - Contain at least one uppercase letter
-    /// - Contain at least one lowercase letter
-    /// - Contain at least one digit
-    /// - Contain at least one special character (non-alphanumeric)
+    /// <list type="bullet">
+    ///   <item><description>Be at least 8 characters long</description></item>
+    ///   <item><description>Contain at least one uppercase letter</description></item>
+    ///   <item><description>Contain at least one lowercase letter</description></item>
+    ///   <item><description>Contain at least one digit</description></item>
+    ///   <item><description>Contain at least one special character (non-alphanumeric)</description></item>
+    /// </list>
     /// </remarks>
     public static bool IsStrongPassword(string password)
     {
-        if (password.Length < 8)
+        if (string.IsNullOrEmpty(password) || password.Length < 8)
             return false;
-        bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
-        foreach (char c in password)
-        {
-            if (char.IsUpper(c)) hasUpper = true;
-            else if (char.IsLower(c)) hasLower = true;
-            else if (char.IsDigit(c)) hasDigit = true;
-            else hasSpecial = true;
-        }
+
+        bool hasUpper = password.Any(char.IsUpper);
+        bool hasLower = password.Any(char.IsLower);
+        bool hasDigit = password.Any(char.IsDigit);
+        bool hasSpecial = password.Any(c => !char.IsLetterOrDigit(c));
+
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }
 
@@ -388,73 +371,59 @@ internal static class Tools
     /// <returns>True if the ID number is valid according to the Israeli ID checksum; otherwise, false.</returns>
     /// <remarks>
     /// Israeli ID numbers use a checksum algorithm where:
-    /// - Odd-positioned digits (from right) are doubled, and their digits are summed
-    /// - Even-positioned digits are added as-is
-    /// - The last digit must make the total sum divisible by 10
+    /// <list type="bullet">
+    ///   <item><description>Odd-positioned digits (from right) are doubled, and their digits are summed</description></item>
+    ///   <item><description>Even-positioned digits are added as-is</description></item>
+    ///   <item><description>The last digit must make the total sum divisible by 10</description></item>
+    /// </list>
     /// </remarks>
     public static bool IsValidId(int id)
     {
-        int tempId = id;
+        int tempId = id / 10; // Skip the check digit
         int sum = 0;
-        tempId = tempId / 10;
+
         for (int i = 1; i < 9; i++)
         {
-            int temp = tempId % 10;
+            int digit = tempId % 10;
+
             if (i % 2 == 0)
             {
-                sum = sum + temp;
+                sum += digit;
             }
             else
             {
-                temp = temp * 2;
-                sum = sum + (temp % 10 + temp / 10);
+                int doubled = digit * 2;
+                sum += (doubled % 10) + (doubled / 10);
             }
-            tempId = tempId / 10;
+
+            tempId /= 10;
         }
 
-        return (id % 10 == (10 - (sum % 10)));
+        int checkDigit = (10 - (sum % 10)) % 10;
+        return id % 10 == checkDigit;
     }
-
-    public static bool IsValidDistens(double distens)
-    {
-        if (AdminManager.GetConfig().MaxDeliveryRange is double max)
-        {
-            return distens <= max;
-        }
-        else
-            return true;
-    }
-
 
     /// <summary>
-    /// Calculates the estimated delivery time for an active delivery.
+    /// Validates that a delivery distance is within the allowed maximum range.
     /// </summary>
-    /// <param name="delivery">The delivery record containing distance and courier information.</param>
-    /// <returns>The estimated date and time when the delivery will be completed.</returns>
-    /// <exception cref="BO.BlDoesNotExistException">
-    /// Thrown when the courier associated with the delivery is not found.
-    /// </exception>
-    /// <remarks>
-    /// If the actual distance is available, estimates based on:
-    /// - The courier's vehicle type and its average speed (from configuration)
-    /// - The actual distance to be traveled
-    /// 
-    /// If no actual distance is available, uses the maximum delivery time from configuration.
-    /// The calculation assumes constant average speed for the vehicle type.
-    /// </remarks>
+    /// <param name="distance">The distance in kilometers to validate.</param>
+    /// <returns>True if the distance is within the allowed range; otherwise, false.</returns>
+    public static bool IsValidDistens(double distance)
+    {
+        var maxRange = AdminManager.GetConfig().MaxDeliveryRange;
+        return maxRange == null || distance <= maxRange;
+    }
+
+    /// <summary>
+    /// Calculates the estimated delivery time based on shipment type and distance.
+    /// </summary>
+    /// <param name="typeShipment">The type of vehicle/shipment method.</param>
+    /// <param name="actualDistance">The distance to travel in kilometers.</param>
+    /// <returns>The estimated time to complete the delivery.</returns>
     public static TimeSpan? GetEstimatedDeliveryTime(BO.TheTypeShipment typeShipment, double actualDistance)
     {
-        double avgSpeed = typeShipment switch
-        {
-            BO.TheTypeShipment.CAR => AdminManager.GetConfig().AvgSpeedCar,
-            BO.TheTypeShipment.MOTORCYCLE => AdminManager.GetConfig().AvgSpeedMotorcycle,
-            BO.TheTypeShipment.BIKE => AdminManager.GetConfig().AvgSpeedBike,
-            BO.TheTypeShipment.FOOT => AdminManager.GetConfig().AvgSpeedFoot,
-            _ => 1.0
-        };
-
+        double avgSpeed = s_getAverageSpeed(typeShipment);
         double estimatedHours = actualDistance / avgSpeed;
-
         return TimeSpan.FromHours(estimatedHours);
     }
 
@@ -465,50 +434,60 @@ internal static class Tools
     /// <returns>
     /// The estimated delivery time if a delivery exists, or null if no delivery has been assigned.
     /// </returns>
-    /// <remarks>
-    /// This overload automatically retrieves the most recent delivery for the order.
-    /// See the main overload for calculation details.
-    /// </remarks>
     public static TimeSpan? GetEstimatedDeliveryTime(DO.Order order)
     {
-        var delivery = (from deliver in DeliveryManager.ReadAll()
-                        where deliver.OrderId == order.Id
-                        orderby deliver.Id descending
-                        select deliver).FirstOrDefault();
-
+        var delivery = s_getLatestDelivery(order.Id);
         return delivery == null ? null : GetEstimatedDeliveryTime(delivery);
     }
 
-    public static TimeSpan? GetEstimatedDeliveryTime(DO.Delivery Delivery, DO.Courier? courier = null)
+    /// <summary>
+    /// Calculates the estimated delivery time for an active delivery.
+    /// </summary>
+    /// <param name="delivery">The delivery record.</param>
+    /// <param name="courier">Optional courier information (will be retrieved if not provided).</param>
+    /// <returns>The estimated delivery time, or null if the delivery is already completed.</returns>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the courier or order associated with the delivery is not found.
+    /// </exception>
+    public static TimeSpan? GetEstimatedDeliveryTime(DO.Delivery delivery, DO.Courier? courier = null)
     {
-        if (Delivery is DO.Delivery delivery && delivery.EndDelivery is null)
-        {
-            if (courier is null)
-            {
-                courier = s_dal.Courier.Read(delivery.CourierId)
-                  ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does Not exist");
-            }
-
-            double? actualDistance = delivery.ActualDistance;
-            if (actualDistance is null or 0)
-            {
-                DO.Order order = s_dal.Order.Read(delivery.OrderId)
-                  ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does Not exist");
-
-                actualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
-
-                s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
-            }
-            return GetEstimatedDeliveryTime((BO.TheTypeShipment)courier.TypeShipment, actualDistance ?? 0);
-        }
-        else
-        {
+        if (delivery.EndDelivery != null)
             return null;
+
+        courier ??= s_dal.Courier.Read(delivery.CourierId)
+            ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does not exist");
+
+        double? actualDistance = delivery.ActualDistance;
+
+        if (actualDistance is null or 0)
+        {
+            DO.Order order = s_dal.Order.Read(delivery.OrderId)
+                ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does not exist");
+
+            actualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
+            s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
         }
 
+        return GetEstimatedDeliveryTime((BO.TheTypeShipment)courier.TypeShipment, actualDistance ?? 0);
     }
 
-
+    /// <summary>
+    /// Gets the average speed for a shipment type from configuration.
+    /// </summary>
+    /// <param name="typeShipment">The shipment type.</param>
+    /// <returns>The average speed in km/h.</returns>
+    private static double s_getAverageSpeed(BO.TheTypeShipment typeShipment)
+    {
+        var config = AdminManager.GetConfig();
+        return typeShipment switch
+        {
+            BO.TheTypeShipment.CAR => config.AvgSpeedCar,
+            BO.TheTypeShipment.MOTORCYCLE => config.AvgSpeedMotorcycle,
+            BO.TheTypeShipment.BIKE => config.AvgSpeedBike,
+            BO.TheTypeShipment.FOOT => config.AvgSpeedFoot,
+            _ => 1.0
+        };
+    }
 
     /// <summary>
     /// Calculates the time remaining until an order reaches its maximum delivery deadline.
@@ -519,16 +498,10 @@ internal static class Tools
     /// The time remaining as a TimeSpan, or TimeSpan.Zero if the order is completed or cancelled.
     /// May return negative TimeSpan if the order is already late.
     /// </returns>
-    /// <remarks>
-    /// For COMPLETED or CANCELLED orders, returns zero as no time is left.
-    /// For active orders (OPEN, DELIVERING, REFUSED), calculates: (OrderDate + MaxDeliveryTime) - CurrentTime
-    /// </remarks>
     public static TimeSpan GetTimeLeftForDelivery(DO.Order order, BO.OrderStatus status)
     {
         if (status is BO.OrderStatus.COMPLETED or BO.OrderStatus.CANCELLED or BO.OrderStatus.REFUSED)
-        {
             return TimeSpan.Zero;
-        }
 
         return (order.OrderDate + AdminManager.GetConfig().MaxDeliveryTime) - AdminManager.Now;
     }
@@ -538,116 +511,104 @@ internal static class Tools
     /// </summary>
     /// <param name="order">The order to calculate time remaining for.</param>
     /// <returns>The time remaining as a TimeSpan.</returns>
-    /// <remarks>
-    /// This overload automatically determines the order status before calculating time remaining.
-    /// </remarks>
     public static TimeSpan GetTimeLeftForDelivery(DO.Order order)
     {
-        BO.OrderStatus status = GetOrderStatus(order);
+        BO.OrderStatus status = s_getOrderStatus(order);
         return GetTimeLeftForDelivery(order, status);
     }
-
 
     /// <summary>
     /// Calculates the total time taken for a delivery from order placement to completion.
     /// </summary>
     /// <param name="order">The order to calculate delivery time for.</param>
     /// <param name="status">The current status of the order.</param>
-    /// <param name="delivery">The delivery record containing completion time.</param>
+    /// <param name="endDelivery">The delivery completion time.</param>
     /// <returns>
-    /// The total delivery time as a TimeSpan if the order is completed or cancelled,
-    /// or TimeSpan.Zero if the order is still active (OPEN, DELIVERING, or REFUSED).
+    /// The total delivery time as a TimeSpan if the order is completed,
+    /// or TimeSpan.Zero if the order is still active.
     /// </returns>
-    /// <remarks>
-    /// For COMPLETED or CANCELLED orders, calculates: TimeEndDelivery - OrderDate
-    /// For active orders (OPEN, DELIVERING, REFUSED), returns zero as delivery is not complete.
-    /// </remarks>
     public static TimeSpan GetTotalTimeOfDelivery(DO.Order order, BO.OrderStatus status, DateTime? endDelivery)
     {
-        if (status == BO.OrderStatus.OPEN || status == BO.OrderStatus.DELIVERING)
+        if (status is BO.OrderStatus.OPEN or BO.OrderStatus.DELIVERING)
             return TimeSpan.Zero;
-        else
-            return endDelivery - order.OrderDate ?? TimeSpan.Zero;
+
+        return endDelivery - order.OrderDate ?? TimeSpan.Zero;
     }
 
     /// <summary>
     /// Counts the number of delivery attempts made for a specific order.
     /// </summary>
     /// <param name="orderId">The unique identifier of the order.</param>
-    /// <returns>The total number of delivery attempts (records) for the order.</returns>
-    /// <remarks>
-    /// Each delivery assignment to a courier creates a new delivery record.
-    /// This count includes all attempts regardless of outcome (delivered, refused, failed, etc.).
-    /// </remarks>
+    /// <returns>The total number of delivery attempts for the order.</returns>
     public static int GetCuntOfDelivery(int orderId)
     {
         return s_dal.Delivery.ReadAll(d => d.OrderId == orderId).Count();
     }
 
-   
+    /// <summary>
+    /// Retrieves the most recent delivery for an order.
+    /// </summary>
+    /// <param name="orderId">The order ID.</param>
+    /// <returns>The most recent delivery, or null if no deliveries exist.</returns>
+    private static DO.Delivery? s_getLatestDelivery(int orderId)
+    {
+        return DeliveryManager.ReadAll()
+            .Where(d => d.OrderId == orderId)
+            .OrderByDescending(d => d.Id)
+            .FirstOrDefault();
+    }
 
     /// <summary>
     /// Checks if a given ID belongs to the system manager.
     /// </summary>
-    /// <param name="Id">The ID to verify.</param>
-    /// <returns>True if the ID matches the manager ID configured in the system; otherwise, false.</returns>
-    /// <remarks>
-    /// This method is used for authorization checks to determine if a user has manager privileges.
-    /// The manager ID is retrieved from the system configuration.
-    /// </remarks>
-    public static bool CheckManger(int Id)
+    /// <param name="id">The ID to verify.</param>
+    /// <returns>True if the ID matches the manager ID; otherwise, false.</returns>
+    public static bool CheckManger(int id)
     {
-        return Id == AdminManager.GetConfig().ManagerId;
+        return id == AdminManager.GetConfig().ManagerId;
     }
 
     /// <summary>
-    ///  Sends an email using SMTP via Gmail's SMTP server.
+    /// Sends an email using SMTP via Gmail's SMTP server.
     /// </summary>
-    /// <param name="toEmail"></param>
-    /// <param name="subject"></param>
-    /// <param name="body"></param>
-    /// <exception cref="SmtpException"></exception>
+    /// <param name="toEmail">The recipient's email address.</param>
+    /// <param name="subject">The email subject line.</param>
+    /// <param name="body">The email body content.</param>
+    /// <exception cref="SmtpException">
+    /// Thrown when the email fails to send or the recipient address is empty.
+    /// </exception>
+    /// <remarks>
+    /// Uses Gmail's SMTP server (smtp.gmail.com) on port 587 with TLS encryption.
+    /// Requires valid Gmail credentials configured in the code.
+    /// </remarks>
     public static void SendEmail(string toEmail, string subject, string body)
     {
+        if (string.IsNullOrWhiteSpace(toEmail))
+            throw new SmtpException("Recipient email address is empty");
+
         try
         {
-            MailMessage mail = new MailMessage();
-            SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+            using MailMessage mail = new MailMessage();
+            using SmtpClient smtpServer = new SmtpClient("smtp.gmail.com");
 
-            string fromEmail = "aaaaaaaaa@gmail.com";
-            string password = "1234 5678 @#$% Asdf"; // סיסמת האפליקציה (16 תווים)
+            // Email credentials (should be moved to configuration)
+            const string fromEmail = "aaaaaaaaa@gmail.com";
+            const string password = "1234 5678 @#$% Asdf";
 
             mail.From = new MailAddress(fromEmail);
-
-            // ולידציה בסיסית למקרה שהמייל ריק
-            if (string.IsNullOrWhiteSpace(toEmail))
-
-                throw new SmtpException("כתובת נמען ריקה");
-
-
             mail.To.Add(toEmail);
             mail.Subject = subject;
             mail.Body = body;
 
+            smtpServer.Port = 587;
+            smtpServer.Credentials = new NetworkCredential(fromEmail, password);
+            smtpServer.EnableSsl = true;
 
-            // הגדרות שרת
-            SmtpServer.Port = 587;
-            SmtpServer.Credentials = new NetworkCredential(fromEmail, password);
-            SmtpServer.EnableSsl = true;
-
-            SmtpServer.Send(mail);
+            smtpServer.Send(mail);
         }
-        //catch (Exception ex)
-        //{
-
-        //    throw new Exception($"שגיאה בשליחת מייל: {ex.Message}");
-        //}
         catch (SmtpException ex)
         {
-            throw new SmtpException($"שגיאה בשליחת מייל: {ex.Message}");
+            throw new SmtpException($"Failed to send email: {ex.Message}");
         }
     }
-
- 
-
 }

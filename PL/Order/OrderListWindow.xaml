@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת הזמנות"
-        Height="500" Width="1100" Loaded="Window_Loaded" FlowDirection="RightToLeft">
+        Height="500" Width="1000" Loaded="Window_Loaded" FlowDirection="RightToLeft">
 
     <Window.Resources>
         <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
@@ -159,10 +159,10 @@
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                    <DataGridTextColumn Header="סטטוס עמידה בזמנים"
+                    <DataGridTextColumn Header="סטטוס לו''ז"
                                     Binding="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}}"
                                     SortMemberPath="ScheduleStatus"
-                                    Width="Auto"
+                                    Width="85"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
@@ -180,10 +180,10 @@
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                    <DataGridTextColumn Header="מספר ניסיונות משלוח"
+                    <DataGridTextColumn Header="נסיון מס'"
                                         Binding="{Binding NumberOfDeliveryAttempts}"
                                         SortMemberPath="NumberOfDeliveryAttempts"
-                                        Width="Auto"
+                                        Width="65"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                         HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 

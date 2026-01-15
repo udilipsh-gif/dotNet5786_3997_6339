@@ -324,7 +324,7 @@ internal static class OrderManager
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         // Validate order status without expensive full conversion
-        BO.OrderStatus currentStatus = Tools.GetOrderStatus(doOrder);
+        BO.OrderStatus currentStatus = Tools.s_getOrderStatus(doOrder);
 
         if (currentStatus is not BO.OrderStatus.OPEN)
             throw new BO.BlInvalidOperationException("Order is not open for selection");
