@@ -235,6 +235,6 @@ internal static class Config
         RiskRange = TimeSpan.FromDays(1);
         MaxTimeInactivity = TimeSpan.FromDays(100);
         GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
-        EmailAddress = string.Empty;
+        EmailAddress = "david48483@gmail.com";
     }
 }

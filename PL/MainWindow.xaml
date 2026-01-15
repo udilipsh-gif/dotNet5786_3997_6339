@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:PL"
         Title="כניסה למערכת"
         Height="650" Width="650" 
-        MinHeight="620" MinWidth="600" 
+        MinHeight="620" MinWidth="800" 
         WindowStartupLocation="CenterScreen"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
