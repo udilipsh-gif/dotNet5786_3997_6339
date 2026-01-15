@@ -1,5 +1,4 @@
-﻿using BO;
-using DalApi;
+﻿using DalApi;
 using System.Net.Mail;
 
 namespace Helpers;
@@ -14,8 +13,6 @@ namespace Helpers;
 /// </remarks>
 internal static class OrderManager
 {
-    #region Fields
-
     /// <summary>
     /// Data access layer instance for database operations.
     /// </summary>
@@ -25,10 +22,6 @@ internal static class OrderManager
     /// Observer manager for notifying UI components about order changes.
     /// </summary>
     internal static readonly ObserverManager Observer = new();
-
-    #endregion
-
-    #region Statistics
 
     /// <summary>
     /// Retrieves statistical counts of orders grouped by order status and schedule status.
@@ -77,10 +70,6 @@ internal static class OrderManager
         return results;
     }
 
-    #endregion
-
-    #region CRUD Operations
-
     /// <summary>
     /// Creates a new order in the system.
     /// </summary>
@@ -99,7 +88,7 @@ internal static class OrderManager
     /// </remarks>
     public static void Create(BO.Order boOrder)
     {
-        ValidateOrderFields(boOrder);
+        s_validateOrderFields(boOrder);
 
         var addressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
 
@@ -150,8 +139,8 @@ internal static class OrderManager
         if (doOrder is null)
             return null;
 
-        var deliveryPerOrderInLists = CreateDeliveryPerOrderInList(doOrder.Id);
-        DateTime? estimatedDeliveryTime = CalculateEstimatedDeliveryTime(doOrder, deliveryPerOrderInLists);
+        var deliveryPerOrderInLists = s_createDeliveryPerOrderInList(doOrder.Id);
+        DateTime? estimatedDeliveryTime = s_calculateEstimatedDeliveryTime(doOrder, deliveryPerOrderInLists);
 
         return new BO.Order
         {
@@ -189,7 +178,7 @@ internal static class OrderManager
     /// </remarks>
     public static void Update(BO.Order boOrder)
     {
-        ValidateOrderFields(boOrder);
+        s_validateOrderFields(boOrder);
 
         var addressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
 
@@ -226,10 +215,6 @@ internal static class OrderManager
         throw new BO.BlInvalidOperationException("Order cannot be deleted. Use Cancel instead.");
     }
 
-    #endregion
-
-    #region Read All Operations
-
     /// <summary>
     /// Retrieves all orders from the system with optional filtering and sorting.
     /// </summary>
@@ -246,7 +231,7 @@ internal static class OrderManager
         object? filterValue,
         BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
     {
-        Func<BO.OrderInList, bool> filterPredicate = GetFilterPredicate(filter, filterValue);
+        Func<BO.OrderInList, bool> filterPredicate = s_getFilterPredicate(filter, filterValue);
         return ReadAll(filterPredicate, orderBy);
     }
 
@@ -266,10 +251,10 @@ internal static class OrderManager
             .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
 
         Func<BO.OrderInList, bool> filter = customPredicate ?? (_ => true);
-        Func<BO.OrderInList, object> sortSelector = GetSortSelector(orderBy);
+        Func<BO.OrderInList, object> sortSelector = s_getSortSelector(orderBy);
 
         var query = from doOrder in s_dal.Order.ReadAll()
-                    let boOrder = ConvertToBoOrderOptimized(doOrder, deliveriesMap)
+                    let boOrder = s_convertToBoOrderOptimized(doOrder, deliveriesMap)
                     where filter(boOrder)
                     orderby sortSelector(boOrder)
                     select boOrder;
@@ -277,9 +262,6 @@ internal static class OrderManager
         return [.. query];
     }
 
-    #endregion
-
-    #region Order Operations
 
     /// <summary>
     /// Cancels an existing order based on its current status.
@@ -308,8 +290,8 @@ internal static class OrderManager
         {
             DO.OrderStatus.COMPLETED => throw new BO.BlInvalidOperationException("Cannot cancel a completed order."),
             DO.OrderStatus.CONCELLED => throw new BO.BlInvalidOperationException("Order is already cancelled."),
-            DO.OrderStatus.OPEN or DO.OrderStatus.REFUSED => () => CancelOpenOrder(doOrder),
-            DO.OrderStatus.DELIVERING => () => CancelDeliveringOrder(doOrder, orderId),
+            DO.OrderStatus.OPEN or DO.OrderStatus.REFUSED => () => s_cancelOpenOrder(doOrder),
+            DO.OrderStatus.DELIVERING => () => s_cancelDeliveringOrder(doOrder, orderId),
             _ => throw new BO.BlInvalidOperationException("Invalid order status.")
         };
 
@@ -344,15 +326,11 @@ internal static class OrderManager
         // Validate order status without expensive full conversion
         BO.OrderStatus currentStatus = Tools.GetOrderStatus(doOrder);
 
-        if (currentStatus is not (BO.OrderStatus.OPEN or BO.OrderStatus.REFUSED))
+        if (currentStatus is not BO.OrderStatus.OPEN)
             throw new BO.BlInvalidOperationException("Order is not open for selection");
 
         DeliveryManager.Create(doOrder, doCourier);
     }
-
-    #endregion
-
-    #region Query Operations
 
     /// <summary>
     /// Retrieves all completed deliveries for a specific courier with optional filtering and sorting.
@@ -394,7 +372,7 @@ internal static class OrderManager
 
         var uniqueQuery = query.DistinctBy(x => x.OrderId);
 
-        return [.. SortClosedDeliveries(uniqueQuery, sort)];
+        return [.. s_sortClosedDeliveries(uniqueQuery, sort)];
     }
 
     /// <summary>
@@ -421,7 +399,7 @@ internal static class OrderManager
         DO.Courier doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        var permittedOrders = GetPermittedOrderTypes(doCourier.TypeShipment);
+        var permittedOrders = s_getPermittedOrderTypes(doCourier.TypeShipment);
 
         Func<DO.Order, bool> orderFilter = order =>
             permittedOrders.Contains(order.TypeOfOrder) &&
@@ -445,19 +423,15 @@ internal static class OrderManager
                         MaxDeliveryTime = maxDeliveryTime
                     };
 
-        return [.. SortOpenOrders(query, sort)];
+        return [.. s_sortOpenOrders(query, sort)];
     }
-
-    #endregion
-
-    #region Private Helper Methods - Validation
 
     /// <summary>
     /// Validates all required fields of an order.
     /// </summary>
     /// <param name="order">The order to validate.</param>
     /// <exception cref="BO.BlInvalidValueException">Thrown when any required field is invalid.</exception>
-    private static void ValidateOrderFields(BO.Order order)
+    private static void s_validateOrderFields(BO.Order order)
     {
         if (string.IsNullOrEmpty(order.Name))
             throw new BO.BlInvalidValueException("Order name cannot be empty.");
@@ -472,17 +446,13 @@ internal static class OrderManager
             throw new BO.BlInvalidValueException("Order details cannot be empty.");
     }
 
-    #endregion
-
-    #region Private Helper Methods - Conversion
-
     /// <summary>
     /// Converts a data layer order to a business logic OrderInList object using pre-fetched deliveries.
     /// </summary>
     /// <param name="doOrder">The data layer order to convert.</param>
     /// <param name="deliveriesMap">Pre-fetched deliveries grouped by order ID.</param>
     /// <returns>An OrderInList object with calculated fields.</returns>
-    private static BO.OrderInList ConvertToBoOrderOptimized(
+    private static BO.OrderInList s_convertToBoOrderOptimized(
         DO.Order doOrder,
         Dictionary<int, List<DO.Delivery>> deliveriesMap)
     {
@@ -515,7 +485,7 @@ internal static class OrderManager
     /// <returns>
     /// A list of DeliveryPerOrderInList objects, or null if no deliveries exist.
     /// </returns>
-    private static List<BO.DeliveryPerOrderInList>? CreateDeliveryPerOrderInList(int orderId)
+    private static List<BO.DeliveryPerOrderInList>? s_createDeliveryPerOrderInList(int orderId)
     {
         var deliveries = from doDelivery in s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
                          let courier = s_dal.Courier.Read(doDelivery.CourierId)
@@ -541,7 +511,7 @@ internal static class OrderManager
     /// <param name="doOrder">The data layer order.</param>
     /// <param name="deliveries">List of delivery attempts for the order.</param>
     /// <returns>The estimated delivery time, or null if not applicable.</returns>
-    private static DateTime? CalculateEstimatedDeliveryTime(
+    private static DateTime? s_calculateEstimatedDeliveryTime(
         DO.Order doOrder,
         List<BO.DeliveryPerOrderInList>? deliveries)
     {
@@ -557,15 +527,11 @@ internal static class OrderManager
             : null;
     }
 
-    #endregion
-
-    #region Private Helper Methods - Cancellation
-
     /// <summary>
     /// Cancels an order that is in OPEN or REFUSED status.
     /// </summary>
     /// <param name="doOrder">The order to cancel.</param>
-    private static void CancelOpenOrder(DO.Order doOrder)
+    private static void s_cancelOpenOrder(DO.Order doOrder)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
         s_dal.Order.Update(doOrder);
@@ -593,7 +559,7 @@ internal static class OrderManager
     /// <exception cref="BO.BlDoesNotExistException">
     /// Thrown when the delivery or courier is not found.
     /// </exception>
-    private static void CancelDeliveringOrder(DO.Order doOrder, int orderId)
+    private static void s_cancelDeliveringOrder(DO.Order doOrder, int orderId)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
         s_dal.Order.Update(doOrder);
@@ -634,10 +600,6 @@ internal static class OrderManager
         }
     }
 
-    #endregion
-
-    #region Private Helper Methods - Filtering and Sorting
-
     /// <summary>
     /// Creates a filter predicate function based on the specified field and value.
     /// </summary>
@@ -647,7 +609,7 @@ internal static class OrderManager
     /// <exception cref="BO.BlInvalidValueException">
     /// Thrown when a filter field is specified but no filter value is provided.
     /// </exception>
-    private static Func<BO.OrderInList, bool> GetFilterPredicate(
+    private static Func<BO.OrderInList, bool> s_getFilterPredicate(
         BO.OrderInListField? filter,
         object? filterValue)
     {
@@ -673,7 +635,7 @@ internal static class OrderManager
     /// </summary>
     /// <param name="sort">The field to sort by, or null to use default sorting.</param>
     /// <returns>A selector function that extracts the specified field value.</returns>
-    private static Func<BO.OrderInList, object> GetSortSelector(BO.OrderInListField? sort)
+    private static Func<BO.OrderInList, object> s_getSortSelector(BO.OrderInListField? sort)
     {
         return sort switch
         {
@@ -694,7 +656,7 @@ internal static class OrderManager
     /// <param name="query">The query to sort.</param>
     /// <param name="sort">The field to sort by.</param>
     /// <returns>Sorted enumerable of closed deliveries.</returns>
-    private static IEnumerable<BO.ClosedDeliveryInList> SortClosedDeliveries(
+    private static IEnumerable<BO.ClosedDeliveryInList> s_sortClosedDeliveries(
         IEnumerable<BO.ClosedDeliveryInList> query,
         BO.ClosedDeliveryInListField? sort)
     {
@@ -718,7 +680,7 @@ internal static class OrderManager
     /// <param name="query">The query to sort.</param>
     /// <param name="sort">The field to sort by.</param>
     /// <returns>Sorted enumerable of open orders.</returns>
-    private static IEnumerable<BO.OpenOrderInList> SortOpenOrders(
+    private static IEnumerable<BO.OpenOrderInList> s_sortOpenOrders(
         IEnumerable<BO.OpenOrderInList> query,
         BO.OpenOrderInListField? sort)
     {
@@ -743,7 +705,7 @@ internal static class OrderManager
     /// </summary>
     /// <param name="shipmentType">The courier's shipment/vehicle type.</param>
     /// <returns>Array of permitted order types.</returns>
-    private static DO.TypeOfOrder[] GetPermittedOrderTypes(DO.TheTypeShipment shipmentType)
+    private static DO.TypeOfOrder[] s_getPermittedOrderTypes(DO.TheTypeShipment shipmentType)
     {
         return shipmentType switch
         {
@@ -759,7 +721,5 @@ internal static class OrderManager
             _ => []
         };
     }
-
-    #endregion
 }
 
