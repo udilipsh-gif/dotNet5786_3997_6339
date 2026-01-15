@@ -1,4 +1,5 @@
 ﻿//using BO;
+using DO;
 using System.Runtime.CompilerServices;
 
 namespace Helpers;
@@ -30,22 +31,24 @@ internal static class AdminManager //stage 4
         var oldClock = s_dal.Config.Clock; //stage 4
         s_dal.Config.Clock = newClock; //stage 4
 
-        //Add calls here to any logic method that should be called periodically,
-        //after each clock update
-        //for example, Periodic students' updates:
-        // - Go through all students to update properties that are affected by the clock update
-        // - (students become not active after 5 years etc.)
 
-        //TO_DO: //stage 4
+        if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
+        {
+            _periodicTask = Task.Run(() =>
+            {
+                // קריאה לפונקציה החדשה שיצרנו ב-Tools
+                bool dataChanged = Tools.PeriodicSystemUpdates();
 
-
-        ////  StudentManager.PeriodicStudentsUpdates(oldClock, newClock); //stage 4. to be removed in stage 7 and replaced as below
-        // TO_DO stage 4
-       // DeliveryManager.PeriodicOrdersUpdates(oldClock, newClock);
-
-
-
-        //...
+                // אם בוצעו שינויים בנתונים (למשל שליח הפך ללא פעיל), נרצה להודיע על כך
+                if (dataChanged)
+                {
+                    // אופציונלי: קריאה לאירוע עדכון קונפיגורציה או אירוע ייעודי אחר לריענון רשימות
+                    //ConfigUpdatedObservers?.Invoke();
+                    //CourierManager.Observer.NotifyListUpdated();
+                }
+                //OrderManager.Observer.NotifyListUpdated();
+            });
+        }
 
         //TO_DO: //stage 7
         //if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7

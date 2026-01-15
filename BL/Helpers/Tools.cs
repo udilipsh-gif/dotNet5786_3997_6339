@@ -236,6 +236,46 @@ internal static class Tools
     }
 
     /// <summary>
+    /// Performs periodic checks on system entities (Couriers, Orders) triggered by clock updates.
+    /// Checks for courier inactivity and updates their status if necessary.
+    /// </summary>
+    /// <returns>True if any changes were made to the database/lists, requiring a UI refresh.</returns>
+    public static bool PeriodicSystemUpdates()
+    {
+        bool hasChanges = false;
+        DateTime now = AdminManager.Now;
+
+        // שליפת טווח חוסר הפעילות מהקונפיגורציה
+        TimeSpan maxInactivity = s_dal.Config.MaxTimeInactivity;
+        // --- לוגיקה לעדכון שליחים (Couriers) ---
+        var couriers = s_dal.Courier.ReadAll();
+
+        foreach (var courier in couriers)
+        {
+            // שליפת המשלוח האחרון שהסתיים עבור שליח זה
+            var lastDelivery = s_dal.Delivery.ReadAll(d => d.CourierId == courier.Id && d.EndDelivery != null)
+                                             .OrderByDescending(d => d.EndDelivery)
+                                             .FirstOrDefault();
+
+            // אם נמצא משלוח, בודקים את הזמן שעבר
+            if (lastDelivery != null && lastDelivery.TimeEndDelivery.HasValue)
+            {
+                TimeSpan timeSinceLastDelivery = now - lastDelivery.TimeEndDelivery.Value;
+
+                if (courier.Active && timeSinceLastDelivery > maxInactivity)
+                {
+                    // עדכון השליח ללא פעיל
+                    var updatedCourier = courier with { Active = false };
+                    s_dal.Courier.Update(updatedCourier);
+                    hasChanges = true;
+                }
+
+            }
+        }
+        return hasChanges;
+    }
+
+    /// <summary>
     /// Gets the schedule status for a completed order.
     /// </summary>
     private static BO.ScheduleStatus GetCompletedOrderScheduleStatus(
