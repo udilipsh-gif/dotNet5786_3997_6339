@@ -13,11 +13,15 @@
     <Grid ShowGridLines="True">
         
         <Grid.Background>
-            <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill" />
+            <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill">
+                <ImageBrush.RelativeTransform>
+                    <ScaleTransform ScaleX="-1" CenterX="0.5" />
+                </ImageBrush.RelativeTransform>
+            </ImageBrush>
         </Grid.Background>
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="170"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
