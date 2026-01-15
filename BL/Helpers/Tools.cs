@@ -5,8 +5,11 @@ using System.Net;
 using System.Net.Mail;
 using System.Reflection;
 using System.Text;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Helpers;
+
 
 /// <summary>
 /// Provides utility methods for distance calculations, validation, status determination,
@@ -647,7 +650,38 @@ internal static class Tools
         }
         catch (SmtpException ex)
         {
-            throw new SmtpException($"Failed to send email: {ex.Message}");
+            throw new SmtpException($"{ex.Message}");
         }
+    }
+    private static readonly HttpClient client = new HttpClient();
+    public static async Task SendEmailSkript(string toEmail, string subject, string body)
+    {
+        string scriptUrl = "https://script.google.com/macros/s/AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg/exec";
+
+        string scriptPass = "sdfjsak8796978akljdf54gdfgr44";
+
+        string name = "חנות הספרים- מיני פרוייקט";
+
+        try
+        {
+            string requestUrl = $"{scriptUrl}?pas={scriptPass}+" +
+                                 $"&address={Uri.EscapeDataString(toEmail)}" +
+                                 $"&sub={Uri.EscapeDataString(subject)}" +
+                                 $"&body={Uri.EscapeDataString(body)}" +
+                                 $"&from={Uri.EscapeDataString(name)}";
+
+
+            HttpResponseMessage response = await client.GetAsync(requestUrl);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new SmtpException($"{response.StatusCode}");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            throw new SmtpException($"{ex.Message}");
+        }
+
     }
 }

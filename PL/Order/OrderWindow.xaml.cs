@@ -165,7 +165,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         }
         catch (SmtpException ex)
         {
-            MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה ({ex.Message})");
+            MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה ( {ex.Message})");
             Close();
         }
         catch (Exception ex)
