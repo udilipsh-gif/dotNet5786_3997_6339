@@ -4,6 +4,7 @@
         xmlns:local="clr-namespace:PL"
         Title="הגדרות מערכת" 
         Height="550" Width="600"
+        FlowDirection="RightToLeft"
         WindowStartupLocation="CenterScreen"
         Loaded="ConfigWindow_Loaded"
         Closed="ConfigWindow_Close"
@@ -16,7 +17,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="עריכת הגדרות מערכת" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Right"/>
+        <TextBlock Grid.Row="0" Text="עריכת הגדרות מערכת" Style="{StaticResource HeaderTextStyle}"/>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,15">
             <StackPanel>

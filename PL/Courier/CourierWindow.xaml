@@ -7,24 +7,27 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         mc:Ignorable="d"
         Title="כרטיס שליח"
-        Height="600" Width="900"
+        Height="600"
+        SizeToContent="Width"
+        FlowDirection="RightToLeft"
         WindowStartupLocation="CenterScreen"
         Loaded="CourierWindow_Loaded"
         Closed="CourierWindow_Closed">
 
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="320"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" 
-                Margin="0,0,20,0"
+        <Border Grid.Column="1" 
+                Margin="20,0"
                 Background="#FFF8E1" 
                 BorderBrush="{StaticResource AccentColor}" 
                 BorderThickness="1" 
                 CornerRadius="8"
                 Padding="15"
+                Width="200"
                 Visibility="{Binding CurrentCourier.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}}">
 
             <Grid>
@@ -72,7 +75,9 @@
             </Grid>
         </Border>
 
-        <Border Grid.Column="1" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="20">
+        <Border Grid.Column="0" Width="500" Background="{StaticResource SurfaceColor}" 
+                BorderBrush="{StaticResource BorderColor}" 
+                BorderThickness="1" CornerRadius="8" Padding="15,15,5,15">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -82,7 +87,7 @@
 
                 <TextBlock Grid.Row="0" Text="פרטי שליח" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
 
-                <ScrollViewer Grid.Row="1">
+                <ScrollViewer Grid.Row="1" Padding="10">
                     <StackPanel>
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
@@ -172,7 +177,9 @@
                 </ScrollViewer>
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,20,0,0">
-                    <Button Content="{Binding ButtonText}" Click="btnAddUpdate_Click" Width="150"/>
+                    <Button Content="{Binding ButtonText, Converter={StaticResource ValueToHebrewConverter}}"
+                            Click="btnAddUpdate_Click"
+                            Width="150"/>
 
                     <Button Content="מחק שליח" 
                             Click="btnDelete_Click" 

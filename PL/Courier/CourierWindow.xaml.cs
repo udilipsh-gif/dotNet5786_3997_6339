@@ -16,22 +16,8 @@ namespace PL;
 /// Couriers can also edit their own information through this window.
 /// Implements INotifyPropertyChanged for dynamic UI updates.
 /// </remarks>
-public partial class CourierWindow : Window, INotifyPropertyChanged
+public partial class CourierWindow : Window
 {
-    /// <summary>
-    /// Event raised when a property value changes, enabling data binding updates.
-    /// </summary>
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    /// <summary>
-    /// Raises the PropertyChanged event for the specified property.
-    /// </summary>
-    /// <param name="propertyName">The name of the property that changed.</param>
-    protected void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
     /// <summary>
     /// Business logic layer instance for accessing courier operations.
     /// </summary>
@@ -101,24 +87,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
            typeof(CourierWindow), new PropertyMetadata("Add"));
 
     /// <summary>
-    /// Backing field for DeleteButtonVisibility property.
-    /// </summary>
-    private Visibility _deleteButtonVisibility = Visibility.Collapsed;
-
-    /// <summary>
-    /// Gets or sets the visibility of the delete button (visible only in update mode).
-    /// </summary>
-    public Visibility DeleteButtonVisibility
-    {
-        get => _deleteButtonVisibility;
-        set
-        {
-            _deleteButtonVisibility = value;
-            OnPropertyChanged(nameof(DeleteButtonVisibility));
-        }
-    }
-
-    /// <summary>
     /// List of all vehicle/shipment types for the ComboBox.
     /// </summary>
     public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
@@ -145,7 +113,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
         if (CURRENT_ID != 0)
         {
             ButtonText = "Update";
-            DeleteButtonVisibility = Visibility.Visible;
 
             try
             {
@@ -161,7 +128,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
         else
         {
             ButtonText = "Add";
-            DeleteButtonVisibility = Visibility.Collapsed;
 
             CurrentCourier = new BO.Courier()
             {
