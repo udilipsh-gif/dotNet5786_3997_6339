@@ -5,7 +5,6 @@
         Title="כניסה למערכת"
         Height="450" Width="400" 
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Loaded="MainWindow_Loaded"

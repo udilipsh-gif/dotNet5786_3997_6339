@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
-        ResizeMode="NoResize"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת שליחים" 
         Height="550" Width="750"

@@ -127,6 +127,33 @@ public class BooleanToHebrewConverter : IValueConverter
     }
 }
 
+public class ValueToHebrewConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string val)
+        {
+            if(val == "Update")
+                return "עדכן";
+            if (val == "Add")
+                return "חדש";
+        }
+        return "חדש";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string val)
+        {
+            if(val == "חדש")
+                return "Add";
+            if (val == "עדכן")
+                return "Update";
+        }
+        return "Add";
+    }
+}
+
 
 public class EnumDescriptionConverter : IValueConverter
 {

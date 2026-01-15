@@ -151,6 +151,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
         {
             orderWindow = new OrderWindow(0);
         }
+        Tools.SetSoftOwner(orderWindow, this);
         orderWindow.Show();
     }
 

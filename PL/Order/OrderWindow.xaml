@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
+        FlowDirection="RightToLeft"
         Title="פרטי הזמנה"
-        Height="650" Width="1000"
+        Height="650"
+        SizeToContent="Width"
         WindowStartupLocation="CenterScreen"
         Loaded="OrderWindow_Loaded"
         Closed="OrderWindow_Closed"
@@ -14,23 +16,24 @@
 
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="500"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" 
-                Margin="0,0,20,0" 
+        <Border Grid.Column="1" 
+                Margin="20,0" 
                 Background="{StaticResource SurfaceColor}" 
                 BorderBrush="{StaticResource BorderColor}" 
                 BorderThickness="1" 
                 CornerRadius="8"
                 Padding="15"
+                Width="200"
                 Visibility="{Binding CurrentOrder.DeliveryPerOrderInLists, Converter={StaticResource NullToVisibilityConverter}}">
 
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" 
@@ -87,11 +90,12 @@
             </Grid>
         </Border>
 
-        <Border Grid.Column="1" 
+        <Border Grid.Column="0" 
                 Background="{StaticResource SurfaceColor}" 
                 BorderBrush="{StaticResource BorderColor}" 
                 BorderThickness="1" 
                 CornerRadius="8" 
+                Width="500"
                 Padding="25">
 
             <Grid>
@@ -180,7 +184,7 @@
                 </Grid>
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,30,0,0">
-                    <Button Content="{Binding ButtonText}" 
+                    <Button Content="{Binding ButtonText, Converter={StaticResource ValueToHebrewConverter}}" 
                             Click="btnAddUpdate_Click"
                             Width="150"/>
 
@@ -189,22 +193,10 @@
                             Width="150"
                             Margin="15,0,0,0">
                         <Button.IsEnabled>
-                            <Binding Path="CurrentOrder.OrderStatus" Mode="OneWay" Converter="{StaticResource EnumToBooleanConverter}"/>
+                            <Binding Path="CurrentOrder.OrderStatus" Mode="OneWay" Converter="{StaticResource OrderStatusToCancelConverter}"/>
                         </Button.IsEnabled>
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource DestructiveButtonStyle}">
-                                <Setter Property="IsEnabled" Value="False"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="OPEN">
-                                        <Setter Property="IsEnabled" Value="True"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="REFUSED">
-                                        <Setter Property="IsEnabled" Value="True"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding CurrentOrder.OrderStatus}" Value="DELIVERING">
-                                        <Setter Property="IsEnabled" Value="True"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
                             </Style>
                         </Button.Style>
                     </Button>
