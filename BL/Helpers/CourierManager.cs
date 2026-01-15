@@ -13,9 +13,15 @@ namespace Helpers;
 /// </remarks>
 internal static class CourierManager
 {
+    /// <summary>
+    /// Data access layer instance for database operations.
+    /// </summary>
     private static readonly IDal s_dal = Factory.Get;
 
-    internal static ObserverManager Observer = new();
+    /// <summary>
+    /// Observer manager for notifying UI components about courier changes.
+    /// </summary>
+    internal static readonly ObserverManager Observer = new();
 
     /// <summary>
     /// Authenticates a user by ID and password, determining if they are a manager or courier.
@@ -26,30 +32,36 @@ internal static class CourierManager
     /// Returns "Manager" if the credentials match the manager account,
     /// or "Courier" if they match a courier account.
     /// </returns>
-    /// <exception cref="BO.BlDoesNotExistException">Thrown when a courier with the specified ID does not exist.</exception>
-    /// <exception cref="BO.BlIncorrectPasswordException">Thrown when the password is incorrect for the given ID.</exception>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when a courier with the specified ID does not exist.
+    /// </exception>
+    /// <exception cref="BO.BlIncorrectPasswordException">
+    /// Thrown when the password is incorrect for the given ID.
+    /// </exception>
     /// <remarks>
     /// This method first checks if the ID matches the manager ID from configuration.
     /// If not, it attempts to authenticate as a courier.
     /// </remarks>
     internal static string? Login(int id, string password)
     {
-        var _config = AdminManager.GetConfig();
-        if (id == _config.ManagerId)
+        var config = AdminManager.GetConfig();
+
+        // Check if user is manager
+        if (id == config.ManagerId)
         {
-            if (password == _config.PasswordManager)
+            if (password == config.PasswordManager)
                 return "Manager";
-            else
-                throw new BO.BlIncorrectPasswordException();
+            throw new BO.BlIncorrectPasswordException();
         }
 
+        // Check if user is courier
         DO.Courier? doCourier = s_dal.Courier.Read(id)
-            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does Not exist");
+            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
 
         if (doCourier.Password == password)
             return "Courier";
-        else
-            throw new BO.BlIncorrectPasswordException();
+
+        throw new BO.BlIncorrectPasswordException();
     }
 
     /// <summary>
@@ -58,55 +70,35 @@ internal static class CourierManager
     /// <param name="boCourier">The business logic courier object containing courier details to create.</param>
     /// <exception cref="BO.BlInvalidValueException">
     /// Thrown when:
-    /// - The courier ID is not valid according to Israeli ID validation rules
-    /// - The phone number format is invalid
-    /// - The email address format is invalid
-    /// - The password does not meet strength requirements
-    /// </exception>
-    /// <exception cref="BO.BlAlreadyExistsException">Thrown when a courier with the specified ID already exists in the system.</exception>
-    /// <remarks>
-    /// This method validates all courier information before creating the record:
     /// <list type="bullet">
-    /// <item><description>ID must pass Israeli ID checksum validation</description></item>
-    /// <item><description>Phone number must be in valid Israeli or international format</description></item>
-    /// <item><description>Email must be in valid email format</description></item>
-    /// <item><description>Password must meet strength requirements (uppercase, lowercase, digit, special character, min 8 chars)</description></item>
+    ///   <item><description>The courier ID is not valid according to Israeli ID validation rules</description></item>
+    ///   <item><description>The phone number format is invalid</description></item>
+    ///   <item><description>The email address format is invalid</description></item>
+    ///   <item><description>The password does not meet strength requirements</description></item>
+    ///   <item><description>The maximum delivery distance exceeds the allowed limit</description></item>
     /// </list>
-    /// The courier is automatically set to the active status specified in the input.
+    /// </exception>
+    /// <exception cref="BO.BlAlreadyExistsException">
+    /// Thrown when a courier with the specified ID already exists in the system.
+    /// </exception>
+    /// <remarks>
+    /// Password requirements: minimum 8 characters, including uppercase, lowercase, digit, and special character.
     /// </remarks>
     internal static void Create(BO.Courier boCourier)
     {
-        if (!Tools.IsValidId(boCourier.Id))
-            throw new BO.BlInvalidValueException(boCourier.Id);
-        if (!Tools.IsValidPhone(boCourier.Phone))
-            throw new BO.BlInvalidValueException("Invalid phone number.");
-        if (!Tools.IsValidEmail(boCourier.Email))
-            throw new BO.BlInvalidValueException("Invalid email address.");
-        if (!Tools.IsStrongPassword(boCourier.Password))
-            throw new BO.BlInvalidValueException("סיסמה חלשה מידי. הכנס 8 תווים בהם אות גדולה, קטנה, ספרה וסימן.");
-        if (!Tools.IsValidDistens(boCourier.MaxDistanceDelivery ?? 0))
-            throw new BO.BlInvalidValueException("Max Distance For Deliveri is to hige.");
+        s_validateCourierFields(boCourier, validateId: true);
 
-        DO.Courier doCourier = new DO.Courier
-        {
-            Id = boCourier.Id,
-            Name = boCourier.Name,
-            Phone = boCourier.Phone,
-            Email = boCourier.Email,
-            Password = boCourier.Password,
-            Active = boCourier.Active,
-            MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
-            TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
-            WorkingSince = boCourier.WorkingSince
-        };
+        DO.Courier doCourier = s_convertToDataObject(boCourier);
+
         try
         {
             s_dal.Courier.Create(doCourier);
         }
         catch (Exception ex)
         {
-            throw new BO.BlAlreadyExistsException($"courier with id {boCourier.Id} is alredy exists", ex);
+            throw new BO.BlAlreadyExistsException($"Courier with ID {boCourier.Id} already exists", ex);
         }
+
         Observer.NotifyListUpdated();
     }
 
@@ -118,21 +110,216 @@ internal static class CourierManager
     /// A <see cref="BO.Courier"/> object with complete courier details including delivery statistics
     /// and current order in progress.
     /// </returns>
-    /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier with the specified ID does not exist.</exception>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the courier with the specified ID does not exist.
+    /// </exception>
     /// <remarks>
     /// This method enriches the courier data with calculated fields:
     /// <list type="bullet">
-    /// <item><description>DeliveryOnTime: Count of deliveries completed within the maximum delivery time</description></item>
-    /// <item><description>DeliveryLate: Count of deliveries completed after the maximum delivery time</description></item>
-    /// <item><description>OrderInProgress: Details of the current active delivery, if any</description></item>
+    ///   <item><description>DeliveryOnTime: Count of deliveries completed within the maximum delivery time</description></item>
+    ///   <item><description>DeliveryLate: Count of deliveries completed after the maximum delivery time</description></item>
+    ///   <item><description>OrderInProgress: Details of the current active delivery, if any</description></item>
     /// </list>
     /// </remarks>
     internal static BO.Courier? Read(int id)
     {
         DO.Courier doCourier = s_dal.Courier.Read(id)
-            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does Not exist");
+            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
 
-        BO.Courier boCourier = new BO.Courier
+        return s_convertToBusinessObject(doCourier);
+    }
+
+    /// <summary>
+    /// Updates an existing courier's information in the system.
+    /// </summary>
+    /// <param name="requesterId">
+    /// The ID of the user requesting the update. Determines if Active status can be changed.
+    /// </param>
+    /// <param name="boCourier">The business logic courier object with updated information.</param>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the courier with the specified ID does not exist.
+    /// </exception>
+    /// <exception cref="BO.BlInvalidValueException">
+    /// Thrown when phone number, email, password, or max distance is invalid.
+    /// </exception>
+    /// <remarks>
+    /// <para>Only managers can change the Active status of a courier.</para>
+    /// <para>The WorkingSince date is preserved from the original record.</para>
+    /// </remarks>
+    internal static void Update(int requesterId, BO.Courier boCourier)
+    {
+        bool isManager = requesterId == AdminManager.GetConfig().ManagerId;
+
+        DO.Courier existingCourier = s_dal.Courier.Read(boCourier.Id)
+            ?? throw new BO.BlDoesNotExistException(
+                $"Courier with ID={boCourier.Id} does not exist");
+
+        s_validateCourierFields(boCourier, validateId: false);
+
+        DO.Courier doCourier = new DO.Courier
+        {
+            Id = existingCourier.Id,
+            Name = boCourier.Name,
+            Phone = boCourier.Phone,
+            Email = boCourier.Email,
+            Password = boCourier.Password,
+            Active = isManager ? boCourier.Active : existingCourier.Active,
+            MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
+            TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
+            WorkingSince = existingCourier.WorkingSince // Preserve original date
+        };
+
+        try
+        {
+            s_dal.Courier.Update(doCourier);
+            Observer.NotifyItemUpdated(boCourier.Id);
+            Observer.NotifyListUpdated();
+        }
+        catch (Exception ex)
+        {
+            throw new BO.BlDoesNotExistException($"Courier with ID {boCourier.Id} not found", ex);
+        }
+    }
+
+    /// <summary>
+    /// Deletes a courier from the system.
+    /// </summary>
+    /// <param name="id">The unique identifier of the courier to delete.</param>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the courier with the specified ID does not exist.
+    /// </exception>
+    /// <exception cref="BO.BlInvalidOperationException">
+    /// Thrown when:
+    /// <list type="bullet">
+    ///   <item><description>The courier has an active delivery in progress</description></item>
+    ///   <item><description>The courier has completed deliveries in the past (historical records exist)</description></item>
+    /// </list>
+    /// </exception>
+    /// <remarks>
+    /// A courier can only be deleted if they have never made any deliveries.
+    /// This preserves data integrity and delivery history.
+    /// </remarks>
+    internal static void Delete(int id)
+    {
+        _ = s_dal.Courier.Read(id)
+            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
+
+        s_validateCourierCanBeDeleted(id);
+
+        s_dal.Courier.Delete(id);
+        Observer.NotifyItemUpdated(id);
+        Observer.NotifyListUpdated();
+    }
+
+    /// <summary>
+    /// Retrieves all couriers with optional filtering and sorting.
+    /// </summary>
+    /// <param name="requesterId">The ID of the user requesting the list (used for authorization).</param>
+    /// <param name="isActive">
+    /// Optional filter for courier active status:
+    /// <list type="bullet">
+    ///   <item><description>true: Returns only active couriers</description></item>
+    ///   <item><description>false: Returns only inactive couriers</description></item>
+    ///   <item><description>null: Returns all couriers regardless of status</description></item>
+    /// </list>
+    /// </param>
+    /// <param name="sort">The field to sort results by. Defaults to Id.</param>
+    /// <returns>
+    /// An <see cref="IEnumerable{T}"/> of <see cref="BO.CourierInList"/> objects
+    /// containing courier summary information including delivery statistics.
+    /// </returns>
+    internal static IEnumerable<BO.CourierInList> ReadAll(
+        int requesterId,
+        bool? isActive,
+        BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
+    {
+        var couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive);
+        var sortedCouriers = s_sortCouriers(couriers, sort);
+
+        return sortedCouriers.Select(s_convertToCourierInList);
+    }
+
+    /// <summary>
+    /// Validates all required fields of a courier.
+    /// </summary>
+    /// <param name="courier">The courier to validate.</param>
+    /// <param name="validateId">Whether to validate the ID (only needed for creation).</param>
+    /// <exception cref="BO.BlInvalidValueException">Thrown when any field is invalid.</exception>
+    private static void s_validateCourierFields(BO.Courier courier, bool validateId)
+    {
+        if (validateId && !Tools.IsValidId(courier.Id))
+            throw new BO.BlInvalidValueException(courier.Id);
+
+        if (!Tools.IsValidPhone(courier.Phone))
+            throw new BO.BlInvalidValueException("Invalid phone number.");
+
+        if (!Tools.IsValidEmail(courier.Email))
+            throw new BO.BlInvalidValueException("Invalid email address.");
+
+        if (!Tools.IsStrongPassword(courier.Password))
+            throw new BO.BlInvalidValueException(
+                "Password too weak. Required: 8 characters with uppercase, lowercase, digit, and special character.");
+
+        if (!Tools.IsValidDistens(courier.MaxDistanceDelivery ?? 0))
+            throw new BO.BlInvalidValueException("Maximum delivery distance exceeds the allowed limit.");
+    }
+
+    /// <summary>
+    /// Validates that a courier can be safely deleted.
+    /// </summary>
+    /// <param name="courierId">The courier ID to validate.</param>
+    /// <exception cref="BO.BlInvalidOperationException">
+    /// Thrown when the courier has active or historical deliveries.
+    /// </exception>
+    private static void s_validateCourierCanBeDeleted(int courierId)
+    {
+        var courierDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == courierId);
+
+        if (!courierDeliveries.Any())
+            return;
+
+        // Check for active deliveries
+        bool hasActiveDelivery = courierDeliveries.Any(delivery =>
+        {
+            var order = s_dal.Order.Read(delivery.OrderId);
+            return order != null && order.OrderStatus == DO.OrderStatus.DELIVERING;
+        });
+
+        if (hasActiveDelivery)
+            throw new BO.BlInvalidOperationException("Cannot delete courier with active delivery.");
+
+        throw new BO.BlInvalidOperationException("Cannot delete courier with delivery history.");
+    }
+
+    /// <summary>
+    /// Converts a business object courier to a data object courier.
+    /// </summary>
+    /// <param name="boCourier">The business object to convert.</param>
+    /// <returns>A data object courier.</returns>
+    private static DO.Courier s_convertToDataObject(BO.Courier boCourier)
+    {
+        return new DO.Courier
+        {
+            Id = boCourier.Id,
+            Name = boCourier.Name,
+            Phone = boCourier.Phone,
+            Email = boCourier.Email,
+            Password = boCourier.Password,
+            Active = boCourier.Active,
+            MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
+            TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
+            WorkingSince = boCourier.WorkingSince
+        };
+    }
+
+    /// <summary>
+    /// Converts a data object courier to a business object courier with enriched data.
+    /// </summary>
+    /// <param name="doCourier">The data object to convert.</param>
+    /// <returns>A business object courier with calculated statistics.</returns>
+    private static BO.Courier s_convertToBusinessObject(DO.Courier doCourier)
+    {
+        return new BO.Courier
         {
             Id = doCourier.Id,
             Name = doCourier.Name,
@@ -143,280 +330,91 @@ internal static class CourierManager
             MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
             WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = s_getDeliveryOnTime(doCourier),
-            DeliveryLate = s_getDeliveryLate(doCourier),
-            OrderInProgress = s_getOrderInProgres(doCourier.Id)
+            DeliveryOnTime = s_getDeliveryOnTimeCount(doCourier),
+            DeliveryLate = s_getDeliveryLateCount(doCourier),
+            OrderInProgress = s_getOrderInProgress(doCourier.Id)
         };
-        return boCourier;
     }
 
     /// <summary>
-    /// Updates an existing courier's information in the system.
+    /// Converts a data object courier to a CourierInList summary object.
     /// </summary>
-    /// <param name="requesterId">The ID of the user requesting the update. Determines if Active status can be changed.</param>
-    /// <param name="boCourier">The business logic courier object with updated information.</param>
-    /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier with the specified ID does not exist.</exception>
-    /// <exception cref="BO.BlInvalidValueException">
-    /// Thrown when:
-    /// - The phone number format is invalid
-    /// - The email address format is invalid
-    /// - The password does not meet strength requirements
-    /// </exception>
-    /// <remarks>
-    /// This method validates all courier information before updating.
-    /// Only managers can change the Active status of a courier.
-    /// The WorkingSince date is preserved from the original record.
-    /// </remarks>
-    internal static void Update(int requesterId, BO.Courier boCourier)
+    /// <param name="doCourier">The data object to convert.</param>
+    /// <returns>A CourierInList object with summary information.</returns>
+    private static BO.CourierInList s_convertToCourierInList(DO.Courier doCourier)
     {
-        bool manager = requesterId == AdminManager.GetConfig().ManagerId;
-
-        DO.Courier courier = s_dal.Courier.Read(boCourier.Id)
-            ?? throw new BO.BlDoesNotExistException(
-                $"Courier with ID={boCourier.Id} does not exist, you can't update");
-
-        if (!Tools.IsValidPhone(boCourier.Phone))
-            throw new BO.BlInvalidValueException("Invalid phone number.");
-
-        if (!Tools.IsValidEmail(boCourier.Email))
-            throw new BO.BlInvalidValueException("Invalid email address.");
-
-        if (!Tools.IsStrongPassword(boCourier.Password))
-            throw new BO.BlInvalidValueException("Password is not strong enough.");
-
-        if(!Tools.IsValidDistens(boCourier.MaxDistanceDelivery?? 0))
-            throw new BO.BlInvalidValueException("Max Distance For Deliveri is to hige.");
-
-
-        DO.Courier doCourier = new DO.Courier
+        return new BO.CourierInList
         {
-            Id = courier.Id,
-            Name = boCourier.Name,
-            Phone = boCourier.Phone,
-            Email = boCourier.Email,
-            Password = boCourier.Password,
-            Active = manager ? boCourier.Active : courier.Active,
-            MaxDistanceDelivery = boCourier.MaxDistanceDelivery,
-            TypeShipment = (DO.TheTypeShipment)boCourier.TypeShipment,
-            WorkingSince = courier.WorkingSince
+            Id = doCourier.Id,
+            Name = doCourier.Name,
+            Active = doCourier.Active,
+            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
+            WorkingSince = doCourier.WorkingSince,
+            DeliveryOnTime = s_getDeliveryOnTimeCount(doCourier),
+            DeliveryLate = s_getDeliveryLateCount(doCourier),
+            DeliveryId = s_getOrderInProgress(doCourier.Id)?.DeliveryId
         };
-        try
-        {
-            s_dal.Courier.Update(doCourier);
-            Observer.NotifyItemUpdated(boCourier.Id);
-            Observer.NotifyListUpdated();
-        }
-        catch (Exception ex)
-        {
-            throw new BO.BlDoesNotExistException($"courier with id {boCourier.Id} is not found", ex);
-        }
-
     }
 
     /// <summary>
-    /// Deletes a courier from the system.
+    /// Sorts couriers by the specified field.
     /// </summary>
-    /// <param name="id">The unique identifier of the courier to delete.</param>
-    /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier with the specified ID does not exist.</exception>
-    /// <exception cref="BO.BlInvalidOperationException">Thrown when the courier has active (non-delivered) deliveries.</exception>
-    /// <remarks>
-    /// This method performs the following validations before deletion:
-    /// <list type="bullet">
-    /// <item><description>Verifies that the courier exists in the system</description></item>
-    /// <item><description>Checks that the courier has no active deliveries (deliveries that are not yet completed)</description></item>
-    /// </list>
-    /// A courier with pending or in-progress deliveries cannot be deleted.
-    /// </remarks>
-    internal static void Delete(int id)
+    /// <param name="couriers">The couriers to sort.</param>
+    /// <param name="sort">The field to sort by.</param>
+    /// <returns>Sorted enumerable of couriers.</returns>
+    private static IEnumerable<DO.Courier> s_sortCouriers(
+        IEnumerable<DO.Courier> couriers,
+        BO.CourierFieldSort? sort)
     {
-        DO.Courier? courier = s_dal.Courier.Read(id)
-            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist, you can't delete");
-        // if (courier == null)
-
-
-        //IEnumerable<DO.Delivery> activeDeliveries = s_dal.Delivery.ReadAll(d =>
-        //d.CourierId == id &&
-        //(d.EndDelivery == null || d.EndDelivery != DO.EndDelivery.DELIVERED)
-        //);
-        //if (activeDeliveries.Any())
-        //    throw new BO.BlInvalidOperationException("Cannot delete courier with active deliveries.");
-
-        //IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
-        //    d.CourierId == id
-        //);
-        //if (allDeliveries.Any())
-        //    foreach (var item in allDeliveries)
-        //    {
-        //        var order = s_dal.Order.Read(item.OrderId);
-        //        if (order != null && order.OrderStatus == DO.OrderStatus.DELIVERING)
-        //            throw new BO.BlInvalidOperationException("קיים משלוח פעיל ");
-        //        else
-        //            throw new BO.BlInvalidOperationException("בוצעו משלוחים בעבר ");
-
-        //    }
-
-        var courierDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == id);
-        if (courierDeliveries.Any())
-        {
-
-            bool hasActiveDelivery =// courierDeliveries.Any(d => s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING);
-                (from delivery in courierDeliveries
-                 let d = s_dal.Order.Read(delivery.Id)
-                 where d != null && d.OrderStatus == DO.OrderStatus.DELIVERING
-                 select d).Any();
-
-            if (hasActiveDelivery)
-                throw new BO.BlInvalidOperationException(" .קיים משלוח פעיל לשליח זה");
-            throw new BO.BlInvalidOperationException(" .לשליח זה בוצעו משלוחים בעבר");
-        }
-        s_dal.Courier.Delete(id);
-        Observer.NotifyItemUpdated(id);
-        Observer.NotifyListUpdated();
-
-    }
-
-    /// <summary>
-    /// Retrieves all couriers with optional filtering and sorting.
-    /// </summary>
-    /// <param name="requesterId">The ID of the user requesting the list (used for authorization).</param>
-    /// <param name="isActive">
-    /// Optional filter for courier active status:
-    /// - true: Returns only active couriers
-    /// - false: Returns only inactive couriers
-    /// - null: Returns all couriers regardless of status
-    /// </param>
-    /// <param name="sort">The field to sort results by. Defaults to Id.</param>
-    /// <returns>
-    /// An <see cref="IEnumerable{T}"/> of <see cref="BO.CourierInList"/> objects
-    /// containing courier summary information including delivery statistics.
-    /// </returns>
-    /// <remarks>
-    /// Each courier in the list includes:
-    /// <list type="bullet">
-    /// <item><description>Basic courier information (Id, Name, Active status, TypeShipment, WorkingSince)</description></item>
-    /// <item><description>DeliveryOnTime: Count of on-time completed deliveries</description></item>
-    /// <item><description>DeliveryLate: Count of late completed deliveries</description></item>
-    /// <item><description>DeliveryId: The ID of the current active delivery, if any</description></item>
-    /// </list>
-    /// </remarks>
-    internal static IEnumerable<BO.CourierInList> ReadAll(
-    int requesterId,
-    bool? isActive,
-    BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
-    {
-        var couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive);
-
-        // מיון לפי השדה הנבחר
-        var sortedCouriers = sort switch
+        return sort switch
         {
             BO.CourierFieldSort.Name => couriers.OrderBy(c => c.Name),
             BO.CourierFieldSort.Phone => couriers.OrderBy(c => c.Phone),
             BO.CourierFieldSort.TypeShipment => couriers.OrderBy(c => c.TypeShipment),
-            BO.CourierFieldSort.Id or null or _ => couriers.OrderBy(c => c.Id)
+            _ => couriers.OrderBy(c => c.Id)
         };
-
-        return sortedCouriers.Select(c => new BO.CourierInList
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Active = c.Active,
-            TypeShipment = (BO.TheTypeShipment)c.TypeShipment,
-            WorkingSince = c.WorkingSince,
-            DeliveryOnTime = s_getDeliveryOnTime(c),
-            DeliveryLate = s_getDeliveryLate(c),
-            DeliveryId = s_getOrderInProgres(c.Id)?.DeliveryId
-        });
     }
 
     /// <summary>
     /// Calculates the number of on-time deliveries completed by a courier.
     /// </summary>
-    /// <param name="doCourier">The data object courier to calculate statistics for.</param>
+    /// <param name="doCourier">The courier to calculate statistics for.</param>
     /// <returns>The count of deliveries completed within the maximum allowed delivery time.</returns>
     /// <remarks>
     /// A delivery is considered on-time if the time between OrderDate and TimeEndDelivery
     /// is less than or equal to the MaxDeliveryTime configured in the system.
     /// Only deliveries with EndDelivery status of DELIVERED are counted.
     /// </remarks>
-    private static int s_getDeliveryOnTime(DO.Courier doCourier)
+    private static int s_getDeliveryOnTimeCount(DO.Courier doCourier)
     {
-        IEnumerable<DO.Delivery> deliveriesOnTime = s_dal.Delivery.ReadAll(d =>
-               d.CourierId == doCourier.Id &&
-               d.EndDelivery == DO.EndDelivery.DELIVERED &&
-               d.TimeEndDelivery - d.OrderDate <= AdminManager.GetConfig().MaxDeliveryTime
-        );
+        var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
-        return deliveriesOnTime.Count();
+        return s_dal.Delivery.ReadAll(d =>
+            d.CourierId == doCourier.Id &&
+            d.EndDelivery == DO.EndDelivery.DELIVERED &&
+            d.TimeEndDelivery - d.OrderDate <= maxDeliveryTime
+        ).Count();
     }
 
     /// <summary>
     /// Calculates the number of late deliveries completed by a courier.
     /// </summary>
-    /// <param name="doCourier">The data object courier to calculate statistics for.</param>
+    /// <param name="doCourier">The courier to calculate statistics for.</param>
     /// <returns>The count of deliveries completed after the maximum allowed delivery time.</returns>
     /// <remarks>
     /// A delivery is considered late if the time between OrderDate and TimeEndDelivery
     /// exceeds the MaxDeliveryTime configured in the system.
     /// Only deliveries with EndDelivery status of DELIVERED are counted.
     /// </remarks>
-    private static int s_getDeliveryLate(DO.Courier doCourier)
+    private static int s_getDeliveryLateCount(DO.Courier doCourier)
     {
-        IEnumerable<DO.Delivery> deliveriesLate = s_dal.Delivery.ReadAll(d =>
-               d.CourierId == doCourier.Id &&
-               d.EndDelivery == DO.EndDelivery.DELIVERED &&
-               d.TimeEndDelivery - d.OrderDate > AdminManager.GetConfig().MaxDeliveryTime
-        );
+        var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
-        return deliveriesLate.Count();
-    }
-
-    /// <summary>
-    /// Creates an OrderInProgress object from a delivery record.
-    /// </summary>
-    /// <param name="delivery">The delivery record to convert.</param>
-    /// <returns>An <see cref="BO.OrderInProgress"/> object containing complete delivery and order information.</returns>
-    /// <exception cref="BO.BlDoesNotExistException">Thrown when the order associated with the delivery is not found.</exception>
-    /// <remarks>
-    /// This method retrieves the associated order and calculates:
-    /// <list type="bullet">
-    /// <item><description>Distance from store to delivery address</description></item>
-    /// <item><description>Estimated delivery time based on courier speed and distance</description></item>
-    /// <item><description>Maximum allowed delivery time</description></item>
-    /// <item><description>Schedule status (on-time, at-risk, or late)</description></item>
-    /// <item><description>Time remaining until the delivery deadline</description></item>
-    /// </list>
-    /// </remarks>
-    private static BO.OrderInProgress s_createOrderInProgress(DO.Delivery delivery)
-    {
-        DO.Order? order = s_dal.Order.Read(delivery.OrderId)
-         ?? throw new BO.BlDoesNotExistException("Order not found");
-
-        DO.Courier? courier = s_dal.Courier.Read(delivery.CourierId)
-            ?? throw new BO.BlDoesNotExistException("Courier not found");
-
-        TimeSpan estimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(delivery) ?? TimeSpan.Zero;
-        var maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
-
-        BO.OrderInProgress orderInProgress = new BO.OrderInProgress
-        {
-            DeliveryId = delivery.Id,
-            OrderId = delivery.OrderId,
-            TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
-            Details = order.Details,
-            Address = order.Addres,
-            Distance = Tools.GetDistance(order),
-            ActualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),// delivery.ActualDistance,
-            CustomerName = order.Name,
-            CustomerPhone = order.Phone,
-            OrderTime = order.OrderDate,
-            StartDeliveryTime = delivery.OrderDate,
-            EstimatedDeliveryTime = delivery.OrderDate + estimatedDeliveryTime,
-            MaxDeliveryTime = maxDeliveryTime,
-            OrderStatus = BO.OrderStatus.DELIVERING,
-            ScheduleStatus = Tools.GetScheduleStatus(order, delivery),
-            TimeRemaining = (delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime) - AdminManager.Now)
-        };
-        return orderInProgress;
+        return s_dal.Delivery.ReadAll(d =>
+            d.CourierId == doCourier.Id &&
+            d.EndDelivery == DO.EndDelivery.DELIVERED &&
+            d.TimeEndDelivery - d.OrderDate > maxDeliveryTime
+        ).Count();
     }
 
     /// <summary>
@@ -430,23 +428,72 @@ internal static class CourierManager
     /// <remarks>
     /// This method searches for deliveries that:
     /// <list type="bullet">
-    /// <item><description>Are assigned to the specified courier</description></item>
-    /// <item><description>Have not yet ended (EndDelivery is null)</description></item>
-    /// <item><description>Are associated with an order in DELIVERING status</description></item>
+    ///   <item><description>Are assigned to the specified courier</description></item>
+    ///   <item><description>Have not yet ended (EndDelivery is null)</description></item>
+    ///   <item><description>Are associated with an order in DELIVERING status</description></item>
     /// </list>
-    /// If multiple active deliveries exist, returns the first one found.
     /// </remarks>
-    private static BO.OrderInProgress? s_getOrderInProgres(int courierId)
+    private static BO.OrderInProgress? s_getOrderInProgress(int courierId)
     {
-        IEnumerable<DO.Delivery> allDeliveries = s_dal.Delivery.ReadAll(d =>
+        var activeDeliveries = s_dal.Delivery.ReadAll(d =>
             d.CourierId == courierId &&
             d.EndDelivery == null &&
             s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING
         );
 
-        if (!allDeliveries.Any())
+        if (!activeDeliveries.Any())
             return null;
 
-        return s_createOrderInProgress(allDeliveries.First());
+        return s_createOrderInProgress(activeDeliveries.First());
+    }
+
+    /// <summary>
+    /// Creates an OrderInProgress object from a delivery record.
+    /// </summary>
+    /// <param name="delivery">The delivery record to convert.</param>
+    /// <returns>An <see cref="BO.OrderInProgress"/> object with complete delivery information.</returns>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the order or courier associated with the delivery is not found.
+    /// </exception>
+    /// <remarks>
+    /// This method retrieves the associated order and calculates:
+    /// <list type="bullet">
+    ///   <item><description>Distance from store to delivery address</description></item>
+    ///   <item><description>Estimated delivery time based on courier speed and distance</description></item>
+    ///   <item><description>Maximum allowed delivery time</description></item>
+    ///   <item><description>Schedule status (on-time, at-risk, or late)</description></item>
+    ///   <item><description>Time remaining until the delivery deadline</description></item>
+    /// </list>
+    /// </remarks>
+    private static BO.OrderInProgress s_createOrderInProgress(DO.Delivery delivery)
+    {
+        DO.Order order = s_dal.Order.Read(delivery.OrderId)
+            ?? throw new BO.BlDoesNotExistException("Order not found");
+
+        DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
+            ?? throw new BO.BlDoesNotExistException("Courier not found");
+
+        TimeSpan estimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(delivery) ?? TimeSpan.Zero;
+        DateTime maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
+
+        return new BO.OrderInProgress
+        {
+            DeliveryId = delivery.Id,
+            OrderId = delivery.OrderId,
+            TypeOfOrder = (BO.TypeOfOrder)order.TypeOfOrder,
+            Details = order.Details,
+            Address = order.Addres,
+            Distance = Tools.GetDistance(order),
+            ActualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
+            CustomerName = order.Name,
+            CustomerPhone = order.Phone,
+            OrderTime = order.OrderDate,
+            StartDeliveryTime = delivery.OrderDate,
+            EstimatedDeliveryTime = delivery.OrderDate + estimatedDeliveryTime,
+            MaxDeliveryTime = maxDeliveryTime,
+            OrderStatus = BO.OrderStatus.DELIVERING,
+            ScheduleStatus = Tools.GetScheduleStatus(order, delivery),
+            TimeRemaining = maxDeliveryTime - AdminManager.Now
+        };
     }
 }

@@ -10,8 +10,6 @@ namespace Helpers;
 /// </summary>
 public static class GoogleMapsService
 {
-    #region Constants and Fields
-
     /// <summary>
     /// User agent string for API requests.
     /// </summary>
@@ -49,10 +47,6 @@ public static class GoogleMapsService
     /// </summary>
     private static readonly object s_cacheLock = new();
 
-    #endregion
-
-    #region Data Types
-
     /// <summary>
     /// Route information including polyline for map display and travel metrics.
     /// Contains all data returned from the Google Directions API for a single route.
@@ -85,10 +79,6 @@ public static class GoogleMapsService
         /// </summary>
         public string DistanceText { get; set; } = string.Empty;
     }
-
-    #endregion
-
-    #region Cache Management
 
     /// <summary>
     /// Initializes the distance cache with predefined address data.
@@ -146,10 +136,6 @@ public static class GoogleMapsService
     /// </summary>
     public static void ClearCache() => s_routeCache.Clear();
 
-    #endregion
-
-    #region Helper Methods
-
     /// <summary>
     /// Converts shipment type to Google Maps travel mode.
     /// </summary>
@@ -158,7 +144,7 @@ public static class GoogleMapsService
     /// "walking" for FOOT and BIKE shipment types,
     /// "driving" for MOTORCYCLE, CAR, and default cases.
     /// </returns>
-    private static string GetTravelMode(BO.TheTypeShipment shipmentType)
+    private static string s_getTravelMode(BO.TheTypeShipment shipmentType)
     {
         return shipmentType switch
         {
@@ -173,7 +159,7 @@ public static class GoogleMapsService
     /// <summary>
     /// Prepares the HTTP client for API requests by setting the User-Agent header.
     /// </summary>
-    private static void PrepareHttpClient()
+    private static void s_prepareHttpClient()
     {
         s_httpClient.DefaultRequestHeaders.Clear();
         s_httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
@@ -185,7 +171,7 @@ public static class GoogleMapsService
     /// <param name="route">The route XML element.</param>
     /// <param name="leg">The leg XML element containing distance and duration.</param>
     /// <returns>A RouteInfo object with parsed data.</returns>
-    private static RouteInfo ParseRouteInfo(XElement route, XElement leg)
+    private static RouteInfo s_parseRouteInfo(XElement route, XElement leg)
     {
         return new RouteInfo
         {
@@ -200,10 +186,6 @@ public static class GoogleMapsService
             DurationText = leg.Element("duration")?.Element("text")?.Value ?? string.Empty
         };
     }
-
-    #endregion
-
-    #region Route Methods
 
     /// <summary>
     /// Gets route information between two points using Google Directions API (XML format).
@@ -239,7 +221,7 @@ public static class GoogleMapsService
                         $"&mode={mode}" +
                         $"&key={apiKey}";
 
-            PrepareHttpClient();
+            s_prepareHttpClient();
 
             string xmlContent = s_httpClient.GetStringAsync(url).GetAwaiter().GetResult();
             XDocument doc = XDocument.Parse(xmlContent);
@@ -262,7 +244,7 @@ public static class GoogleMapsService
             if (route == null || leg == null)
                 return null;
 
-            var routeInfo = ParseRouteInfo(route, leg);
+            var routeInfo = s_parseRouteInfo(route, leg);
             s_routeCache.TryAdd(cacheKey, routeInfo);
             return routeInfo;
         }
@@ -303,7 +285,7 @@ public static class GoogleMapsService
                         $"&mode={mode}" +
                         $"&key={apiKey}";
 
-            PrepareHttpClient();
+            s_prepareHttpClient();
 
             string xmlContent = s_httpClient.GetStringAsync(url).GetAwaiter().GetResult();
             XDocument doc = XDocument.Parse(xmlContent);
@@ -326,7 +308,7 @@ public static class GoogleMapsService
             if (route == null || leg == null)
                 return null;
 
-            var routeInfo = ParseRouteInfo(route, leg);
+            var routeInfo = s_parseRouteInfo(route, leg);
             s_routeCache.TryAdd(cacheKey, routeInfo);
             return routeInfo;
         }
@@ -356,7 +338,7 @@ public static class GoogleMapsService
         double storeLat = config.Latitude ?? throw new InvalidOperationException("Store latitude not configured");
         double storeLng = config.Longitude ?? throw new InvalidOperationException("Store longitude not configured");
 
-        string mode = GetTravelMode(shipmentType);
+        string mode = s_getTravelMode(shipmentType);
         return GetRoute(storeLat, storeLng, destLat, destLng, mode);
     }
 
@@ -377,13 +359,9 @@ public static class GoogleMapsService
         var config = AdminManager.GetConfig();
         string storeAddress = config.StoreAddress ?? throw new InvalidOperationException("Store address not configured");
 
-        string mode = GetTravelMode(shipmentType);
+        string mode = s_getTravelMode(shipmentType);
         return GetRouteByAddress(storeAddress, destinationAddress, mode);
     }
-
-    #endregion
-
-    #region Static Map Methods
 
     /// <summary>
     /// Builds a Static Map URL with route overlay.
@@ -440,10 +418,6 @@ public static class GoogleMapsService
                                route.EncodedPolyline, width, height);
     }
 
-    #endregion
-
-    #region Geocoding Methods
-
     /// <summary>
     /// Converts a street address to geographic coordinates using the Google Geocoding API.
     /// </summary>
@@ -477,7 +451,7 @@ public static class GoogleMapsService
 
         try
         {
-            PrepareHttpClient();
+            s_prepareHttpClient();
             HttpResponseMessage response = s_httpClient.GetAsync(url).GetAwaiter().GetResult();
 
             if (!response.IsSuccessStatusCode)
@@ -520,10 +494,6 @@ public static class GoogleMapsService
         }
     }
 
-    #endregion
-
-    #region Distance Methods
-
     /// <summary>
     /// Calculates the actual road distance from the store to a delivery address using the Google Distance Matrix API.
     /// </summary>
@@ -560,7 +530,7 @@ public static class GoogleMapsService
         string storeAddress = AdminManager.GetConfig().StoreAddress
             ?? throw new BO.BlInvalidValueException("Store Address is not configured.");
 
-        string mode = GetTravelMode(typeShipment);
+        string mode = s_getTravelMode(typeShipment);
         string cacheKey = $"{storeAddress}|{address}|{mode}".ToLowerInvariant();
 
         // Check if distance already exists in cache
@@ -577,7 +547,7 @@ public static class GoogleMapsService
 
         try
         {
-            PrepareHttpClient();
+            s_prepareHttpClient();
             HttpResponseMessage response = s_httpClient.GetAsync(url).GetAwaiter().GetResult();
 
             if (!response.IsSuccessStatusCode)
@@ -620,10 +590,6 @@ public static class GoogleMapsService
         }
     }
 
-    #endregion
-
-    #region Authorization Methods
-
     /// <summary>
     /// Checks if a given ID belongs to the system manager.
     /// </summary>
@@ -637,21 +603,6 @@ public static class GoogleMapsService
     {
         return id == AdminManager.GetConfig().ManagerId;
     }
-
-    /// <summary>
-    /// Checks if a given ID belongs to the system manager.
-    /// </summary>
-    /// <param name="Id">The ID to verify.</param>
-    /// <returns>True if the ID matches the manager ID configured in the system; otherwise, false.</returns>
-    /// <remarks>
-    /// This method is kept for backward compatibility. Use <see cref="CheckManager(int)"/> instead.
-    /// </remarks>
-    [Obsolete("Use CheckManager instead")]
-    public static bool CheckManger(int Id) => CheckManager(Id);
-
-    #endregion
-
-    #region Predefined Data
 
     /// <summary>
     /// Predefined address data for caching distance calculations.
@@ -766,5 +717,4 @@ public static class GoogleMapsService
         [" אליהו סעדון 20, אור יהודה", "32.0255384", "34.8549182", "12238", "9905"]
     ];
 
-    #endregion
 }

@@ -90,7 +90,7 @@ internal static class OrderManager
     {
         s_validateOrderFields(boOrder);
 
-        var addressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
+        var addressCoordinates = GoogleMapsService.GetGeocodingSync(boOrder.Addres);
 
         var distance = Tools.GetDistance(
             addressCoordinates?.Lat ?? 0,
@@ -180,7 +180,7 @@ internal static class OrderManager
     {
         s_validateOrderFields(boOrder);
 
-        var addressCoordinates = Tools.GetGeocodingSync(boOrder.Addres);
+        var addressCoordinates = GoogleMapsService.GetGeocodingSync(boOrder.Addres);
 
         DO.Order doOrder = new DO.Order
         {
@@ -405,10 +405,25 @@ internal static class OrderManager
             permittedOrders.Contains(order.TypeOfOrder) &&
             (filter == null || order.TypeOfOrder == (DO.TypeOfOrder)filter);
 
+        double? storLet = AdminManager.GetConfig().Latitude;
+        double? storLon = AdminManager.GetConfig().Longitude;
+        double? maxDelivery = doCourier.MaxDistanceDelivery;
+
+        Func<DO.Order, bool> permittedDistens = order =>
+        {
+            if(storLet is double let && storLon is double lon && maxDelivery is double max)
+            {
+                return Tools.GetDistance(order.Latitude, order.Longitude, let, lon) <= max;
+            }
+            else
+                return true;
+        };
+
+
         var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
-                    let distance = GoogleMapsService.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment) ?? 0.1
-                    where orderFilter(doOrder) && distance <= doCourier.MaxDistanceDelivery
+                    where (orderFilter(doOrder) && permittedDistens(doOrder))
                     let maxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime
+                    let distance = GoogleMapsService.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)
                     select new BO.OpenOrderInList
                     {
                         OrderId = doOrder.Id,
@@ -417,7 +432,7 @@ internal static class OrderManager
                         Address = doOrder.Addres,
                         DistanceKm = doOrder.DistanceKm ?? 0,
                         ActualDistance = distance,
-                        EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime((BO.TheTypeShipment)doCourier.TypeShipment, distance),
+                        EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime((BO.TheTypeShipment)doCourier.TypeShipment, distance ?? 0),
                         ScheduleStatus = Tools.GetScheduleStatus(doOrder),
                         TimeLeftForDelivery = maxDeliveryTime - AdminManager.Now,
                         MaxDeliveryTime = maxDeliveryTime

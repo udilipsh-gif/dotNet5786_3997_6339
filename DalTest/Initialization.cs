@@ -200,10 +200,12 @@ public static class Initialization
         /// </returns>
         static double? getMaxDistanceDelivery(TheTypeShipment shipment)
         {
+            int? maxRange = (int?)s_dal?.Config.MaxDeliveryRange;
+
             double? distans = shipment switch
             {
-                TheTypeShipment.CAR => s_rand.Next(10, 100),
-                TheTypeShipment.MOTORCYCLE => s_rand.Next(2, 25),
+                TheTypeShipment.CAR => s_rand.Next(10, maxRange ?? 100),
+                TheTypeShipment.MOTORCYCLE => s_rand.Next(2, maxRange ?? 25),
                 TheTypeShipment.BIKE => s_rand.Next(1, 5),
                 TheTypeShipment.FOOT => s_rand.NextDouble() * (3.5 - 0.5) + 0.5,
                 _ => null

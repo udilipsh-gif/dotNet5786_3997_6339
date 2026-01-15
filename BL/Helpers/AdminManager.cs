@@ -110,7 +110,7 @@ internal static class AdminManager //stage 4
         if (s_dal.Config.StoreAddress != configuration.StoreAddress)
         {
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
-            (double Lat, double Lon)? adressCoordinates = Tools.GetGeocodingSync(address) ??
+            (double Lat, double Lon)? adressCoordinates = GoogleMapsService.GetGeocodingSync(address) ??
                 throw new BO.BlInvalidValueException("Geocoding failed.");
             configuration.Latitude = adressCoordinates?.Lat;
             configuration.Longitude = adressCoordinates?.Lon;
