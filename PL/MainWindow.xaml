@@ -11,6 +11,9 @@
         Closed="MainWindow_Close">
 
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill"/>
+        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -39,6 +42,8 @@
                 <Label Content="תעודת זהות:"/>
                 <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" 
                          MaxLength="9"
+                         Background="#50CCCCCC"
+                       
                          local:Tools.NumericOnly="True"/>
 
                 <Label Content="סיסמה:" Margin="0,15,0,0"/>
