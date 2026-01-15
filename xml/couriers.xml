@@ -89,6 +89,17 @@
     <WorkingSince>2025-11-17T11:13:38.0000000</WorkingSince>
   </Courier>
   <Courier>
+    <Id>45</Id>
+    <Name>Nadav 45 Katz</Name>
+    <Phone>0590348322</Phone>
+    <Email>nadav.katz@courier.com</Email>
+    <Password>45</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>5</MaxDistanceDelivery>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <WorkingSince>2025-11-17T11:13:38.0000000</WorkingSince>
+  </Courier>
+  <Courier>
     <Id>254070867</Id>
     <Name>Rina Cohen</Name>
     <Phone>0546110630</Phone>

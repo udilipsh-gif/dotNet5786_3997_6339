@@ -12,9 +12,10 @@ public class EnumToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        if (value == null || parameter == null)
+            return false;
 
-        //המרה של ערך ENUM לבוליאני
-        string checkValue = value.ToString()!;//אין אפשרות שיהיה null כי זה ENUM
+        string checkValue = value.ToString()!;
         string targetValue = parameter.ToString()!;
 
         return checkValue.Equals(targetValue, StringComparison.InvariantCultureIgnoreCase);
@@ -22,9 +23,11 @@ public class EnumToBooleanConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        //המרה של ערך בוליאני חזרה ל ENUM
+        if (value == null || parameter == null)
+            return Binding.DoNothing;
+
         bool useValue = (bool)value;
-        string targetValue = parameter.ToString()!;//אין אפשרות שיהיה null כי זה פרמטר שהוגדר בקישור
+        string targetValue = parameter.ToString()!;
 
         if (useValue)
         {
@@ -123,6 +126,7 @@ public class BooleanToHebrewConverter : IValueConverter
         return false;
     }
 }
+
 
 public class EnumDescriptionConverter : IValueConverter
 {
@@ -281,6 +285,27 @@ public class NullToSizeConverter : IValueConverter
         }
 
         return NotNullSize;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class OrderStatusToCancelConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        // בדיקה אם הערך הוא null
+        if (value == null) return false;
+
+        // המרה ל-String או ל-Enum שלך. נניח שזה עובד מול המחרוזת או ה-Enum
+        string status = value.ToString();
+
+        // הלוגיקה שהייתה לך ב-Triggers:
+        // פעיל רק אם: OPEN, REFUSED, DELIVERING
+        return status == "OPEN" || status == "REFUSED" || status == "DELIVERING";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

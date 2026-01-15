@@ -1,178 +1,61 @@
 ﻿<Window x:Class="PL.StartDeliveryWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        mc:Ignorable="d" 
-        Title="בחירת הזמנה"
+        Title="בחר משלוח לביצוע"
         Loaded="StartDeliveryWindow_Loaded"
         Closed="StartDeliveryWindow_Closed"
-        Height="450" Width="840">
-    <Window.Resources>
-        <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+        Height="500" Width="900"
+        WindowStartupLocation="CenterScreen">
 
-        <!-- Style לתאים עם Wrap -->
-        <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="TextAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="4,2"/>
-        </Style>
-
-        <!-- Style לשורות עם אירוע לחיצה -->
-        <Style TargetType="DataGridRow">
-            <Setter Property="Height" Value="Auto"/>
-            <Setter Property="MinHeight" Value="32"/>
-            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="DataGridRow_PreviewMouseLeftButtonUp"/>
-        </Style>
-
-        <!-- Style לכותרות עם Wrap -->
-        <Style x:Key="WrappedHeaderStyle" TargetType="DataGridColumnHeader">
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"
-                               VerticalAlignment="Center"
-                               Margin="4,2"/>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
-    <Grid>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Label Grid.Column="0" Content="סוג משלוח:" 
-                   FontSize="16" 
-                   FontWeight="Bold"
-                   Margin="5"/>
-            <ComboBox Grid.Column="1"
-                   ItemsSource="{Binding EnumTypeOfOrder}"
-                   DisplayMemberPath="Name"
-                   SelectedValuePath="Id"
-                   SelectedValue="{Binding SelectedFilter}"
-                   SelectionChanged="ComboBox_SelectionChanged"
-                   SelectedIndex="0"
-                   FontSize="14"
-                   Width="150"
-                   Margin="5"
-                   ToolTip="בחר סוג משלוח להצגה בטבלה">
-            </ComboBox>
-        </Grid>
 
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+            <Label Content="הצג משלוחים מסוג:" VerticalAlignment="Center" FontSize="16"/>
+            <ComboBox ItemsSource="{Binding EnumTypeOfOrder}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Id"
+                      SelectedValue="{Binding SelectedFilter}"
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      SelectedIndex="0"
+                      Width="200"
+                      Height="35"
+                      Margin="10,0"/>
+        </StackPanel>
 
         <DataGrid Grid.Row="1"
-          x:Name="OrdersGrid"
-          AutoGenerateColumns="False"
-          Margin="5"
-          ItemsSource="{Binding DeliveryListView}"
-          ToolTip="טבלת הזמנות - הצג, מיין וסנן מידע על הזמנות"
-          IsReadOnly="True"
-          SelectionMode="Single"
-          CanUserAddRows="False"
-          CanUserDeleteRows="False"
-          HorizontalScrollBarVisibility="Auto"
-          FlowDirection="RightToLeft"
-          EnableRowVirtualization="False"
-          EnableColumnVirtualization="False">
-            
+                  x:Name="OrdersGrid"
+                  ItemsSource="{Binding DeliveryListView}"
+                  IsReadOnly="True"
+                  SelectionMode="Single">
+
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="איסוף" Width="Auto">
-                    
+                <DataGridTemplateColumn Width="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="איסוף"
+                            <Button Content="אסוף 📦"
                                     Click="CollectOrder_Click"
-                                    Padding="8,4"
-                                    Margin="2"
                                     Background="#4CAF50"
-                                    Foreground="White"
-                                    Cursor="Hand"
-                                    ToolTip="לחץ לאיסוף ההזמנה"/>
+                                    Padding="5"
+                                    Height="30"
+                                    FontSize="12"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
-                <DataGridTextColumn Header="מזהה הזמנה"
-                            Binding="{Binding OrderId}"
-                            SortMemberPath="OrderId"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
-                <DataGridTextColumn Header="סוג הזמנה"
-                            Binding="{Binding TypeOfOrder}"
-                            SortMemberPath="TypeOfOrder"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-                
-
-                <DataGridTextColumn Header=" מרחק אווירי"
-                                Binding="{Binding DistanceKm, StringFormat=N2}"
-                                SortMemberPath="DistanceKm"
-                                Width="Auto"
-                                HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <DataGridTextColumn Header="מרחק בפועל"
-                            Binding="{Binding ActualDistance}"
-                            SortMemberPath="TypeOfOrder"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <DataGridTextColumn Header="משקל"
-                            Binding="{Binding Weight}"
-                            SortMemberPath="TypeOfOrder"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <DataGridTextColumn Header="הערכת זמן"
-                            Binding="{Binding EstimatedDeliveryTime, Converter={StaticResource TimeSpanConverter}}"
-                            SortMemberPath="TypeOfOrder"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <DataGridTextColumn Header="סטטוס"
-                            Binding="{Binding ScheduleStatus}"
-                            SortMemberPath="ScheduleStatus"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <DataGridTextColumn Header="זמן לסיום"
-                            Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}"
-                            SortMemberPath="TimeLeftForDelivery"
-                            Width="Auto"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <DataGridTextColumn Header="סך זמן השלמת הטיפול"
-                                Binding="{Binding MaxDeliveryTime, StringFormat='{}{0:dd/MM/yyyy}'}"
-                                SortMemberPath="MaxDeliveryTime"
-                                Width="Auto"
-                                HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-                
+                <DataGridTextColumn Header="מזהה" Binding="{Binding OrderId}" Width="60"/>
+                <DataGridTextColumn Header="סוג" Binding="{Binding TypeOfOrder}" Width="Auto"/>
+                <DataGridTextColumn Header="מרחק (ק״מ)" Binding="{Binding DistanceKm, StringFormat=N2}" Width="Auto"/>
+                <DataGridTextColumn Header="כתובת" Binding="{Binding Address}" Width="*"/>
+                <DataGridTextColumn Header="זמן משוער" Binding="{Binding EstimatedDeliveryTime, Converter={StaticResource TimeSpanConverter}}" Width="Auto"/>
+                <DataGridTextColumn Header="זמן שנותר" Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}" FontWeight="Bold" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
-
-
     </Grid>
 </Window>

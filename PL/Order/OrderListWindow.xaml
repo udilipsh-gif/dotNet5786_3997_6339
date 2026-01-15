@@ -7,239 +7,120 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת הזמנות"
-        Height="500" Width="1000" Loaded="Window_Loaded" FlowDirection="RightToLeft">
+        FlowDirection="RightToLeft"
+        Height="600" Width="950"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded">
 
-    <Window.Resources>
-        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <!-- Style לתאים עם Wrap -->
-        <!--<Style x:Key="WrappedTextCellStyle" TargetType="TextBlock" >
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="TextAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="4,2"/>
-        </Style>-->
-        <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="TextAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="5,2"/>
-        </Style>
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="ניהול הזמנות" Style="{StaticResource HeaderTextStyle}"/>
 
-        <!-- Style לשורות -->
-        <Style TargetType="DataGridRow">
-            <Setter Property="Height" Value="Auto"/>
-            <Setter Property="MinHeight" Value="32"/>
-        </Style>
+            <Border Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
 
-        <!-- Style לכותרות עם Wrap -->
-        <Style x:Key="WrappedHeaderStyle" TargetType="DataGridColumnHeader">
-            <Setter Property="ContentTemplate" >
-                <Setter.Value>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}"
-                                   TextWrapping="Wrap"
-                                   TextAlignment="Center"
-                                   VerticalAlignment="Center"
-                                    FontSize="14"
-                                   FontFamily="BOLD"
-                                   Margin="1,2"/>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-    <Border Grid.Column="0"
-         Margin="10"
-         Padding="10"
-         CornerRadius="10"
-         Background="#F5F5F5"
-         BorderBrush="#DDD"
-         BorderThickness="1">
-
-
-        <Grid>
-            <!--3 שורות, סינון, תוכן, כפתור -->
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-
-
-            </Grid.RowDefinitions>
-
-            <StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="0,0,0,10">
-                <StackPanel Margin="5,0">
-                    <TextBlock Text="סנן לפי סטטוס עמידה בזמנים:" Margin="0,0,0,3"/>
-                    <ComboBox Width="150" 
+                    <StackPanel Margin="10,0">
+                        <Label Content="סטטוס עמידה בזמנים:"/>
+                        <ComboBox Width="180" 
+                          Style="{StaticResource ModernComboBox}"
                           ItemsSource="{Binding ScheduleStatusList}"
                           DisplayMemberPath="Name"
                           SelectedValuePath="Id"
                           SelectedValue="{Binding SelectedScheduleFilter}"
-                          SelectionChanged="ComboBox_SelectionChanged">
-                    </ComboBox>
-                </StackPanel>
+                          SelectionChanged="ComboBox_SelectionChanged"/>
+                    </StackPanel>
 
-                <StackPanel Margin="5,0">
-                    <TextBlock Text="סנן לפי סוג הזמנה:" Margin="0,0,0,3"/>
-                    <ComboBox Width="150" 
+                    <StackPanel Margin="10,0">
+                        <Label Content="סוג הזמנה:"/>
+                        <ComboBox Width="180" 
+                          Style="{StaticResource ModernComboBox}"
                           ItemsSource="{Binding TypeOfOrderList}"
+                          DisplayMemberPath="Name"
+                          SelectedValuePath="Id"
                           SelectedValue="{Binding SelectedTypeFilter}"
-                          SelectionChanged="ComboBox_SelectionChanged"
-                          DisplayMemberPath="Name"
-                          SelectedValuePath="Id">
-                    </ComboBox>
-                </StackPanel>
-                
-                <StackPanel Margin="5,0">
-                    <TextBlock Text="סנן לפי סטטוס הזמנה:" Margin="0,0,0,3"/>
-                    <ComboBox Width="150" 
+                          SelectionChanged="ComboBox_SelectionChanged"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,0">
+                        <Label Content="סטטוס הזמנה:"/>
+                        <ComboBox Width="180" 
+                          Style="{StaticResource ModernComboBox}"
                           ItemsSource="{Binding TypeOfOrderStatusList}"
-                          SelectedValue="{Binding SelectedOrderStatusFilter}"
-                          SelectionChanged="ComboBox_SelectionChanged"
                           DisplayMemberPath="Name"
-                          SelectedValuePath="Id">
-                    </ComboBox>
+                          SelectedValuePath="Id"
+                          SelectedValue="{Binding SelectedOrderStatusFilter}"
+                          SelectionChanged="ComboBox_SelectionChanged"/>
+                    </StackPanel>
+
                 </StackPanel>
+            </Border>
+        </StackPanel>
 
-            </StackPanel>
-
-
-
-            <!-- DataGrid להצגת ההזמנות -->
-            <DataGrid Grid.Row="1"
-                  AutoGenerateColumns="False"
-                  Margin="5"
+        <DataGrid Grid.Row="1"
                   ItemsSource="{Binding OrderList}"
-                  ToolTip="טבלת הזמנות - הצג, מיין וסנן מידע על הזמנות"
                   IsReadOnly="True"
                   SelectionMode="Single"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  HorizontalScrollBarVisibility="Auto"
                   FlowDirection="RightToLeft"
-                  EnableRowVirtualization="False"
-                  EnableColumnVirtualization="False"
                   MouseDoubleClick="Add_Edit_Order_Click">
 
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="מזהה הזמנה"
-                                    Binding="{Binding OrderId}"
-                                    SortMemberPath="OrderId"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="מזהה" Binding="{Binding OrderId}" Width="Auto"/>
 
-                    <DataGridTextColumn Header="סטטוס הזמנה"
-                                    Binding="{Binding OrderStatus, Converter={StaticResource EnumDescriptionConverter}}"
-                                    SortMemberPath="OrderStatus"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="סטטוס" 
+                                    Binding="{Binding OrderStatus, Converter={StaticResource EnumDescriptionConverter}}" 
+                                    Width="Auto" FontWeight="Bold"/>
 
-                    <DataGridTextColumn Header="מזהה משלוח"
-                                    Binding="{Binding DeliveryId}"
-                                    SortMemberPath="DeliveryId"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="משלוח" Binding="{Binding DeliveryId}" Width="Auto"/>
 
-                    <DataGridTextColumn Header="סוג הזמנה"
-                                    Binding="{Binding TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}}"
-                                    SortMemberPath="TypeOfOrder"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="סוג" 
+                                    Binding="{Binding TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}}" 
+                                    Width="Auto"/>
 
-                    <DataGridTextColumn Header="מרחק"
-                                        Binding="{Binding DistanceKm, StringFormat=N2}"
-                                        SortMemberPath="DistanceKm"
-                                        Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                        HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="מרחק (ק״מ)" 
+                                    Binding="{Binding DistanceKm, StringFormat=N2}" 
+                                    Width="90"/>
 
-                    <DataGridTextColumn Header="סטטוס לו''ז"
-                                    Binding="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}}"
-                                    SortMemberPath="ScheduleStatus"
-                                    Width="85"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="מצב לו''ז" 
+                                    Binding="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}}" 
+                                    Width="Auto"/>
 
-                    <DataGridTextColumn Header="זמן לסיום"
-                                    Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}"
-                                    SortMemberPath="TimeLeftForDelivery"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="זמן לסיום" 
+                                    Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}" 
+                                    Width="120"/>
 
-                    <DataGridTextColumn Header="סך זמן השלמת הטיפול"
-                                        Binding="{Binding TotalTimeOfDelivery, Converter={StaticResource TimeSpanConverter}}"
-                                        SortMemberPath="TotalTimeOfDelivery"
-                                        Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                        HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="זמן טיפול כולל" 
+                                    Binding="{Binding TotalTimeOfDelivery, Converter={StaticResource TimeSpanConverter}}" 
+                                    Width="120"/>
 
-                    <DataGridTextColumn Header="נסיון מס'"
-                                        Binding="{Binding NumberOfDeliveryAttempts}"
-                                        SortMemberPath="NumberOfDeliveryAttempts"
-                                        Width="65"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                        HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="ניסיונות" Binding="{Binding NumberOfDeliveryAttempts}" Width="70"/>
 
-                    <DataGridTemplateColumn Header="ביטול" Width="*" HeaderStyle="{StaticResource WrappedHeaderStyle}">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="בטל" 
-                            Click="btnCancelOrder_Click" 
-                            Padding="5,2" 
-                            Margin="2"
-                            ToolTip="לחץ כאן לביטול הזמנה"
-                            Background="Green">
+                <DataGridTemplateColumn Header="ביטול" Width="*" HeaderStyle="{StaticResource WrappedHeaderStyle}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="בטל" 
+                                    Click="btnCancelOrder_Click" 
+                                    Style="{StaticResource GhostDestructiveButtonStyle}"
+                                    Width="60"
+                                    Margin="0"
+                                    IsEnabled="{Binding OrderStatus, Converter={StaticResource OrderStatusToCancelConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
 
-
-                                    <Button.Style>
-                                        <Style TargetType="Button">
-
-
-
-                                            <Setter Property="IsEnabled" Value="False"/>
-
-                                            <Style.Triggers>
-
-                                                <DataTrigger Binding="{Binding OrderStatus}" Value="OPEN">
-                                                    <Setter Property="IsEnabled" Value="True"/>
-                                                </DataTrigger>
-
-                                                <DataTrigger Binding="{Binding OrderStatus}" Value="REFUSED">
-                                                    <Setter Property="IsEnabled" Value="True"/>
-                                                </DataTrigger>
-
-                                                <DataTrigger Binding="{Binding OrderStatus}" Value="DELIVERING">
-                                                    <Setter Property="IsEnabled" Value="True"/>
-                                                </DataTrigger>
-
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-
-                                </Button>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-            <!-- Add Button: Opens a window to add a new order to the system -->
-            <Button Content="הוסף הזמנה" 
-            Grid.Row="2" 
-            HorizontalAlignment="Center" 
-            VerticalAlignment="Bottom" 
-            Height="30"        
-            Margin="10,5"         
-            Width="100"
-            Click="Add_Edit_Order_Click"
-            ToolTip="לחץ כאן להוספת הזמנה למערכת"
-            AutomationProperties.Name="כפתור הוספת הזמנה"/>
-        </Grid>
-    </Border>
+        <Button Grid.Row="2" 
+                Content="+ הוסף הזמנה חדשה" 
+                HorizontalAlignment="Right" 
+                Width="180" 
+                Height="40"
+                Margin="0,15,0,0"
+                Click="Add_Edit_Order_Click"/>
+    </Grid>
 </Window>

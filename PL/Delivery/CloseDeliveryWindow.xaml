@@ -1,18 +1,13 @@
 ﻿<Window x:Class="PL.CloseDeliveryWindow"
-               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PL"
-        FlowDirection="RightToLeft"
         Title="סיום משלוח" 
-        Height="220" Width="250"
-        WindowStartupLocation="CenterOwner"
+        Height="250" Width="350"
         ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
-    <Window.Resources>
-        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
-    </Window.Resources>
-    
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,46 +15,35 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- כותרת -->
-        <TextBlock Grid.Row="0" 
-                   Text="בחר סיבת סיום המשלוח:" 
-                   FontSize="16" 
-                   FontWeight="Bold"
-                   Margin="0,0,0,15"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="סיום משלוח" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
+            <TextBlock Text="אנא בחר את סיבת סיום המשלוח:" FontSize="14" Foreground="{StaticResource SubTextColor}" Margin="0,5,0,0"/>
+        </StackPanel>
 
-        <!-- רשימת בחירה -->
         <ComboBox Grid.Row="1" 
-          x:Name="EndDeliveryComboBox"
-          ItemsSource="{Binding EndDeliveryOptions}"
-          SelectedItem="{Binding SelectedEndDelivery, Mode=TwoWay}"
-          FontSize="14"    
-          VerticalAlignment="Top">
-            <!-- תבנית להצגת פריטים ברשימה הנפתחת -->
+                  x:Name="EndDeliveryComboBox"
+                  ItemsSource="{Binding EndDeliveryOptions}"
+                  SelectedItem="{Binding SelectedEndDelivery, Mode=TwoWay}"
+                  VerticalAlignment="Top"
+                  Height="40">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" Padding="5"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <!-- כפתורי אישור וביטול -->
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Center"
-                    Margin="0,20,0,0">
-            <Button Content="ביטול" 
-                    Width="90" 
-                    Height="35"
-                    Margin="5"
-                    Click="CancelButton_Click"
-                    IsCancel="True"/>     
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,20,0,0">
             <Button Content="אישור" 
-                    Width="90" 
-                    Height="35"
-                    Margin="5"
+                    Width="100" 
                     Click="OkButton_Click"
                     IsDefault="True"/>
-          
+
+            <Button Content="ביטול" 
+                    Width="100" 
+                    Click="CancelButton_Click"
+                    IsCancel="True"
+                    Style="{StaticResource SecondaryButtonStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

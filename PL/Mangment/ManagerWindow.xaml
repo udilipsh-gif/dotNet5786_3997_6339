@@ -1,113 +1,76 @@
 ﻿<Window x:Class="PL.ManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
-        mc:Ignorable="d"
-        FlowDirection="RightToLeft"
-        Height="550" Width="500" 
+        Title="ניהול המערכת" 
+        Height="600" Width="800"
+        WindowStartupLocation="CenterScreen"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="ניהול המערכת" MinHeight="300" MinWidth="450"
+        FlowDirection="RightToLeft"
         Loaded="ManagerWindow_Loaded"
+        ResizeMode="NoResize"
         Closed="ManagerWindow_Close">
-    <Window.Resources>
-        <!-- Converter for TimeSpan to string format (DD:HH) and back -->
-        <local:SpanTimeConverter x:Key="SpanTimeConverter" />
 
-        <Style TargetType="Label" x:Key="UniformLabel">
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="VerticalContentAlignment" Value="Top"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
-    </Window.Resources>
-
-    <Grid Background="WhiteSmoke">
-
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="80*"/>
-            <RowDefinition Height="120*"/>
-            <RowDefinition Height="400*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Top-left section: Store name, clock display, and time advance buttons -->
-        <Grid Grid.Row="1">
+        <Border Grid.Row="0" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="ניהול שליחים" Click="btnCourierList_Click" Width="120"/>
+                <Button Content="ניהול הזמנות" Click="btnOrderList_Click" Width="120" ToolTip="טבלת הזמנות - הצג רשימה, מיין וסנן"/>
+                <Button Content="הגדרות" Click="btnConfig_Click" Width="120"/>
+
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                    <Button Content="איפוס נתונים" Click="ResetDB" Width="120" Style="{StaticResource DestructiveButtonStyle}"/>
+                    <Button Content="אתחול נתונים" Click="InitDB" Width="120" Style="{StaticResource SecondaryButtonStyle}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="20">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Store name label -->
-            <Label Grid.Row="0" Content="חנות הספרים שלי" Padding="5" Width="220"
-                   Style="{StaticResource UniformLabel}"/>
+            <TextBlock Grid.Row="0" Text="חנות הספרים שלי - לוח בקרה" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
 
-            <!-- Current system clock display - Shows date and time in Hebrew locale -->
-            <Label Grid.Row="1"  Language="he-IL" Content="{Binding CurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" FontWeight="Bold" Padding="10,5" FontSize="20"/>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10">
+                <TextBlock Text="שעון מערכת: " FontSize="18" VerticalAlignment="Center" Foreground="{StaticResource SubTextColor}"/>
+                <TextBlock Text="{Binding CurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
+                           Language="he-IL" 
+                           FontSize="20" 
+                           FontWeight="Bold" 
+                           Foreground="{StaticResource PrimaryColor}"/>
+            </StackPanel>
 
-            <!-- Clock advance buttons - Each button advances the clock by different time units -->
-            <WrapPanel Grid.Row="2" Margin="10,0">
-                <!-- Advance clock by 1 minute -->
-                <Button Margin="2,0" Content="דקה" Height="Auto" Width="Auto" Tag="Minute" Click="ClockForward_Click" BorderThickness="0"/>
-                <!-- Advance clock by 1 hour -->
-                <Button Margin="2,0" Content="שעה" Height="Auto" Width="Auto" Tag="Hour" Click="ClockForward_Click" BorderThickness="0"/>
-                <!-- Advance clock by 1 day -->
-                <Button Margin="2,0" Content="יום" Height="Auto" Width="Auto" Tag="Day" Click="ClockForward_Click" BorderThickness="0"/>
-                <!-- Advance clock by 1 week -->
-                <Button Margin="2,0" Content="שבוע" Height="Auto" Width="Auto" Tag="Week" Click="ClockForward_Click" BorderThickness="0"/>
-                <!-- Advance clock by 1 month -->
-                <Button Margin="2,0" Content="חודש" Height="Auto" Width="Auto" Tag="Month" Click="ClockForward_Click" BorderThickness="0"/>
-                <!-- Advance clock by 1 year -->
-                <Button Margin="2,0" Content="שנה" Height="Auto" Width="Auto" Tag="Year" Click="ClockForward_Click" BorderThickness="0"/>
+            <WrapPanel Grid.Row="2" Margin="0,10">
+                <TextBlock Text="הרץ זמן קדימה:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"/>
+
+                <Button Content="דקה" Tag="Minute" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
+                <Button Content="שעה" Tag="Hour" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
+                <Button Content="יום" Tag="Day" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
+                <Button Content="שבוע" Tag="Week" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
+                <Button Content="חודש" Tag="Month" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
+                <Button Content="שנה" Tag="Year" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
             </WrapPanel>
         </Grid>
 
-        <ListBox Grid.Row="2" 
-         ItemsSource="{Binding CombinedStatistics}" 
-         HorizontalAlignment="Center"
-         BorderThickness="0" 
-         Background="Transparent">
-
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical" />
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Button Margin="5,0" Padding="10,5"  Width="300" Click="btnStatistic_Click">
-                        <!--Click="FilterButton_Click"-->
-                        <Button.Content>
-                            <TextBlock>
-                                <Run Text="{Binding Name}" /> 
-                                <Run Text=" (" />
-                                <Run Text="{Binding Value}" FontWeight="Bold"/>
-                                <Run Text=")" />        
-                            </TextBlock>
-                        </Button.Content>
-                        <Button.Tag>
-                            <Binding Path="Id" />
-                        </Button.Tag>
-                    </Button>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-        <!-- Top menu bar: Main navigation and action buttons -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,10">
-       
-            <!-- Courier management button - Opens courier list window -->
-            <Button  Content="ניהול שליחים" Margin="10" Padding="5" Click="btnCourierList_Click"/>
-            <!-- Order management button - To be implemented -->
-            <Button  Content="ניהול הזמנות" ToolTip="טבלת הזמנות - הצג רשימה, מיין וסנן מידע על הזמנות" Margin="10" Padding="5" Click="btnOrderList_Click"/>
-            <!-- Reset database button - Clears all data -->
-            <Button  Content="איפוס" Margin="10" Padding="5" Click="ResetDB"/>
-            <!-- Initialize database button - Populates with sample data -->
-            <Button  Content="אתחול" Margin="10" Padding="5" Click="InitDB"/>
-            <!-- Initialize database button - Populates with sample data -->
-            <Button  Content="הגדרות" Margin="10" Padding="5" Click="btnConfig_Click"/>
-        </StackPanel>
+        <ScrollViewer Grid.Row="2" Margin="20,0,20,20" Padding="10">
+            <ItemsControl ItemsSource="{Binding CombinedStatistics}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Style="{StaticResource StatisticButtonStyle}"
+                    Click="btnStatistic_Click"
+                    Tag="{Binding Id}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </Window>
