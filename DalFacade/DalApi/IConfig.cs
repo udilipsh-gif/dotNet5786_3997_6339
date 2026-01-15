@@ -68,6 +68,8 @@ public interface IConfig
     /// </summary>
     string GoogleApiKey { get; set; }
 
+    string EmailAddress { get; set; }
+
     /// <summary>
     /// Resets the configuration settings to their default values.
     /// </summary>

@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closed="Window_Closed"
-        Title="היסטוריית משלוחים" Height="450" Width="815">
+        Title="היסטוריית משלוחים" Height="450" Width="850">
     
 
         <Window.Resources>
@@ -16,11 +16,15 @@
          
             <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
                 <Setter Property="TextWrapping" Value="Wrap"/>
-                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+
+            
                 <Setter Property="TextAlignment" Value="Right"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Margin" Value="5,2"/>
-            </Style>
+                
+           
+        </Style>
 
             <!-- Style לשורות -->
             <Style TargetType="DataGridRow">
@@ -39,8 +43,8 @@
                                 TextAlignment="Center"
                                      
                                 VerticalAlignment="Center"
-                                 FontSize="14"
-                                FontFamily="BOLD"
+                                 FontSize="15"
+                                FontFamily="Britannic Bold"
                                 Margin="1,2"/>
                         </DataTemplate>
                     </Setter.Value>
@@ -59,9 +63,7 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
            <DataGrid Grid.Row="1"

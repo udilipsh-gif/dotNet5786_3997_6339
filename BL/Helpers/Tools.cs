@@ -631,9 +631,8 @@ internal static class Tools
             using MailMessage mail = new MailMessage();
             using SmtpClient smtpServer = new SmtpClient("smtp.gmail.com");
 
-            // Email credentials (should be moved to configuration)
-            const string fromEmail = "aaaaaaaaa@gmail.com";
-            const string password = "1234 5678 @#$% Asdf";
+            string fromEmail = s_dal.Config.EmailAddress;
+            string password = "1234 5678 @#$% Asdf";
 
             mail.From = new MailAddress(fromEmail);
             mail.To.Add(toEmail);

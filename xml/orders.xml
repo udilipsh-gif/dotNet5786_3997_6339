@@ -33,22 +33,6 @@
     <DistanceKmWalk>2.159</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100005</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 4</Details>
-    <Addres> רבי עקיבא 50, בני ברק</Addres>
-    <Latitude>32.0876045</Latitude>
-    <Longitude>34.8278091</Longitude>
-    <Name>Customer4</Name>
-    <Phone>0507448882</Phone>
-    <Weight>10</Weight>
-    <OrderDate>2026-01-13T02:15:41.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>0.8106792052240024</DistanceKm>
-    <DistanceKmRoad>0.912</DistanceKmRoad>
-    <DistanceKmWalk>0.898</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100010</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 9</Details>
@@ -799,5 +783,21 @@
     <DistanceKm>4.160732294322267</DistanceKm>
     <DistanceKmRoad>5.393</DistanceKmRoad>
     <DistanceKmWalk>4.886</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100005</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 4</Details>
+    <Addres> רבי עקיבא 50, בני ברק</Addres>
+    <Latitude>32.0876045</Latitude>
+    <Longitude>34.8278091</Longitude>
+    <Name>Customer4</Name>
+    <Phone>0507448882</Phone>
+    <Weight>10</Weight>
+    <OrderDate>2026-01-13T02:15:41.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>0.8106792052240024</DistanceKm>
+    <DistanceKmRoad>0.912</DistanceKmRoad>
+    <DistanceKmWalk>0.898</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

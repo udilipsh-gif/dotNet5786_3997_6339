@@ -128,6 +128,10 @@ internal class ConfigImplementation : IConfig
     public string GoogleApiKey { get; set; } = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
 
 
+    public string? EmailAddress { get; set; } 
+
+
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>

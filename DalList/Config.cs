@@ -1,4 +1,5 @@
 ﻿using DO;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dal;
 
@@ -158,6 +159,8 @@ internal static class Config
 
     internal static string GoogleApiKey { get; set; } = string.Empty;
 
+    internal static string EmailAddress { get; set; } = string.Empty;
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
@@ -180,5 +183,6 @@ internal static class Config
         RiskRange = TimeSpan.FromDays(1);
         MaxTimeInactivity = TimeSpan.FromDays(100);
         GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
+        EmailAddress = string.Empty;
     }
 }

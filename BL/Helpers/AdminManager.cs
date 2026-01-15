@@ -79,7 +79,9 @@ internal static class AdminManager //stage 4
         MaxDeliveryTime = s_dal.Config.MaxDeliveryTime,
         RiskRange = s_dal.Config.RiskRange,
         MaxTimeInactivity = s_dal.Config.MaxTimeInactivity,
-        GoogleApiKey = s_dal.Config.GoogleApiKey
+        GoogleApiKey = s_dal.Config.GoogleApiKey,
+        EmailAddress = s_dal.Config.EmailAddress
+
     };
 
     /// <summary>

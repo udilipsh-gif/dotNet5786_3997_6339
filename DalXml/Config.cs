@@ -186,6 +186,12 @@ internal static class Config
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "GoogleApiKey", value);
     }
 
+    internal static string EmailAddress
+    {
+        get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "EmailAddress");
+        set => XMLTools.SetConfigGenericVal(s_data_config_xml, "EmailAddress", value);
+    }
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
@@ -229,5 +235,6 @@ internal static class Config
         RiskRange = TimeSpan.FromDays(1);
         MaxTimeInactivity = TimeSpan.FromDays(100);
         GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
+        EmailAddress = string.Empty;
     }
 }

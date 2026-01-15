@@ -94,6 +94,7 @@ public class Config
     /// </remarks>
     public string GoogleApiKey { get; set; } = string.Empty;
 
+    public string? EmailAddress { get; set; } = null;
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
@@ -113,6 +114,7 @@ public class Config
         RiskRange = TimeSpan.Zero;
         MaxTimeInactivity = TimeSpan.Zero;
         GoogleApiKey = string.Empty;
+        EmailAddress = null;
     }
 
     /// <summary>
