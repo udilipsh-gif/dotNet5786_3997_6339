@@ -133,24 +133,32 @@ public class ValueToHebrewConverter : IValueConverter
     {
         if (value is string val)
         {
-            if(val == "Update")
-                return "עדכן";
-            if (val == "Add")
-                return "חדש";
+            return val switch
+            {
+                "Add" => "חדש",
+                "Update" => "עדכן",
+                "true" => "פעיל",
+                "false" => "לא פעיל",
+                _ => "לא ידוע"
+            };
         }
-        return "חדש";
+        return "לא ידוע";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string val)
         {
-            if(val == "חדש")
-                return "Add";
-            if (val == "עדכן")
-                return "Update";
+            return val switch
+            {
+                "חדש" => "Add",
+                "עדכן" => "Update",
+                "פעיל" => "true",
+                "לא פעיל" => "false",
+                _ => "null"
+            };
         }
-        return "Add";
+        return "null";
     }
 }
 

@@ -26,7 +26,6 @@
         <local:TotalHoursConverter x:Key="TotalHoursConverter"/>
         <local:ValueToHebrewConverter x:Key="ValueToHebrewConverter"/>
         <local:OrderStatusToCancelConverter x:Key="OrderStatusToCancelConverter"/>
-        <local:BooleanToHebrewConverter x:Key="BoolToHebrewKey"/>
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
 
         <Style TargetType="{x:Type Window}">
