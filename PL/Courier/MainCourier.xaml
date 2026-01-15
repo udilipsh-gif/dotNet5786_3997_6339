@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:PL"
         Title="האזור האישי - שליח" 
         FlowDirection="RightToLeft"
-        Height="600"
+        Height="700"
         SizeToContent="Width"
         WindowStartupLocation="CenterScreen"
         Loaded="MainCourier_Loaded"
@@ -89,13 +89,17 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-
-                <StackPanel Grid.Row="1" Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ScrollViewer Grid.Row="1" Padding="5"
+                              Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel >
                     <Label Content="שם:"/>
                     <TextBox Text="{Binding CurrentUser.Name, Mode=TwoWay}"/>
 
                     <Label Content="טלפון:"/>
                     <TextBox Text="{Binding CurrentUser.Phone, Mode=TwoWay}" local:Tools.NumericOnly="True" MaxLength="10"/>
+
+                    <Label Content="מייל:"/>
+                    <TextBox Text="{Binding CurrentUser.Email, Mode=TwoWay}"/>
 
                     <Label Content="סיסמה:"/>
                     <TextBox Text="{Binding CurrentUser.Password, Mode=TwoWay}"/>
@@ -115,8 +119,8 @@
                     <TextBox Text="{Binding CurrentUser.MaxDistanceDelivery, Mode=TwoWay}" 
                                      local:Tools.NumericOnly="True" MaxLength="2"/>
                 </StackPanel>
+                </ScrollViewer>
 
-                
 
 
                 <StackPanel Grid.Row="2" Margin="0,20,0,0">

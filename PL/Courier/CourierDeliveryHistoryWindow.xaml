@@ -23,12 +23,30 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="משלוח" Binding="{Binding DeliveryId}" Width="60"/>
                 <DataGridTextColumn Header="הזמנה" Binding="{Binding OrderId}" Width="60"/>
-                <DataGridTextColumn Header="סוג הזמנה" Binding="{Binding OrderType, Converter={StaticResource EnumDescriptionConverter}}" Width="Auto"/>
+                <DataGridTextColumn Header="סוג הזמנה" Binding="{Binding OrderType, Converter={StaticResource EnumDescriptionConverter}}" Width="Auto">
+                    <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource WrappedTextCellStyle}">
+                            <Setter Property="Background" Value="{Binding OrderType, Converter={StaticResource StatusToColorConverter}}"/>
+                            <Setter Property="Padding" Value="10,2"/>
+                                <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 <DataGridTextColumn Header="כתובת יעד" Binding="{Binding Address}" Width="*"/>
                 <DataGridTextColumn Header="רכב" Binding="{Binding ShipmentType, Converter={StaticResource EnumDescriptionConverter}}" Width="Auto"/>
                 <DataGridTextColumn Header="מרחק בפועל" Binding="{Binding ActualDistens, StringFormat=N2}" Width="Auto"/>
                 <DataGridTextColumn Header="זמן ביצוע" Binding="{Binding DelyveryTime, Converter={StaticResource TimeSpanConverter}}" Width="Auto"/>
-                <DataGridTextColumn Header="סטטוס סיום" Binding="{Binding EndDelivery, Converter={StaticResource EnumDescriptionConverter}}" FontWeight="Bold" Width="Auto"/>
+                <DataGridTextColumn Header="סטטוס סיום" Binding="{Binding EndDelivery, Converter={StaticResource EnumDescriptionConverter}}" FontWeight="Bold" Width="Auto">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource WrappedTextCellStyle}">
+                            <Setter Property="Background" Value="{Binding EndDelivery, Converter={StaticResource StatusToColorConverter}}"/>
+                            <Setter Property="Padding" Value="10,2"/>
+                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

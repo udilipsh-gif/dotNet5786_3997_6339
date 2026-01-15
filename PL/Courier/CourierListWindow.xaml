@@ -73,12 +73,7 @@
                                        HorizontalAlignment="Center" FontWeight="Bold">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="Red"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Active}" Value="True">
-                                                <Setter Property="Foreground" Value="Green"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
+                                        <Setter Property="Background" Value="{Binding Active, Converter={StaticResource StatusToColorConverter}}"/>
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>

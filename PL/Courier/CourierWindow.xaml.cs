@@ -172,7 +172,7 @@ public partial class CourierWindow : Window
 
         try
         {
-            Tools.RunSafe(() => s_bl.Courier.Delete(CURRENT_MANAGER_ID, CURRENT_ID));
+            s_bl.Courier.Delete(CURRENT_MANAGER_ID, CURRENT_ID);
             MessageBox.Show("השליח נמחק בהצלחה");
 
             Close();
@@ -202,7 +202,7 @@ public partial class CourierWindow : Window
     private void CourierWindow_Closed(object sender, EventArgs e)
     {
         if (CURRENT_ID != 0)
-            s_bl.Courier.RemoveObserver(CourierObserver);
+            s_bl.Courier.RemoveObserver(CURRENT_ID, CourierObserver);
     }
 
     /// <summary>

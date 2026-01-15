@@ -27,6 +27,7 @@
         <local:ValueToHebrewConverter x:Key="ValueToHebrewConverter"/>
         <local:OrderStatusToCancelConverter x:Key="OrderStatusToCancelConverter"/>
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
+        <local:StatusToColorConverter x:Key="StatusToColorConverter"/>
 
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -90,6 +91,25 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
             <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style x:Key="StatusCellStyle" TargetType="DataGridCell">
+            <Setter Property="Padding" Value="5,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="0">
+                            <Border.Background>
+                                <Binding Path="." Converter="{StaticResource StatusToColorConverter}"/>
+                            </Border.Background>
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style TargetType="TextBox">

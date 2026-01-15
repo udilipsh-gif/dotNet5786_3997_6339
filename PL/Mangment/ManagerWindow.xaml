@@ -62,13 +62,23 @@
 
         <ScrollViewer Grid.Row="2" Margin="20,0,20,20" Padding="10">
             <ItemsControl ItemsSource="{Binding CombinedStatistics}">
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button Style="{StaticResource StatisticButtonStyle}"
-                    Click="btnStatistic_Click"
-                    Tag="{Binding Id}"/>
+                        Click="btnStatistic_Click"
+                        Tag="{Binding Id}"
+                        Width="200"  
+                        Margin="10"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
+
             </ItemsControl>
         </ScrollViewer>
     </Grid>
