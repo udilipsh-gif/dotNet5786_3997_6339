@@ -82,9 +82,17 @@
 
                 <DataGridTextColumn Header="סוג"
                                     Binding="{Binding TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource WrappedTextCellStyle}">
+                            <Setter Property="Background" Value="{Binding TypeOfOrder, Converter={StaticResource StatusToColorConverter}}"/>
+                            <Setter Property="Padding" Value="10,2"/>
+                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+
+                </DataGridTextColumn>
 
                 <DataGridTextColumn Header="מרחק אווירי"
                                     Binding="{Binding DistanceKm, StringFormat=N2}"
@@ -112,9 +120,16 @@
 
                 <DataGridTextColumn Header="סטטוס"
                                     Binding="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource WrappedTextCellStyle}">
+                            <Setter Property="Background" Value="{Binding ScheduleStatus, Converter={StaticResource StatusToColorConverter}}"/>
+                            <Setter Property="Padding" Value="10,2"/>
+                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
                 <DataGridTextColumn Header="זמן לסיום"
                                     Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}"
@@ -123,7 +138,7 @@
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
 
                 <DataGridTextColumn Header="זמן כולל"
-                                    Binding="{Binding MaxDeliveryTime, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                    Binding="{Binding MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
                                     Width="Auto"
                                     ElementStyle="{StaticResource WrappedTextCellStyle}"
                                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>

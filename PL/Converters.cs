@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Reflection.Metadata;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace PL;
 
@@ -54,7 +55,7 @@ public class NullToVisibilityConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         bool isNullOrEmpty = value == null;
-        
+
         // בדיקה אם זו רשימה ריקה
         if (!isNullOrEmpty && value is ICollection collection)
         {
@@ -341,6 +342,81 @@ public class OrderStatusToCancelConverter : IValueConverter
         // הלוגיקה שהייתה לך ב-Triggers:
         // פעיל רק אם: OPEN, REFUSED, DELIVERING
         return status == "OPEN" || status == "REFUSED" || status == "DELIVERING";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class StatusToColorConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value == null) return Brushes.Transparent;
+        if(value is bool bo)
+            return bo? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9")) // ירוק
+                        : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEBEE")); // אדום
+
+        // המרה ל-String כדי שנוכל לבדוק את השם (עובד גם אם ה-Enum מסוגים שונים)
+        if(value.ToString() is string str && str != string.Empty )
+        {
+ // החזרת צבעים בהתאם לסטטוס
+        switch (str)
+        {
+            // מצבים חיוביים / סופיים (ירוק בהיר)
+            case "STANDART":
+            case "רגיל":
+            case "COMPLETED":
+            case "נמסר":
+            case "DELIVERED":
+            case "נמסר בהצלחה":
+            case "True":
+            case "פעיל":
+            case "ONTYME":
+            case "בזמן":
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9")); // ירוק
+
+            // מצבי אמצע / תהליך (צהוב/כתום בהיר)
+            case "FAST_DELIVERY":
+            case "מהיר":
+            case "DELIVERING":
+            case "במשלוח":
+            
+            case "NOTFOUND":
+            case "כתובת/לקוח לא נמצא":
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF3E0")); // כתום
+
+            // מצבים התחלתיים (כחול/אפור בהיר)
+            case "פתוח":
+            case "OPEN":
+            case "INRISK":
+            case "בסיכון":
+
+
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E3F2FD")); // כחול
+
+            // מצבים שליליים (אדום בהיר)
+            case "DELIVER_IMMEDIATELY":
+            case "מיידי":
+            case "סורב על ידי הלקוח":
+            case "REFUSED":
+            case "בוטל":
+            case "CANCELLED":
+            case "LATE":
+            case "באיחור":
+            case "FAILED":
+            case "נכשל":
+            case "False":
+            case "לא פעיל":
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEBEE")); // אדום
+
+            default:
+                return Brushes.Transparent;
+        }
+        }
+        return Brushes.Transparent;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
