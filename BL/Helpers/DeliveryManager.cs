@@ -12,24 +12,32 @@ namespace Helpers;
 /// </remarks>
 internal static class DeliveryManager
 {
-    private static IDal s_dal = Factory.Get; //stage 4
+    /// <summary>
+    /// Data access layer instance for database operations.
+    /// </summary>
+    private static readonly IDal s_dal = Factory.Get;
 
-    internal static ObserverManager Observer = new();
+    /// <summary>
+    /// Observer manager for notifying UI components about delivery changes.
+    /// </summary>
+    internal static readonly ObserverManager Observer = new();
 
     /// <summary>
     /// Retrieves all deliveries from the data access layer.
     /// </summary>
-    /// <param name="sort">Optional sorting criterion for deliveries. Currently not implemented - parameter is ignored.</param>
+    /// <param name="sort">
+    /// Optional sorting criterion for deliveries. 
+    /// Currently not implemented - parameter is ignored.
+    /// </param>
     /// <returns>
-    /// An <see cref="IEnumerable{T}"/> of <see cref="DO.Delivery"/> objects representing all deliveries in the system.
+    /// An <see cref="IEnumerable{T}"/> of <see cref="DO.Delivery"/> objects 
+    /// representing all deliveries in the system.
     /// </returns>
     /// <remarks>
     /// Note: The sort parameter is currently not utilized in the implementation.
     /// All deliveries are returned in their default order from the data access layer.
-    /// This method is intended for internal use within the business logic layer.
     /// </remarks>
-    internal static IEnumerable<DO.Delivery> ReadAll(
-    BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
+    internal static IEnumerable<DO.Delivery> ReadAll(BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
         return s_dal.Delivery.ReadAll();
     }
@@ -39,72 +47,12 @@ internal static class DeliveryManager
     /// </summary>
     /// <param name="id">The unique identifier of the delivery to retrieve.</param>
     /// <returns>
-    /// The <see cref="DO.Delivery"/> object with the specified ID, or null if not found.
+    /// The <see cref="DO.Delivery"/> object with the specified ID, 
+    /// or null if not found.
     /// </returns>
-    /// <remarks>
-    /// This method provides read-only access to delivery information.
-    /// It queries the data access layer for the delivery with the matching ID.
-    /// </remarks>
     internal static DO.Delivery? Read(int id)
     {
         return s_dal.Delivery.Read(id);
-    }
-
-    /// <summary>
-    /// Marks a delivery as completed by the assigned courier.
-    /// </summary>
-    /// <param name="courierId">The unique identifier of the courier completing the delivery.</param>
-    /// <param name="deliveryId">The unique identifier of the delivery being completed.</param>
-    /// <exception cref="BO.BlDoesNotExistException">
-    /// Thrown when the delivery with the specified ID does not exist in the system.
-    /// </exception>
-    /// <exception cref="BO.BlInvalidValueException">
-    /// Thrown when the courier attempting to complete the delivery is not the assigned courier for that delivery.
-    /// </exception>
-    /// <remarks>
-    /// This method performs the following operations:
-    /// <list type="number">
-    /// <item><description>Validates that the delivery exists</description></item>
-    /// <item><description>Verifies that the courier is assigned to this delivery</description></item>
-    /// <item><description>Updates the delivery status to DELIVERED</description></item>
-    /// <item><description>Records the completion time using the current system clock</description></item>
-    /// </list>
-    /// </remarks>
-    public static void Deliver(int courierId, int deliveryId, BO.EndDelivery endDelivery)
-    {
-        DO.Delivery delivery = s_dal.Delivery.Read(deliveryId)
-            ?? throw new BO.BlDoesNotExistException($"Delivery with ID {deliveryId} not found");
-        if (delivery.CourierId != courierId)
-            throw new BO.BlInvalidValueException($"Courier with ID {courierId} is not assigned to this delivery  ");
-        delivery = delivery with
-        {
-            EndDelivery = (DO.EndDelivery)endDelivery,
-            TimeEndDelivery = AdminManager.Now
-        };
-
-        s_dal.Delivery.Update(delivery);
-
-        DO.Order order = s_dal.Order.Read(delivery.OrderId)
-                ?? throw new BO.BlDoesNotExistException($"Order with ID {delivery.OrderId} not found");
-        s_dal.Order.Update(order with
-        {
-            OrderStatus = endDelivery switch
-            {
-                BO.EndDelivery.DELIVERED => DO.OrderStatus.COMPLETED,
-                BO.EndDelivery.CANCELLED => DO.OrderStatus.CONCELLED,
-                BO.EndDelivery.REFUSED => DO.OrderStatus.REFUSED,
-                BO.EndDelivery.FAILED => DO.OrderStatus.OPEN,
-                BO.EndDelivery.NOTFOUND => DO.OrderStatus.OPEN,
-                _ => order.OrderStatus
-            }
-        });
-
-        Observer.NotifyItemUpdated(deliveryId);
-        OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
-        CourierManager.Observer.NotifyItemUpdated(courierId);
-        Observer.NotifyListUpdated();
-        OrderManager.Observer.NotifyListUpdated();
-        CourierManager.Observer.NotifyListUpdated();
     }
 
     /// <summary>
@@ -118,23 +66,23 @@ internal static class DeliveryManager
     /// <remarks>
     /// This method performs the following operations:
     /// <list type="number">
-    /// <item><description>Validates that the courier can handle the delivery distance</description></item>
-    /// <item><description>Creates a new delivery record with the current timestamp</description></item>
-    /// <item><description>Calculates the actual road/walking distance based on the order address and shipment type using Google Distance Matrix API</description></item>
-    /// <item><description>Assigns the courier to the delivery</description></item>
-    /// <item><description>Sets TypeShipment based on the courier's vehicle type (not order type)</description></item>
-    /// <item><description>Persists the delivery to the data access layer with ID 0 (auto-generated)</description></item>
+    ///   <item><description>Validates that the courier can handle the delivery distance</description></item>
+    ///   <item><description>Creates a new delivery record with the current timestamp</description></item>
+    ///   <item><description>Calculates the actual road/walking distance using Google Distance Matrix API</description></item>
+    ///   <item><description>Assigns the courier to the delivery</description></item>
+    ///   <item><description>Sets TypeShipment based on the courier's vehicle type</description></item>
+    ///   <item><description>Updates the order status to DELIVERING</description></item>
+    ///   <item><description>Notifies all relevant observers about the changes</description></item>
     /// </list>
     /// The delivery is created with null end status and time, indicating it is in progress.
     /// </remarks>
     public static void Create(DO.Order order, DO.Courier courier)
     {
-        if (order.DistanceKm > courier.MaxDistanceDelivery)
-            throw new BO.BlInvalidValueException($"Courier with ID {courier.Id} cannot deliver to distance {order.DistanceKm} km");
+        s_validateDeliveryDistance(order, courier);
 
         DO.Delivery delivery = new DO.Delivery
         {
-            Id = 0,
+            Id = 0, // Auto-generated by DAL
             OrderId = order.Id,
             CourierId = courier.Id,
             TypeShipment = courier.TypeShipment,
@@ -142,60 +90,168 @@ internal static class DeliveryManager
             ActualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
             EndDelivery = null,
             TimeEndDelivery = null
-
         };
+
         s_dal.Delivery.Create(delivery);
         s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
-        OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
-        CourierManager.Observer.NotifyItemUpdated(courier.Id);
+
+        s_notifyAllObservers(delivery.OrderId, courier.Id);
+    }
+
+    /// <summary>
+    /// Marks a delivery as completed with the specified end status.
+    /// </summary>
+    /// <param name="courierId">The unique identifier of the courier completing the delivery.</param>
+    /// <param name="deliveryId">The unique identifier of the delivery being completed.</param>
+    /// <param name="endDelivery">The final status of the delivery attempt.</param>
+    /// <exception cref="BO.BlDoesNotExistException">
+    /// Thrown when the delivery or associated order does not exist in the system.
+    /// </exception>
+    /// <exception cref="BO.BlInvalidValueException">
+    /// Thrown when the courier attempting to complete the delivery is not the assigned courier.
+    /// </exception>
+    /// <remarks>
+    /// This method performs the following operations:
+    /// <list type="number">
+    ///   <item><description>Validates that the delivery exists</description></item>
+    ///   <item><description>Verifies that the courier is assigned to this delivery</description></item>
+    ///   <item><description>Updates the delivery with the end status and completion time</description></item>
+    ///   <item><description>Updates the order status based on the delivery outcome</description></item>
+    ///   <item><description>Notifies all relevant observers about the changes</description></item>
+    /// </list>
+    /// 
+    /// Order status mapping based on delivery outcome:
+    /// <list type="bullet">
+    ///   <item><description>DELIVERED → Order COMPLETED</description></item>
+    ///   <item><description>CANCELLED → Order CANCELLED</description></item>
+    ///   <item><description>REFUSED → Order REFUSED</description></item>
+    ///   <item><description>FAILED/NOTFOUND → Order OPEN (available for retry)</description></item>
+    /// </list>
+    /// </remarks>
+    public static void Deliver(int courierId, int deliveryId, BO.EndDelivery endDelivery)
+    {
+        DO.Delivery delivery = s_getAndValidateDelivery(deliveryId, courierId);
+
+        // Update delivery with completion details
+        delivery = delivery with
+        {
+            EndDelivery = (DO.EndDelivery)endDelivery,
+            TimeEndDelivery = AdminManager.Now
+        };
+        s_dal.Delivery.Update(delivery);
+
+        // Update order status based on delivery outcome
+        UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
+
+        // Notify all observers
+        s_notifyDeliveryCompleted(deliveryId, delivery.OrderId, courierId);
+    }
+
+    /// <summary>
+    /// Validates that the courier can handle the delivery distance.
+    /// </summary>
+    /// <param name="order">The order to be delivered.</param>
+    /// <param name="courier">The courier assigned to the delivery.</param>
+    /// <exception cref="BO.BlInvalidValueException">
+    /// Thrown when the distance exceeds the courier's maximum capability.
+    /// </exception>
+    private static void s_validateDeliveryDistance(DO.Order order, DO.Courier courier)
+    {
+        if (order.DistanceKm > courier.MaxDistanceDelivery)
+        {
+            throw new BO.BlInvalidValueException(
+                $"Courier with ID {courier.Id} cannot deliver to distance {order.DistanceKm} km. " +
+                $"Maximum distance: {courier.MaxDistanceDelivery} km");
+        }
+    }
+
+    /// <summary>
+    /// Retrieves and validates a delivery for completion.
+    /// </summary>
+    /// <param name="deliveryId">The delivery ID to retrieve.</param>
+    /// <param name="courierId">The courier ID attempting to complete the delivery.</param>
+    /// <returns>The validated delivery object.</returns>
+    /// <exception cref="BO.BlDoesNotExistException">Thrown when the delivery is not found.</exception>
+    /// <exception cref="BO.BlInvalidValueException">Thrown when the courier is not assigned to this delivery.</exception>
+    private static DO.Delivery s_getAndValidateDelivery(int deliveryId, int courierId)
+    {
+        DO.Delivery delivery = s_dal.Delivery.Read(deliveryId)
+            ?? throw new BO.BlDoesNotExistException($"Delivery with ID {deliveryId} not found");
+
+        if (delivery.CourierId != courierId)
+        {
+            throw new BO.BlInvalidValueException(
+                $"Courier with ID {courierId} is not assigned to delivery {deliveryId}. " +
+                $"Assigned courier: {delivery.CourierId}");
+        }
+
+        return delivery;
+    }
+
+    /// <summary>
+    /// Updates the order status based on the delivery outcome.
+    /// </summary>
+    /// <param name="orderId">The order ID to update.</param>
+    /// <param name="endDelivery">The delivery outcome status.</param>
+    /// <exception cref="BO.BlDoesNotExistException">Thrown when the order is not found.</exception>
+    private static void UpdateOrderStatusAfterDelivery(int orderId, BO.EndDelivery endDelivery)
+    {
+        DO.Order order = s_dal.Order.Read(orderId)
+            ?? throw new BO.BlDoesNotExistException($"Order with ID {orderId} not found");
+
+        DO.OrderStatus newStatus = s_mapDeliveryOutcomeToOrderStatus(endDelivery, order.OrderStatus);
+
+        s_dal.Order.Update(order with { OrderStatus = newStatus });
+    }
+
+    /// <summary>
+    /// Maps a delivery outcome to the corresponding order status.
+    /// </summary>
+    /// <param name="endDelivery">The delivery outcome.</param>
+    /// <param name="currentStatus">The current order status (used as fallback).</param>
+    /// <returns>The new order status based on the delivery outcome.</returns>
+    private static DO.OrderStatus s_mapDeliveryOutcomeToOrderStatus(
+        BO.EndDelivery endDelivery,
+        DO.OrderStatus currentStatus)
+    {
+        return endDelivery switch
+        {
+            BO.EndDelivery.DELIVERED => DO.OrderStatus.COMPLETED,
+            BO.EndDelivery.CANCELLED => DO.OrderStatus.CONCELLED,
+            BO.EndDelivery.REFUSED => DO.OrderStatus.REFUSED,
+            BO.EndDelivery.FAILED => DO.OrderStatus.OPEN,
+            BO.EndDelivery.NOTFOUND => DO.OrderStatus.OPEN,
+            _ => currentStatus
+        };
+    }
+
+    /// <summary>
+    /// Notifies all relevant observers after a delivery is created.
+    /// </summary>
+    /// <param name="orderId">The order ID involved in the delivery.</param>
+    /// <param name="courierId">The courier ID assigned to the delivery.</param>
+    private static void s_notifyAllObservers(int orderId, int courierId)
+    {
+        OrderManager.Observer.NotifyItemUpdated(orderId);
+        CourierManager.Observer.NotifyItemUpdated(courierId);
         Observer.NotifyListUpdated();
         OrderManager.Observer.NotifyListUpdated();
         CourierManager.Observer.NotifyListUpdated();
     }
 
-
-
-
-    ///// <summary>
-    ///// Periodically updates the status of ongoing deliveries based on clock changes.
-    ///// </summary>
-    ///// <param name="oldClock">The previous system time before the clock was advanced.</param>
-    ///// <param name="newClock">The new system time after the clock was advanced.</param>
-    ///// <remarks>
-    ///// This method is currently commented out but would be used to automatically complete
-    ///// deliveries that have exceeded their maximum delivery time when the system clock is advanced.
-    ///// <para>
-    ///// The method would:
-    ///// <list type="bullet">
-    ///// <item><description>Query all deliveries that have not yet ended</description></item>
-    ///// <item><description>Check if the new clock time exceeds the maximum delivery time for each delivery</description></item>
-    ///// <item><description>Automatically mark overdue deliveries as DELIVERED</description></item>
-    ///// <item><description>Set the completion time to the new clock time</description></item>
-    ///// </list>
-    ///// </para>
-    ///// </remarks>
-    //internal static void PeriodicDeliveriesUpdates(DateTime oldClock, DateTime newClock)
-    //{
-    //    // קריאת המשלוחים שעדיין לא הסתיימו
-    //    var deliveries = s_dal.Delivery.ReadAll(d => d.EndDelivery == null);
-
-    //    TimeSpan maxTime = s_dal.Config.MaxDeliveryTime;
-
-    //    foreach (var delivery in deliveries)
-    //    {
-    //        // אם הזמן החדש עבר את זמן המשלוח המקסימלי
-    //        if (newClock >= delivery.OrderDate.Add(maxTime))
-    //        {
-    //            var updated = delivery with
-    //            {
-    //                EndDelivery = DO.EndDelivery.DELIVERED,
-    //                TimeEndDelivery = newClock
-    //            };
-
-    //            s_dal.Delivery.Update(updated);
-    //        }
-    //    }
-    //}
-
-
+    /// <summary>
+    /// Notifies all relevant observers after a delivery is completed.
+    /// </summary>
+    /// <param name="deliveryId">The completed delivery ID.</param>
+    /// <param name="orderId">The order ID involved in the delivery.</param>
+    /// <param name="courierId">The courier ID who completed the delivery.</param>
+    private static void s_notifyDeliveryCompleted(int deliveryId, int orderId, int courierId)
+    {
+        Observer.NotifyItemUpdated(deliveryId);
+        OrderManager.Observer.NotifyItemUpdated(orderId);
+        CourierManager.Observer.NotifyItemUpdated(courierId);
+        Observer.NotifyListUpdated();
+        OrderManager.Observer.NotifyListUpdated();
+        CourierManager.Observer.NotifyListUpdated();
+    }
 }
