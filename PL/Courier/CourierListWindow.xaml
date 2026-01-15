@@ -6,214 +6,103 @@
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
         FlowDirection="RightToLeft"
+        ResizeMode="NoResize"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת שליחים" 
-        Height="450" 
-        Width="800"
+        Height="550" Width="750"
+        WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Closed="Window_Close">
 
-    <!-- Window Resources: Defines reusable resources for the window -->
     <Window.Resources>
-        <!-- CourierFieldFilter enumeration converter for ComboBox items -->
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
-        <local:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
-        <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
-        <local:BooleanToHebrewConverter x:Key="BoolToHebrewKey" />
-        
-        <!-- Style לתאים עם Wrap -->
-        <Style x:Key="WrappedTextCellStyle" TargetType="TextBlock">
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="TextAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="4,2"/>
-        </Style>
-
-        <!-- Style לשורות -->
-        <Style TargetType="DataGridRow">
-            <Setter Property="Height" Value="Auto"/>
-            <Setter Property="MinHeight" Value="32"/>
-            
-        </Style>
-
-        <!-- Style לכותרות עם Wrap -->
-        <Style x:Key="WrappedHeaderStyle" TargetType="DataGridColumnHeader">
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"
-                               VerticalAlignment="Center"
-                               Margin="4,2"/>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ActiveStatusStyle" TargetType="TextBlock" BasedOn="{StaticResource WrappedTextCellStyle}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Active}" Value="True">
-                    <Setter Property="Foreground" Value="Green"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Active}" Value="False">
-                    <Setter Property="Foreground" Value="Red"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-
     </Window.Resources>
 
-    <!-- Main Grid: Container for all window content, divided into 3 rows -->
-    <Grid>
-        <!-- Row Definitions: Header (40), Content (500), Footer (Auto) -->
+    <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="500*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
-        <!-- Filter Panel Grid: Contains the filter label and ComboBox for courier filtering -->
-        <Grid HorizontalAlignment="Stretch" 
-              Height="auto" 
-              Grid.Row="0" 
-              VerticalAlignment="Stretch" 
-              Width="auto"
-              ToolTip="פאנל סינון שליחים">
-            <!-- Column Definitions: Two equal columns for label and ComboBox -->
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            
-            <!-- Filter Label: Displays "Filter by:" text -->
-            <Label Grid.Column="0" 
-                   Content="סינון לפי:" 
-                   HorizontalAlignment="Right" 
-                   VerticalAlignment="Center"
-                   ToolTip="תווית לסינון שליחים"
-                   AutomationProperties.Name="תווית סינון"/>
-            
-            <!-- Filter ComboBox: Allows user to select filter criteria (All/Active/Inactive) with Hebrew descriptions -->
-            <ComboBox Grid.Column="1" 
-                      HorizontalAlignment="Stretch"  
-                      VerticalAlignment="Stretch" 
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="ניהול שליחים" Style="{StaticResource HeaderTextStyle}"/>
+
+            <Border Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                    <Label Content="סינון לפי סטטוס:" Margin="0,0,10,0" VerticalAlignment="Center" FontWeight="SemiBold"/>
+
+                    <ComboBox Width="200"
+                      Style="{StaticResource ModernComboBox}"
                       ItemsSource="{Binding Source={StaticResource CourierFieldFilterKey}}" 
                       SelectedItem="{Binding CourierFilter}"
-                      SelectionChanged="ComboBox_SelectionChanged"
-                      ToolTip="בחר סינון: הכל, פעילים בלבד, או לא פעילים"
-                      AutomationProperties.Name="תיבת בחירה לסינון שליחים">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </Grid>
-        
-        <!-- Couriers DataGrid: Main table displaying courier information with sorting capabilities -->
+                      SelectionChanged="ComboBox_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
         <DataGrid Grid.Row="1"
                   x:Name="CourierGrid"
-                  AutoGenerateColumns="False"
-                  Margin="5" 
                   ItemsSource="{Binding CourierInList}"
-                  ToolTip="מציג את השליחים במערכת"
                   IsReadOnly="True"
                   SelectionMode="Single"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  HorizontalScrollBarVisibility="Auto"
-                  FlowDirection="RightToLeft"
-                  EnableRowVirtualization="False"
-                  EnableColumnVirtualization="False">         
+                  FlowDirection="RightToLeft">
+
             <DataGrid.InputBindings>
                 <MouseBinding Gesture="LeftDoubleClick" 
-                    Command="{Binding SelectCourierCommand}"
-                    CommandParameter="{Binding ElementName=CourierGrid, Path=SelectedItem}" />
+                              Command="{Binding SelectCourierCommand}"
+                              CommandParameter="{Binding ElementName=CourierGrid, Path=SelectedItem}" />
             </DataGrid.InputBindings>
 
-            <!-- DataGrid Columns: Defines all columns for courier data display -->
             <DataGrid.Columns>
+                <DataGridTextColumn Header="מזהה" Binding="{Binding Id}"/>
 
-                <!-- ID Column: Displays unique courier identifier -->
-                <DataGridTextColumn Header="מזהה שליח"
-                            Binding="{Binding Id}"
-                            SortMemberPath="OrderId"
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="שם השליח" Binding="{Binding Name}"/>
 
-                <!-- Name Column: Displays courier's full name -->
-                <DataGridTextColumn Header="שם" 
-                            Binding="{Binding Name}" 
-                            SortMemberPath="Name" 
-                            Width="*"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTemplateColumn Header="סטטוס">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Active, Converter={StaticResource BooleanToHebrewConverter}}" 
+                                       HorizontalAlignment="Center" FontWeight="Bold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="Red"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Active}" Value="True">
+                                                <Setter Property="Foreground" Value="Green"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                <!-- Active Status Column: Shows whether courier is currently active (CheckBox) -->
-                <DataGridTextColumn Header="פעיל"
-                            Binding="{Binding Active, Converter={StaticResource BoolToHebrewKey}}"
-                            SortMemberPath="Active"
-                            Width="Auto"
-                            ElementStyle="{StaticResource ActiveStatusStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="סוג כלי רכב" Binding="{Binding TypeShipment, Converter={StaticResource EnumDescriptionConverter}}"/>
 
-                <!-- Shipment Type Column: Displays the type of delivery vehicle (Car/Motorcycle/OnFoot) -->
-                <DataGridTextColumn Header="סוג משלוח" 
-                            Binding="{Binding TypeShipment, Converter={StaticResource EnumDescriptionConverter}}" 
-                            SortMemberPath="TypeShipment" 
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="תאריך הצטרפות" Binding="{Binding WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}"/>
 
-                <!-- Working Since Column: Shows the date when courier started working (formatted as dd/MM/yyyy) -->
-                <DataGridTextColumn Header="עובד מאז" 
-                            Binding="{Binding WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" 
-                            SortMemberPath="WorkingSince" 
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                <DataGridTextColumn Header="בזמן" Binding="{Binding DeliveryOnTime}" Foreground="Green" FontWeight="SemiBold"/>
+                <DataGridTextColumn Header="באיחור" Binding="{Binding DeliveryLate}" Foreground="Red" FontWeight="SemiBold"/>
 
-                <!-- On-Time Deliveries Column: Shows count of deliveries delivered on time -->
-                <DataGridTextColumn Header="משלוחים בזמן" 
-                            Binding="{Binding DeliveryOnTime}" 
-                            SortMemberPath="DeliveryOnTime" 
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <!-- Late Deliveries Column: Shows count of deliveries that were late -->
-                <DataGridTextColumn Header="משלוחים באיחור" 
-                            Binding="{Binding DeliveryLate}" 
-                            SortMemberPath="DeliveryLate" 
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
-                <!-- Current Delivery ID Column: Displays the ID of courier's current active delivery (if any) -->
-                <DataGridTextColumn Header="משלוח נוכחי" 
-                            Binding="{Binding DeliveryId}" 
-                            SortMemberPath="DeliveryId" 
-                            Width="Auto"
-                            ElementStyle="{StaticResource WrappedTextCellStyle}"
-                            HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
-
+                <DataGridTextColumn Header="משלוח פעיל" Binding="{Binding DeliveryId}"/>
             </DataGrid.Columns>
         </DataGrid>
-        
-        <!-- Add Button: Opens a window to add a new courier to the system -->
-        <Button Content="הוסף שליח" 
-                Grid.Row="2" 
-                HorizontalAlignment="Center" 
-                Height="Auto" 
-                Margin="10" 
-                Width="100"
-                Command="{Binding AddCourierCommand}"
-                ToolTip="לחץ כאן להוספת שליח חדש למערכת"
-                AutomationProperties.Name="כפתור הוספת שליח חדש"/>
+
+        <Button Grid.Row="2" 
+                Content="+ הוסף שליח חדש" 
+                HorizontalAlignment="Right" 
+                Width="180" 
+                Margin="0,15,0,0"
+                Command="{Binding AddCourierCommand}"/>
     </Grid>
 </Window>
