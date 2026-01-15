@@ -14,6 +14,7 @@
         <SolidColorBrush x:Key="TextColor" Color="#333333"/>
         <SolidColorBrush x:Key="SubTextColor" Color="#757575"/>
         <SolidColorBrush x:Key="BorderColor" Color="#E0E0E0"/>
+
         <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
@@ -25,6 +26,8 @@
         <local:TotalHoursConverter x:Key="TotalHoursConverter"/>
         <local:ValueToHebrewConverter x:Key="ValueToHebrewConverter"/>
         <local:OrderStatusToCancelConverter x:Key="OrderStatusToCancelConverter"/>
+        <local:BooleanToHebrewConverter x:Key="BoolToHebrewKey"/>
+        <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
 
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -230,15 +233,14 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="DataGridCell">
                         <Border Padding="{TemplateBinding Padding}" 
-                        Background="{TemplateBinding Background}" 
-                        BorderBrush="{TemplateBinding BorderBrush}" 
-                        BorderThickness="0">
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="0">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="#E3F2FD"/>

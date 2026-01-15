@@ -328,7 +328,7 @@ public class OrderStatusToCancelConverter : IValueConverter
         if (value == null) return false;
 
         // המרה ל-String או ל-Enum שלך. נניח שזה עובד מול המחרוזת או ה-Enum
-        string status = value.ToString();
+        string status = value.ToString() ?? string.Empty;
 
         // הלוגיקה שהייתה לך ב-Triggers:
         // פעיל רק אם: OPEN, REFUSED, DELIVERING
