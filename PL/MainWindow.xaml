@@ -29,12 +29,12 @@
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Right"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="BorderBrush" Value="SkyBlue"/>
+            <Setter Property="BorderBrush" Value="White"/>
             <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="Height" Value="Auto"/>
             <Setter Property="Background" Value="AliceBlue"/>
             <Setter Property="FontSize" Value="20"/>
-            
+
 
         </Style>
 
@@ -45,17 +45,20 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill"/>
+        </Grid.Background>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50*"/>
+            <RowDefinition Height="70*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="50*"/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="חנות הספרים שלי" Style="{StaticResource UniformLabel}"/>
-        <Border Grid.Row="1" Width="200" Height="250"
+        <!--<Label Grid.Row="0" Content="חנות הספרים שלי" Style="{StaticResource UniformLabel}"/>-->
+        <Border Grid.Row="1" Width="200" Height="150"
                 HorizontalAlignment="Center"
                 
                 VerticalAlignment="Center"
-                Background="AliceBlue">
+                Background="#50CCCCCC">
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -71,11 +74,15 @@
                          Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" 
                          Style="{StaticResource UniformTextBox}"
                          MaxLength="9"
+                         Background="#50CCCCCC"
+                       
                          local:Tools.NumericOnly="True"/>
 
-                <Label Grid.Row="2" Content=":סיסמה" FontSize="14" FontWeight="DemiBold" Style="{StaticResource UniformLabel}"/>
+                <Label Grid.Row="2" Content=":סיסמה" FontSize="14" FontWeight="DemiBold"  Style="{StaticResource UniformLabel}"/>
                 <PasswordBox Grid.Row="3" 
                          x:Name="UserPasswordBox" 
+                          Background="#50CCCCCC"
+                         
                          Style="{StaticResource UniformPasswordBox}">
 
                     <PasswordBox.InputBindings>
@@ -92,10 +99,24 @@
                         IsEnabled="{Binding LoginCommand}"
                         Command="{Binding LoginCommand}" 
                         CommandParameter="{Binding ElementName=UserPasswordBox}"
+                         Background="#50CCCCCC"
+                       
                         Width="100" Height="30"/>
             </Grid>
         </Border>
-        <Label Grid.Row="2" Language="he-IL" Content="{Binding CurrentTime}" Style="{StaticResource UniformLabel}"/>   
+        <!--<Label Grid.Row="2" Language="he-IL" Content="{Binding CurrentTime}" Style="{StaticResource UniformLabel}"/>-->
+        <Border Grid.Row="2" 
+        HorizontalAlignment="Left" 
+        VerticalAlignment="Bottom" 
+        Background="#80000000" 
+        BorderThickness="0" 
+        Padding="10" 
+                
+        Margin="10,0,0,30">
+
+            <Label Content="{Binding CurrentTime}" Language="he-IL" Style="{StaticResource UniformLabel}"
+                   FontSize="12" Foreground="White"/>
+        </Border>
 
     </Grid>
 </Window>

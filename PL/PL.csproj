@@ -14,7 +14,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\image_login.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BL\BL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\image_login.png" />
   </ItemGroup>
   
 </Project>
