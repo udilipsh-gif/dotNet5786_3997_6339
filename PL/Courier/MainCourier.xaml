@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PL"
         Title="האזור האישי - שליח" 
+        FlowDirection="RightToLeft"
         Height="550" Width="800"
         WindowStartupLocation="CenterScreen"
         Loaded="MainCourier_Loaded"
@@ -41,13 +42,17 @@
                         </Grid.RowDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" Content="שם:"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentUser.Name}" Style="{StaticResource ModernLabel}" FontWeight="Normal"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentUser.Name}" 
+                                   Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                         <Label Grid.Row="1" Grid.Column="0" Content="טלפון:"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentUser.Phone}" Style="{StaticResource ModernLabel}" FontWeight="Normal"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentUser.Phone}" 
+                                   Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                         <Label Grid.Row="2" Grid.Column="0" Content="כלי רכב:"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentUser.TypeShipment, Converter={StaticResource EnumDescriptionConverter}}" Style="{StaticResource ModernLabel}" FontWeight="Normal"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentUser.TypeShipment, 
+                            Converter={StaticResource EnumDescriptionConverter}}" 
+                                   Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                         <Label Grid.Row="3" Grid.Column="0" Content="דירוג:" VerticalAlignment="Top"/>
                         <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="5">
