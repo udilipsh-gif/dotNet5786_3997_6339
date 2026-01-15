@@ -21,8 +21,6 @@ public partial class CourierDeliveryHistoryWindow : Window
     {
         UserId = couriorId;
         InitializeComponent();
-      
-
     }
 
     public ObservableCollection<BO.ClosedDeliveryInList> DeliveriesHistory
@@ -41,7 +39,7 @@ public partial class CourierDeliveryHistoryWindow : Window
         try
         {
             OrderObserver();
-            s_bl.Order.AddObserver(UserId, OrderObserver);
+            s_bl.Order.AddObserver(OrderObserver);
         }
         catch (Exception ex)
         {

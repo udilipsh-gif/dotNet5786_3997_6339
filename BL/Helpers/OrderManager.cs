@@ -370,9 +370,9 @@ internal static class OrderManager
                         EndDelivery = (BO.EndDelivery)doDelivery.EndDelivery!
                     };
 
-        var uniqueQuery = query.DistinctBy(x => x.OrderId);
-
-        return [.. s_sortClosedDeliveries(uniqueQuery, sort)];
+        //var uniqueQuery = query.DistinctBy(x => x.OrderId);
+        // return [.. s_sortClosedDeliveries(uniqueQuery, sort)];
+        return [.. s_sortClosedDeliveries(query, sort)];
     }
 
     /// <summary>
@@ -685,7 +685,7 @@ internal static class OrderManager
             BO.ClosedDeliveryInListField.AqualDistens => query.OrderBy(x => x.ActualDistens),
             BO.ClosedDeliveryInListField.DelyveryTime => query.OrderBy(x => x.DelyveryTime),
             BO.ClosedDeliveryInListField.EndDelivery => query.OrderBy(x => x.EndDelivery),
-            _ => query.OrderBy(x => x.OrderId)
+            _ => query.OrderBy(x => x.DeliveryId)
         };
     }
 

@@ -103,7 +103,7 @@ public partial class MainCourier : Window
 
         // פתיחת חלון בחירת סיבת סיום
         var selectionWindow = new CloseDeliveryWindow();
-        
+        selectionWindow.Owner = Window.GetWindow(this);
 
         // הצגת החלון כ-Modal Dialog
         bool? result = selectionWindow.ShowDialog();
