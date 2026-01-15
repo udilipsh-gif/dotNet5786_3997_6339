@@ -11,29 +11,37 @@
         Loaded="MainWindow_Loaded"
         Closed="MainWindow_Close">
 
-    <Grid>
+    <Grid ShowGridLines="True">
+        
         <Grid.Background>
-            <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill">
+                <ImageBrush.RelativeTransform>
+                    <ScaleTransform ScaleX="-1" CenterX="0.5" />
+                </ImageBrush.RelativeTransform>
+            </ImageBrush>
         </Grid.Background>
+        
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
-                   Text="חנות הספרים שלי" 
+                   Text="" 
                    Style="{StaticResource HeaderTextStyle}"
                    Margin="0,40,0,20"/>
 
         <Border Grid.Row="1" 
                 Width="300"
                 VerticalAlignment="Top"
-                Background="{StaticResource SurfaceColor}"
+                Background="#50FFFFFF"
                 BorderBrush="{StaticResource BorderColor}"
                 BorderThickness="1"
                 CornerRadius="8"
-                Padding="25">
+                Padding="15">
+            <!--  זה ירד מהבורדר של שורה 1 כמו כן הפדינג היה 25-->
+            <!--Background="{StaticResource SurfaceColor}"-->
 
             <Border.Effect>
                 <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="#000"/>
@@ -63,7 +71,7 @@
             </StackPanel>
         </Border>
 
-        <TextBlock Grid.Row="2" 
+        <TextBlock Grid.Row="0" 
                    Language="he-IL" 
                    Text="{Binding CurrentTime}" 
                    HorizontalAlignment="Center" 
