@@ -154,6 +154,12 @@ internal class ConfigImplementation : IConfig
         get => Config.GoogleApiKey; 
         set => Config.GoogleApiKey = value ?? string.Empty; 
     }
+
+    public string EmailAddress { 
+        get => Config.EmailAddress; 
+        set => Config.EmailAddress = value ?? string.Empty;
+    }
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>

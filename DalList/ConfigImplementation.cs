@@ -128,7 +128,7 @@ internal class ConfigImplementation : IConfig
     public string GoogleApiKey { get; set; } = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
 
 
-    public string? EmailAddress { get; set; } 
+    public string EmailAddress { get; set; } = string.Empty;
 
 
 
