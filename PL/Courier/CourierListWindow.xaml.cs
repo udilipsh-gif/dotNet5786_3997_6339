@@ -232,6 +232,7 @@ public partial class CourierListWindow : Window
             {
                 courierWindow = new CourierWindow(0);
             }
+            Tools.SetSoftOwner(courierWindow, this);
             courierWindow.Show();
         }
         catch (Exception ex)

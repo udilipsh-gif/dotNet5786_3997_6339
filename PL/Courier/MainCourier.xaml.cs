@@ -68,7 +68,7 @@ public partial class MainCourier : Window
     private void MainCourier_Closed(object sender, EventArgs e)
     {
         if (USERID != 0)
-            Tools.RunSafe(() => s_bl.Courier.RemoveObserver(GetCurier));
+            Tools.RunSafe(() => s_bl.Courier.RemoveObserver(USERID, GetCurier));
     }
 
     private void GetCurier()
