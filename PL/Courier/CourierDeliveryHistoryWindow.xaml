@@ -13,12 +13,16 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        
         <TextBlock Grid.Row="0" Text="היסטוריית הביצועים שלי" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Right"/>
-
-        <DataGrid Grid.Row="1" ItemsSource="{Binding DeliveriesHistory}" IsReadOnly="True" FlowDirection="RightToLeft">
+        <DataGrid Grid.Row="1"
+          ItemsSource="{Binding DeliveriesHistory}"
+          IsReadOnly="True"
+          SelectionMode="Single"
+          FlowDirection="RightToLeft">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="מזהה" Binding="{Binding DeliveryId}" Width="60"/>
+                <DataGridTextColumn Header="משלוח" Binding="{Binding DeliveryId}" Width="60"/>
+                <DataGridTextColumn Header="הזמנה" Binding="{Binding OrderId}" Width="60"/>
                 <DataGridTextColumn Header="סוג הזמנה" Binding="{Binding OrderType, Converter={StaticResource EnumDescriptionConverter}}" Width="Auto"/>
                 <DataGridTextColumn Header="כתובת יעד" Binding="{Binding Address}" Width="*"/>
                 <DataGridTextColumn Header="רכב" Binding="{Binding ShipmentType, Converter={StaticResource EnumDescriptionConverter}}" Width="Auto"/>

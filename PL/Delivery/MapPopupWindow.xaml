@@ -14,28 +14,46 @@
             BorderBrush="{StaticResource PrimaryColor}" 
             BorderThickness="1" 
             CornerRadius="10"
-            Margin="10">
-
+            Margin="10"
+            ClipToBounds="True">
         <Border.Effect>
             <DropShadowEffect BlurRadius="15" ShadowDepth="5" Opacity="0.4" Color="#333"/>
         </Border.Effect>
 
-        <Grid Margin="15">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Margin="0,0,0,10">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="📍" FontSize="20" Margin="0,0,5,0"/>
-                    <TextBlock Text="{Binding Order.OrderId, StringFormat='מיקום הזמנה #{0}'}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
-                </StackPanel>
-                <Button Content="✕" HorizontalAlignment="Left" Click="CloseButton_Click" Background="Transparent" Foreground="Gray" BorderThickness="0" Padding="5" FontSize="16"/>
-            </Grid>
+            <Border Grid.Row="0" 
+                    Background="{StaticResource PrimaryColor}"
+                    Padding="15,10"
+                    CornerRadius="10,10,0,0"
+                    MouseLeftButtonDown="Header_MouseDown">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="📍" FontSize="18" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding Order.OrderId, StringFormat='מיקום הזמנה #{0}'}" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   Foreground="White"/>
+                    </StackPanel>
 
-            <Border Grid.Row="1" Background="#E1F5FE" CornerRadius="5" ClipToBounds="True">
+                    <Button Content="✕" 
+                            HorizontalAlignment="Right" 
+                            Click="CloseButton_Click" 
+                            Background="Transparent" 
+                            Foreground="White" 
+                            BorderThickness="0" 
+                            FontSize="14"
+                            Padding="5"
+                            Cursor="Hand"/>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Margin="15,10" Background="#E1F5FE" CornerRadius="5" ClipToBounds="True">
                 <Grid>
                     <Image Source="{Binding MapImageUrl}" Stretch="UniformToFill" Visibility="{Binding MapImageUrl, Converter={StaticResource NullToVisibilityConverter}}"/>
 
@@ -46,10 +64,11 @@
                 </Grid>
             </Border>
 
-            <StackPanel Grid.Row="2" Margin="0,15,0,0">
+            <StackPanel Grid.Row="2" Margin="15,0,15,15">
                 <TextBlock Text="{Binding RouteInfo}" Foreground="Gray" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                <Button Content="אסוף הזמנה זו" Click="CollectButton_Click" Background="#4CAF50" Height="40"/>
+                <Button Content="אסוף הזמנה זו" Click="CollectButton_Click" Background="#4CAF50" Height="40" Foreground="White" FontWeight="Bold"/>
             </StackPanel>
+
         </Grid>
     </Border>
 </Window>

@@ -4,11 +4,18 @@
         xmlns:local="clr-namespace:PL"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="בחר משלוח לביצוע"
+        Title="בחירת הזמנה"
         Loaded="StartDeliveryWindow_Loaded"
         Closed="StartDeliveryWindow_Closed"
-        Height="500" Width="900"
+        Height="450" Width="850"
         WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style TargetType="DataGridRow">
+            <Setter Property="Cursor" Value="Hand"/>
+            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="DataGridRow_PreviewMouseLeftButtonUp"/>
+        </Style>
+    </Window.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -17,44 +24,110 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-            <Label Content="הצג משלוחים מסוג:" VerticalAlignment="Center" FontSize="16"/>
-            <ComboBox ItemsSource="{Binding EnumTypeOfOrder}"
+            <Label Content="סוג משלוח:" Style="{StaticResource ModernLabel}" FontSize="16"/>
+
+            <ComboBox Width="200"
+                      Style="{StaticResource ModernComboBox}"
+                      ItemsSource="{Binding EnumTypeOfOrder}"
                       DisplayMemberPath="Name"
                       SelectedValuePath="Id"
                       SelectedValue="{Binding SelectedFilter}"
                       SelectionChanged="ComboBox_SelectionChanged"
                       SelectedIndex="0"
-                      Width="200"
-                      Height="35"
-                      Margin="10,0"/>
+                      ToolTip="בחר סוג משלוח להצגה בטבלה"/>
         </StackPanel>
 
         <DataGrid Grid.Row="1"
                   x:Name="OrdersGrid"
                   ItemsSource="{Binding DeliveryListView}"
+                  ToolTip="טבלת הזמנות - הצג, מיין וסנן מידע על הזמנות"
                   IsReadOnly="True"
-                  SelectionMode="Single">
+                  SelectionMode="Single"
+                  FlowDirection="RightToLeft">
 
             <DataGrid.Columns>
-                <DataGridTemplateColumn Width="100">
+
+                <DataGridTemplateColumn Header="פעולה" Width="Auto" HeaderStyle="{StaticResource WrappedHeaderStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="אסוף 📦"
+                            <Button Content="איסוף"
                                     Click="CollectOrder_Click"
-                                    Background="#4CAF50"
-                                    Padding="5"
                                     Height="30"
-                                    FontSize="12"/>
+                                    Width="70"
+                                    Padding="0"
+                                    Margin="2"
+                                    FontSize="12"
+                                    Background="#4CAF50" 
+                                    Foreground="White"
+                                    ToolTip="לחץ לאיסוף ההזמנה">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#388E3C"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="מזהה" Binding="{Binding OrderId}" Width="60"/>
-                <DataGridTextColumn Header="סוג" Binding="{Binding TypeOfOrder}" Width="Auto"/>
-                <DataGridTextColumn Header="מרחק (ק״מ)" Binding="{Binding DistanceKm, StringFormat=N2}" Width="Auto"/>
-                <DataGridTextColumn Header="כתובת" Binding="{Binding Address}" Width="*"/>
-                <DataGridTextColumn Header="זמן משוער" Binding="{Binding EstimatedDeliveryTime, Converter={StaticResource TimeSpanConverter}}" Width="Auto"/>
-                <DataGridTextColumn Header="זמן שנותר" Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}" FontWeight="Bold" Width="Auto"/>
+                <DataGridTextColumn Header="מזהה"
+                                    Binding="{Binding OrderId}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="סוג"
+                                    Binding="{Binding TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="מרחק אווירי"
+                                    Binding="{Binding DistanceKm, StringFormat=N2}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="מרחק בפועל"
+                                    Binding="{Binding ActualDistance}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="משקל"
+                                    Binding="{Binding Weight}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="הערכת זמן"
+                                    Binding="{Binding EstimatedDeliveryTime, Converter={StaticResource TimeSpanConverter}}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="סטטוס"
+                                    Binding="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="זמן לסיום"
+                                    Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="זמן כולל"
+                                    Binding="{Binding MaxDeliveryTime, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                    Width="Auto"
+                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
+                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

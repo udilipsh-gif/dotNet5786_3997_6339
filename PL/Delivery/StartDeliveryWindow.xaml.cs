@@ -106,10 +106,8 @@ public partial class StartDeliveryWindow : Window
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         => UpdateOrdersList();
 
-    // הוסף שדה לשמירת החלון הצף הפתוח
     private MapPopupWindow? _currentPopup;
 
-    // הוסף את האירוע הזה
     private void DataGridRow_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
         if (IsClickInsideButton(e.OriginalSource))
@@ -121,17 +119,26 @@ public partial class StartDeliveryWindow : Window
 
         if (sender is DataGridRow row && row.Item is BO.OpenOrderInList selectedOrder)
         {
-            // קבל את מיקום העכבר על המסך
-            var screenPoint = PointToScreen(e.GetPosition(this));
+            var relativePoint = e.GetPosition(this);
 
-            // צור את החלון הצף
+            var screenPoint = PointToScreen(relativePoint);
+
+            PresentationSource source = PresentationSource.FromVisual(this);
+            if (source != null)
+            {
+                double scaleX = source.CompositionTarget.TransformToDevice.M11;
+                double scaleY = source.CompositionTarget.TransformToDevice.M22;
+
+                screenPoint.X /= scaleX;
+                screenPoint.Y /= scaleY;
+            }
+
             _currentPopup = new MapPopupWindow(UserId, selectedOrder, typeShipment)
             {
-                Left = screenPoint.X + 20,
-                Top = screenPoint.Y - 50
+                Left = screenPoint.X + 15,
+                Top = screenPoint.Y + 15
             };
 
-            // האזן לאירוע איסוף
             _currentPopup.OnCollectClicked += (order) =>
             {
                 CollectOrderInternal(order);
