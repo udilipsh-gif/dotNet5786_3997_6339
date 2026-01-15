@@ -133,17 +133,6 @@
     <WorkingSince>2025-03-18T09:18:02.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>267040867</Id>
-    <Name>Yaniv Shapiro</Name>
-    <Phone>0598429378</Phone>
-    <Email>yaniv.shapiro@courier.com</Email>
-    <Password>Pass#246550</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>1</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
-    <WorkingSince>2025-11-11T09:18:02.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>45</Id>
     <Name>Yaniv 45 Shapiro</Name>
     <Phone>0598429378</Phone>
@@ -241,5 +230,16 @@
     <MaxDistanceDelivery>20</MaxDistanceDelivery>
     <TypeShipment>MOTORCYCLE</TypeShipment>
     <WorkingSince>2025-05-24T09:18:02.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>267040867</Id>
+    <Name>Yaniv Shapiro</Name>
+    <Phone>0598429378</Phone>
+    <Email>yaniv.shapiro@courier.com</Email>
+    <Password>Pass#246550</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>20</MaxDistanceDelivery>
+    <TypeShipment>BIKE</TypeShipment>
+    <WorkingSince>2025-11-11T09:18:02.0000000</WorkingSince>
   </Courier>
 </ArrayaOfCouriers>

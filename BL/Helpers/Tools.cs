@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Mail;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Xml.Linq;
 
@@ -413,6 +414,17 @@ internal static class Tools
 
         return (id % 10 == (10 - (sum % 10)));
     }
+
+    public static bool IsValidDistens(double distens)
+    {
+        if (AdminManager.GetConfig().MaxDeliveryRange is double max)
+        {
+            return distens <= max;
+        }
+        else
+            return true;
+    }
+
 
     /// <summary>
     /// Calculates the estimated delivery time for an active delivery.

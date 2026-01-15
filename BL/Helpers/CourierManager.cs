@@ -84,6 +84,8 @@ internal static class CourierManager
             throw new BO.BlInvalidValueException("Invalid email address.");
         if (!Tools.IsStrongPassword(boCourier.Password))
             throw new BO.BlInvalidValueException("סיסמה חלשה מידי. הכנס 8 תווים בהם אות גדולה, קטנה, ספרה וסימן.");
+        if (!Tools.IsValidDistens(boCourier.MaxDistanceDelivery ?? 0))
+            throw new BO.BlInvalidValueException("Max Distance For Deliveri is to hige.");
 
         DO.Courier doCourier = new DO.Courier
         {
@@ -181,6 +183,10 @@ internal static class CourierManager
 
         if (!Tools.IsStrongPassword(boCourier.Password))
             throw new BO.BlInvalidValueException("Password is not strong enough.");
+
+        if(!Tools.IsValidDistens(boCourier.MaxDistanceDelivery?? 0))
+            throw new BO.BlInvalidValueException("Max Distance For Deliveri is to hige.");
+
 
         DO.Courier doCourier = new DO.Courier
         {
