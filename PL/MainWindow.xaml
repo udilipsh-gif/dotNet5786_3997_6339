@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PL"
         Title="כניסה למערכת"
-        Height="610" Width="650" 
+        Height="650" Width="650" 
+        MinHeight="620" MinWidth="600" 
         WindowStartupLocation="CenterScreen"
         FlowDirection="RightToLeft"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
@@ -11,7 +12,7 @@
         Closed="MainWindow_Close">
 
     <Grid ShowGridLines="False">
-        
+
         <Grid.Background>
             <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill">
                 <ImageBrush.RelativeTransform>
@@ -19,17 +20,21 @@
                 </ImageBrush.RelativeTransform>
             </ImageBrush>
         </Grid.Background>
-        
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="215"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="130"/>
+            <RowDefinition Height="1.9*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="1.2*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
-                   Text="" 
-                   Style="{StaticResource HeaderTextStyle}"
-                   Margin="0,40,0,20"/>
+               Language="he-IL" 
+               Text="{Binding CurrentTime}" 
+               HorizontalAlignment="Center" 
+               Foreground="{StaticResource PrimaryDarkColor}"
+               FontWeight="Bold"
+                   FontSize="20"
+               Margin="10"/>
 
         <Border Grid.Row="1" 
                 Width="300"
@@ -47,7 +52,19 @@
             </Border.Effect>
 
             <StackPanel>
-                <Label Content="תעודת זהות:" />
+                <Border Grid.Row="2"
+                        Background="{StaticResource PrimaryColor}" 
+                        CornerRadius="12" 
+                        Padding="10,4" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Center"
+                        Margin="0,5">
+
+                    <TextBlock Text="תעודת זהות:" 
+                               Foreground="White" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"/>
+                </Border>
                 <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" 
                          MaxLength="9"
                          Background="#70CCCCCC"
@@ -55,7 +72,19 @@
                        
                          local:Tools.NumericOnly="True"/>
 
-                <Label Content="סיסמה:"   Margin="0,15,0,0"/>
+                <Border Grid.Row="2"
+                        Background="{StaticResource PrimaryColor}" 
+                        CornerRadius="12" 
+                        Padding="10,4" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Center"
+                        Margin="0,5">
+
+                    <TextBlock Text="סיסמה:" 
+                               Foreground="White" 
+                               FontSize="14" 
+                               FontWeight="SemiBold"/>
+                </Border>
                 <PasswordBox x:Name="UserPasswordBox" Background="#70CCCCCC">
                     <PasswordBox.InputBindings>
                         <KeyBinding Key="Enter" 
@@ -66,17 +95,10 @@
                 </PasswordBox>
 
                 <Button Content="התחבר" 
-                        Margin="0,25,0,0"
+                        Margin="0,20,0,0"
                         Command="{Binding LoginCommand}" 
                         CommandParameter="{Binding ElementName=UserPasswordBox}"/>
             </StackPanel>
         </Border>
-
-        <TextBlock Grid.Row="0" 
-                   Language="he-IL" 
-                   Text="{Binding CurrentTime}" 
-                   HorizontalAlignment="Center" 
-                   Foreground="{StaticResource SubTextColor}"
-                   Margin="10"/>
     </Grid>
 </Window>
