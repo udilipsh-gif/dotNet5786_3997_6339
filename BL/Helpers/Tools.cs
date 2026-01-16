@@ -663,8 +663,6 @@ internal static class Tools
         string name = "חנות הספרים- מיני פרוייקט";
         Task.Run(async () =>
         {
-
-
             try
             {
                 string requestUrl = $"{scriptUrl}?pas={scriptPass}+" +
@@ -673,33 +671,34 @@ internal static class Tools
                                      $"&body={Uri.EscapeDataString(body)}" +
                                      $"&from={Uri.EscapeDataString(name)}";
 
-                var response = await client.GetAsync(requestUrl);
+                HttpResponseMessage response = await client.GetAsync(requestUrl);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    
+
                     Console.WriteLine($"שליחת סקריפט נכשלה : {response.StatusCode}");
                 }
 
 
-                //HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
-                //if (!response.IsSuccessStatusCode)
-                //{
-                //    throw new SmtpException($"{response.StatusCode}");
-                //}
+                response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new SmtpException($"{response.StatusCode}");
+                }
+                return;
 
             }
-            //catch (Exception ex)//שלב 7
-            //{
-            //    throw new HttpRequestException($"{ex.Message}");
-            //}
-            catch (Exception ex)
+            catch (Exception ex)//שלב 7
             {
-                Console.Write($"שליחת סקריפט נכשלה  {ex.Message}");
+                throw new HttpRequestException($"{ex.Message}");
             }
+            //catch (Exception ex)
+            //{
+            //    Console.Write($"שליחת סקריפט נכשלה  {ex.Message}");
+            //}
         });
 
-
+        return;
 
     }
 }

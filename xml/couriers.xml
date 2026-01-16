@@ -231,4 +231,15 @@
     <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2026-01-22T14:26:35.0000000</WorkingSince>
   </Courier>
+  <Courier>
+    <Id>200986339</Id>
+    <Name>דוד דוידוביץ</Name>
+    <Phone>0527148483</Phone>
+    <Email>david48483@gmail.com</Email>
+    <Password>Admin1234@</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>8</MaxDistanceDelivery>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <WorkingSince>2026-01-22T14:26:35.0000000</WorkingSince>
+  </Courier>
 </ArrayaOfCouriers>

@@ -17,22 +17,6 @@
     <DistanceKmWalk>6.309</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100031</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 30</Details>
-    <Addres> שטמפפר 15, פתח תקווה</Addres>
-    <Latitude>32.0901497</Latitude>
-    <Longitude>34.8855149</Longitude>
-    <Name>Customer30</Name>
-    <Phone>0589016274</Phone>
-    <Weight>2</Weight>
-    <OrderDate>2026-01-13T11:13:38.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>5.906828246041569</DistanceKm>
-    <DistanceKmRoad>7.737</DistanceKmRoad>
-    <DistanceKmWalk>6.262</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100037</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 36</Details>
@@ -799,5 +783,21 @@
     <DistanceKm>3.8000219110957776</DistanceKm>
     <DistanceKmRoad>4.698</DistanceKmRoad>
     <DistanceKmWalk>4.569</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100031</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 30</Details>
+    <Addres> שטמפפר 15, פתח תקווה</Addres>
+    <Latitude>32.0901497</Latitude>
+    <Longitude>34.8855149</Longitude>
+    <Name>Customer30</Name>
+    <Phone>0589016274</Phone>
+    <Weight>2</Weight>
+    <OrderDate>2026-01-13T11:13:38.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>5.906828246041569</DistanceKm>
+    <DistanceKmRoad>7.737</DistanceKmRoad>
+    <DistanceKmWalk>6.262</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

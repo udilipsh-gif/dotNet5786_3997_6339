@@ -580,4 +580,14 @@
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>2026-01-22T14:26:35.0000000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200059</Id>
+    <OrderId>100031</OrderId>
+    <CourierId>200986339</CourierId>
+    <TypeShipment>MOTORCYCLE</TypeShipment>
+    <OrderDate>2026-01-22T14:26:35.0000000</OrderDate>
+    <ActualDistance>7.737</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-22T15:26:35.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
