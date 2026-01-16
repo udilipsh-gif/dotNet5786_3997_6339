@@ -595,24 +595,25 @@ internal static class OrderManager
         var courier = s_dal.Courier.Read(delivery.CourierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        try
-        {
-            Tools.SendEmailSkript(
-                courier.Email,
-                "Order Cancelled",
-                $"Order number {orderId} has been cancelled by the manager").GetAwaiter().GetResult();//השלב הלא סינכוני!!!###################################################
-        }
-        catch (SmtpException)
-        {
-            throw new SmtpException("Failed to send email notification");
-        }
-        finally
-        {
+        //######################################################################################################שליחת מייל- כרגע מוקפאת עד שלב 7
+        //try
+        //{
+        //    Tools.SendEmailSkript(
+        //        courier.Email,
+        //        "Order Cancelled",
+        //        $"Order number {orderId} has been cancelled by the manager").GetAwaiter().GetResult();//השלב הלא סינכוני!!!###################################################
+        //}
+        //catch (SmtpException)
+        //{
+        //    throw new SmtpException("Failed to send email notification");
+        //}
+        //finally
+        //{
             DeliveryManager.Observer.NotifyItemUpdated(delivery.Id);
             CourierManager.Observer.NotifyItemUpdated(delivery.CourierId);
             Observer.NotifyItemUpdated(orderId);
             Observer.NotifyListUpdated();
-        }
+        //}
     }
 
     /// <summary>
