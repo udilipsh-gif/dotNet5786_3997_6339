@@ -160,6 +160,19 @@ internal class ConfigImplementation : IConfig
         set => Config.EmailAddress = value ?? string.Empty;
     }
 
+    public string ScriptUrl { 
+        get => Config.ScriptUrl; 
+        set => Config.ScriptUrl = value ?? string.Empty;
+    }
+    public string ScriptPass { 
+        get => Config.ScriptPass; 
+        set => Config.ScriptPass = value ?? string.Empty;
+    }
+    public string TokenCallSms { 
+        get => Config.TokenCallSms; 
+        set => Config.TokenCallSms = value ?? string.Empty;
+    }
+
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>

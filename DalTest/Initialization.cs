@@ -230,6 +230,18 @@ public static class Initialization
                 MaxDistanceDelivery = getMaxDistanceDelivery(typeShipment)
             });
         }
+        s_dal?.Courier.Create(new()
+        {
+            Id = 5,
+            Name = "יהודה ליפשיץ",
+            Email = "yuda4539@gmail.com",
+            Phone = "0553059755",
+            Password = "5",
+            Active = true,
+            TypeShipment = TheTypeShipment.CAR,
+            WorkingSince = s_dal.Config.Clock.AddDays(-s_rand.Next(5, 366)),
+            MaxDistanceDelivery = s_dal.Config.MaxDeliveryRange
+        });
     }
 
     /// <summary>
@@ -384,11 +396,11 @@ public static class Initialization
             };
 
             TimeSpan duration = TimeSpan.Zero;
-            if (distense  is double dis)
+            if (distense is double dis)
             {
                 duration = TimeSpan.FromHours(dis / avgSpeed);
             }
-                
+
 
             DateTime orderDate;
 
@@ -402,8 +414,8 @@ public static class Initialization
                 DateTime maxEndTime = delivery.Max(d => d.TimeEndDelivery) ?? DateTime.MinValue;
                 globalMaxTime = maxEndTime;
                 // קביעת הזמן החדש לזמן הסיום האחרון + 10 דק 
-                orderDate = maxEndTime.AddMinutes(s_rand.Next(10,100));
-              
+                orderDate = maxEndTime.AddMinutes(s_rand.Next(10, 100));
+
             }
             else
             {

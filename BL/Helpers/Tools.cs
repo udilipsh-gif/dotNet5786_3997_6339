@@ -649,6 +649,7 @@ internal static class Tools
             smtpServer.Send(mail);
         }
         catch (SmtpException ex)
+
         {
             throw new SmtpException($"{ex.Message}");
         }
@@ -656,16 +657,20 @@ internal static class Tools
     private static readonly HttpClient client = new HttpClient();
     public static void SendEmailSkript(string toEmail, string subject, string body)
     {
-        string scriptUrl = "https://script.google.com/macros/s/AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg/exec";
+        string headUrl = "https://script.google.com/macros/s/";
 
-        string scriptPass = "sdfjsak8796978akljdf54gdfgr44";
+        string endUrl = "/exec";
+
+        string scriptUrl =$"{headUrl}{AdminManager.GetConfig().ScriptUrl}{endUrl}";          //"https://script.google.com/macros/s/AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg/exec";
+
+        string scriptPass = AdminManager.GetConfig().ScriptPass;                                                                ///"sdfjsak8796978akljdf54gdfgr44";
 
         string name = "חנות הספרים- מיני פרוייקט";
         Task.Run(async () =>
         {
             try
             {
-                string requestUrl = $"{scriptUrl}?pas={scriptPass}+" +
+                string requestUrl = $"{scriptUrl}?pas={scriptPass}" +
                                      $"&address={Uri.EscapeDataString(toEmail)}" +
                                      $"&sub={Uri.EscapeDataString(subject)}" +
                                      $"&body={Uri.EscapeDataString(body)}" +
@@ -674,7 +679,8 @@ internal static class Tools
                 HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new SmtpException($"{response.StatusCode}");
+                      throw new SmtpException($"{response.StatusCode}");
+                    //Console.WriteLine($"Error sending email: {response.StatusCode}");
                 }
                 return;
 
@@ -682,6 +688,7 @@ internal static class Tools
             catch (Exception ex)//שלב 7
             {
                 throw new HttpRequestException($"{ex.Message}");
+                //Console.WriteLine($"Exception in SendEmail: {ex.Message}");
             }
             //catch (Exception ex)
             //{

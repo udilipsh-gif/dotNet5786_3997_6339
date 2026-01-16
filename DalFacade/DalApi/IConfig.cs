@@ -67,8 +67,22 @@ public interface IConfig
     /// gets or sets the Google API key used for accessing Google services.
     /// </summary>
     string GoogleApiKey { get; set; }
-
+    /// <summary>
+    /// gets or sets the email address used for sending notifications.
+    /// </summary>
     string EmailAddress { get; set; }
+    /// <summary>
+    /// gets or sets the URL of the script used for specific operations.
+    /// </summary>
+    string ScriptUrl { get; set; }
+    /// <summary>
+    /// gets or sets the password for the script used in operations.
+    /// </summary>
+    string ScriptPass { get; set; }
+    /// <summary>
+    /// gets or sets the token used for call notifications.
+    /// </summary>
+    string TokenCallSms { get; set; }
 
     /// <summary>
     /// Resets the configuration settings to their default values.

@@ -80,7 +80,11 @@ internal static class AdminManager //stage 4
         RiskRange = s_dal.Config.RiskRange,
         MaxTimeInactivity = s_dal.Config.MaxTimeInactivity,
         GoogleApiKey = s_dal.Config.GoogleApiKey,
-        EmailAddress = s_dal.Config.EmailAddress
+        EmailAddress = s_dal.Config.EmailAddress,
+        ScriptUrl = s_dal.Config.ScriptUrl,
+        ScriptPass = s_dal.Config.ScriptPass,
+        TokenCallSms = s_dal.Config.TokenCallSms
+
 
     };
 

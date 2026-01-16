@@ -93,8 +93,22 @@ public class Config
     /// Prefer loading this value from user secrets, environment variables, or secured configuration.
     /// </remarks>
     public string GoogleApiKey { get; set; } = string.Empty;
-
+    /// <summary>
+    /// gets or sets the email address used for system notifications.
+    /// </summary>
     public string? EmailAddress { get; set; } = null;
+    /// <summary>
+    /// gets or sets the URL of the script for external integrations.
+    /// </summary>
+    public string ScriptUrl { get; set; } = string.Empty;
+    /// <summary>
+    /// gets or sets the script password used for authentication or encryption purposes.
+    /// </summary>
+    public string ScriptPass { get; set; } = string.Empty;
+    /// <summary>
+    /// gets or sets the SMS API token used for sending SMS notifications.
+    /// </summary>
+    public string TokenCallSms { get; set; } = string.Empty;
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
@@ -115,6 +129,9 @@ public class Config
         MaxTimeInactivity = TimeSpan.Zero;
         GoogleApiKey = string.Empty;
         EmailAddress = null;
+        ScriptUrl = string.Empty;
+        ScriptPass = string.Empty;
+        TokenCallSms = string.Empty;
     }
 
     /// <summary>

@@ -191,6 +191,21 @@ internal static class Config
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "EmailAddress");
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "EmailAddress", value);
     }
+    internal static string ScriptUrl
+    {
+        get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "ScriptUrl");
+        set => XMLTools.SetConfigGenericVal(s_data_config_xml, "ScriptUrl", value);
+    }
+    internal static string ScriptPass
+    {
+        get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "ScriptPass");
+        set => XMLTools.SetConfigGenericVal(s_data_config_xml, "ScriptPass", value);
+    }
+    internal static string TokenCallSms
+    {
+        get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "TokenCallSms");
+        set => XMLTools.SetConfigGenericVal(s_data_config_xml, "TokenCallSms", value);
+    }
 
     /// <summary>
     /// Resets all configuration values to their default initial state.
@@ -236,5 +251,9 @@ internal static class Config
         MaxTimeInactivity = TimeSpan.FromDays(100);
         GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
         EmailAddress = "david48483@gmail.com";
+        ScriptUrl = "AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg";
+        ScriptPass = "sdfjsak8796978akljdf54gdfgr44";
+        TokenCallSms = "########";
+
     }
 }

@@ -127,8 +127,22 @@ internal class ConfigImplementation : IConfig
     /// </summary>
     public string GoogleApiKey { get; set; } = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
 
-
+    /// <summary>
+    /// gets or sets the email address used for system notifications.
+    /// </summary>
     public string EmailAddress { get; set; } = string.Empty;
+    /// <summary>
+    /// gets or sets the URL of the script used for mail notifications.
+    /// </summary>
+    public string ScriptUrl { get; set; } = string.Empty;
+    /// <summary>
+    /// Gets or sets the script password used for authentication or encryption purposes.
+    /// </summary>
+    public string ScriptPass { get; set; } = string.Empty;
+    /// <summary>
+    /// gets or sets the SMS API token used for sending SMS notifications.
+    /// </summary>
+    public string TokenCallSms { get; set; } = string.Empty;
 
 
 

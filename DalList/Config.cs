@@ -73,7 +73,7 @@ internal static class Config
     /// </summary>
     /// <param name="id">The ID number to validate.</param>
     /// <returns>True if the ID is valid, false otherwise.</returns>
-   
+
     static bool ValidId(int id)
     {
         int tempId = id;
@@ -156,10 +156,28 @@ internal static class Config
     /// Gets or sets the maximum time of inactivity allowed.
     /// </summary>
     internal static TimeSpan MaxTimeInactivity { get; set; } = TimeSpan.FromDays(0);
-
+    /// <summary>
+    ///  gets or sets the Google API key for accessing Google services.
+    /// </summary>
     internal static string GoogleApiKey { get; set; } = string.Empty;
-
+    /// <summary>
+    /// gets or sets the email address used for system notifications.
+    /// </summary>
     internal static string EmailAddress { get; set; } = string.Empty;
+    /// <summary>
+    /// gets or sets the URL of the script used for mail notifications.
+    /// </summary>
+    internal static string ScriptUrl { get; set; } = string.Empty;
+    /// <summary>
+    /// gets or sets the password for accessing the script.
+    /// </summary>
+
+    internal static string ScriptPass { get; set; } = string.Empty;
+    /// <summary>
+    /// gets or sets the token used for SMS  & call notifications.
+    /// </summary>
+
+    internal static string TokenCallSms { get; set; }= string.Empty;
 
     /// <summary>
     /// Resets all configuration values to their default initial state.
@@ -184,5 +202,9 @@ internal static class Config
         MaxTimeInactivity = TimeSpan.FromDays(100);
         GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
         EmailAddress = "david48483@gmail.com";
+        ScriptUrl = "AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F - Gdesv - gNg";
+        ScriptPass = "sdfjsak8796978akljdf54gdfgr44";
+        TokenCallSms = "########";
+
     }
 }
