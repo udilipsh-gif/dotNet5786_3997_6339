@@ -671,16 +671,7 @@ internal static class Tools
                                      $"&body={Uri.EscapeDataString(body)}" +
                                      $"&from={Uri.EscapeDataString(name)}";
 
-                HttpResponseMessage response = await client.GetAsync(requestUrl);
-
-                if (!response.IsSuccessStatusCode)
-                {
-
-                    Console.WriteLine($"שליחת סקריפט נכשלה : {response.StatusCode}");
-                }
-
-
-                response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
+                HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new SmtpException($"{response.StatusCode}");
