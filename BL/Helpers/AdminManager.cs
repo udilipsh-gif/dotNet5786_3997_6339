@@ -178,6 +178,31 @@ internal static class AdminManager //stage 4
             s_dal.Config.MaxTimeInactivity = configuration.MaxTimeInactivity;
             configChanged = true;
         }
+        if (s_dal.Config.GoogleApiKey != configuration.GoogleApiKey)
+        {
+            s_dal.Config.GoogleApiKey = configuration.GoogleApiKey;
+            configChanged = true;
+        }
+        if (s_dal.Config.EmailAddress != configuration.EmailAddress)
+        {
+            s_dal.Config.EmailAddress = configuration.EmailAddress;
+            configChanged = true;
+        }
+        if (s_dal.Config.ScriptUrl != configuration.ScriptUrl)
+        {
+            s_dal.Config.ScriptUrl = configuration.ScriptUrl;
+            configChanged = true;
+        }
+        if (s_dal.Config.ScriptPass != configuration.ScriptPass)
+        {
+            s_dal.Config.ScriptPass = configuration.ScriptPass;
+            configChanged = true;
+        }
+        if (s_dal.Config.TokenCallSms != configuration.TokenCallSms)
+        {
+            s_dal.Config.TokenCallSms = configuration.TokenCallSms;
+            configChanged = true;
+        }
 
         //Calling all the observers of configuration update
         if (configChanged) // stage 5
