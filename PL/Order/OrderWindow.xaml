@@ -185,6 +185,7 @@
 
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,30,0,0">
                     <Button Content="{Binding ButtonText, Converter={StaticResource ValueToHebrewConverter}}" 
+                            Tag="{Binding ButtonText}"
                             Click="btnAddUpdate_Click"
                             Width="150"/>
 

@@ -220,7 +220,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
         try
         {
-            if (sender is Button button && button.Content is "Add")
+            if (sender is Button button && button.Tag.ToString() is "Add")
             {
                 s_bl.Order.Create(CURRENT_MANAGER_ID, CurrentOrder);
                 MessageBox.Show("Order added successfully!");

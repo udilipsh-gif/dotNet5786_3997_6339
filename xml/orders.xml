@@ -800,4 +800,20 @@
     <DistanceKmRoad>4.698</DistanceKmRoad>
     <DistanceKmWalk>4.569</DistanceKmWalk>
   </Order>
+  <Order>
+    <Id>100051</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>כ</Details>
+    <Addres>טרומפלדור 24 בני ברק</Addres>
+    <Latitude>32.0952472</Latitude>
+    <Longitude>34.8381144</Longitude>
+    <Name>משה</Name>
+    <Phone>123456789</Phone>
+    <Weight>0</Weight>
+    <OrderDate>2026-01-22T14:26:35.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
+    <DistanceKm>1.4402736914022574</DistanceKm>
+    <DistanceKmRoad />
+    <DistanceKmWalk />
+  </Order>
 </ArrayOfOrder>

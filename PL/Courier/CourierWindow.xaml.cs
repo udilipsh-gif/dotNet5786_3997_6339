@@ -225,7 +225,7 @@ public partial class CourierWindow : Window
 
         try
         {
-            if (sender is Button button && button.Tag.ToString()== "Add")
+            if (sender is Button button && button.Tag.ToString() is "Add")
             {
                 s_bl.Courier.Create(CURRENT_MANAGER_ID, CurrentCourier);
                 MessageBox.Show("Courier added successfully!");
