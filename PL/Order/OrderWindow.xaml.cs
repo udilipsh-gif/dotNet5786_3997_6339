@@ -163,6 +163,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         {
             MessageBox.Show(ex.Message);
         }
+        //רלוונטי למייל לא לסקריפט. בלשב הסינכרוני לא נדע אם נשלח או לא
         catch (SmtpException ex)
         {
             MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה ( {ex.Message})");

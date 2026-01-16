@@ -181,6 +181,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
             {
                 MessageBox.Show(ex.Message);
             }
+            //רלוונטי למייל לא לסקריפט. בלשב הסינכרוני לא נדע אם נשלח או לא
             catch (SmtpException ex)
             {
                 MessageBox.Show($"הזמנה מס' {orderInList.OrderId} בוטלה בהצלחה ({ex.Message})");

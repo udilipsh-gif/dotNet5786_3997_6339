@@ -220,4 +220,15 @@
     <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2026-01-22T14:26:35.0000000</WorkingSince>
   </Courier>
+  <Courier>
+    <Id>312506082</Id>
+    <Name>דוד דוידוביץ</Name>
+    <Phone>123456789</Phone>
+    <Email>david48483@gmail.com</Email>
+    <Password>asdASD123!@#</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>20</MaxDistanceDelivery>
+    <TypeShipment>CAR</TypeShipment>
+    <WorkingSince>2026-01-22T14:26:35.0000000</WorkingSince>
+  </Courier>
 </ArrayaOfCouriers>

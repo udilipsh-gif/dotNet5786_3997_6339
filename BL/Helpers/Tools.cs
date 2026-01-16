@@ -654,34 +654,52 @@ internal static class Tools
         }
     }
     private static readonly HttpClient client = new HttpClient();
-    public static async Task SendEmailSkript(string toEmail, string subject, string body)
+    public static void SendEmailSkript(string toEmail, string subject, string body)
     {
         string scriptUrl = "https://script.google.com/macros/s/AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg/exec";
 
         string scriptPass = "sdfjsak8796978akljdf54gdfgr44";
 
         string name = "חנות הספרים- מיני פרוייקט";
-
-        try
+        Task.Run(async () =>
         {
-            string requestUrl = $"{scriptUrl}?pas={scriptPass}+" +
-                                 $"&address={Uri.EscapeDataString(toEmail)}" +
-                                 $"&sub={Uri.EscapeDataString(subject)}" +
-                                 $"&body={Uri.EscapeDataString(body)}" +
-                                 $"&from={Uri.EscapeDataString(name)}";
 
 
-            HttpResponseMessage response = await client.GetAsync(requestUrl);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new SmtpException($"{response.StatusCode}");
-            }
+                string requestUrl = $"{scriptUrl}?pas={scriptPass}+" +
+                                     $"&address={Uri.EscapeDataString(toEmail)}" +
+                                     $"&sub={Uri.EscapeDataString(subject)}" +
+                                     $"&body={Uri.EscapeDataString(body)}" +
+                                     $"&from={Uri.EscapeDataString(name)}";
 
-        }
-        catch (Exception ex)
-        {
-            throw new SmtpException($"{ex.Message}");
-        }
+                var response = await client.GetAsync(requestUrl);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    
+                    Console.WriteLine($"שליחת סקריפט נכשלה : {response.StatusCode}");
+                }
+
+
+                //HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
+                //if (!response.IsSuccessStatusCode)
+                //{
+                //    throw new SmtpException($"{response.StatusCode}");
+                //}
+
+            }
+            //catch (Exception ex)//שלב 7
+            //{
+            //    throw new HttpRequestException($"{ex.Message}");
+            //}
+            catch (Exception ex)
+            {
+                Console.Write($"שליחת סקריפט נכשלה  {ex.Message}");
+            }
+        });
+
+
 
     }
 }
