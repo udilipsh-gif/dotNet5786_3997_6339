@@ -1,22 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfOrder>
   <Order>
-    <Id>100004</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 3</Details>
-    <Addres> גורדון 5, גבעתיים</Addres>
-    <Latitude>32.076085</Latitude>
-    <Longitude>34.807312</Longitude>
-    <Name>Customer3</Name>
-    <Phone>0508640610</Phone>
-    <Weight>2</Weight>
-    <OrderDate>2026-01-14T11:13:38.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>2.4435691396355597</DistanceKm>
-    <DistanceKmRoad>3.383</DistanceKmRoad>
-    <DistanceKmWalk>2.953</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100007</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 6</Details>
@@ -799,5 +783,21 @@
     <DistanceKm>1.1774111915412198</DistanceKm>
     <DistanceKmRoad>1.349</DistanceKmRoad>
     <DistanceKmWalk>1.335</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100004</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 3</Details>
+    <Addres> גורדון 5, גבעתיים</Addres>
+    <Latitude>32.076085</Latitude>
+    <Longitude>34.807312</Longitude>
+    <Name>Customer3</Name>
+    <Phone>0508640610</Phone>
+    <Weight>2</Weight>
+    <OrderDate>2026-01-14T11:13:38.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>2.4435691396355597</DistanceKm>
+    <DistanceKmRoad>3.383</DistanceKmRoad>
+    <DistanceKmWalk>2.953</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

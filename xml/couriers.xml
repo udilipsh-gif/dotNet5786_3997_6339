@@ -209,4 +209,15 @@
     <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2025-06-16T11:13:38.0000000</WorkingSince>
   </Courier>
+  <Courier>
+    <Id>203383997</Id>
+    <Name>יהי</Name>
+    <Phone>123456789</Phone>
+    <Email>yuda4539@gmail.com</Email>
+    <Password>1234567asdASD!@</Password>
+    <Active>true</Active>
+    <MaxDistanceDelivery>25</MaxDistanceDelivery>
+    <TypeShipment>CAR</TypeShipment>
+    <WorkingSince>2026-01-22T14:26:35.0000000</WorkingSince>
+  </Courier>
 </ArrayaOfCouriers>

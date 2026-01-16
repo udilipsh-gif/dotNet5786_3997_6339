@@ -500,4 +500,14 @@
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>2026-01-15T14:37:01.7600000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200051</Id>
+    <OrderId>100004</OrderId>
+    <CourierId>203383997</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-22T14:26:35.0000000</OrderDate>
+    <ActualDistance>3.383</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-22T14:26:35.0000000</TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>

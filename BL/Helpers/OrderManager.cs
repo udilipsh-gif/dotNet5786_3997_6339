@@ -600,7 +600,7 @@ internal static class OrderManager
             Tools.SendEmailSkript(
                 courier.Email,
                 "Order Cancelled",
-                $"Order number {orderId} has been cancelled by the manager").GetAwaiter().GetResult();
+                $"Order number {orderId} has been cancelled by the manager").GetAwaiter().GetResult();//השלב הלא סינכוני!!!###################################################
         }
         catch (SmtpException)
         {
