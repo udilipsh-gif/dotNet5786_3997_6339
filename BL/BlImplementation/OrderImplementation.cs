@@ -103,7 +103,7 @@ internal class OrderImplementation : IOrder
     {
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
-        OrderManager.StartDelivery(courierId, orderId);
+        DeliveryManager.StartDelivery(courierId, orderId);
     }
 
     /// <summary>
@@ -222,7 +222,7 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        return OrderManager.GetClosed(courierId, filter, sort);
+        return DeliveryManager.GetClosed(courierId, filter, sort);
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
 
-        return OrderManager.GetOpen(courierId, filter, sort);
+        return DeliveryManager.GetOpen(courierId, filter, sort);
     }
 
     public void AddObserver(Action listObserver) =>
