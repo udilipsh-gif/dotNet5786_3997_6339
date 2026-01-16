@@ -34,6 +34,17 @@ public partial class ConfigWindow : Window
     public static readonly DependencyProperty ConfigurationProperty =
         DependencyProperty.Register("Configuration", typeof(BO.Config), typeof(ConfigWindow));
 
+
+    public bool? StateToken
+    {
+        get { return Tools.StateToken; }
+        set
+        {
+            Tools.StateToken = value;
+            
+        }
+    }
+
     private void ConfigWindow_Loaded(object sender, RoutedEventArgs e)
     {
         Tools.RunSafe(() => s_bl.Admin.AddConfigObserver(ConfigObserver));

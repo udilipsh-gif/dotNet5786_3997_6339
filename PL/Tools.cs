@@ -48,7 +48,7 @@ public static class Tools
 
     internal static string GetDescription(this Enum value)
     {
-        if(value.GetType().GetField(value.ToString()) is FieldInfo field)
+        if (value.GetType().GetField(value.ToString()) is FieldInfo field)
         {
             if (field == null) return value.ToString();
 
@@ -60,7 +60,7 @@ public static class Tools
         else
         {
             return string.Empty;
-        }   
+        }
     }
 
     // גרסה 1: ללא תנאי (כמו שהיה לך עד עכשיו - שומר על תאימות לאחור)
@@ -73,7 +73,7 @@ public static class Tools
     // הוספנו פרמטר אופציונלי 'owner'
     internal static void OpenOrActivateWindow<T>(
         Predicate<T>? matchPredicate,
-        Window? owner = null, 
+        Window? owner = null,
         params object?[] args) where T : Window
     {
         var existingWindow = Application.Current.Windows.OfType<T>().FirstOrDefault(window =>
@@ -213,4 +213,8 @@ public static class Tools
         };
     }
 
+    //טוקן לשיחות SMS
+    public static bool? StateToken { get; set; } = null;
+
+    
 }

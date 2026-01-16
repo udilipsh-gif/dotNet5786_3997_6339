@@ -513,22 +513,6 @@
     <DistanceKmWalk>7.756</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100003</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 2</Details>
-    <Addres> העצמאות 40, אור יהודה</Addres>
-    <Latitude>32.0289963</Latitude>
-    <Longitude>34.8655017</Longitude>
-    <Name>Customer2</Name>
-    <Phone>0547765844</Phone>
-    <Weight>7</Weight>
-    <OrderDate>2026-01-16T13:56:33.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>8.22905031074318</DistanceKm>
-    <DistanceKmRoad>12.632</DistanceKmRoad>
-    <DistanceKmWalk>9.877</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100023</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 22</Details>
@@ -799,5 +783,21 @@
     <DistanceKm>4.874791688330585</DistanceKm>
     <DistanceKmRoad>6.268</DistanceKmRoad>
     <DistanceKmWalk>5.571</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100003</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 2</Details>
+    <Addres> העצמאות 40, אור יהודה</Addres>
+    <Latitude>32.0289963</Latitude>
+    <Longitude>34.8655017</Longitude>
+    <Name>Customer2</Name>
+    <Phone>0547765844</Phone>
+    <Weight>7</Weight>
+    <OrderDate>2026-01-16T13:56:33.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>8.22905031074318</DistanceKm>
+    <DistanceKmRoad>12.632</DistanceKmRoad>
+    <DistanceKmWalk>9.877</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

@@ -331,16 +331,6 @@
     <TimeEndDelivery>2026-01-16T13:56:33.0000000</TimeEndDelivery>
   </Delivery>
   <Delivery>
-    <Id>200034</Id>
-    <OrderId>100003</OrderId>
-    <CourierId>227397542</CourierId>
-    <TypeShipment>CAR</TypeShipment>
-    <OrderDate>2026-01-16T13:56:33.0000000</OrderDate>
-    <ActualDistance>12.632</ActualDistance>
-    <EndDelivery></EndDelivery>
-    <TimeEndDelivery></TimeEndDelivery>
-  </Delivery>
-  <Delivery>
     <Id>200035</Id>
     <OrderId>100013</OrderId>
     <CourierId>380184249</CourierId>
@@ -527,6 +517,16 @@
     <TypeShipment>CAR</TypeShipment>
     <OrderDate>2026-01-16T15:34:21.0000000</OrderDate>
     <ActualDistance>6.268</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-16T15:34:21.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200034</Id>
+    <OrderId>100003</OrderId>
+    <CourierId>227397542</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-16T13:56:33.0000000</OrderDate>
+    <ActualDistance>12.632</ActualDistance>
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>2026-01-16T15:34:21.0000000</TimeEndDelivery>
   </Delivery>
