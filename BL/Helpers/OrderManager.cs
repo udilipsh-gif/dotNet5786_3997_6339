@@ -281,7 +281,7 @@ internal static class OrderManager
     ///   <item><description>COMPLETED/CANCELLED: Cannot be cancelled (throws exception)</description></item>
     /// </list>
     /// </remarks>
-    public static void Cancel(int orderId)
+    public static void Cancel(int orderId, bool token = false)
     {
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
@@ -291,7 +291,7 @@ internal static class OrderManager
             DO.OrderStatus.COMPLETED => throw new BO.BlInvalidOperationException("Cannot cancel a completed order."),
             DO.OrderStatus.CONCELLED => throw new BO.BlInvalidOperationException("Order is already cancelled."),
             DO.OrderStatus.OPEN or DO.OrderStatus.REFUSED => () => s_cancelOpenOrder(doOrder),
-            DO.OrderStatus.DELIVERING => () => s_cancelDeliveringOrder(doOrder, orderId),
+            DO.OrderStatus.DELIVERING => () => s_cancelDeliveringOrder(doOrder, orderId, token),
             _ => throw new BO.BlInvalidOperationException("Invalid order status.")
         };
 
@@ -433,7 +433,7 @@ internal static class OrderManager
     /// <exception cref="BO.BlDoesNotExistException">
     /// Thrown when the delivery or courier is not found.
     /// </exception>
-    private static void s_cancelDeliveringOrder(DO.Order doOrder, int orderId)
+    private static void s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool token)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
         s_dal.Order.Update(doOrder);
@@ -459,7 +459,7 @@ internal static class OrderManager
         {
             Tools.SendEmailSkript(
                 courier.Email,
-                $"{ courier.Name}, ההזמנה בוטלה!!!",
+                $"{courier.Name}, ההזמנה בוטלה!!!",
                 $"Order number {orderId} has been cancelled by the manager");//השלב הלא סינכוני!!!###################################################
         }
         //חריגה עבור שליחת מייל לא סקריפט, סקריפט לא זורק חרגיות לכאן בשלב 6 כי הוא סינכרוני
@@ -467,6 +467,25 @@ internal static class OrderManager
         {
             throw new SmtpException("Failed to send email notification");
         }
+        try
+        {
+            if (!token)
+            {
+                Tools.SendEmail(
+                    courier.Email,
+                    $"{courier.Name}, ההזמנה בוטלה!!!",
+                    $"Order number {orderId} has been cancelled by the manager");
+            }
+        }
+        catch (SmtpException)
+        {
+            throw new SmtpException("Failed to send email notification");
+        }
+
+
+
+
+
         finally
         {
             DeliveryManager.Observer.NotifyItemUpdated(delivery.Id);

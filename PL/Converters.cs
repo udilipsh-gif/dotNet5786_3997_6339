@@ -98,6 +98,7 @@ public class BoolToVisibilityConverter : IValueConverter
     }
 }
 
+
 public class NullToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -344,6 +345,24 @@ public class OrderStatusToCancelConverter : IValueConverter
         return status == "OPEN" || status == "REFUSED" || status == "DELIVERING";
     }
 
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class OrderStatusToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        // בדיקה אם הערך הוא null
+        if (value == null) return Visibility.Collapsed;
+        // המרה ל-String או ל-Enum שלך. נניח שזה עובד מול המחרוזת או ה-Enum
+        string status = value.ToString() ?? string.Empty;
+        // הלוגיקה שהייתה לך ב-Triggers:
+        // גלוי רק אם: OPEN, REFUSED, DELIVERING
+        return (status == "OPEN" || status == "REFUSED" || status == "DELIVERING") ? Visibility.Visible : Visibility.Collapsed;
+    }
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();

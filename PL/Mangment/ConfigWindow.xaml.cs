@@ -35,15 +35,7 @@ public partial class ConfigWindow : Window
         DependencyProperty.Register("Configuration", typeof(BO.Config), typeof(ConfigWindow));
 
 
-    public bool? StateToken
-    {
-        get { return Tools.StateToken; }
-        set
-        {
-            Tools.StateToken = value;
-            
-        }
-    }
+  
 
     private void ConfigWindow_Loaded(object sender, RoutedEventArgs e)
     {

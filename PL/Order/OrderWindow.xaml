@@ -189,6 +189,13 @@
                             Click="btnAddUpdate_Click"
                             Width="150"/>
 
+                    <CheckBox Content="שלח סמס" 
+                               IsChecked="{Binding stateToken, TargetNullValue=false, Mode=TwoWay}"
+                               Visibility="{Binding CurrentOrder.OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0"/>
+
+
                     <Button Content="בטל הזמנה" 
                             Click="btnCancel_Click"
                             Width="150"

@@ -155,6 +155,10 @@ public partial class OrderListWindow : Window, IWindowUpdater
         orderWindow.Show();
     }
 
+
+    
+    public bool StateToken { get; set; } = false;
+
     private void btnCancelOrder_Click(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show(
@@ -170,7 +174,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
         {
             try
             {
-                s_bl.Order.Cancel(CURRENT_MANAGER_ID, orderInList.OrderId);
+                s_bl.Order.Cancel(CURRENT_MANAGER_ID, orderInList.OrderId, StateToken);
                 MessageBox.Show($"הזמנה מס' {orderInList.OrderId} בוטלה בהצלחה");
             }
             catch (BO.BlDoesNotExistException ex)

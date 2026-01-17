@@ -213,8 +213,7 @@ public static class Tools
         };
     }
 
-    //טוקן לשיחות SMS
-    public static bool? StateToken { get; set; } = null;
+   
 
     
 }

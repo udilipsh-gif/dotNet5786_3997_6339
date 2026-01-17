@@ -57,7 +57,6 @@
                           SelectedValue="{Binding SelectedOrderStatusFilter}"
                           SelectionChanged="ComboBox_SelectionChanged"/>
                     </StackPanel>
-
                 </StackPanel>
             </Border>
         </StackPanel>
@@ -130,12 +129,23 @@
                 <DataGridTemplateColumn Header="ביטול" Width="*" HeaderStyle="{StaticResource WrappedHeaderStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="בטל" 
+                            <StackPanel Orientation="Horizontal" 
+                                        HorizontalAlignment="Center" 
+                                        VerticalAlignment="Center">
+
+                                <CheckBox Content="שלח סמס" 
+                                          IsChecked="{Binding StateToken, TargetNullValue=false, Mode=TwoWay}"
+                                          Visibility="{Binding OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,10,0"/>
+
+                                <Button Content="בטל" 
                                     Click="btnCancelOrder_Click" 
                                     Style="{StaticResource GhostDestructiveButtonStyle}"
                                     Width="60"
                                     Margin="0"
                                     IsEnabled="{Binding OrderStatus, Converter={StaticResource OrderStatusToCancelConverter}}"/>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

@@ -26,6 +26,7 @@
         <local:TotalHoursConverter x:Key="TotalHoursConverter"/>
         <local:ValueToHebrewConverter x:Key="ValueToHebrewConverter"/>
         <local:OrderStatusToCancelConverter x:Key="OrderStatusToCancelConverter"/>
+        <local:OrderStatusToVisibilityConverter x:Key="OrderStatusToVisibilityConverter"/>
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
         <local:StatusToColorConverter x:Key="StatusToColorConverter"/>
 

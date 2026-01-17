@@ -131,6 +131,16 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
 
     }
+
+    private bool? stateToken
+    {
+        get { return stateToken; }
+        set
+        {
+            stateToken = value;
+
+        }
+    }
     /// <summary>
     /// btnCancel_Click - Handles the click event for the Cancel button to cancel the current order.
     /// </summary>
