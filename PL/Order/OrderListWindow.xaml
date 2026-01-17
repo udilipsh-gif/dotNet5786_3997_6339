@@ -129,14 +129,10 @@
                 <DataGridTemplateColumn Header="ביטול" Width="*" HeaderStyle="{StaticResource WrappedHeaderStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" 
+                            <!--<StackPanel Orientation="Horizontal" 
                                         HorizontalAlignment="Center" 
                                         VerticalAlignment="Center">
-                                <CheckBox x:Name="chkSms" 
-                                          Content="שלח סמס" 
-                                          Visibility="{Binding OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
-                                          VerticalAlignment="Center"
-                                          Margin="0,0,10,0"/>
+                                
                                 <Button Content="בטל" 
                                     Click="btnCancelOrder_Click" 
                                     Style="{StaticResource GhostDestructiveButtonStyle}"
@@ -144,7 +140,36 @@
                                     Margin="0"
                                     IsEnabled="{Binding OrderStatus, Converter={StaticResource OrderStatusToCancelConverter}}"
                                     CommandParameter="{Binding IsChecked, ElementName=chkSms}"/>
-                            </StackPanel>
+                                <CheckBox x:Name="chkSms" 
+                                      Content="שלח סמס" 
+                                      Visibility="{Binding OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
+                                      VerticalAlignment="Center"
+                                      Margin="0,0,10,0"/>
+                            </StackPanel>-->
+                            <Grid HorizontalAlignment="Stretch">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button Grid.Column="1"
+                                        Content="בטל" 
+                                        Click="btnCancelOrder_Click" 
+                                        Style="{StaticResource GhostDestructiveButtonStyle}"
+                                        Width="60"
+                                        Margin="0"
+                                        IsEnabled="{Binding OrderStatus, Converter={StaticResource OrderStatusToCancelConverter}}"
+                                        CommandParameter="{Binding IsChecked, ElementName=chkSms}"/>
+
+                                <CheckBox Grid.Column="2"
+                                          x:Name="chkSms" 
+                                          Content="שלח סמס" 
+                                          Visibility="{Binding OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Right" 
+                                          Margin="10,0,0,0"/>
+                            </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

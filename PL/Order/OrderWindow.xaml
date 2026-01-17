@@ -189,14 +189,6 @@
                             Click="btnAddUpdate_Click"
                             Width="150"/>
 
-                    <CheckBox x:Name="chkSms"
-                               Content=" שלח סמס לשליח" 
-                             
-                               Visibility="{Binding CurrentOrder.OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0"/>
-
-
                     <Button Content="בטל הזמנה" 
                             Click="btnCancel_Click"
                             CommandParameter="{Binding IsChecked, ElementName=chkSms}"
@@ -210,6 +202,12 @@
                             </Style>
                         </Button.Style>
                     </Button>
+                    
+                    <CheckBox x:Name="chkSms"
+                             Content=" שלח סמס לשליח" 
+                             Visibility="{Binding CurrentOrder.OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
+                             VerticalAlignment="Center"
+                             Margin="0,0,10,0"/>
                 </StackPanel>
             </Grid>
         </Border>
