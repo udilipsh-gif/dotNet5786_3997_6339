@@ -8,7 +8,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת הזמנות"
         FlowDirection="RightToLeft"
-        Height="600" Width="1100"
+        Height="600" Width="1010"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
 
@@ -126,7 +126,7 @@
 
                 <DataGridTextColumn Header="ניסיונות" Binding="{Binding NumberOfDeliveryAttempts}" Width="65"/>
 
-                <DataGridTemplateColumn Header="ביטול" Width="*" HeaderStyle="{StaticResource WrappedHeaderStyle}">
+                <DataGridTemplateColumn Header="ביטול" Width="auto" HeaderStyle="{StaticResource WrappedHeaderStyle}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <!--<StackPanel Orientation="Horizontal" 
@@ -148,12 +148,12 @@
                             </StackPanel>-->
                             <Grid HorizontalAlignment="Stretch">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
+                                   
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Button Grid.Column="1"
+                                <Button Grid.Column="0"
                                         Content="בטל" 
                                         Click="btnCancelOrder_Click" 
                                         Style="{StaticResource GhostDestructiveButtonStyle}"
@@ -162,13 +162,13 @@
                                         IsEnabled="{Binding OrderStatus, Converter={StaticResource OrderStatusToCancelConverter}}"
                                         CommandParameter="{Binding IsChecked, ElementName=chkSms}"/>
 
-                                <CheckBox Grid.Column="2"
+                                <CheckBox Grid.Column="1"
                                           x:Name="chkSms" 
                                           Content="שלח סמס" 
                                           Visibility="{Binding OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
                                           VerticalAlignment="Center"
                                           HorizontalAlignment="Right" 
-                                          Margin="10,0,0,0"/>
+                                          Margin="5,0,0,0"/>
                             </Grid>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
