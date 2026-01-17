@@ -8,7 +8,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת הזמנות"
         FlowDirection="RightToLeft"
-        Height="600" Width="1050"
+        Height="600" Width="1100"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
 
@@ -124,7 +124,7 @@
                                     Binding="{Binding TotalTimeOfDelivery, Converter={StaticResource TimeSpanConverter}}" 
                                     Width="120"/>
 
-                <DataGridTextColumn Header="ניסיונות" Binding="{Binding NumberOfDeliveryAttempts}" Width="70"/>
+                <DataGridTextColumn Header="ניסיונות" Binding="{Binding NumberOfDeliveryAttempts}" Width="65"/>
 
                 <DataGridTemplateColumn Header="ביטול" Width="*" HeaderStyle="{StaticResource WrappedHeaderStyle}">
                     <DataGridTemplateColumn.CellTemplate>
