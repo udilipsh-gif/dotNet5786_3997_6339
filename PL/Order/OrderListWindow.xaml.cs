@@ -157,7 +157,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
 
 
     
-    public bool StateToken { get; set; } = false;
+   
 
     private void btnCancelOrder_Click(object sender, RoutedEventArgs e)
     {
@@ -172,6 +172,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
         if (sender is Button button
             && button.DataContext is BO.OrderInList orderInList)
         {
+            bool StateToken = (button.CommandParameter as bool?).GetValueOrDefault();
             try
             {
                 s_bl.Order.Cancel(CURRENT_MANAGER_ID, orderInList.OrderId, StateToken);

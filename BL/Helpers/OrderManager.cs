@@ -469,17 +469,17 @@ internal static class OrderManager
         }
         try
         {
-            if (!token)
+            if (token)
             {
-                Tools.SendEmail(
-                    courier.Email,
+                Tools.SendSms(
+                    courier.Phone,
                     $"{courier.Name}, ההזמנה בוטלה!!!",
                     $"Order number {orderId} has been cancelled by the manager");
             }
         }
         catch (SmtpException)
         {
-            throw new SmtpException("Failed to send email notification");
+            throw new SmtpException("Failed to send sms notification");
         }
 
 

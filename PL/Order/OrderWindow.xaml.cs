@@ -132,15 +132,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
     }
 
-    private bool? stateToken
-    {
-        get { return stateToken; }
-        set
-        {
-            stateToken = value;
-
-        }
-    }
+  
     /// <summary>
     /// btnCancel_Click - Handles the click event for the Cancel button to cancel the current order.
     /// </summary>
@@ -156,10 +148,15 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
         if (result != MessageBoxResult.Yes)
             return;
+        
 
         try
         {
-            s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID);
+            var btn = sender as Button;
+            bool StateToken = (btn?.CommandParameter as bool?).GetValueOrDefault();
+
+
+            s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID, StateToken);
            
             MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה");
 

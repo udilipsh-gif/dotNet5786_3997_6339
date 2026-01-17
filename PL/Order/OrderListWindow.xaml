@@ -8,7 +8,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="רשימת הזמנות"
         FlowDirection="RightToLeft"
-        Height="600" Width="950"
+        Height="600" Width="1050"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
 
@@ -132,19 +132,18 @@
                             <StackPanel Orientation="Horizontal" 
                                         HorizontalAlignment="Center" 
                                         VerticalAlignment="Center">
-
-                                <CheckBox Content="שלח סמס" 
-                                          IsChecked="{Binding StateToken, TargetNullValue=false, Mode=TwoWay}"
+                                <CheckBox x:Name="chkSms" 
+                                          Content="שלח סמס" 
                                           Visibility="{Binding OrderStatus, Converter={StaticResource OrderStatusToVisibilityConverter}}"
                                           VerticalAlignment="Center"
                                           Margin="0,0,10,0"/>
-
                                 <Button Content="בטל" 
                                     Click="btnCancelOrder_Click" 
                                     Style="{StaticResource GhostDestructiveButtonStyle}"
                                     Width="60"
                                     Margin="0"
-                                    IsEnabled="{Binding OrderStatus, Converter={StaticResource OrderStatusToCancelConverter}}"/>
+                                    IsEnabled="{Binding OrderStatus, Converter={StaticResource OrderStatusToCancelConverter}}"
+                                    CommandParameter="{Binding IsChecked, ElementName=chkSms}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

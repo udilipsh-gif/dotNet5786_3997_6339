@@ -361,7 +361,7 @@ public class OrderStatusToVisibilityConverter : IValueConverter
         string status = value.ToString() ?? string.Empty;
         // הלוגיקה שהייתה לך ב-Triggers:
         // גלוי רק אם: OPEN, REFUSED, DELIVERING
-        return (status == "OPEN" || status == "REFUSED" || status == "DELIVERING") ? Visibility.Visible : Visibility.Collapsed;
+        return (status == "DELIVERING") ? Visibility.Visible : Visibility.Collapsed;
     }
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {

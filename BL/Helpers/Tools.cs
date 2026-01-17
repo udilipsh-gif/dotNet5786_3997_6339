@@ -699,4 +699,9 @@ internal static class Tools
         return;
 
     }
+
+    public static void SendSms(string phone, string mane, string body)
+    {
+        throw new SmtpException("SMS sending not implemented");
+    }
 }
