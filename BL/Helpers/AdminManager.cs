@@ -113,6 +113,8 @@ internal static class AdminManager //stage 4
         }
         if (s_dal.Config.PasswordManager != configuration.PasswordManager)
         {
+            if (!Tools.IsStrongPassword(configuration.PasswordManager))
+                throw new BO.BlInvalidValueException("Weak password for Manager.");
             s_dal.Config.PasswordManager = configuration.PasswordManager;
             configChanged = true;
         }
