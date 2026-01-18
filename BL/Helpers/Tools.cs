@@ -693,9 +693,10 @@ internal static class Tools
 
     public static async Task SendSms(string phone, string name, string body)
     {
-        string headUrl = "https://www.call2all.co.il/ym/api/YemotCampaign";
+        //string encodedMessage = Uri.EscapeDataString(name+" "+body);
+        string headUrl = "https://www.call2all.co.il/ym/api/SendSms";
         string token = AdminManager.GetConfig().TokenCallSms;
-        string tokenUrl= $"{headUrl}?token={token}&phones={phone}&message={name+body}";
+        string tokenUrl= $"{headUrl}?token={token}&phones={phone}&message={name + " " + body}";
 
         try
         {           

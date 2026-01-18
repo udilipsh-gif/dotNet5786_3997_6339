@@ -496,7 +496,7 @@ internal static class OrderManager
                 await Tools.SendSms(
                       courier.Phone,
                       $"{courier.Name}, ההזמנה בוטלה!!!",
-                      $"Order number {orderId} has been cancelled by the manager");
+                      $"הזמנה מספר {orderId} בוטלה על ידי המנהל");
             }
         }
         catch (BLNoSendSmsException)
