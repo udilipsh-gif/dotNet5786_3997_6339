@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BO;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -138,7 +139,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void btnCancel_Click(object sender, RoutedEventArgs e)
+    private async void btnCancel_Click(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show(
             "האם אתה רוצה לבטל את ההזמנה הזו?",
@@ -156,7 +157,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
             bool StateToken = (btn?.CommandParameter as bool?).GetValueOrDefault();
 
 
-            s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID, StateToken);
+             await s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID, StateToken);
            
             MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה");
 
@@ -170,11 +171,10 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         {
             MessageBox.Show(ex.Message);
         }
-        //רלוונטי למייל לא לסקריפט. בלשב הסינכרוני לא נדע אם נשלח או לא
-        catch (SmtpException ex)
+        catch (BLNoSendSmsException ex)
         {
-            MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה ( {ex.Message})");
-            Close();
+            MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה ({ex.Message})");
+
         }
         catch (Exception ex)
         {

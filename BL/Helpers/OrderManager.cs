@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
@@ -288,7 +289,7 @@ internal static class OrderManager
     public static async Task Cancel(int orderId, bool token = false)
     {
         DO.Order doOrder = s_dal.Order.Read(orderId)
-            ?? throw new BO.BlDoesNotExistException("Order not found");
+            ?? throw new BO.BlDoesNotExistException("הזמנה לא נמצאה לביטול");
 
         switch (doOrder.OrderStatus)
         {
@@ -303,9 +304,11 @@ internal static class OrderManager
             case DO.OrderStatus.REFUSED:
                 s_cancelOpenOrder(doOrder);
                 break;
+
             case DO.OrderStatus.DELIVERING:
                 await s_cancelDeliveringOrder(doOrder, orderId, token);
                 break;
+
             default:
                 throw new BO.BlInvalidOperationException("Invalid order status.");
         }
@@ -459,7 +462,7 @@ internal static class OrderManager
                         where d.OrderId == doOrder.Id
                         orderby d.Id descending
                         select d).FirstOrDefault()
-            ?? throw new BO.BlDoesNotExistException("Delivery not found for the order");
+            ?? throw new BO.BlDoesNotExistException("לא נמצא משלוח עבור הזמנה זו");
 
         s_dal.Delivery.Update(delivery with
         {
@@ -470,19 +473,22 @@ internal static class OrderManager
         var courier = s_dal.Courier.Read(delivery.CourierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        //######################################################################################################שליחת מייל- כרגע מוקפאת או פתרון ביניים עד שלב 7
+        Exception? exceptionMail = null;
+        Exception? exceptionSms = null;
         try
         {
             await Tools.SendEmailSkript(
                   courier.Email,
                   $"{courier.Name}, ההזמנה בוטלה!!!",
-                  $"Order number {orderId} has been cancelled by the manager");//השלב הלא סינכוני!!!###################################################
+                  $"הזמנה מספר {orderId} בוטלה על ידי המנהל.");
+
         }
-        //חריגה עבור שליחת מייל לא סקריפט, סקריפט לא זורק חרגיות לכאן בשלב 6 כי הוא סינכרוני
-        catch (SmtpException ex)
+
+        catch (BLNoSendEmailException ex)
         {
-            throw new SmtpException($"Failed to send email notification {ex.Message}");
+            exceptionMail = new BLNoSendEmailException($"Failed to send email notification {ex.Message}");
         }
+
         try
         {
             if (token)
@@ -493,12 +499,15 @@ internal static class OrderManager
                       $"Order number {orderId} has been cancelled by the manager");
             }
         }
-        catch (SmtpException)
+        catch (BLNoSendSmsException)
         {
-            throw new SmtpException("Failed to send sms notification");
+            exceptionSms = new BLNoSendSmsException("Failed to send sms notification");
         }
-
-
+        try
+        {
+            if (exceptionMail is not null && exceptionSms is not null)
+                throw new BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
+        }
 
 
 

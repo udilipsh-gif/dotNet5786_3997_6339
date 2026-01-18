@@ -1,11 +1,12 @@
 ﻿using BO;
 using DalApi;
+using System;
 using System.Collections;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Reflection;
 using System.Text;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Helpers;
@@ -667,33 +668,53 @@ internal static class Tools
 
         string name = "חנות הספרים- מיני פרוייקט";
 
-
+        string requestUrl = $"{scriptUrl}?pas={scriptPass}" +
+                                $"&address={Uri.EscapeDataString(toEmail)}" +
+                                $"&sub={Uri.EscapeDataString(subject)}" +
+                                $"&body={Uri.EscapeDataString(body)}" +
+                                $"&from={Uri.EscapeDataString(name)}";
         try
         {
-            string requestUrl = $"{scriptUrl}?pas={scriptPass}" +
-                                 $"&address={Uri.EscapeDataString(toEmail)}" +
-                                 $"&sub={Uri.EscapeDataString(subject)}" +
-                                 $"&body={Uri.EscapeDataString(body)}" +
-                                 $"&from={Uri.EscapeDataString(name)}";
-
             HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
             if (!response.IsSuccessStatusCode)
             {
-                throw new SmtpException($"{response.StatusCode}");
-                //Console.WriteLine($"Error sending email: {response.StatusCode}");
+                throw new BLNoSendEmailException($"{response.StatusCode}");
+                
             }
 
 
         }
         catch (Exception ex)//שלב 7
         {
-            throw new HttpRequestException($"{ex.Message}");
+            throw new BLNoSendEmailException($"{ex.Message}");
             //Console.WriteLine($"Exception in SendEmail: {ex.Message}");
         }
     }
 
-    public static async Task SendSms(string phone, string mane, string body)
+    public static async Task SendSms(string phone, string name, string body)
     {
-        throw new SmtpException("SMS sending not implemented");
+        string headUrl = "https://www.call2all.co.il/ym/api/YemotCampaign";
+        string token = AdminManager.GetConfig().TokenCallSms;
+        string tokenUrl= $"{headUrl}?token={token}&phones={phone}&message={name+body}";
+
+        try
+        {           
+            HttpResponseMessage response = await client.GetAsync(tokenUrl);
+
+           
+            string result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+              throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + response.StatusCode);
+            }
+           
+        }
+        catch (Exception ex)
+        {
+          throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + ex.Message);
+        }
     }
+
+      
 }
