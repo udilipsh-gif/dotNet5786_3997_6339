@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Threading.Tasks;
+using System.Windows;
 
 namespace PL;
 
@@ -71,11 +72,11 @@ public partial class MainCourier : Window
             Tools.RunSafe(() => s_bl.Courier.RemoveObserver(USERID, GetCurier));
     }
 
-    private void GetCurier()
+    private async void GetCurier()
     {
         try
         {
-            CurrentUser = s_bl.Courier.Read(USERID, USERID).GetAwaiter().GetResult()
+            CurrentUser =await s_bl.Courier.Read(USERID, USERID)
                 ?? throw new BO.BlDoesNotExistException();
             if (CurrentUser.OrderInProgress is not null)
             {

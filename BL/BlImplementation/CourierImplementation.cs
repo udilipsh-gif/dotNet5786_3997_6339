@@ -43,7 +43,8 @@ internal class CourierImplementation : ICourier
         if (!Tools.CheckManger(requesterId) && requesterId != courierId)
             throw new BO.BlNoAccessException();
 
-        return await CourierManager.Read(courierId);
+        var result = await CourierManager.Read(courierId);
+        return result;
     }
 
     /// <summary>
@@ -116,7 +117,8 @@ internal class CourierImplementation : ICourier
     {
         if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException("Only manager can access the list of couriers.");
-        return await CourierManager.ReadAll(requesterId, isActive, sort);
+        var result = await CourierManager.ReadAll(requesterId, isActive, sort);
+        return result;
     }
 
     public void AddObserver(Action listObserver) =>

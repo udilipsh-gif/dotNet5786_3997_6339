@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Metrics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -277,11 +278,11 @@ public partial class CourierWindow : Window
     /// This method is called whenever the business layer notifies of changes to the courier.
     /// It is skipped if a deletion operation is in progress to avoid accessing deleted data.
     /// </remarks>
-    private void CourierObserver()
+    private  async void CourierObserver()
     {
         try
         {
-            CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID).GetAwaiter().GetResult()
+            CurrentCourier = await s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
                         ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
         }
         catch (BO.BlDoesNotExistException)

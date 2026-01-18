@@ -86,7 +86,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
         DependencyProperty.Register(nameof(SelectedOrderStatusFilter), typeof(BO.OrderStatus?),
             typeof(OrderListWindow), new PropertyMetadata(null));
 
-    private void LoadOrders()
+    private async void LoadOrders()
     {
         Func<BO.OrderInList, bool> filterPredicate = order =>
             (SelectedScheduleFilter == null || order.ScheduleStatus == SelectedScheduleFilter) &&
@@ -95,7 +95,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
 
         try
         {
-            var filteredResults = s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId).GetAwaiter().GetResult();
+            var filteredResults = await s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId);
 
             if (OrderList == null)
             {

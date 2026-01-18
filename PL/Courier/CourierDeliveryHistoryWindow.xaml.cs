@@ -63,12 +63,12 @@ public partial class CourierDeliveryHistoryWindow : Window
     }
 
 
-    private void OrderObserver()
+    private async void OrderObserver()
     {
         try
         {
 
-            var newList = s_bl.Order.GetClosed(MANAGER_ID, UserId, null, null).GetAwaiter().GetResult()
+            var newList = await s_bl.Order.GetClosed(MANAGER_ID, UserId, null, null)
                            ?? throw new BO.BlDoesNotExistException($"The list for id: {UserId} does not exist");
             if (DeliveriesHistory == null)
             {

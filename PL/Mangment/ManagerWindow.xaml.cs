@@ -161,12 +161,12 @@ public partial class ManagerWindow : Window
     /// </summary>
     private void ClockObserver() => CurrentTime = s_bl.Admin.GetClock();
 
-    private void StatisticObserver()
+    private async void StatisticObserver()
     {
         int[]? newStats = null;
         try
         {
-             newStats = s_bl.Order.GetAllOrderStatistic(UserId).GetAwaiter().GetResult();
+             newStats = await s_bl.Order.GetAllOrderStatistic(UserId);
         }
         catch(BlNoAccessException)
         {

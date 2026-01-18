@@ -48,7 +48,8 @@ internal class OrderImplementation : IOrder
     {
         //if (!Tools.CheckManger(id))
         //    throw new BO.BlNoAccessException();
-        return await OrderManager.Read(orderId);
+        var result = await OrderManager.Read(orderId);
+        return result;
     }
 
     /// <summary>
@@ -130,7 +131,9 @@ internal class OrderImplementation : IOrder
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
-        return await OrderManager.ReadAll(filter, value, sort);
+
+        var result = await OrderManager.ReadAll(filter, value, sort);
+        return result;
     }
 
     public async Task<IEnumerable<BO.OrderInList>> ReadAll(
@@ -140,7 +143,8 @@ internal class OrderImplementation : IOrder
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
-        return await OrderManager.ReadAll(filter, sort);
+        var result = await OrderManager.ReadAll(filter, sort);
+        return result;
     }
 
     /// <summary>
@@ -201,7 +205,8 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        return await OrderManager.GetAllOrderStatistic();
+        var result = await OrderManager.GetAllOrderStatistic();
+        return result;
     }
 
     /// <summary>
@@ -223,7 +228,8 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        return await DeliveryManager.GetClosed(courierId, filter, sort);
+        var result = await DeliveryManager.GetClosed(courierId, filter, sort);
+        return result;
     }
 
     /// <summary>
@@ -248,7 +254,8 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
 
-        return await DeliveryManager.GetOpen(courierId, filter, sort);
+        var result = await DeliveryManager.GetOpen(courierId, filter, sort);
+        return result;
     }
 
     public void AddObserver(Action listObserver) =>

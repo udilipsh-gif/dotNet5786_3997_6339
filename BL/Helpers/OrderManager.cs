@@ -232,7 +232,8 @@ internal static class OrderManager
         BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
     {
         Func<BO.OrderInList, bool> filterPredicate = s_getFilterPredicate(filter, filterValue);
-        return await ReadAll(filterPredicate, orderBy);
+        var result = await ReadAll(filterPredicate, orderBy);
+        return result;
     }
 
     /// <summary>
@@ -254,7 +255,8 @@ internal static class OrderManager
 
         var conversionTasks = s_dal.Order.ReadAll().Select(async doOrder =>
         {
-            return await s_convertToBoOrderOptimized(doOrder, deliveriesMap);
+            var result = await s_convertToBoOrderOptimized(doOrder, deliveriesMap);
+            return result;
         });
 
         var allBoOrders = await Task.WhenAll(conversionTasks);

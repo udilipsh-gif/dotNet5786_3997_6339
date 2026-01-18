@@ -339,7 +339,8 @@ public static class GoogleMapsService
         double storeLng = config.Longitude ?? throw new InvalidOperationException("Store longitude not configured");
 
         string mode = s_getTravelMode(shipmentType);
-        return await GetRoute(storeLat, storeLng, destLat, destLng, mode);
+        var result = await GetRoute(storeLat, storeLng, destLat, destLng, mode);
+        return result;
     }
 
     /// <summary>
@@ -360,7 +361,8 @@ public static class GoogleMapsService
         string storeAddress = config.StoreAddress ?? throw new InvalidOperationException("Store address not configured");
 
         string mode = s_getTravelMode(shipmentType);
-        return await GetRouteByAddress(storeAddress, destinationAddress, mode);
+        var result = await GetRouteByAddress(storeAddress, destinationAddress, mode);
+        return result;
     }
 
     /// <summary>
@@ -382,12 +384,13 @@ public static class GoogleMapsService
         string apiKey = AdminManager.GetConfig().GoogleApiKey;
         string encodedPath = Uri.EscapeDataString(encodedPolyline);
 
-        return await Task.FromResult($"https://maps.googleapis.com/maps/api/staticmap" +
+        var result = await Task.FromResult($"https://maps.googleapis.com/maps/api/staticmap" +
                $"?size={width}x{height}" +
                $"&markers=color:green|label:S|{originLat},{originLng}" +
                $"&markers=color:red|label:D|{destLat},{destLng}" +
                $"&path=enc:{encodedPath}" +
                $"&key={apiKey}");
+        return result;
     }
 
     /// <summary>
@@ -414,8 +417,9 @@ public static class GoogleMapsService
         double storeLat = config.Latitude ?? 0;
         double storeLng = config.Longitude ?? 0;
 
-        return await GetStaticMapUrl(storeLat, storeLng, destLat, destLng,
+        var result = await GetStaticMapUrl(storeLat, storeLng, destLat, destLng,
                                route.EncodedPolyline, width, height);
+        return result;
     }
 
     /// <summary>

@@ -235,7 +235,8 @@ internal static class Tools
     public static async Task<BO.ScheduleStatus> GetScheduleStatus(DO.Order order)
     {
         var delivery = s_getLatestDelivery(order.Id);
-        return await GetScheduleStatus(order, delivery);
+        var result = await GetScheduleStatus(order, delivery);
+        return result;
     }
 
     /// <summary>

@@ -82,11 +82,11 @@ public partial class StartDeliveryWindow : Window
         Tools.RunSafe(() => s_bl.Courier.RemoveObserver(UserId, orderListObserver));
     }
 
-    private void UpdateOrdersList()
+    private async void UpdateOrdersList()
     {
         try
         {
-            var DeliveryList = s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null).GetAwaiter().GetResult();
+            var DeliveryList = await s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null);
 
             if (DeliveryListView == null)
             {

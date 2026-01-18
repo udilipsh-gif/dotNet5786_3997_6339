@@ -185,11 +185,11 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     /// <summary>
     /// orderObserver - Observes changes to the current order and updates the UI accordingly.
     /// </summary>
-    private void OrderObserver()
+    private async void OrderObserver()
     {
         try
         {
-            CurrentOrder = s_bl.Order.Read(CURRENT_MANAGER_ID, CurrentID).GetAwaiter().GetResult()
+            CurrentOrder = await s_bl.Order.Read(CURRENT_MANAGER_ID, CurrentID)
                         ?? throw new BO.BlDoesNotExistException($"The Order with id: {CurrentID} does not exist");
         }
         catch (BO.BlDoesNotExistException)
