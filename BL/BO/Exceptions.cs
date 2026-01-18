@@ -87,25 +87,23 @@ public class BlNoAccessException : Exception
 }
 
 
-//[Serializable]
-//public class DalException : Exception
-//{
-//    string Message { get; }
-//    public int EntityId { get; }
-
-//    public DalException(string message) : base(message) { }
-
-//    public DalException() : base() { }
-//    public DalException(DalAlreadyExistsException ex)
-//    {
-//        Message = ex.ToString();
-//    }
-
-//    public DalException(Exception ex)
-//    {
-//        Message = ex.ToString();
-//    }
-
-//    public override string ToString() => $"DalException: {Message}\n";
-
-//}
+[Serializable]
+public class BLNoSendEmailException : Exception
+{
+    public BLNoSendEmailException() : base("Failed to send email.") { }
+    public BLNoSendEmailException(string message) : base(message) { }
+    public BLNoSendEmailException(string message, Exception innerException)
+                : base(message, innerException) { }
+    public override string ToString() =>
+        $"BL Exception: No Send Email. {Message}\n {InnerException}\n";
+}
+[Serializable]
+public class BLNoSendSmsException : Exception
+{
+    public BLNoSendSmsException() : base("Failed to send SMS.") { }
+    public BLNoSendSmsException(string message) : base(message) { }
+    public BLNoSendSmsException(string message, Exception innerException)
+                : base(message, innerException) { }
+    public override string ToString() =>
+        $"BL Exception: No Send SMS. {Message}\n {InnerException}\n";
+}
