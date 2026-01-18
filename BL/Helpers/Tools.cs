@@ -240,45 +240,6 @@ internal static class Tools
     }
 
     /// <summary>
-    /// Performs periodic checks on system entities (Couriers, Orders) triggered by clock updates.
-    /// Checks for courier inactivity and updates their status if necessary.
-    /// </summary>
-    /// <returns>True if any changes were made to the database/lists, requiring a UI refresh.</returns>
-    public static bool PeriodicSystemUpdates()
-    {
-        bool hasChanges = false;
-        DateTime now = AdminManager.Now;
-
-        TimeSpan maxInactivity = s_dal.Config.MaxTimeInactivity;
-
-        var couriers = s_dal.Courier.ReadAll();
-
-        foreach (var courier in couriers)
-        {
-            // שליפת המשלוח האחרון שהסתיים עבור שליח זה
-            var lastDelivery = s_dal.Delivery.ReadAll(d => d.CourierId == courier.Id && d.EndDelivery != null)
-                                             .OrderByDescending(d => d.EndDelivery)
-                                             .FirstOrDefault();
-
-            // אם נמצא משלוח, בודקים את הזמן שעבר
-            if (lastDelivery != null && lastDelivery.TimeEndDelivery.HasValue)
-            {
-                TimeSpan timeSinceLastDelivery = now - lastDelivery.TimeEndDelivery.Value;
-
-                if (courier.Active && timeSinceLastDelivery > maxInactivity)
-                {
-                    // עדכון השליח ללא פעיל
-                    var updatedCourier = courier with { Active = false };
-                    s_dal.Courier.Update(updatedCourier);
-                    hasChanges = true;
-                }
-
-            }
-        }
-        return hasChanges;
-    }
-
-    /// <summary>
     /// Gets the schedule status for a completed order.
     /// </summary>
     private static BO.ScheduleStatus GetCompletedOrderScheduleStatus(
@@ -496,19 +457,22 @@ internal static class Tools
     {
         if (delivery.EndDelivery != null)
             return null;
-
-        courier ??= s_dal.Courier.Read(delivery.CourierId)
-            ?? throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does not exist");
+        lock (AdminManager.BlMutex)
+            courier ??= s_dal.Courier.Read(delivery.CourierId) ??
+                throw new BO.BlDoesNotExistException($"Courier with ID={delivery.CourierId} does not exist");
 
         double? actualDistance = delivery.ActualDistance;
 
         if (actualDistance is null or 0)
         {
-            DO.Order order = s_dal.Order.Read(delivery.OrderId)
-                ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does not exist");
+            DO.Order order;
+            lock (AdminManager.BlMutex)
+                order = s_dal.Order.Read(delivery.OrderId)
+                    ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does not exist");
 
             actualDistance = await GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
-            s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
+            lock (AdminManager.BlMutex)
+                s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
         }
 
         return GetEstimatedDeliveryTime((BO.TheTypeShipment)courier.TypeShipment, actualDistance ?? 0);
@@ -579,16 +543,6 @@ internal static class Tools
     }
 
     /// <summary>
-    /// Counts the number of delivery attempts made for a specific order.
-    /// </summary>
-    /// <param name="orderId">The unique identifier of the order.</param>
-    /// <returns>The total number of delivery attempts for the order.</returns>
-    public static int GetCuntOfDelivery(int orderId)
-    {
-        return s_dal.Delivery.ReadAll(d => d.OrderId == orderId).Count();
-    }
-
-    /// <summary>
     /// Retrieves the most recent delivery for an order.
     /// </summary>
     /// <param name="orderId">The order ID.</param>
@@ -611,53 +565,54 @@ internal static class Tools
         return id == AdminManager.GetConfig().ManagerId;
     }
 
-    /// <summary>
-    /// Sends an email using SMTP via Gmail's SMTP server.
-    /// </summary>
-    /// <param name="toEmail">The recipient's email address.</param>
-    /// <param name="subject">The email subject line.</param>
-    /// <param name="body">The email body content.</param>
-    /// <exception cref="SmtpException">
-    /// Thrown when the email fails to send or the recipient address is empty.
-    /// </exception>
-    /// <remarks>
-    /// Uses Gmail's SMTP server (smtp.gmail.com) on port 587 with TLS encryption.
-    /// Requires valid Gmail credentials configured in the code.
-    /// </remarks>
-    public static void SendEmail(string toEmail, string subject, string body)
-    {
-        if (string.IsNullOrWhiteSpace(toEmail))
-            throw new SmtpException("Recipient email address is empty");
+    ///// <summary>
+    ///// Sends an email using SMTP via Gmail's SMTP server.
+    ///// </summary>
+    ///// <param name="toEmail">The recipient's email address.</param>
+    ///// <param name="subject">The email subject line.</param>
+    ///// <param name="body">The email body content.</param>
+    ///// <exception cref="SmtpException">
+    ///// Thrown when the email fails to send or the recipient address is empty.
+    ///// </exception>
+    ///// <remarks>
+    ///// Uses Gmail's SMTP server (smtp.gmail.com) on port 587 with TLS encryption.
+    ///// Requires valid Gmail credentials configured in the code.
+    ///// </remarks>
+    //public static void SendEmail(string toEmail, string subject, string body)
+    //{
+    //    if (string.IsNullOrWhiteSpace(toEmail))
+    //        throw new SmtpException("Recipient email address is empty");
 
-        try
-        {
-            using MailMessage mail = new MailMessage();
-            using SmtpClient smtpServer = new SmtpClient("smtp.gmail.com");
+    //    try
+    //    {
+    //        using MailMessage mail = new MailMessage();
+    //        using SmtpClient smtpServer = new SmtpClient("smtp.gmail.com");
 
-            string fromEmail = s_dal.Config.EmailAddress;
-            string password = "1234 5678 @#$% Asdf";
+    //        string fromEmail;
+    //        fromEmail = AdminManager.GetConfig().EmailAddress ?? String.Empty;
+    //        string password = "1234 5678 @#$% Asdf";
 
-            mail.From = new MailAddress(fromEmail);
-            mail.To.Add(toEmail);
-            mail.Subject = subject;
-            mail.Body = body;
+    //        mail.From = new MailAddress(fromEmail);
+    //        mail.To.Add(toEmail);
+    //        mail.Subject = subject;
+    //        mail.Body = body;
 
-            smtpServer.Port = 587;
-            smtpServer.Credentials = new NetworkCredential(fromEmail, password);
-            smtpServer.EnableSsl = true;
+    //        smtpServer.Port = 587;
+    //        smtpServer.Credentials = new NetworkCredential(fromEmail, password);
+    //        smtpServer.EnableSsl = true;
 
-            smtpServer.Send(mail);
-        }
-        catch (SmtpException ex)
+    //        smtpServer.Send(mail);
+    //    }
+    //    catch (SmtpException ex)
 
-        {
-            throw new SmtpException($"{ex.Message}");
-        }
-    }
+    //    {
+    //        throw new SmtpException($"{ex.Message}");
+    //    }
+    //}
     private static readonly HttpClient client = new HttpClient();
     public static async Task SendEmailSkript(string toEmail, string subject, string body)
     {
-        string headUrl ="https://script.google.com/macros/s/";
+        string headUrl = "https://script.google.com/macros/s/";
 
         string endUrl = "/exec";
 
@@ -678,7 +633,7 @@ internal static class Tools
             if (!response.IsSuccessStatusCode)
             {
                 throw new BLNoSendEmailException($"{response.StatusCode}");
-                
+
             }
 
 

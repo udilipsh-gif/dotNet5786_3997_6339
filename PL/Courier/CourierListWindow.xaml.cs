@@ -155,7 +155,7 @@ public partial class CourierListWindow : Window
     /// </list>
     /// The couriers are sorted by ID by default.
     /// </remarks>
-    private async Task UpdateCourierList()
+    private async void UpdateCourierList()
     {
         // Convert filter value to appropriate boolean value
         bool? isActive = CourierFilter switch

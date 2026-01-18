@@ -1,4 +1,6 @@
 ﻿using DalApi;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Helpers;
@@ -18,6 +20,8 @@ internal static class CourierManager
     /// Data access layer instance for database operations.
     /// </summary>
     private static readonly IDal s_dal = Factory.Get;
+
+    private static readonly Random s_rand = new();
 
     /// <summary>
     /// Observer manager for notifying UI components about courier changes.
@@ -55,9 +59,13 @@ internal static class CourierManager
             throw new BO.BlIncorrectPasswordException();
         }
 
+        DO.Courier? doCourier;
         // Check if user is courier
-        DO.Courier? doCourier = s_dal.Courier.Read(id)
+        lock (AdminManager.BlMutex)
+        {
+            doCourier = s_dal.Courier.Read(id)
             ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
+        }
 
         if (doCourier.Password == password)
             return "Courier";
@@ -93,7 +101,8 @@ internal static class CourierManager
 
         try
         {
-            s_dal.Courier.Create(doCourier);
+            lock (AdminManager.BlMutex)
+                s_dal.Courier.Create(doCourier);
         }
         catch (Exception ex)
         {
@@ -124,8 +133,10 @@ internal static class CourierManager
     /// </remarks>
     internal static async Task<BO.Courier?> Read(int id)
     {
-        DO.Courier doCourier = s_dal.Courier.Read(id)
-            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
+        DO.Courier doCourier;
+        lock (AdminManager.BlMutex)
+            doCourier = s_dal.Courier.Read(id)
+                ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
 
         return await s_convertToBObject(doCourier);
     }
@@ -151,7 +162,9 @@ internal static class CourierManager
     {
         bool isManager = requesterId == AdminManager.GetConfig().ManagerId;
 
-        DO.Courier existingCourier = s_dal.Courier.Read(boCourier.Id)
+        DO.Courier existingCourier;
+        lock (AdminManager.BlMutex)
+            existingCourier = s_dal.Courier.Read(boCourier.Id)
             ?? throw new BO.BlDoesNotExistException(
                 $"Courier with ID={boCourier.Id} does not exist");
 
@@ -172,7 +185,8 @@ internal static class CourierManager
 
         try
         {
-            s_dal.Courier.Update(doCourier);
+            lock (AdminManager.BlMutex)
+                s_dal.Courier.Update(doCourier);
             Observer.NotifyItemUpdated(boCourier.Id);
             Observer.NotifyListUpdated();
         }
@@ -202,12 +216,14 @@ internal static class CourierManager
     /// </remarks>
     internal static void Delete(int id)
     {
-        _ = s_dal.Courier.Read(id)
+        lock (AdminManager.BlMutex)
+            _ = s_dal.Courier.Read(id)
             ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
 
         s_validateCourierCanBeDeleted(id);
 
-        s_dal.Courier.Delete(id);
+        lock (AdminManager.BlMutex)
+            s_dal.Courier.Delete(id);
         Observer.NotifyItemUpdated(id);
         Observer.NotifyListUpdated();
     }
@@ -234,7 +250,9 @@ internal static class CourierManager
         bool? isActive,
         BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
-        var couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive);
+        IEnumerable<DO.Courier>? couriers;
+        lock (AdminManager.BlMutex)
+            couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive).ToList();
         var sortedCouriers = s_sortCouriers(couriers, sort);
 
         var tasks = sortedCouriers.Select(s_convertToCourierInList);
@@ -275,7 +293,9 @@ internal static class CourierManager
     /// </exception>
     private static void s_validateCourierCanBeDeleted(int courierId)
     {
-        var courierDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == courierId);
+        IEnumerable<DO.Delivery>? courierDeliveries;
+        lock (AdminManager.BlMutex)
+            courierDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == courierId);
 
         if (!courierDeliveries.Any())
             return;
@@ -283,7 +303,9 @@ internal static class CourierManager
         // Check for active deliveries
         bool hasActiveDelivery = courierDeliveries.Any(delivery =>
         {
-            var order = s_dal.Order.Read(delivery.OrderId);
+            DO.Order? order;
+            lock (AdminManager.BlMutex)
+                order = s_dal.Order.Read(delivery.OrderId);
             return order != null && order.OrderStatus == DO.OrderStatus.DELIVERING;
         });
 
@@ -395,11 +417,14 @@ internal static class CourierManager
     {
         var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
-        return s_dal.Delivery.ReadAll(d =>
+        int count;
+        lock (AdminManager.BlMutex)
+            count = s_dal.Delivery.ReadAll(d =>
             d.CourierId == doCourier.Id &&
             d.EndDelivery == DO.EndDelivery.DELIVERED &&
             d.TimeEndDelivery - d.OrderDate <= maxDeliveryTime
         ).Count();
+        return count;
     }
 
     /// <summary>
@@ -416,11 +441,14 @@ internal static class CourierManager
     {
         var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
-        return s_dal.Delivery.ReadAll(d =>
+        int count;
+        lock (AdminManager.BlMutex)
+            count = s_dal.Delivery.ReadAll(d =>
             d.CourierId == doCourier.Id &&
             d.EndDelivery == DO.EndDelivery.DELIVERED &&
             d.TimeEndDelivery - d.OrderDate > maxDeliveryTime
         ).Count();
+        return count;
     }
 
     /// <summary>
@@ -441,11 +469,13 @@ internal static class CourierManager
     /// </remarks>
     private static async Task<BO.OrderInProgress?> s_getOrderInProgress(int courierId)
     {
-        var activeDeliveries = s_dal.Delivery.ReadAll(d =>
+        IEnumerable<DO.Delivery> activeDeliveries;
+        lock (AdminManager.BlMutex)
+            activeDeliveries = s_dal.Delivery.ReadAll(d =>
             d.CourierId == courierId &&
             d.EndDelivery == null &&
             s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING
-        );
+        ).ToList();
 
         if (!activeDeliveries.Any())
             return null;
@@ -473,10 +503,14 @@ internal static class CourierManager
     /// </remarks>
     private static async Task<BO.OrderInProgress> s_createOrderInProgress(DO.Delivery delivery)
     {
-        DO.Order order = s_dal.Order.Read(delivery.OrderId)
+        DO.Order order;
+        lock (AdminManager.BlMutex)
+            order = s_dal.Order.Read(delivery.OrderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
 
-        DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
+        DO.Courier courier;
+        lock (AdminManager.BlMutex)
+            courier = s_dal.Courier.Read(delivery.CourierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         var estimatedTimeTask = Tools.GetEstimatedDeliveryTime(delivery);
@@ -517,5 +551,70 @@ internal static class CourierManager
             ScheduleStatus = scheduleStatus,
             TimeRemaining = maxDeliveryTime - AdminManager.Now
         };
+    }
+
+    private static async Task CourierSimulation(DateTime newClock)
+    {
+        int managerId = AdminManager.GetConfig().ManagerId;
+        var allCoureier = await ReadAll(managerId, true, BO.CourierFieldSort.Id)
+            ?? new List<BO.CourierInList>();
+
+        foreach (var curier in allCoureier)
+        {
+            if(curier.DeliveryId is not null)
+            {
+                if(s_rand.Next(1, 100) <= 15)
+                {
+                    var openOrder = await DeliveryManager.GetOpen(curier.Id, null, null);
+                    var rendoOrder = openOrder[s_rand.Next(openOrder.Count)];
+                    if (s_rand.Next(1, 100) <= 50 && rendoOrder is BO.OpenOrderInList order)
+                        _ = Task.Run(()=> DeliveryManager.StartDelivery(curier.Id, order.OrderId));
+                }
+            }
+            else if(curier.DeliveryId is int id)
+            {
+                DO.Delivery? delivery;
+                lock (AdminManager.BlMutex)
+                    delivery = s_dal.Delivery.Read(id);
+
+                if (delivery is not null)
+                {
+                    TimeSpan? duration = await Tools.GetEstimatedDeliveryTime(delivery);
+
+                    if (duration is not null)
+                    {
+                        DateTime estimatedArrival = delivery.OrderDate + duration.Value;
+
+                        if (newClock >= estimatedArrival)
+                        {
+                            var endDeliveryChance = s_rand.Next(1, 15);
+                            switch (endDeliveryChance)
+                            {
+                                case < 2:
+                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.REFUSED);
+                                    break;
+                                case <= 5:
+                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.NOTFOUND);
+                                    break;
+                                case <= 8:
+                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.NOTFOUND);
+                                    break;
+                                default:
+                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.DELIVERED);
+                                    break;
+                            }
+                        }
+                        else if (s_rand.Next(1, 100) <= 10)
+                        {
+                            await OrderManager.Cancel(delivery.OrderId);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
     }
 }

@@ -86,6 +86,17 @@ public class BlNoAccessException : Exception
         $"BL Exception: No Access. {Message}\n {InnerException}\n";
 }
 
+[Serializable]
+public class BLTemporaryNotAvailableException : Exception
+{
+    public BLTemporaryNotAvailableException() : base("לא ניתן לעדכן כאשר הסימולטור פעיל.") { }
+    public BLTemporaryNotAvailableException(string message) : base(message) { }
+    public BLTemporaryNotAvailableException(string message, Exception innerException)
+                : base(message, innerException) { }
+    public override string ToString() =>
+        $"BL Exception: No Access. {Message}\n {InnerException}\n";
+}
+
 
 [Serializable]
 public class BLNoSendEmailException : Exception
@@ -97,6 +108,7 @@ public class BLNoSendEmailException : Exception
     public override string ToString() =>
         $"BL Exception: No Send Email. {Message}\n {InnerException}\n";
 }
+
 [Serializable]
 public class BLNoSendSmsException : Exception
 {

@@ -25,6 +25,8 @@ internal class CourierImplementation : ICourier
     /// <exception cref="BO.BlAlreadyExistsException">Thrown when a courier with the same ID already exists.</exception>
     public void Create(int requesterId, BO.Courier boCourier)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException();
         CourierManager.Create(boCourier);    
@@ -58,6 +60,8 @@ internal class CourierImplementation : ICourier
     /// <exception cref="BO.BlInvalidValueException">Thrown when provided courier data is invalid.</exception>
     public void Update(int requesterId, BO.Courier boCourier)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(requesterId) && requesterId != boCourier.Id)
             throw new BO.BlNoAccessException();
 
@@ -74,6 +78,8 @@ internal class CourierImplementation : ICourier
     /// <exception cref="BO.BlInvalidOperationException">Thrown when the courier has active deliveries.</exception>
     public void Delete(int requesterId, int courierId)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException();
         CourierManager.Delete(courierId);

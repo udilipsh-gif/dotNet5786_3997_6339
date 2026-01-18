@@ -40,7 +40,8 @@ internal static class DeliveryManager
     /// </remarks>
     internal static IEnumerable<DO.Delivery> ReadAll(BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
-        return s_dal.Delivery.ReadAll();
+        lock (AdminManager.BlMutex)
+            return s_dal.Delivery.ReadAll().ToList();
     }
 
     /// <summary>
@@ -53,7 +54,8 @@ internal static class DeliveryManager
     /// </returns>
     internal static DO.Delivery? Read(int id)
     {
-        return s_dal.Delivery.Read(id);
+        lock (AdminManager.BlMutex)
+            return s_dal.Delivery.Read(id);
     }
 
     /// <summary>
@@ -73,10 +75,14 @@ internal static class DeliveryManager
     /// </remarks>
     public static async Task StartDelivery(int courierId, int orderId)
     {
-        DO.Order doOrder = s_dal.Order.Read(orderId)
+        DO.Order doOrder;
+        lock (AdminManager.BlMutex)
+            doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
 
-        DO.Courier? doCourier = s_dal.Courier.Read(courierId)
+        DO.Courier? doCourier;
+        lock (AdminManager.BlMutex)
+            doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         // Validate order status without expensive full conversion
@@ -104,35 +110,45 @@ internal static class DeliveryManager
     /// Results are deduplicated by OrderId to show only the most recent delivery attempt for each order.
     /// </remarks>
     public static async Task<List<BO.ClosedDeliveryInList>> GetClosed(
-        int courierId,
-        BO.TypeOfOrder? filter,
-        BO.ClosedDeliveryInListField? sort)
+    int courierId,
+    BO.TypeOfOrder? filter,
+    BO.ClosedDeliveryInListField? sort)
     {
-        DO.Courier courier = s_dal.Courier.Read(courierId)
+        DO.Courier courier;
+        lock (AdminManager.BlMutex)
+            courier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        var rawData = s_dal.Delivery.ReadAll(d => d.CourierId == courierId && d.EndDelivery != null)
-            .Select(doDelivery => new
-            {
-                Delivery = doDelivery,
-                Order = s_dal.Order.Read(doDelivery.OrderId) 
-            })
+        List<(DO.Delivery Delivery, DO.Order? Order)> rawData;
+
+        lock (AdminManager.BlMutex)
+        {
+            rawData = s_dal.Delivery.ReadAll(d => d.CourierId == courierId && d.EndDelivery != null)
+            .Select(doDelivery => (
+                Delivery: doDelivery,
+                Order: s_dal.Order.Read(doDelivery.OrderId)
+            ))
             .Where(item =>
                 item.Order != null &&
-                (filter == null || (BO.TypeOfOrder)item.Order.TypeOfOrder == filter) 
-            );
+                (filter == null || (BO.TypeOfOrder)item.Order.TypeOfOrder == filter)
+            )
+            .ToList();
+        }
 
         var tasks = rawData.Select(async item =>
         {
             double? actualDistance = null;
-            if (item.Order is DO.Order order)
+
+            var order = item.Order!;
+
+            if (item.Delivery.ActualDistance is null or 0.0)
             {
                 try
                 {
                     actualDistance = await GoogleMapsService.GetActualDistance(
-                    order.Latitude,
-                    order.Longitude,
-                    (BO.TheTypeShipment)courier.TypeShipment);
+                        order.Latitude,
+                        order.Longitude,
+                        (BO.TheTypeShipment)courier.TypeShipment);
                 }
                 catch
                 {
@@ -141,18 +157,18 @@ internal static class DeliveryManager
             }
             else
             {
-                actualDistance = null;
+                actualDistance = item.Delivery.ActualDistance;
             }
 
             return new BO.ClosedDeliveryInList
             {
                 DeliveryId = item.Delivery.Id,
-                OrderId = item.Order.Id,
-                OrderType = (BO.TypeOfOrder)item.Order.TypeOfOrder,
-                Address = item.Order.Addres,
+                OrderId = order.Id,
+                OrderType = (BO.TypeOfOrder)order.TypeOfOrder,
+                Address = order.Addres,
                 ShipmentType = (BO.TheTypeShipment)item.Delivery.TypeShipment,
-                ActualDistance = actualDistance, 
-                DeliveryTime = (TimeSpan)(item.Delivery.TimeEndDelivery! - item.Delivery.OrderDate), 
+                ActualDistance = actualDistance,
+                DeliveryTime = (TimeSpan)(item.Delivery.TimeEndDelivery! - item.Delivery.OrderDate),
                 EndDelivery = (BO.EndDelivery)item.Delivery.EndDelivery!
             };
         });
@@ -183,7 +199,9 @@ internal static class DeliveryManager
         BO.TypeOfOrder? filter,
         BO.OpenOrderInListField? sort)
     {
-        DO.Courier doCourier = s_dal.Courier.Read(courierId)
+        DO.Courier doCourier;
+        lock (AdminManager.BlMutex)
+            doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         var config = AdminManager.GetConfig();
@@ -199,15 +217,17 @@ internal static class DeliveryManager
         }
         else
         {
-            distanceFilter = _ => true; 
+            distanceFilter = _ => true;
         }
 
-        var relevantOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
+        IEnumerable<DO.Order> relevantOrders;
+        lock (AdminManager.BlMutex)
+            relevantOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
             .Where(order =>
                 permittedOrders.Contains(order.TypeOfOrder) &&
                 (filter == null || order.TypeOfOrder == (DO.TypeOfOrder)filter) &&
                 distanceFilter(order)
-            );
+            ).ToList();
 
         var tasks = relevantOrders.Select(async doOrder =>
         {
@@ -225,14 +245,14 @@ internal static class DeliveryManager
                 ActualDistance = distance,
                 EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime((BO.TheTypeShipment)doCourier.TypeShipment, distance ?? 0),
                 ScheduleStatus = await Tools.GetScheduleStatus(doOrder),
-                TimeLeftForDelivery = maxDeliveryTime - currentTime, // שימוש בזמן האחיד
+                TimeLeftForDelivery = maxDeliveryTime - currentTime,
                 MaxDeliveryTime = maxDeliveryTime
             };
         });
 
         var results = await Task.WhenAll(tasks);
 
-        return s_sortOpenOrders(results, sort).ToList(); // בהנחה שפונקציית המיון מחזירה IEnumerable
+        return [..s_sortOpenOrders(results, sort)];
     }
 
     /// <summary>
@@ -276,8 +296,10 @@ internal static class DeliveryManager
             TimeEndDelivery = null
         };
 
-        s_dal.Delivery.Create(delivery);
-        s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
+        lock (AdminManager.BlMutex)
+            s_dal.Delivery.Create(delivery);
+        lock (AdminManager.BlMutex)
+            s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
 
         s_notifyAllObservers(delivery.OrderId, courier.Id);
     }
@@ -322,7 +344,8 @@ internal static class DeliveryManager
             EndDelivery = (DO.EndDelivery)endDelivery,
             TimeEndDelivery = AdminManager.Now
         };
-        s_dal.Delivery.Update(delivery);
+        lock (AdminManager.BlMutex)
+            s_dal.Delivery.Update(delivery);
 
         // Update order status based on delivery outcome
         UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
@@ -359,7 +382,9 @@ internal static class DeliveryManager
     /// <exception cref="BO.BlInvalidValueException">Thrown when the courier is not assigned to this delivery.</exception>
     private static DO.Delivery s_getAndValidateDelivery(int deliveryId, int courierId)
     {
-        DO.Delivery delivery = s_dal.Delivery.Read(deliveryId)
+        DO.Delivery delivery;
+        lock (AdminManager.BlMutex)
+            delivery = s_dal.Delivery.Read(deliveryId)
             ?? throw new BO.BlDoesNotExistException($"Delivery with ID {deliveryId} not found");
 
         if (delivery.CourierId != courierId)
@@ -380,12 +405,15 @@ internal static class DeliveryManager
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the order is not found.</exception>
     private static void UpdateOrderStatusAfterDelivery(int orderId, BO.EndDelivery endDelivery)
     {
-        DO.Order order = s_dal.Order.Read(orderId)
+        DO.Order order;
+        lock (AdminManager.BlMutex)
+            order = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException($"Order with ID {orderId} not found");
 
         DO.OrderStatus newStatus = s_mapDeliveryOutcomeToOrderStatus(endDelivery, order.OrderStatus);
 
-        s_dal.Order.Update(order with { OrderStatus = newStatus });
+        lock (AdminManager.BlMutex)
+            s_dal.Order.Update(order with { OrderStatus = newStatus });
     }
 
     /// <summary>

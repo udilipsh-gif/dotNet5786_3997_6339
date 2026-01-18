@@ -12,6 +12,8 @@ internal static class AdminManager //stage 4
     #region Stage 4-7
     private static readonly DalApi.IDal s_dal = DalApi.Factory.Get; //stage 4
 
+    private static readonly AsyncMutex s_periodicMutex = new();
+
     /// <summary>
     /// Property for providing current application's clock value for any BL class that may need it
     /// </summary>
@@ -31,24 +33,25 @@ internal static class AdminManager //stage 4
         var oldClock = s_dal.Config.Clock; //stage 4
         s_dal.Config.Clock = newClock; //stage 4
 
+        Task.Run(() => PeriodicSystemUpdates(oldClock, newClock));
 
-        if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
-        {
-            _periodicTask = Task.Run(() =>
-            {
-                // קריאה לפונקציה החדשה שיצרנו ב-Tools
-                bool dataChanged = Tools.PeriodicSystemUpdates();
+        //if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
+        //{
+        //    _periodicTask = Task.Run(() =>
+        //    {
+        //        // קריאה לפונקציה החדשה שיצרנו ב-Tools
+        //        _ = Task.Run(() => Tools.PeriodicSystemUpdates());
 
-                // אם בוצעו שינויים בנתונים (למשל שליח הפך ללא פעיל), נרצה להודיע על כך
-                if (dataChanged)
-                {
-                    // אופציונלי: קריאה לאירוע עדכון קונפיגורציה או אירוע ייעודי אחר לריענון רשימות
-                    //ConfigUpdatedObservers?.Invoke();
-                    //CourierManager.Observer.NotifyListUpdated();
-                }
-                //OrderManager.Observer.NotifyListUpdated();
-            });
-        }
+        //        // אם בוצעו שינויים בנתונים (למשל שליח הפך ללא פעיל), נרצה להודיע על כך
+        //        //if (dataChanged)
+        //        //{
+        //        //    // אופציונלי: קריאה לאירוע עדכון קונפיגורציה או אירוע ייעודי אחר לריענון רשימות
+        //        //    //ConfigUpdatedObservers?.Invoke();
+        //        //    //CourierManager.Observer.NotifyListUpdated();
+        //        //}
+        //        //OrderManager.Observer.NotifyListUpdated();
+        //    });
+        //}
 
         //TO_DO: //stage 7
         //if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
@@ -94,6 +97,8 @@ internal static class AdminManager //stage 4
     //[MethodImpl(MethodImplOptions.Synchronized)] //stage 7 ******************************************************************************************
     internal static async Task SetConfig(BO.Config configuration) //stage 4
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         bool configChanged = false; // stage 5
 
                                     //if (s_dal.Config.MaxRange != configuration.MaxRange) //stage 4
@@ -104,105 +109,105 @@ internal static class AdminManager //stage 4
         //TO_DO: //stage 4//i did, yuda
         //add a condition+assignment for each configuration property
         //...
-        if (s_dal.Config.ManagerId != configuration.ManagerId)
+        if (AdminManager.GetConfig().ManagerId != configuration.ManagerId)
         {
             if(!Tools.IsValidId(configuration.ManagerId)) 
                 throw new BO.BlInvalidValueException("Invalid Manager ID.");
-            s_dal.Config.ManagerId = configuration.ManagerId;
+            AdminManager.GetConfig().ManagerId = configuration.ManagerId;
             configChanged = true;
         }
-        if (s_dal.Config.PasswordManager != configuration.PasswordManager)
+        if (AdminManager.GetConfig().PasswordManager != configuration.PasswordManager)
         {
             if (!Tools.IsStrongPassword(configuration.PasswordManager))
                 throw new BO.BlInvalidValueException("Weak password for Manager.");
-            s_dal.Config.PasswordManager = configuration.PasswordManager;
+            AdminManager.GetConfig().PasswordManager = configuration.PasswordManager;
             configChanged = true;
         }
-        if (s_dal.Config.StoreAddress != configuration.StoreAddress)
+        if (AdminManager.GetConfig().StoreAddress != configuration.StoreAddress)
         {
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
             (double Lat, double Lon)? adressCoordinates = await GoogleMapsService.GetGeocodingAsync(address) ??
                 throw new BO.BlInvalidValueException("Geocoding failed.");
             configuration.Latitude = adressCoordinates?.Lat;
             configuration.Longitude = adressCoordinates?.Lon;
-            s_dal.Config.StoreAddress = configuration.StoreAddress;
-            s_dal.Config.Latitude = adressCoordinates?.Lat ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
-            s_dal.Config.Longitude = adressCoordinates?.Lon ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
+            AdminManager.GetConfig().StoreAddress = configuration.StoreAddress;
+            AdminManager.GetConfig().Latitude = adressCoordinates?.Lat ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
+            AdminManager.GetConfig().Longitude = adressCoordinates?.Lon ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
             configChanged = true;
         }
-        if (s_dal.Config.Latitude != configuration.Latitude)
+        if (AdminManager.GetConfig().Latitude != configuration.Latitude)
         {
-            s_dal.Config.Latitude = configuration.Latitude;
+            AdminManager.GetConfig().Latitude = configuration.Latitude;
             configChanged = true;
         }
-        if (s_dal.Config.Longitude != configuration.Longitude)
+        if (AdminManager.GetConfig().Longitude != configuration.Longitude)
         {
-            s_dal.Config.Longitude = configuration.Longitude;
+            AdminManager.GetConfig().Longitude = configuration.Longitude;
             configChanged = true;
         }
-        if (s_dal.Config.MaxDeliveryRange != configuration.MaxDeliveryRange)
+        if (AdminManager.GetConfig().MaxDeliveryRange != configuration.MaxDeliveryRange)
         {
-            s_dal.Config.MaxDeliveryRange = configuration.MaxDeliveryRange;
+            AdminManager.GetConfig().MaxDeliveryRange = configuration.MaxDeliveryRange;
             configChanged = true;
         }
-        if (s_dal.Config.AvgSpeedCar != configuration.AvgSpeedCar)
+        if (AdminManager.GetConfig().AvgSpeedCar != configuration.AvgSpeedCar)
         {
-            s_dal.Config.AvgSpeedCar = configuration.AvgSpeedCar;
+            AdminManager.GetConfig().AvgSpeedCar = configuration.AvgSpeedCar;
             configChanged = true;
         }
-        if (s_dal.Config.AvgSpeedMotorcycle != configuration.AvgSpeedMotorcycle)
+        if (AdminManager.GetConfig().AvgSpeedMotorcycle != configuration.AvgSpeedMotorcycle)
         {
-            s_dal.Config.AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
+            AdminManager.GetConfig().AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
             configChanged = true;
         }
-        if (s_dal.Config.AvgSpeedBike != configuration.AvgSpeedBike)
+        if (AdminManager.GetConfig().AvgSpeedBike != configuration.AvgSpeedBike)
         {
-            s_dal.Config.AvgSpeedBike = configuration.AvgSpeedBike;
+            AdminManager.GetConfig().AvgSpeedBike = configuration.AvgSpeedBike;
             configChanged = true;
         }
-        if (s_dal.Config.AvgSpeedFoot != configuration.AvgSpeedFoot)
+        if (AdminManager.GetConfig().AvgSpeedFoot != configuration.AvgSpeedFoot)
         {
-            s_dal.Config.AvgSpeedFoot = configuration.AvgSpeedFoot;
+            AdminManager.GetConfig().AvgSpeedFoot = configuration.AvgSpeedFoot;
             configChanged = true;
         }
-        if (s_dal.Config.MaxDeliveryTime != configuration.MaxDeliveryTime)
+        if (AdminManager.GetConfig().MaxDeliveryTime != configuration.MaxDeliveryTime)
         {
-            s_dal.Config.MaxDeliveryTime = configuration.MaxDeliveryTime;
+            AdminManager.GetConfig().MaxDeliveryTime = configuration.MaxDeliveryTime;
             configChanged = true;
         }
-        if (s_dal.Config.RiskRange != configuration.RiskRange)
+        if (AdminManager.GetConfig().RiskRange != configuration.RiskRange)
         {
-            s_dal.Config.RiskRange = configuration.RiskRange;
+            AdminManager.GetConfig().RiskRange = configuration.RiskRange;
             configChanged = true;
         }
-        if (s_dal.Config.MaxTimeInactivity != configuration.MaxTimeInactivity)
+        if (AdminManager.GetConfig().MaxTimeInactivity != configuration.MaxTimeInactivity)
         {
-            s_dal.Config.MaxTimeInactivity = configuration.MaxTimeInactivity;
+            AdminManager.GetConfig().MaxTimeInactivity = configuration.MaxTimeInactivity;
             configChanged = true;
         }
-        if (s_dal.Config.GoogleApiKey != configuration.GoogleApiKey)
+        if (AdminManager.GetConfig().GoogleApiKey != configuration.GoogleApiKey)
         {
-            s_dal.Config.GoogleApiKey = configuration.GoogleApiKey;
+            AdminManager.GetConfig().GoogleApiKey = configuration.GoogleApiKey;
             configChanged = true;
         }
-        if (s_dal.Config.EmailAddress != configuration.EmailAddress)
+        if (AdminManager.GetConfig().EmailAddress != configuration.EmailAddress)
         {
-            s_dal.Config.EmailAddress = configuration.EmailAddress ?? string.Empty;
+            AdminManager.GetConfig().EmailAddress = configuration.EmailAddress ?? string.Empty;
             configChanged = true;
         }
-        if (s_dal.Config.ScriptUrl != configuration.ScriptUrl)
+        if (AdminManager.GetConfig().ScriptUrl != configuration.ScriptUrl)
         {
-            s_dal.Config.ScriptUrl = configuration.ScriptUrl;
+            AdminManager.GetConfig().ScriptUrl = configuration.ScriptUrl;
             configChanged = true;
         }
-        if (s_dal.Config.ScriptPass != configuration.ScriptPass)
+        if (AdminManager.GetConfig().ScriptPass != configuration.ScriptPass)
         {
-            s_dal.Config.ScriptPass = configuration.ScriptPass;
+            AdminManager.GetConfig().ScriptPass = configuration.ScriptPass;
             configChanged = true;
         }
-        if (s_dal.Config.TokenCallSms != configuration.TokenCallSms)
+        if (AdminManager.GetConfig().TokenCallSms != configuration.TokenCallSms)
         {
-            s_dal.Config.TokenCallSms = configuration.TokenCallSms;
+            AdminManager.GetConfig().TokenCallSms = configuration.TokenCallSms;
             configChanged = true;
         }
 
@@ -257,8 +262,8 @@ internal static class AdminManager //stage 4
     [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
     public static void ThrowOnSimulatorIsRunning()
     {
-      //  if (s_thread is not null)
-         //   throw new BO.BLTemporaryNotAvailableException("Cannot perform the operation since Simulator is running");
+        if (s_thread is not null)
+            throw new BO.BLTemporaryNotAvailableException("לא ניתן לעדכן נתונים כאשר הסימולטור פעיל");
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
@@ -309,6 +314,50 @@ internal static class AdminManager //stage 4
             }
             catch (ThreadInterruptedException) { }
         }
+    }
+
+    /// <summary>
+    /// Performs periodic checks on system entities (Couriers, Orders) triggered by clock updates.
+    /// Checks for courier inactivity and updates their status if necessary.
+    /// </summary>
+    /// <returns>True if any changes were made to the database/lists, requiring a UI refresh.</returns>
+    public static void PeriodicSystemUpdates(DateTime oldClock, DateTime newClock)
+    {
+        if (oldClock.Year == newClock.Year) // nothing to do!
+            return;
+
+        if (s_periodicMutex.CheckAndSetInProgress())
+            return;
+
+        TimeSpan maxInactivity = AdminManager.GetConfig().MaxTimeInactivity;
+
+        IEnumerable<DO.Courier> couriers;
+        lock (AdminManager.BlMutex)
+            couriers = s_dal.Courier.ReadAll();
+
+        foreach (var courier in couriers)
+        {
+            DO.Delivery? lastDelivery;
+            lock (AdminManager.BlMutex)
+                lastDelivery = s_dal.Delivery.ReadAll(d => d.CourierId == courier.Id && d.EndDelivery != null)
+                                             .OrderByDescending(d => d.EndDelivery)
+                                             .FirstOrDefault();
+
+            if (lastDelivery != null && lastDelivery.TimeEndDelivery.HasValue)
+            {
+                TimeSpan timeSinceLastDelivery = newClock - lastDelivery.TimeEndDelivery.Value;
+
+                if (courier.Active && timeSinceLastDelivery > maxInactivity)
+                {
+                    var updatedCourier = courier with { Active = false };
+                    lock (AdminManager.BlMutex)
+                        s_dal.Courier.Update(updatedCourier);
+                    //צריך להוסיף אובזרבר*******************************************************
+                }
+
+            }
+        }
+        return;
     }
 
     #endregion Stage 7 base

@@ -161,4 +161,8 @@ public interface IAdmin
     /// clock change notifications after being removed.
     /// </remarks>
     void RemoveClockObserver(Action clockObserver);
+
+    void StartSimulator(int interval); //stage 7
+
+    void StopSimulator(); //stage 7
 }

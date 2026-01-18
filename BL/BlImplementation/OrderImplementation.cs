@@ -26,6 +26,8 @@ internal class OrderImplementation : IOrder
     /// </remarks>
     public async Task Create(int id, BO.Order boOrder)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
         await OrderManager.Create(boOrder);
@@ -63,6 +65,8 @@ internal class OrderImplementation : IOrder
     /// </remarks>
     public async Task Update(int id, BO.Order boOrder)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
         await OrderManager.Update(boOrder);
@@ -81,6 +85,8 @@ internal class OrderImplementation : IOrder
     /// </remarks>
     public void Delete(int id, int orderId)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
         OrderManager.Delete(orderId);
@@ -102,6 +108,8 @@ internal class OrderImplementation : IOrder
     /// </remarks>
     public async Task StartDelivery(int id, int courierId, int orderId)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
         await DeliveryManager.StartDelivery(courierId, orderId);
@@ -160,6 +168,8 @@ internal class OrderImplementation : IOrder
     /// </remarks>
     public void Deliver(int id, int courierId, int deliveryId, BO.EndDelivery endDelivery)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
         DeliveryManager.Deliver(courierId, deliveryId, endDelivery);
@@ -180,6 +190,8 @@ internal class OrderImplementation : IOrder
     /// </remarks>
     public async Task Cancel(int id, int orderId, bool token = false)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
+
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 

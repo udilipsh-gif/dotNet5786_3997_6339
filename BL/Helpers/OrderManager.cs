@@ -41,7 +41,9 @@ internal static class OrderManager
     /// </remarks>
     public static async Task<int[]> GetAllOrderStatistic()
     {
-        var allOrders = s_dal.Order.ReadAll().ToList();
+        List<DO.Order> allOrders;
+        lock (AdminManager.BlMutex)
+            allOrders = s_dal.Order.ReadAll().ToList();
 
         int maxStatusVal = (int)Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>().Max();
         int maxScheduleVal = (int)Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>().Max();
@@ -100,9 +102,10 @@ internal static class OrderManager
             s_dal.Config.Latitude ?? 0,
             s_dal.Config.Longitude ?? 0);
 
-        if (distance == 0 || distance > s_dal.Config.MaxDeliveryRange)
-            throw new BO.BlInvalidOperationException(
-                $"The distance {distance} KM exceeds the delivery range {s_dal.Config.MaxDeliveryRange} KM");
+        lock (AdminManager.BlMutex)
+            if (distance == 0 || distance > s_dal.Config.MaxDeliveryRange)
+                throw new BO.BlInvalidOperationException(
+                    $"The distance {distance} KM exceeds the delivery range {s_dal.Config.MaxDeliveryRange} KM");
 
         DO.Order doOrder = new DO.Order
         {
@@ -119,7 +122,8 @@ internal static class OrderManager
             DistanceKm = distance,
         };
 
-        s_dal.Order.Create(doOrder);
+        lock (AdminManager.BlMutex)
+            s_dal.Order.Create(doOrder);
         Observer.NotifyListUpdated();
     }
 
@@ -137,7 +141,9 @@ internal static class OrderManager
     /// </remarks>
     public static async Task<BO.Order?> Read(int id)
     {
-        var doOrder = s_dal.Order.Read(id);
+        DO.Order? doOrder;
+        lock (AdminManager.BlMutex)
+            doOrder = s_dal.Order.Read(id);
         if (doOrder is null)
             return null;
 
@@ -197,8 +203,8 @@ internal static class OrderManager
             Weight = boOrder.Weight,
             OrderDate = boOrder.OrderDate,
         };
-
-        s_dal.Order.Update(doOrder);
+        lock (AdminManager.BlMutex)
+            s_dal.Order.Update(doOrder);
         Observer.NotifyItemUpdated(boOrder.Id);
         Observer.NotifyListUpdated();
     }
@@ -247,17 +253,27 @@ internal static class OrderManager
         Func<BO.OrderInList, bool>? customPredicate = null,
         BO.OrderInListField? orderBy = BO.OrderInListField.OrderId)
     {
-        var deliveriesMap = s_dal.Delivery.ReadAll()
-            .GroupBy(d => d.OrderId)
-            .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
+        Dictionary<int, List<DO.Delivery>>? deliveriesMap;
+        lock (AdminManager.BlMutex)
+        {
+            deliveriesMap = s_dal.Delivery.ReadAll()
+                .GroupBy(d => d.OrderId)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
+        }
+            
 
         Func<BO.OrderInList, bool> filter = customPredicate ?? (_ => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortSelector(orderBy);
 
-        var conversionTasks = s_dal.Order.ReadAll().Select(async doOrder =>
+        IEnumerable<Task<BO.OrderInList>>? conversionTasks;
+        lock (AdminManager.BlMutex)
         {
-            return await s_convertToBoOrderOptimized(doOrder, deliveriesMap);
-        });
+            conversionTasks = s_dal.Order.ReadAll().Select(async doOrder =>
+            {
+                return await s_convertToBoOrderOptimized(doOrder, deliveriesMap);
+            }).ToList();
+        }
+           
 
         var allBoOrders = await Task.WhenAll(conversionTasks);
         var result = allBoOrders
@@ -288,7 +304,9 @@ internal static class OrderManager
     /// </remarks>
     public static async Task Cancel(int orderId, bool token = false)
     {
-        DO.Order doOrder = s_dal.Order.Read(orderId)
+        DO.Order doOrder;
+        lock (AdminManager.BlMutex)
+            doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("הזמנה לא נמצאה לביטול");
 
         switch (doOrder.OrderStatus)
@@ -380,7 +398,9 @@ internal static class OrderManager
     /// </returns>
     private static List<BO.DeliveryPerOrderInList>? s_createDeliveryPerOrderInList(int orderId)
     {
-        var deliveries = from doDelivery in s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
+        List<BO.DeliveryPerOrderInList> deliveries;
+        lock (AdminManager.BlMutex)
+            deliveries = (from doDelivery in s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
                          let courier = s_dal.Courier.Read(doDelivery.CourierId)
                          select new BO.DeliveryPerOrderInList
                          {
@@ -393,7 +413,7 @@ internal static class OrderManager
                                  ? (BO.EndDelivery)doDelivery.EndDelivery.Value
                                  : null,
                              TimeEndDelivery = doDelivery.TimeEndDelivery
-                         };
+                         }).ToList();
 
         return deliveries.Any() ? [.. deliveries] : null;
     }
@@ -427,7 +447,8 @@ internal static class OrderManager
     private static void s_cancelOpenOrder(DO.Order doOrder)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
-        s_dal.Order.Update(doOrder);
+        lock (AdminManager.BlMutex)
+            s_dal.Order.Update(doOrder);
         Observer.NotifyItemUpdated(doOrder.Id);
 
         DO.Delivery delivery = new DO.Delivery
@@ -441,7 +462,8 @@ internal static class OrderManager
             TimeEndDelivery = AdminManager.Now,
             ActualDistance = 0
         };
-        s_dal.Delivery.Create(delivery);
+        lock (AdminManager.BlMutex)
+            s_dal.Delivery.Create(delivery);
     }
 
     /// <summary>
@@ -455,23 +477,28 @@ internal static class OrderManager
     private static async Task s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool token)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
-        s_dal.Order.Update(doOrder);
+        lock (AdminManager.BlMutex)
+            s_dal.Order.Update(doOrder);
         Observer.NotifyItemUpdated(doOrder.Id);
 
-        var delivery = (from d in s_dal.Delivery.ReadAll()
+        DO.Delivery? delivery;
+        lock (AdminManager.BlMutex)
+            delivery = (from d in s_dal.Delivery.ReadAll()
                         where d.OrderId == doOrder.Id
                         orderby d.Id descending
                         select d).FirstOrDefault()
-            ?? throw new BO.BlDoesNotExistException("לא נמצא משלוח עבור הזמנה זו");
+               ?? throw new BO.BlDoesNotExistException("לא נמצא משלוח עבור הזמנה זו");
+        lock (AdminManager.BlMutex)
+            s_dal.Delivery.Update(delivery with
+            {
+                EndDelivery = DO.EndDelivery.CONCELLED,
+                TimeEndDelivery = AdminManager.Now
+            });
 
-        s_dal.Delivery.Update(delivery with
-        {
-            EndDelivery = DO.EndDelivery.CONCELLED,
-            TimeEndDelivery = AdminManager.Now
-        });
-
-        var courier = s_dal.Courier.Read(delivery.CourierId)
-            ?? throw new BO.BlDoesNotExistException("Courier not found");
+        DO.Courier? courier;
+        lock (AdminManager.BlMutex)
+            courier = s_dal.Courier.Read(delivery.CourierId)
+                ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         Exception? exceptionMail = null;
         Exception? exceptionSms = null;
