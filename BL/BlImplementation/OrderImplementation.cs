@@ -48,8 +48,7 @@ internal class OrderImplementation : IOrder
     {
         //if (!Tools.CheckManger(id))
         //    throw new BO.BlNoAccessException();
-        var result = await OrderManager.Read(orderId);
-        return result;
+        return await OrderManager.Read(orderId);
     }
 
     /// <summary>
@@ -132,8 +131,7 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        var result = await OrderManager.ReadAll(filter, value, sort);
-        return result;
+        return await OrderManager.ReadAll(filter, value, sort);
     }
 
     public async Task<IEnumerable<BO.OrderInList>> ReadAll(
@@ -143,8 +141,7 @@ internal class OrderImplementation : IOrder
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
-        var result = await OrderManager.ReadAll(filter, sort);
-        return result;
+        return await OrderManager.ReadAll(filter, sort);
     }
 
     /// <summary>
@@ -205,8 +202,7 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        var result = await OrderManager.GetAllOrderStatistic();
-        return result;
+        return await OrderManager.GetAllOrderStatistic();
     }
 
     /// <summary>
@@ -228,8 +224,7 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        var result = await DeliveryManager.GetClosed(courierId, filter, sort);
-        return result;
+        return await DeliveryManager.GetClosed(courierId, filter, sort);
     }
 
     /// <summary>
@@ -254,8 +249,7 @@ internal class OrderImplementation : IOrder
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
 
-        var result = await DeliveryManager.GetOpen(courierId, filter, sort);
-        return result;
+        return await DeliveryManager.GetOpen(courierId, filter, sort);
     }
 
     public void AddObserver(Action listObserver) =>

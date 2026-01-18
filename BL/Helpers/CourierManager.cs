@@ -127,8 +127,7 @@ internal static class CourierManager
         DO.Courier doCourier = s_dal.Courier.Read(id)
             ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
 
-        var result = await s_convertToBObject(doCourier);
-        return result;
+        return await s_convertToBObject(doCourier);
     }
 
     /// <summary>
@@ -239,8 +238,7 @@ internal static class CourierManager
         var sortedCouriers = s_sortCouriers(couriers, sort);
 
         var tasks = sortedCouriers.Select(s_convertToCourierInList);
-        var result = await Task.WhenAll(tasks);
-        return result;
+        return await Task.WhenAll(tasks);
     }
 
     /// <summary>
@@ -452,8 +450,7 @@ internal static class CourierManager
         if (!activeDeliveries.Any())
             return null;
 
-        var result = await s_createOrderInProgress(activeDeliveries.First());
-        return result;
+        return await s_createOrderInProgress(activeDeliveries.First());
     }
 
     /// <summary>
