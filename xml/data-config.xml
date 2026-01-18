@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
   <NextOrderId>100051</NextOrderId>
-  <NextDeliveryId>200052</NextDeliveryId>
+  <NextDeliveryId>200054</NextDeliveryId>
   <Clock>18/01/2026 07:05:38</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
@@ -18,7 +18,7 @@
   <MaxTimeInactivity>100.00:00:00</MaxTimeInactivity>
   <GoogleApiKey>AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk</GoogleApiKey>
   <EmailAddress>david48483@gmail.com</EmailAddress>
-  <ScriptUrl>AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg</ScriptUrl>
+  <ScriptUrl>AKfycbwzaZwF0Lv9iFC2_SWqSAgaIBUQlBDLLqJ9GlAxUS6dJCf4Sm7BqjcQy0nID1Zbip-0jQ</ScriptUrl>
   <ScriptPass>sdfjsak8796978akljdf54gdfgr44</ScriptPass>
   <TokenCallSms>########</TokenCallSms>
 </config>

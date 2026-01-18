@@ -269,7 +269,7 @@ internal static class Config
         MaxTimeInactivity = TimeSpan.FromDays(100);
         GoogleApiKey = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
         EmailAddress = "david48483@gmail.com";
-        ScriptUrl = "AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F - Gdesv - gNg";
+        ScriptUrl = "AKfycbwzaZwF0Lv9iFC2_SWqSAgaIBUQlBDLLqJ9GlAxUS6dJCf4Sm7BqjcQy0nID1Zbip-0jQ";
         ScriptPass = "sdfjsak8796978akljdf54gdfgr44";
         TokenCallSms = "########";
 
