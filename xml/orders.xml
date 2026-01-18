@@ -273,22 +273,6 @@
     <DistanceKmWalk>2.361</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100042</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 41</Details>
-    <Addres> לה גווארדיה 20, תל אביב</Addres>
-    <Latitude>32.059112</Latitude>
-    <Longitude>34.788742</Longitude>
-    <Name>Customer41</Name>
-    <Phone>0509305104</Phone>
-    <Weight>14</Weight>
-    <OrderDate>2026-01-16T16:35:26.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>5.010889072759089</DistanceKm>
-    <DistanceKmRoad>7.291</DistanceKmRoad>
-    <DistanceKmWalk>5.82</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100039</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 38</Details>
@@ -799,5 +783,21 @@
     <DistanceKm>1.2952401384992114</DistanceKm>
     <DistanceKmRoad>2.103</DistanceKmRoad>
     <DistanceKmWalk>1.626</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100042</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 41</Details>
+    <Addres> לה גווארדיה 20, תל אביב</Addres>
+    <Latitude>32.059112</Latitude>
+    <Longitude>34.788742</Longitude>
+    <Name>Customer41</Name>
+    <Phone>0509305104</Phone>
+    <Weight>14</Weight>
+    <OrderDate>2026-01-16T16:35:26.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>5.010889072759089</DistanceKm>
+    <DistanceKmRoad>7.291</DistanceKmRoad>
+    <DistanceKmWalk>5.82</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>
