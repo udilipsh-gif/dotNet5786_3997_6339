@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
   <NextOrderId>100051</NextOrderId>
-  <NextDeliveryId>200056</NextDeliveryId>
-  <Clock>18/01/2026 11:05:43</Clock>
+  <NextDeliveryId>200051</NextDeliveryId>
+  <Clock>18/01/2026 22:56:11</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
   <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
@@ -20,5 +20,5 @@
   <EmailAddress>david48483@gmail.com</EmailAddress>
   <ScriptUrl>AKfycbwzaZwF0Lv9iFC2_SWqSAgaIBUQlBDLLqJ9GlAxUS6dJCf4Sm7BqjcQy0nID1Zbip-0jQ</ScriptUrl>
   <ScriptPass>sdfjsak8796978akljdf54gdfgr44</ScriptPass>
-  <TokenCallSms>########</TokenCallSms>
+  <TokenCallSms>WU1BUElL.apik_j2szxGbBK7FSC2mHXJ1MBQ.f3eQocFPKykDUClg3fsSXpuvpodW5qgiZKAlpST5a8c</TokenCallSms>
 </config>
