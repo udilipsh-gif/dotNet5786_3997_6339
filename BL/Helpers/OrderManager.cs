@@ -1,5 +1,6 @@
 ﻿using DalApi;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace Helpers;
 
@@ -264,7 +265,7 @@ internal static class OrderManager
             .Where(filter)
             .OrderBy(sortSelector);
 
-        return [..result];
+        return [.. result];
     }
 
 
@@ -286,21 +287,33 @@ internal static class OrderManager
     ///   <item><description>COMPLETED/CANCELLED: Cannot be cancelled (throws exception)</description></item>
     /// </list>
     /// </remarks>
-    public static void Cancel(int orderId, bool token = false)
+    public static async Task Cancel(int orderId, bool token = false)
     {
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
 
-        Action action = doOrder.OrderStatus switch
+        switch (doOrder.OrderStatus)
         {
-            DO.OrderStatus.COMPLETED => throw new BO.BlInvalidOperationException("Cannot cancel a completed order."),
-            DO.OrderStatus.CONCELLED => throw new BO.BlInvalidOperationException("Order is already cancelled."),
-            DO.OrderStatus.OPEN or DO.OrderStatus.REFUSED => () => s_cancelOpenOrder(doOrder),
-            DO.OrderStatus.DELIVERING => () => s_cancelDeliveringOrder(doOrder, orderId, token),
-            _ => throw new BO.BlInvalidOperationException("Invalid order status.")
-        };
+            case DO.OrderStatus.COMPLETED:
+                throw new BO.BlInvalidOperationException("לא ניתן לבטל הזמנה שנמסרה.");
 
-        action();
+            case DO.OrderStatus.CONCELLED:
+                throw new BO.BlInvalidOperationException("לא ניתן לבטל, ההזמנה בוטלה בעבר.");
+
+            case DO.OrderStatus.OPEN:
+
+            case DO.OrderStatus.REFUSED:
+                s_cancelOpenOrder(doOrder);
+                break;
+            case DO.OrderStatus.DELIVERING:
+                await s_cancelDeliveringOrder(doOrder, orderId, token);
+                break;
+            default:
+                throw new BO.BlInvalidOperationException("Invalid order status.");
+        }
+
+
+
         Observer.NotifyItemUpdated(orderId);
         Observer.NotifyListUpdated();
     }
@@ -400,7 +413,7 @@ internal static class OrderManager
         var activeDelivery = orderInProgresses
             .OrderByDescending(d => d.DeliveryId)
             .FirstOrDefault(d => d.EndDelivery == null);
-        
+
         return activeDelivery != null
             ? activeDelivery.OrderDate + await Tools.GetEstimatedDeliveryTime(doOrder)
             : null;
@@ -438,7 +451,7 @@ internal static class OrderManager
     /// <exception cref="BO.BlDoesNotExistException">
     /// Thrown when the delivery or courier is not found.
     /// </exception>
-    private static void s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool token)
+    private static async Task s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool token)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
         s_dal.Order.Update(doOrder);
@@ -462,24 +475,24 @@ internal static class OrderManager
         //######################################################################################################שליחת מייל- כרגע מוקפאת או פתרון ביניים עד שלב 7
         try
         {
-            Tools.SendEmailSkript(
-                courier.Email,
-                $"{courier.Name}, ההזמנה בוטלה!!!",
-                $"Order number {orderId} has been cancelled by the manager");//השלב הלא סינכוני!!!###################################################
+            await Tools.SendEmailSkript(
+                  courier.Email,
+                  $"{courier.Name}, ההזמנה בוטלה!!!",
+                  $"Order number {orderId} has been cancelled by the manager");//השלב הלא סינכוני!!!###################################################
         }
         //חריגה עבור שליחת מייל לא סקריפט, סקריפט לא זורק חרגיות לכאן בשלב 6 כי הוא סינכרוני
-        catch (SmtpException)
+        catch (SmtpException ex)
         {
-            throw new SmtpException("Failed to send email notification");
+            throw new SmtpException($"Failed to send email notification {ex.Message}");
         }
         try
         {
             if (token)
             {
-                Tools.SendSms(
-                    courier.Phone,
-                    $"{courier.Name}, ההזמנה בוטלה!!!",
-                    $"Order number {orderId} has been cancelled by the manager");
+                await Tools.SendSms(
+                      courier.Phone,
+                      $"{courier.Name}, ההזמנה בוטלה!!!",
+                      $"Order number {orderId} has been cancelled by the manager");
             }
         }
         catch (SmtpException)
