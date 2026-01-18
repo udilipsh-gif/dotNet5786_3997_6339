@@ -25,7 +25,7 @@ public static class GoogleMapsService
     /// Thread-safe cache for storing distance calculations to avoid repeated API calls.
     /// Key format: "origin|destination|mode" (normalized to lowercase).
     /// Value: Distance in kilometers.
-    /// </summary>
+    /// </summary> 
     private static readonly ConcurrentDictionary<string, double> s_distanceCache = new();
 
     /// <summary>
@@ -200,7 +200,7 @@ public static class GoogleMapsService
     /// A <see cref="RouteInfo"/> object containing route details if successful,
     /// or null if the route calculation fails.
     /// </returns>
-    public static RouteInfo? GetRoute(double originLat, double originLng,
+    public static async Task<RouteInfo?> GetRoute(double originLat, double originLng,
                                        double destLat, double destLng,
                                        string mode = "driving")
     {
@@ -223,7 +223,7 @@ public static class GoogleMapsService
 
             s_prepareHttpClient();
 
-            string xmlContent = s_httpClient.GetStringAsync(url).GetAwaiter().GetResult();
+            string xmlContent = await s_httpClient.GetStringAsync(url);
             XDocument doc = XDocument.Parse(xmlContent);
 
             string? status = doc.Root?.Element("status")?.Value;
@@ -266,7 +266,7 @@ public static class GoogleMapsService
     /// A <see cref="RouteInfo"/> object containing route details if successful,
     /// or null if the route calculation fails.
     /// </returns>
-    public static RouteInfo? GetRouteByAddress(string originAddress, string destinationAddress, string mode = "driving")
+    public static async Task<RouteInfo?> GetRouteByAddress(string originAddress, string destinationAddress, string mode = "driving")
     {
         string cacheKey = $"{originAddress}|{destinationAddress}|{mode}".ToLowerInvariant();
 
@@ -287,7 +287,7 @@ public static class GoogleMapsService
 
             s_prepareHttpClient();
 
-            string xmlContent = s_httpClient.GetStringAsync(url).GetAwaiter().GetResult();
+            string xmlContent = await s_httpClient.GetStringAsync(url);
             XDocument doc = XDocument.Parse(xmlContent);
 
             string? status = doc.Root?.Element("status")?.Value;
@@ -332,14 +332,14 @@ public static class GoogleMapsService
     /// <exception cref="InvalidOperationException">
     /// Thrown when store latitude or longitude is not configured.
     /// </exception>
-    public static RouteInfo? GetRouteFromStore(double destLat, double destLng, BO.TheTypeShipment shipmentType)
+    public static async Task<RouteInfo?> GetRouteFromStore(double destLat, double destLng, BO.TheTypeShipment shipmentType)
     {
         var config = AdminManager.GetConfig();
         double storeLat = config.Latitude ?? throw new InvalidOperationException("Store latitude not configured");
         double storeLng = config.Longitude ?? throw new InvalidOperationException("Store longitude not configured");
 
         string mode = s_getTravelMode(shipmentType);
-        return GetRoute(storeLat, storeLng, destLat, destLng, mode);
+        return await GetRoute(storeLat, storeLng, destLat, destLng, mode);
     }
 
     /// <summary>
@@ -354,13 +354,13 @@ public static class GoogleMapsService
     /// <exception cref="InvalidOperationException">
     /// Thrown when store address is not configured.
     /// </exception>
-    public static RouteInfo? GetRouteFromStore(string destinationAddress, BO.TheTypeShipment shipmentType)
+    public static async Task<RouteInfo?> GetRoute(string destinationAddress, BO.TheTypeShipment shipmentType)
     {
         var config = AdminManager.GetConfig();
         string storeAddress = config.StoreAddress ?? throw new InvalidOperationException("Store address not configured");
 
         string mode = s_getTravelMode(shipmentType);
-        return GetRouteByAddress(storeAddress, destinationAddress, mode);
+        return await GetRouteByAddress(storeAddress, destinationAddress, mode);
     }
 
     /// <summary>
@@ -374,7 +374,7 @@ public static class GoogleMapsService
     /// <param name="width">Image width in pixels. Defaults to 400.</param>
     /// <param name="height">Image height in pixels. Defaults to 300.</param>
     /// <returns>A URL string for the Google Static Maps API with markers and route overlay.</returns>
-    public static string GetStaticMapUrl(double originLat, double originLng,
+    public static async Task<string> GetStaticMapUrl(double originLat, double originLng,
                                           double destLat, double destLng,
                                           string encodedPolyline,
                                           int width = 400, int height = 300)
@@ -382,12 +382,12 @@ public static class GoogleMapsService
         string apiKey = AdminManager.GetConfig().GoogleApiKey;
         string encodedPath = Uri.EscapeDataString(encodedPolyline);
 
-        return $"https://maps.googleapis.com/maps/api/staticmap" +
+        return await Task.FromResult($"https://maps.googleapis.com/maps/api/staticmap" +
                $"?size={width}x{height}" +
                $"&markers=color:green|label:S|{originLat},{originLng}" +
                $"&markers=color:red|label:D|{destLat},{destLng}" +
                $"&path=enc:{encodedPath}" +
-               $"&key={apiKey}";
+               $"&key={apiKey}");
     }
 
     /// <summary>
@@ -402,11 +402,11 @@ public static class GoogleMapsService
     /// A URL string for the Google Static Maps API if successful,
     /// or null if the route calculation fails.
     /// </returns>
-    public static string? GetStaticMapUrlFromStore(double destLat, double destLng,
+    public static async Task<string?> GetStaticMapUrlFromStore(double destLat, double destLng,
                                                     BO.TheTypeShipment shipmentType,
                                                     int width = 400, int height = 300)
     {
-        var route = GetRouteFromStore(destLat, destLng, shipmentType);
+        var route = await GetRouteFromStore(destLat, destLng, shipmentType);
         if (route == null || string.IsNullOrEmpty(route.EncodedPolyline))
             return null;
 
@@ -414,7 +414,7 @@ public static class GoogleMapsService
         double storeLat = config.Latitude ?? 0;
         double storeLng = config.Longitude ?? 0;
 
-        return GetStaticMapUrl(storeLat, storeLng, destLat, destLng,
+        return await GetStaticMapUrl(storeLat, storeLng, destLat, destLng,
                                route.EncodedPolyline, width, height);
     }
 
@@ -444,7 +444,7 @@ public static class GoogleMapsService
     /// - RANGE_INTERPOLATED: Interpolated between two points (rejected)
     /// - GEOMETRIC_CENTER: Center of an area (rejected)
     /// </remarks>
-    public static (double Lat, double Lng)? GetGeocodingSync(string address)
+    public static async Task<(double Lat, double Lng)?> GetGeocodingAsync(string address)
     {
         var apiKey = AdminManager.GetConfig().GoogleApiKey;
         string url = $"https://maps.googleapis.com/maps/api/geocode/xml?address={Uri.EscapeDataString(address)}&key={apiKey}";
@@ -452,12 +452,12 @@ public static class GoogleMapsService
         try
         {
             s_prepareHttpClient();
-            HttpResponseMessage response = s_httpClient.GetAsync(url).GetAwaiter().GetResult();
+            HttpResponseMessage response = await s_httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Failed to get geocoding data.");
 
-            string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            string xmlContent = await response.Content.ReadAsStringAsync();
             XDocument doc = XDocument.Parse(xmlContent);
             string? status = doc.Element("GeocodeResponse")?.Element("status")?.Value;
 
@@ -472,7 +472,7 @@ public static class GoogleMapsService
                              .Element("geometry");
 
             var locationType = geometry?.Element("location_type")?.Value;
-            if (locationType is "APPROXIMATE" or "RANGE_INTERPOLATED" or "GEOMETRIC_CENTER")
+            if (locationType is "APPROXIMATE" or "GEOMETRIC_CENTER")
                 throw new BO.BlInvalidValueException("The address entered is not precise enough. Please enter a more complete address.");
 
             var locationElement = geometry?.Element("location");
@@ -520,18 +520,21 @@ public static class GoogleMapsService
     /// The method calculates the actual road distance based on real routes, which may differ
     /// from the straight-line distance calculated by the Haversine formula.
     /// </remarks>
-    public static double? GetActualDistance(string address, BO.TheTypeShipment typeShipment)
+    public static async Task<double?> GetActualDistance(double latitude, double longitude, BO.TheTypeShipment typeShipment)
     {
         InitializeDistanceCache();
 
         string apiKey = AdminManager.GetConfig().GoogleApiKey
             ?? throw new BO.BlInvalidValueException("Google API Key is not configured.");
 
-        string storeAddress = AdminManager.GetConfig().StoreAddress
-            ?? throw new BO.BlInvalidValueException("Store Address is not configured.");
+        double storeLatitude = AdminManager.GetConfig().Latitude 
+            ?? throw new BO.BlInvalidValueException("Store Latitude is not configured.");
+
+        double storeLongitude = AdminManager.GetConfig().Longitude
+            ?? throw new BO.BlInvalidValueException("Store Longitude is not configured.");
 
         string mode = s_getTravelMode(typeShipment);
-        string cacheKey = $"{storeAddress}|{address}|{mode}".ToLowerInvariant();
+        string cacheKey = $"{storeLatitude}|{storeLongitude}|{latitude}|{longitude}|{mode}".ToLowerInvariant();
 
         // Check if distance already exists in cache
         if (s_distanceCache.TryGetValue(cacheKey, out double cachedDistance))
@@ -540,20 +543,20 @@ public static class GoogleMapsService
         }
 
         string url = $"https://maps.googleapis.com/maps/api/distancematrix/xml" +
-                    $"?origins={Uri.EscapeDataString(storeAddress)}" +
-                    $"&destinations={Uri.EscapeDataString(address)}" +
+                    $"?origins={Uri.EscapeDataString($"{storeLatitude},{storeLongitude}")}" +
+                    $"&destinations={Uri.EscapeDataString($"{latitude},{longitude}")}" +
                     $"&mode={mode}" +
                     $"&key={apiKey}";
 
         try
         {
             s_prepareHttpClient();
-            HttpResponseMessage response = s_httpClient.GetAsync(url).GetAwaiter().GetResult();
+            HttpResponseMessage response = await s_httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Failed to get distance matrix data.");
 
-            string xmlContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            string xmlContent = await response.Content.ReadAsStringAsync();
             XDocument doc = XDocument.Parse(xmlContent);
             string? status = doc.Element("DistanceMatrixResponse")?.Element("status")?.Value;
 

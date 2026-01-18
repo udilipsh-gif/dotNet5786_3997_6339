@@ -2,6 +2,7 @@
 using DalApi;
 using DO;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 
 //using System.Collections.Generic;
 
@@ -16,6 +17,7 @@ internal class CourierImplementation : ICourier
     /// </summary>
     /// <param name="item">The courier object to create.</param>
     /// <exception cref="Exception">Thrown when a courier with the same ID already exists.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Courier item)
     {
         if (Read(item.Id) is not null)
@@ -29,6 +31,7 @@ internal class CourierImplementation : ICourier
     /// </summary>
     /// <param name="id">The unique identifier of the courier to delete.</param>
     /// <exception cref="Exception">Thrown when a courier with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         var courier = Read(id);
@@ -41,6 +44,7 @@ internal class CourierImplementation : ICourier
     /// <summary>
     /// Deletes all couriers from the data source.
     /// </summary>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     { 
         DataSource.Couriers.Clear();
@@ -57,12 +61,13 @@ internal class CourierImplementation : ICourier
         });
 
     }
-  
+
     /// <summary>
     /// Reads and retrieves a courier by their unique ID.
     /// </summary>
     /// <param name="id">The unique identifier of the courier to retrieve.</param>
     /// <returns>The courier object if found; otherwise, null.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Courier? Read(int id)
     {
         return DataSource.Couriers.FirstOrDefault(item => item.Id == id); //stage 2
@@ -81,6 +86,7 @@ internal class CourierImplementation : ICourier
     /// </summary>
     /// <returns>A list containing all courier objects.</returns>
     //public List<Courier> ReadAll() => new List<Courier>(DataSource.Couriers);//stage 1
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Courier> ReadAll(Func<Courier, bool>? filter = null) //stage 2
         => filter != null
             ? from item in DataSource.Couriers
@@ -88,14 +94,15 @@ internal class CourierImplementation : ICourier
               select item
             : from item in DataSource.Couriers
               select item;
-    
-   
+
+
 
     /// <summary>
     /// Updates an existing courier in the data source.
     /// </summary>
     /// <param name="item">The courier object with updated information.</param>
     /// <exception cref="Exception">Thrown when a courier with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Courier item)
     {
         var courier = Read(item.Id);

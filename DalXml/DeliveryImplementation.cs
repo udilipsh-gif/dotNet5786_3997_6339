@@ -1,6 +1,7 @@
 ﻿namespace Dal;
 using DalApi;
 using DO;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 /// <summary>
@@ -20,6 +21,7 @@ internal class DeliveryImplementation : IDelivery
     /// The OrderDate and TimeEndDelivery are expected to be in ISO 8601 format.
     /// Empty TimeEndDelivery values are treated as null.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     private static Delivery getDelivery(XElement delivery)
     {
         return new Delivery()
@@ -47,6 +49,7 @@ internal class DeliveryImplementation : IDelivery
     /// DateTime values are formatted using ISO 8601 format (using "o" format specifier).
     /// Null enum and DateTime values are stored as empty strings.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     private static XElement createDeliveryElement(Delivery delivery)
     {
         return new XElement("Delivery",
@@ -75,6 +78,7 @@ internal class DeliveryImplementation : IDelivery
     /// </list>
     /// The ID is generated using the Config.NextDeliveryId property.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Delivery item)
     {
         XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
@@ -95,6 +99,7 @@ internal class DeliveryImplementation : IDelivery
     /// This method loads the deliveries XML document and searches for a delivery with the matching ID.
     /// Returns null if no delivery with the specified ID exists.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Delivery? Read(int id)
     {
         XElement? deliveryElem =
@@ -113,6 +118,7 @@ internal class DeliveryImplementation : IDelivery
     /// and returns the first one that satisfies the filter condition.
     /// If no delivery matches the filter, returns null.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Delivery? Read(Func<Delivery, bool> filter)
     {
         return XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml).Elements()
@@ -125,6 +131,7 @@ internal class DeliveryImplementation : IDelivery
     /// </summary>
     /// <param name="item">The delivery item with updated information.</param>
     /// <exception cref="DalDoesNotExistException">Thrown when the delivery with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Delivery item)
     {
         XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
@@ -149,6 +156,7 @@ internal class DeliveryImplementation : IDelivery
     /// If a filter is provided, only deliveries that satisfy the filter condition are returned.
     /// If the filter is null, all deliveries are returned.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Delivery> ReadAll(Func<Delivery, bool>? filter = null)
     {
         XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
@@ -174,6 +182,7 @@ internal class DeliveryImplementation : IDelivery
     /// </list>
     /// If the delivery ID doesn't exist, throws a DalDoesNotExistException.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);
@@ -200,6 +209,7 @@ internal class DeliveryImplementation : IDelivery
     /// This operation is irreversible and removes all delivery data.
     /// Use with caution.
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         XElement deliveriesRootElem = XMLTools.LoadListFromXMLElement(Config.s_deliverys_xml);

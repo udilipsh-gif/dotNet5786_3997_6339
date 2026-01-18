@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using System.Threading.Tasks;
 
 namespace Helpers;
 
@@ -121,12 +122,12 @@ internal static class CourierManager
     ///   <item><description>OrderInProgress: Details of the current active delivery, if any</description></item>
     /// </list>
     /// </remarks>
-    internal static BO.Courier? Read(int id)
+    internal static async Task<BO.Courier?> Read(int id)
     {
         DO.Courier doCourier = s_dal.Courier.Read(id)
             ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
 
-        return s_convertToBusinessObject(doCourier);
+        return await s_convertToBObject(doCourier);
     }
 
     /// <summary>
@@ -228,7 +229,7 @@ internal static class CourierManager
     /// An <see cref="IEnumerable{T}"/> of <see cref="BO.CourierInList"/> objects
     /// containing courier summary information including delivery statistics.
     /// </returns>
-    internal static IEnumerable<BO.CourierInList> ReadAll(
+    internal static async Task<IEnumerable<BO.CourierInList>> ReadAll(
         int requesterId,
         bool? isActive,
         BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
@@ -236,7 +237,8 @@ internal static class CourierManager
         var couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive);
         var sortedCouriers = s_sortCouriers(couriers, sort);
 
-        return sortedCouriers.Select(s_convertToCourierInList);
+        var tasks = sortedCouriers.Select(s_convertToCourierInList);
+        return await Task.WhenAll(tasks);
     }
 
     /// <summary>
@@ -317,8 +319,10 @@ internal static class CourierManager
     /// </summary>
     /// <param name="doCourier">The data object to convert.</param>
     /// <returns>A business object courier with calculated statistics.</returns>
-    private static BO.Courier s_convertToBusinessObject(DO.Courier doCourier)
+    private static async Task<BO.Courier> s_convertToBObject(DO.Courier doCourier)
     {
+        var orderInProgress = await s_getOrderInProgress(doCourier.Id);
+
         return new BO.Courier
         {
             Id = doCourier.Id,
@@ -332,7 +336,7 @@ internal static class CourierManager
             WorkingSince = doCourier.WorkingSince,
             DeliveryOnTime = s_getDeliveryOnTimeCount(doCourier),
             DeliveryLate = s_getDeliveryLateCount(doCourier),
-            OrderInProgress = s_getOrderInProgress(doCourier.Id)
+            OrderInProgress = orderInProgress
         };
     }
 
@@ -341,8 +345,10 @@ internal static class CourierManager
     /// </summary>
     /// <param name="doCourier">The data object to convert.</param>
     /// <returns>A CourierInList object with summary information.</returns>
-    private static BO.CourierInList s_convertToCourierInList(DO.Courier doCourier)
+    private static async Task<BO.CourierInList> s_convertToCourierInList(DO.Courier doCourier)
     {
+        var orderInProgress = await s_getOrderInProgress(doCourier.Id);
+
         return new BO.CourierInList
         {
             Id = doCourier.Id,
@@ -352,7 +358,7 @@ internal static class CourierManager
             WorkingSince = doCourier.WorkingSince,
             DeliveryOnTime = s_getDeliveryOnTimeCount(doCourier),
             DeliveryLate = s_getDeliveryLateCount(doCourier),
-            DeliveryId = s_getOrderInProgress(doCourier.Id)?.DeliveryId
+            DeliveryId = orderInProgress?.DeliveryId
         };
     }
 
@@ -433,7 +439,7 @@ internal static class CourierManager
     ///   <item><description>Are associated with an order in DELIVERING status</description></item>
     /// </list>
     /// </remarks>
-    private static BO.OrderInProgress? s_getOrderInProgress(int courierId)
+    private static async Task<BO.OrderInProgress?> s_getOrderInProgress(int courierId)
     {
         var activeDeliveries = s_dal.Delivery.ReadAll(d =>
             d.CourierId == courierId &&
@@ -444,7 +450,7 @@ internal static class CourierManager
         if (!activeDeliveries.Any())
             return null;
 
-        return s_createOrderInProgress(activeDeliveries.First());
+        return await s_createOrderInProgress(activeDeliveries.First());
     }
 
     /// <summary>
@@ -465,7 +471,7 @@ internal static class CourierManager
     ///   <item><description>Time remaining until the delivery deadline</description></item>
     /// </list>
     /// </remarks>
-    private static BO.OrderInProgress s_createOrderInProgress(DO.Delivery delivery)
+    private static async Task<BO.OrderInProgress> s_createOrderInProgress(DO.Delivery delivery)
     {
         DO.Order order = s_dal.Order.Read(delivery.OrderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
@@ -473,9 +479,24 @@ internal static class CourierManager
         DO.Courier courier = s_dal.Courier.Read(delivery.CourierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        TimeSpan estimatedDeliveryTime = Tools.GetEstimatedDeliveryTime(delivery) ?? TimeSpan.Zero;
+        var estimatedTimeTask = Tools.GetEstimatedDeliveryTime(delivery);
+
+        var actualDistanceTask = GoogleMapsService.GetActualDistance(
+            order.Latitude,
+            order.Longitude,
+            (BO.TheTypeShipment)courier.TypeShipment);
+
+        var scheduleStatusTask = Tools.GetScheduleStatus(order, delivery);
+
+        await Task.WhenAll(estimatedTimeTask, actualDistanceTask, scheduleStatusTask);
+
+        TimeSpan estimatedDeliveryTime = await estimatedTimeTask ?? TimeSpan.Zero;
+        var actualDistance = await actualDistanceTask;
+        var scheduleStatus = await scheduleStatusTask;
+
         DateTime maxDeliveryTime = delivery.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
 
+        // 4. יצירת האובייקט
         return new BO.OrderInProgress
         {
             DeliveryId = delivery.Id,
@@ -484,7 +505,7 @@ internal static class CourierManager
             Details = order.Details,
             Address = order.Addres,
             Distance = Tools.GetDistance(order),
-            ActualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
+            ActualDistance = actualDistance,
             CustomerName = order.Name,
             CustomerPhone = order.Phone,
             OrderTime = order.OrderDate,
@@ -492,7 +513,7 @@ internal static class CourierManager
             EstimatedDeliveryTime = delivery.OrderDate + estimatedDeliveryTime,
             MaxDeliveryTime = maxDeliveryTime,
             OrderStatus = BO.OrderStatus.DELIVERING,
-            ScheduleStatus = Tools.GetScheduleStatus(order, delivery),
+            ScheduleStatus = scheduleStatus,
             TimeRemaining = maxDeliveryTime - AdminManager.Now
         };
     }

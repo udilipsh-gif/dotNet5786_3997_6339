@@ -50,7 +50,7 @@ public class ClosedDeliveryInList
     /// This represents the real distance traveled by the courier, which may differ from
     /// the estimated straight-line distance.
     /// </remarks>
-    public double? ActualDistens { get; init; } = null;
+    public double? ActualDistance { get; init; } = null;
 
     /// <summary>
     /// Gets the total time taken to complete the delivery.
@@ -59,7 +59,7 @@ public class ClosedDeliveryInList
     /// <remarks>
     /// Used for performance metrics and future delivery time estimates.
     /// </remarks>
-    public required TimeSpan DelyveryTime { get; init; }
+    public required TimeSpan DeliveryTime { get; init; }
 
     /// <summary>
     /// Gets the final outcome status of the delivery attempt.

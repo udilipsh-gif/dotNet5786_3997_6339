@@ -1,6 +1,7 @@
 ﻿namespace Dal;
 using DalApi;
 using System.Data;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Implementation of the IConfig interface that provides access to system configuration settings.
@@ -11,37 +12,41 @@ internal class ConfigImplementation : IConfig
     /// <summary>
     /// Gets or sets the current system clock time.
     /// </summary>
-    public DateTime Clock {
+    public DateTime Clock
+    {
         get => Config.Clock;
         set => Config.Clock = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the manager's unique identifier.
     /// Validates the ID using Israeli ID validation algorithm.
     /// </summary>
     /// <exception cref="ArgumentException">Thrown when the ID is not valid according to Israeli ID validation rules.</exception>
-    public int ManagerId {
+    public int ManagerId
+    {
         get => Config.ManagerId;
         set => Config.ManagerId = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the manager's password for authentication.
     /// </summary>
-    public string PasswordManager {
+    public string PasswordManager
+    {
         get => Config.PasswordManager;
         set => Config.PasswordManager = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the physical address of the store.
     /// </summary>
-    public string? StoreAddress {
+    public string? StoreAddress
+    {
         get => Config.StoreAddress;
         set => Config.StoreAddress = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the latitude coordinate of the store location.
     /// </summary>
@@ -50,105 +55,133 @@ internal class ConfigImplementation : IConfig
         get => Config.Latitude;
         set => Config.Latitude = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the longitude coordinate of the store location.
     /// </summary>
-    public double? Longitude {
+    public double? Longitude
+    {
         get => Config.Longitude;
         set => Config.Longitude = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the maximum delivery range in distance units (typically kilometers).
     /// </summary>
-    public double? MaxDeliveryRange {
-        get =>Config.MaxDeliveryRange;
+    public double? MaxDeliveryRange
+    {
+        get => Config.MaxDeliveryRange;
         set => Config.MaxDeliveryRange = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the average speed for car deliveries (in km/h).
     /// </summary>
-    public double AvgSpeedCar {
+    public double AvgSpeedCar
+    {
         get => Config.AvgSpeedCar;
         set => Config.AvgSpeedCar = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the average speed for motorcycle deliveries (in km/h).
     /// </summary>
-    public double AvgSpeedMotorcycle {
+    public double AvgSpeedMotorcycle
+    {
         get => Config.AvgSpeedMotorcycle;
         set => Config.AvgSpeedMotorcycle = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the average speed for bike deliveries (in km/h).
     /// </summary>
-    public double AvgSpeedBike {
+    public double AvgSpeedBike
+    {
         get => Config.AvgSpeedBike;
         set => Config.AvgSpeedBike = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the average speed for foot deliveries (in km/h).
     /// </summary>
-    public double AvgSpeedFoot { 
+    public double AvgSpeedFoot
+    {
         get => Config.AvgSpeedFoot;
         set => Config.AvgSpeedFoot = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the maximum time allowed for completing a delivery.
     /// </summary>
-    public TimeSpan MaxDeliveryTime { 
+    public TimeSpan MaxDeliveryTime
+    {
         get => Config.MaxDeliveryTime;
         set => Config.MaxDeliveryTime = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the time range that indicates a delivery is at risk of being late.
     /// </summary>
-    public TimeSpan RiskRange {
+    public TimeSpan RiskRange
+    {
         get => Config.RiskRange;
         set => Config.RiskRange = value;
     }
-    
+
     /// <summary>
     /// Gets or sets the maximum time of inactivity allowed before a courier is flagged.
     /// </summary>
-    public TimeSpan MaxTimeInactivity { 
+    public TimeSpan MaxTimeInactivity
+    {
         get => Config.MaxTimeInactivity;
         set => Config.MaxTimeInactivity = value;
     }
     /// <summary>
     /// Gets or sets the API key used to authenticate requests to Google services.
     /// </summary>
-    public string GoogleApiKey { get; set; } = "AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk";
+    public string GoogleApiKey
+    {
+        get => Config.GoogleApiKey;
+        set => Config.GoogleApiKey = value;
+    }
 
     /// <summary>
     /// gets or sets the email address used for system notifications.
     /// </summary>
-    public string EmailAddress { get; set; } = string.Empty;
+    public string EmailAddress
+    {
+        get => Config.EmailAddress;
+        set => Config.EmailAddress = value;
+    }
     /// <summary>
     /// gets or sets the URL of the script used for mail notifications.
     /// </summary>
-    public string ScriptUrl { get; set; } = string.Empty;
+    public string ScriptUrl
+    {
+        get => Config.ScriptUrl;
+        set => Config.ScriptUrl = value;
+    }
     /// <summary>
     /// Gets or sets the script password used for authentication or encryption purposes.
     /// </summary>
-    public string ScriptPass { get; set; } = string.Empty;
+    public string ScriptPass
+    {
+        get => Config.ScriptPass;
+        set => Config.ScriptPass = value;
+    }
     /// <summary>
     /// gets or sets the SMS API token used for sending SMS notifications.
     /// </summary>
-    public string TokenCallSms { get; set; } = string.Empty;
-
-
+    public string TokenCallSms
+    {
+        get => Config.TokenCallSms;
+        set => Config.TokenCallSms = value;
+    }
 
     /// <summary>
     /// Resets all configuration values to their default initial state.
     /// </summary>
+
     public void Reset()
     {
         Config.Reset();

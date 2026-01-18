@@ -189,7 +189,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     {
         try
         {
-            CurrentOrder = s_bl.Order.Read(CURRENT_MANAGER_ID, CurrentID)
+            CurrentOrder = s_bl.Order.Read(CURRENT_MANAGER_ID, CurrentID).GetAwaiter().GetResult()
                         ?? throw new BO.BlDoesNotExistException($"The Order with id: {CurrentID} does not exist");
         }
         catch (BO.BlDoesNotExistException)

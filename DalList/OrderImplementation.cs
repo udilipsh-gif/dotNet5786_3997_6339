@@ -2,6 +2,7 @@
 using DalApi;
 using DO;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Implementation of the IOrder interface for managing order data in the data access layer.
@@ -13,6 +14,7 @@ internal class OrderImplementation : IOrder
     /// Creates a new order in the data source with an auto-generated unique ID.
     /// </summary>
     /// <param name="item">The order object to create. The ID will be automatically assigned.</param>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Order item)
     {
         var newId = Config.NextOrderId;
@@ -25,6 +27,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="id">The unique identifier of the order to delete.</param>
     /// <exception cref="Exception">Thrown when an order with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         var order = Read(id);
@@ -37,6 +40,7 @@ internal class OrderImplementation : IOrder
     /// <summary>
     /// Deletes all orders from the data source.
     /// </summary>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll() => DataSource.Orders.Clear();
 
     /// <summary>
@@ -44,6 +48,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="id">The unique identifier of the order to retrieve.</param>
     /// <returns>The order object if found; otherwise, null.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Order? Read(int id)
     {
         //foreach (var order in DataSource.Orders)
@@ -55,6 +60,7 @@ internal class OrderImplementation : IOrder
         //return null;
         return DataSource.Orders.FirstOrDefault(item => item.Id == id);
     }
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Order? Read(Func<Order, bool> filter)
     {
         var order = (from item in DataSource.Orders
@@ -68,6 +74,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <returns>A list containing all order objects.</returns>
    // public List<Order> ReadAll() => new List<Order>(DataSource.Orders);//stage 1
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Order> ReadAll(Func<Order, bool>? filter = null) //stage 2
         => filter != null
             ? from item in DataSource.Orders
@@ -81,6 +88,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="item">The order object with updated information.</param>
     /// <exception cref="Exception">Thrown when an order with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Order item)
     {
         Order? order = Read(item.Id);

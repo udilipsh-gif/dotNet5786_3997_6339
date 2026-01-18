@@ -210,7 +210,7 @@ internal static class Tools
     /// Thrown when risk range or max delivery time is not configured,
     /// or when a completed order has no associated delivery record.
     /// </exception>
-    public static BO.ScheduleStatus GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
+    public static async Task<BO.ScheduleStatus> GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
     {
         TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ??
             throw new Exception("Risk range not configured");
@@ -221,7 +221,7 @@ internal static class Tools
         return order.OrderStatus switch
         {
             DO.OrderStatus.COMPLETED => GetCompletedOrderScheduleStatus(order, delivery, maxDeliveryTime),
-            DO.OrderStatus.DELIVERING => GetDeliveringOrderScheduleStatus(order, maxDeliveryTime, riskRange),
+            DO.OrderStatus.DELIVERING => await   GetDeliveringOrderScheduleStatus(order, maxDeliveryTime, riskRange),
             DO.OrderStatus.OPEN => GetOpenOrderScheduleStatus(order, maxDeliveryTime, riskRange),
             _ => BO.ScheduleStatus.CANCELLED
         };
@@ -232,10 +232,10 @@ internal static class Tools
     /// </summary>
     /// <param name="order">The order to evaluate.</param>
     /// <returns>The schedule status based on timing constraints and current progress.</returns>
-    public static BO.ScheduleStatus GetScheduleStatus(DO.Order order)
+    public static async Task<BO.ScheduleStatus> GetScheduleStatus(DO.Order order)
     {
         var delivery = s_getLatestDelivery(order.Id);
-        return GetScheduleStatus(order, delivery);
+        return await GetScheduleStatus(order, delivery);
     }
 
     /// <summary>
@@ -299,12 +299,12 @@ internal static class Tools
     /// <summary>
     /// Gets the schedule status for an order currently being delivered.
     /// </summary>
-    private static BO.ScheduleStatus GetDeliveringOrderScheduleStatus(
+    private static async Task<BO.ScheduleStatus> GetDeliveringOrderScheduleStatus(
         DO.Order order,
         DateTime maxDeliveryTime,
         TimeSpan riskRange)
     {
-        TimeSpan estimatedTime = GetEstimatedDeliveryTime(order) ?? TimeSpan.Zero;
+        TimeSpan estimatedTime = await GetEstimatedDeliveryTime(order) ?? TimeSpan.Zero;
         TimeSpan timeBuffer = (maxDeliveryTime - AdminManager.Now) - estimatedTime;
 
         return EvaluateTimeBuffer(timeBuffer, riskRange);
@@ -477,10 +477,10 @@ internal static class Tools
     /// <returns>
     /// The estimated delivery time if a delivery exists, or null if no delivery has been assigned.
     /// </returns>
-    public static TimeSpan? GetEstimatedDeliveryTime(DO.Order order)
+    public static async Task<TimeSpan?> GetEstimatedDeliveryTime(DO.Order order)
     {
         var delivery = s_getLatestDelivery(order.Id);
-        return delivery == null ? null : GetEstimatedDeliveryTime(delivery);
+        return  delivery == null ? null : await GetEstimatedDeliveryTime(delivery);
     }
 
     /// <summary>
@@ -492,7 +492,7 @@ internal static class Tools
     /// <exception cref="BO.BlDoesNotExistException">
     /// Thrown when the courier or order associated with the delivery is not found.
     /// </exception>
-    public static TimeSpan? GetEstimatedDeliveryTime(DO.Delivery delivery, DO.Courier? courier = null)
+    public static async Task<TimeSpan?> GetEstimatedDeliveryTime(DO.Delivery delivery, DO.Courier? courier = null)
     {
         if (delivery.EndDelivery != null)
             return null;
@@ -507,7 +507,7 @@ internal static class Tools
             DO.Order order = s_dal.Order.Read(delivery.OrderId)
                 ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does not exist");
 
-            actualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
+            actualDistance = await GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
             s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
         }
 

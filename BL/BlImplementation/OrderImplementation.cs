@@ -2,6 +2,7 @@
 using BlApi;
 
 using Helpers;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Implements the <see cref="IOrder"/> interface, providing business logic operations for order management
@@ -23,11 +24,11 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Only managers are authorized to create orders.
     /// </remarks>
-    public void Create(int id, BO.Order boOrder)
+    public async Task Create(int id, BO.Order boOrder)
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
-        OrderManager.Create(boOrder);
+        await OrderManager.Create(boOrder);
     }
 
     /// <summary>
@@ -43,11 +44,11 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Only managers can view order details.
     /// </remarks>
-    public BO.Order? Read(int id, int orderId)
+    public async Task<BO.Order?> Read(int id, int orderId)
     {
         //if (!Tools.CheckManger(id))
         //    throw new BO.BlNoAccessException();
-        return OrderManager.Read(orderId);
+        return await OrderManager.Read(orderId);
     }
 
     /// <summary>
@@ -60,11 +61,11 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Only managers can update orders.
     /// </remarks>
-    public void Update(int id, BO.Order boOrder)
+    public async Task Update(int id, BO.Order boOrder)
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
-        OrderManager.Update(boOrder);
+        await OrderManager.Update(boOrder);
     }
 
     /// <summary>
@@ -99,11 +100,11 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Managers can assign any order to any courier. Couriers can only accept orders for themselves.
     /// </remarks>
-    public void StartDelivery(int id, int courierId, int orderId)
+    public async Task StartDelivery(int id, int courierId, int orderId)
     {
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
-        DeliveryManager.StartDelivery(courierId, orderId);
+        await DeliveryManager.StartDelivery(courierId, orderId);
     }
 
     /// <summary>
@@ -121,7 +122,7 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Only managers can view all orders.
     /// </remarks>
-    public IEnumerable<BO.OrderInList> ReadAll(
+    public async Task<IEnumerable<BO.OrderInList>> ReadAll(
         int id,
         BO.OrderInListField? filter,
         object? value,
@@ -129,17 +130,17 @@ internal class OrderImplementation : IOrder
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
-        return OrderManager.ReadAll(filter, value, sort);
+        return await OrderManager.ReadAll(filter, value, sort);
     }
 
-    public IEnumerable<BO.OrderInList> ReadAll(
+    public async Task<IEnumerable<BO.OrderInList>> ReadAll(
        int id,
        Func<BO.OrderInList, bool>? filter = null,
        BO.OrderInListField? sort = null)
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
-        return OrderManager.ReadAll(filter, sort);
+        return await OrderManager.ReadAll(filter, sort);
     }
 
     /// <summary>
@@ -195,12 +196,12 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Only managers can view order statistics.
     /// </remarks>
-    public int[] GetAllOrderStatistic(int id)
+    public async Task<int[]> GetAllOrderStatistic(int id)
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        return OrderManager.GetAllOrderStatistic();
+        return await OrderManager.GetAllOrderStatistic();
     }
 
     /// <summary>
@@ -217,12 +218,12 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Only managers can view closed delivery history.
     /// </remarks>
-    public IEnumerable<BO.ClosedDeliveryInList> GetClosed(int id, int courierId, BO.TypeOfOrder? filter, BO.ClosedDeliveryInListField? sort)
+    public async Task<IEnumerable<BO.ClosedDeliveryInList>> GetClosed(int id, int courierId, BO.TypeOfOrder? filter, BO.ClosedDeliveryInListField? sort)
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        return DeliveryManager.GetClosed(courierId, filter, sort);
+        return await DeliveryManager.GetClosed(courierId, filter, sort);
     }
 
     /// <summary>
@@ -242,12 +243,12 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Managers can view open orders for any courier. Couriers can only view their own available orders.
     /// </remarks>
-    public IEnumerable<BO.OpenOrderInList> GetOpen(int id, int courierId, BO.TypeOfOrder? filter, BO.OpenOrderInListField? sort)
+    public async Task<IEnumerable<BO.OpenOrderInList>> GetOpen(int id, int courierId, BO.TypeOfOrder? filter, BO.OpenOrderInListField? sort)
     {
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
 
-        return DeliveryManager.GetOpen(courierId, filter, sort);
+        return await DeliveryManager.GetOpen(courierId, filter, sort);
     }
 
     public void AddObserver(Action listObserver) =>

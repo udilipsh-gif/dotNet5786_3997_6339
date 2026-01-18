@@ -84,22 +84,31 @@ public partial class StartDeliveryWindow : Window
 
     private void UpdateOrdersList()
     {
-        var DeliveryList = Tools.GetSafeFromBl(() =>
-                s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null),
-                new List<BO.OpenOrderInList>());
-
-
-        if (DeliveryListView == null)
+        try
         {
-            DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
-        }
-        else
-        {
-            DeliveryListView.Clear(); // מחיקת הישנים
-            foreach (var item in DeliveryList)
+            var DeliveryList = s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null).GetAwaiter().GetResult();
+
+            if (DeliveryListView == null)
             {
-                DeliveryListView.Add(item); // הוספת החדשים
+                DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
             }
+            else
+            {
+                DeliveryListView.Clear(); // מחיקת הישנים
+                foreach (var item in DeliveryList)
+                {
+                    DeliveryListView.Add(item); // הוספת החדשים
+                }
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}", "שגיאה",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            DeliveryListView = new ObservableCollection<BO.OpenOrderInList>();
+            return;
         }
     }
 

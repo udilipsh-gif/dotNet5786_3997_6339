@@ -281,7 +281,7 @@ public partial class CourierWindow : Window
     {
         try
         {
-            CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
+            CurrentCourier = s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID).GetAwaiter().GetResult()
                         ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
         }
         catch (BO.BlDoesNotExistException)

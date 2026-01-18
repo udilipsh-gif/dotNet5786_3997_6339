@@ -75,7 +75,7 @@ public partial class MainCourier : Window
     {
         try
         {
-            CurrentUser = s_bl.Courier.Read(USERID, USERID)
+            CurrentUser = s_bl.Courier.Read(USERID, USERID).GetAwaiter().GetResult()
                 ?? throw new BO.BlDoesNotExistException();
             if (CurrentUser.OrderInProgress is not null)
             {

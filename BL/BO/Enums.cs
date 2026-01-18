@@ -128,10 +128,10 @@ public enum ClosedDeliveryInListField
     ShipmentType,
 
     /// <summary>Actual travel distance (km).</summary>
-    AqualDistens,
+    ActualDistance,
 
     /// <summary>Delivery duration/time.</summary>
-    DelyveryTime,
+    DeliveryTime,
 
     /// <summary>Delivery end status/outcome.</summary>
     EndDelivery

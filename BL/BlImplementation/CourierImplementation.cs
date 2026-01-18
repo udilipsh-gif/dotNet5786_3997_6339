@@ -3,6 +3,7 @@ using BlApi;
 
 using Helpers;
 using System;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Implements the <see cref="ICourier"/> interface and provides business logic operations for courier management
@@ -37,12 +38,12 @@ internal class CourierImplementation : ICourier
     /// <returns>A <see cref="BO.Courier"/> instance if found.</returns>
     /// <exception cref="BO.BlNoAccessException">Thrown when the user does not have manager privileges.</exception>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier does not exist.</exception>
-    public BO.Courier? Read(int requesterId, int courierId)
+    public async Task<BO.Courier?> Read(int requesterId, int courierId)
     {
         if (!Tools.CheckManger(requesterId) && requesterId != courierId)
             throw new BO.BlNoAccessException();
 
-        return CourierManager.Read(courierId);
+        return await CourierManager.Read(courierId);
     }
 
     /// <summary>
@@ -108,14 +109,14 @@ internal class CourierImplementation : ICourier
     /// <param name="sort">Optional sort field.</param>
     /// <returns>An enumerable of <see cref="BO.CourierInList"/> items.</returns>
     /// <exception cref="BO.BlNoAccessException">Thrown when the user does not have manager privileges.</exception>
-    public IEnumerable<BO.CourierInList> ReadAll(
+    public async Task<IEnumerable<BO.CourierInList>> ReadAll(
         int requesterId,
         bool? isActive,
         BO.CourierFieldSort? sort)
     {
         if (!Tools.CheckManger(requesterId))
             throw new BO.BlNoAccessException("Only manager can access the list of couriers.");
-        return CourierManager.ReadAll(requesterId, isActive, sort);
+        return await CourierManager.ReadAll(requesterId, isActive, sort);
     }
 
     public void AddObserver(Action listObserver) =>

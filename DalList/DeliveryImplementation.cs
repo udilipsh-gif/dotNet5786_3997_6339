@@ -1,6 +1,7 @@
 ﻿namespace Dal;
 using DalApi;
 using DO;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Implementation of the IDelivery interface for managing delivery data in the data access layer.
@@ -12,6 +13,7 @@ internal class DeliveryImplementation : IDelivery
     /// Creates a new delivery in the data source with an auto-generated unique ID.
     /// </summary>
     /// <param name="item">The delivery object to create. The ID will be automatically assigned.</param>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Delivery item)
     {
         int newId = Config.NextDeliveryId;
@@ -24,6 +26,7 @@ internal class DeliveryImplementation : IDelivery
     /// </summary>
     /// <param name="id">The unique identifier of the delivery to delete.</param>
     /// <exception cref="Exception">Thrown when a delivery with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         var delivery = Read(id);
@@ -38,6 +41,7 @@ internal class DeliveryImplementation : IDelivery
     /// <summary>
     /// Deletes all deliveries from the data source.
     /// </summary>
+    [MethodImpl(MethodImplOptions.Synchronized)] 
     public void DeleteAll() => DataSource.Deliveries.Clear();
 
     /// <summary>
@@ -45,6 +49,7 @@ internal class DeliveryImplementation : IDelivery
     /// </summary>
     /// <param name="id">The unique identifier of the delivery to retrieve.</param>
     /// <returns>The delivery object if found; otherwise, null.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Delivery? Read(int id)
     {
        
@@ -63,6 +68,7 @@ internal class DeliveryImplementation : IDelivery
     /// </summary>
     /// <returns>A list containing all delivery objects.</returns>
     // public List<Delivery> ReadAll() => new List<Delivery>(DataSource.Deliveries);//stage 1
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Delivery> ReadAll(Func<Delivery, bool>? filter = null) //stage 2
          => filter != null
              ? from item in DataSource.Deliveries
@@ -76,6 +82,7 @@ internal class DeliveryImplementation : IDelivery
     /// </summary>
     /// <param name="item">The delivery object with updated information.</param>
     /// <exception cref="Exception">Thrown when a delivery with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Delivery item)
     {
         var delivery = Read(item.Id);

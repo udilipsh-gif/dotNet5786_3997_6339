@@ -91,8 +91,8 @@ internal static class AdminManager //stage 4
     /// <summary>
     /// Method for setting current configuration variables values for any BL class that may need it
     /// </summary>
-    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7
-    internal static void SetConfig(BO.Config configuration) //stage 4
+    //[MethodImpl(MethodImplOptions.Synchronized)] //stage 7 ******************************************************************************************
+    internal static async Task SetConfig(BO.Config configuration) //stage 4
     {
         bool configChanged = false; // stage 5
 
@@ -119,7 +119,7 @@ internal static class AdminManager //stage 4
         if (s_dal.Config.StoreAddress != configuration.StoreAddress)
         {
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
-            (double Lat, double Lon)? adressCoordinates = GoogleMapsService.GetGeocodingSync(address) ??
+            (double Lat, double Lon)? adressCoordinates = await GoogleMapsService.GetGeocodingAsync(address) ??
                 throw new BO.BlInvalidValueException("Geocoding failed.");
             configuration.Latitude = adressCoordinates?.Lat;
             configuration.Longitude = adressCoordinates?.Lon;
@@ -185,7 +185,7 @@ internal static class AdminManager //stage 4
         }
         if (s_dal.Config.EmailAddress != configuration.EmailAddress)
         {
-            s_dal.Config.EmailAddress = configuration.EmailAddress;
+            s_dal.Config.EmailAddress = configuration.EmailAddress ?? string.Empty;
             configChanged = true;
         }
         if (s_dal.Config.ScriptUrl != configuration.ScriptUrl)

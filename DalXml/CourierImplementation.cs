@@ -2,6 +2,7 @@
 using DalApi;
 using DO;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 /// <summary>
@@ -16,6 +17,7 @@ public class CourierImplementation : ICourier
     /// <param name="s">The XElement containing courier data.</param>
     /// <returns>A Courier object populated with data from the XElement.</returns>
     /// <exception cref="FormatException">Thrown when required fields cannot be converted.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     static Courier getCourier(XElement s)
     {
         return new Courier()
@@ -37,6 +39,7 @@ public class CourierImplementation : ICourier
     /// </summary>
     /// <param name="courier">The Courier object to convert.</param>
     /// <returns>An XElement containing the courier data.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     static XElement createCourierElement(Courier courier)
     {
         return new XElement("Courier",
@@ -70,6 +73,7 @@ public class CourierImplementation : ICourier
     /// </summary>
     /// <param name="filter">A function to test each courier for a condition.</param>
     /// <returns>The first Courier that matches the filter, or null if none found.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Courier? Read(Func<Courier, bool> filter)
     {
         return XMLTools.LoadListFromXMLElement(Config.s_couriers_xml).Elements()
@@ -82,6 +86,7 @@ public class CourierImplementation : ICourier
     /// </summary>
     /// <param name="item">The courier item with updated information.</param>
     /// <exception cref="DalDoesNotExistException">Thrown when the courier with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Courier item)
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
@@ -101,6 +106,7 @@ public class CourierImplementation : ICourier
     /// </summary>
     /// <param name="item">The courier item to create.</param>
     /// <exception cref="DalAlreadyExistsException">Thrown when a courier with the specified ID already exists.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Courier item)
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
@@ -118,6 +124,7 @@ public class CourierImplementation : ICourier
     /// </summary>
     /// <param name="id">The unique identifier of the courier to delete.</param>
     /// <exception cref="DalDoesNotExistException">Thrown when the courier with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
@@ -134,6 +141,7 @@ public class CourierImplementation : ICourier
     /// <summary>
     /// Deletes all couriers from the XML data store.
     /// </summary>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         XElement couriersRootElem = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml);
@@ -160,6 +168,7 @@ public class CourierImplementation : ICourier
     /// </summary>
     /// <param name="filter">An optional function to filter couriers. If null, all couriers are returned.</param>
     /// <returns>An IEnumerable of Courier objects matching the filter criteria.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Courier> ReadAll(Func<Courier, bool>? filter = null)
     {
         var allCouriers = XMLTools.LoadListFromXMLElement(Config.s_couriers_xml)

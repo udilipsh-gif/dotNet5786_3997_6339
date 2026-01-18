@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using System.Threading.Tasks;
 
 namespace Helpers;
 
@@ -70,7 +71,7 @@ internal static class DeliveryManager
     /// Creates a new delivery record linking the courier to the order and updates
     /// the order status to DELIVERING. Only orders with OPEN or REFUSED status can be selected.
     /// </remarks>
-    public static void StartDelivery(int courierId, int orderId)
+    public static async Task StartDelivery(int courierId, int orderId)
     {
         DO.Order doOrder = s_dal.Order.Read(orderId)
             ?? throw new BO.BlDoesNotExistException("Order not found");
@@ -84,7 +85,7 @@ internal static class DeliveryManager
         if (currentStatus is not BO.OrderStatus.OPEN)
             throw new BO.BlInvalidOperationException("Order is not open for selection");
 
-        DeliveryManager.Create(doOrder, doCourier);
+        await DeliveryManager.Create(doOrder, doCourier);
     }
 
     /// <summary>
@@ -102,32 +103,63 @@ internal static class DeliveryManager
     /// Only returns deliveries that have ended (EndDelivery is not null).
     /// Results are deduplicated by OrderId to show only the most recent delivery attempt for each order.
     /// </remarks>
-    public static List<BO.ClosedDeliveryInList> GetClosed(
+    public static async Task<List<BO.ClosedDeliveryInList>> GetClosed(
         int courierId,
         BO.TypeOfOrder? filter,
         BO.ClosedDeliveryInListField? sort)
     {
-        DO.Courier? courier = s_dal.Courier.Read(courierId)
+        DO.Courier courier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
-        var query = from doDelivery in s_dal.Delivery.ReadAll(d => d.CourierId == courierId && d.EndDelivery != null)
-                    let order = s_dal.Order.Read(doDelivery.OrderId)
-                    where order != null && (filter == null || (BO.TypeOfOrder)order.TypeOfOrder == filter)
-                    select new BO.ClosedDeliveryInList
-                    {
-                        DeliveryId = doDelivery.Id,
-                        OrderId = order.Id,
-                        OrderType = (BO.TypeOfOrder)order.TypeOfOrder,
-                        Address = order.Addres,
-                        ShipmentType = (BO.TheTypeShipment)doDelivery.TypeShipment,
-                        ActualDistens = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
-                        DelyveryTime = (TimeSpan)(doDelivery.TimeEndDelivery! - doDelivery.OrderDate),
-                        EndDelivery = (BO.EndDelivery)doDelivery.EndDelivery!
-                    };
+        var rawData = s_dal.Delivery.ReadAll(d => d.CourierId == courierId && d.EndDelivery != null)
+            .Select(doDelivery => new
+            {
+                Delivery = doDelivery,
+                Order = s_dal.Order.Read(doDelivery.OrderId) 
+            })
+            .Where(item =>
+                item.Order != null &&
+                (filter == null || (BO.TypeOfOrder)item.Order.TypeOfOrder == filter) 
+            );
 
-        //var uniqueQuery = query.DistinctBy(x => x.OrderId);
-        // return [.. s_sortClosedDeliveries(uniqueQuery, sort)];
-        return [.. s_sortClosedDeliveries(query, sort)];
+        var tasks = rawData.Select(async item =>
+        {
+            double? actualDistance = null;
+            if (item.Order is DO.Order order)
+            {
+                try
+                {
+                    actualDistance = await GoogleMapsService.GetActualDistance(
+                    order.Latitude,
+                    order.Longitude,
+                    (BO.TheTypeShipment)courier.TypeShipment);
+                }
+                catch
+                {
+                    actualDistance = null;
+                }
+            }
+            else
+            {
+                actualDistance = null;
+            }
+
+            return new BO.ClosedDeliveryInList
+            {
+                DeliveryId = item.Delivery.Id,
+                OrderId = item.Order.Id,
+                OrderType = (BO.TypeOfOrder)item.Order.TypeOfOrder,
+                Address = item.Order.Addres,
+                ShipmentType = (BO.TheTypeShipment)item.Delivery.TypeShipment,
+                ActualDistance = actualDistance, 
+                DeliveryTime = (TimeSpan)(item.Delivery.TimeEndDelivery! - item.Delivery.OrderDate), 
+                EndDelivery = (BO.EndDelivery)item.Delivery.EndDelivery!
+            };
+        });
+
+        var results = await Task.WhenAll(tasks);
+
+        return [.. s_sortClosedDeliveries(results, sort)];
     }
 
     /// <summary>
@@ -146,7 +178,7 @@ internal static class DeliveryManager
     /// maximum delivery distance capability and match the courier's vehicle capabilities.
     /// Results can be filtered by order type and sorted by various fields.
     /// </remarks>
-    public static List<BO.OpenOrderInList> GetOpen(
+    public static async Task<List<BO.OpenOrderInList>> GetOpen(
         int courierId,
         BO.TypeOfOrder? filter,
         BO.OpenOrderInListField? sort)
@@ -154,46 +186,53 @@ internal static class DeliveryManager
         DO.Courier doCourier = s_dal.Courier.Read(courierId)
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
+        var config = AdminManager.GetConfig();
+        var currentTime = AdminManager.Now;
         var permittedOrders = s_getPermittedOrderTypes(doCourier.TypeShipment);
 
-        Func<DO.Order, bool> orderFilter = order =>
-            permittedOrders.Contains(order.TypeOfOrder) &&
-            (filter == null || order.TypeOfOrder == (DO.TypeOfOrder)filter);
-
-        double? storLet = AdminManager.GetConfig().Latitude;
-        double? storLon = AdminManager.GetConfig().Longitude;
-        double? maxDelivery = doCourier.MaxDistanceDelivery;
-
-        Func<DO.Order, bool> permittedDistens = order =>
+        Func<DO.Order, bool> distanceFilter;
+        if (config.Latitude is double storeLat &&
+            config.Longitude is double storeLon &&
+            doCourier.MaxDistanceDelivery is double maxDist)
         {
-            if (storLet is double let && storLon is double lon && maxDelivery is double max)
+            distanceFilter = order => Tools.GetDistance(order.Latitude, order.Longitude, storeLat, storeLon) <= maxDist;
+        }
+        else
+        {
+            distanceFilter = _ => true; 
+        }
+
+        var relevantOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
+            .Where(order =>
+                permittedOrders.Contains(order.TypeOfOrder) &&
+                (filter == null || order.TypeOfOrder == (DO.TypeOfOrder)filter) &&
+                distanceFilter(order)
+            );
+
+        var tasks = relevantOrders.Select(async doOrder =>
+        {
+            var maxDeliveryTime = doOrder.OrderDate + config.MaxDeliveryTime;
+
+            var distance = await GoogleMapsService.GetActualDistance(doOrder.Latitude, doOrder.Longitude, (BO.TheTypeShipment)doCourier.TypeShipment);
+
+            return new BO.OpenOrderInList
             {
-                return Tools.GetDistance(order.Latitude, order.Longitude, let, lon) <= max;
-            }
-            else
-                return true;
-        };
+                OrderId = doOrder.Id,
+                TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
+                Weight = doOrder.Weight,
+                Address = doOrder.Addres,
+                DistanceKm = doOrder.DistanceKm ?? 0,
+                ActualDistance = distance,
+                EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime((BO.TheTypeShipment)doCourier.TypeShipment, distance ?? 0),
+                ScheduleStatus = await Tools.GetScheduleStatus(doOrder),
+                TimeLeftForDelivery = maxDeliveryTime - currentTime, // שימוש בזמן האחיד
+                MaxDeliveryTime = maxDeliveryTime
+            };
+        });
 
+        var results = await Task.WhenAll(tasks);
 
-        var query = from doOrder in s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN)
-                    where (orderFilter(doOrder) && permittedDistens(doOrder))
-                    let maxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime
-                    let distance = GoogleMapsService.GetActualDistance(doOrder.Addres, (BO.TheTypeShipment)doCourier.TypeShipment)
-                    select new BO.OpenOrderInList
-                    {
-                        OrderId = doOrder.Id,
-                        TypeOfOrder = (BO.TypeOfOrder)doOrder.TypeOfOrder,
-                        Weight = doOrder.Weight,
-                        Address = doOrder.Addres,
-                        DistanceKm = doOrder.DistanceKm ?? 0,
-                        ActualDistance = distance,
-                        EstimatedDeliveryTime = Tools.GetEstimatedDeliveryTime((BO.TheTypeShipment)doCourier.TypeShipment, distance ?? 0),
-                        ScheduleStatus = Tools.GetScheduleStatus(doOrder),
-                        TimeLeftForDelivery = maxDeliveryTime - AdminManager.Now,
-                        MaxDeliveryTime = maxDeliveryTime
-                    };
-
-        return [.. s_sortOpenOrders(query, sort)];
+        return s_sortOpenOrders(results, sort).ToList(); // בהנחה שפונקציית המיון מחזירה IEnumerable
     }
 
     /// <summary>
@@ -217,7 +256,7 @@ internal static class DeliveryManager
     /// </list>
     /// The delivery is created with null end status and time, indicating it is in progress.
     /// </remarks>
-    public static void Create(DO.Order order, DO.Courier courier)
+    public static async Task Create(DO.Order order, DO.Courier courier)
     {
         s_validateDeliveryDistance(order, courier);
 
@@ -232,7 +271,7 @@ internal static class DeliveryManager
             CourierId = courier.Id,
             TypeShipment = courier.TypeShipment,
             OrderDate = AdminManager.Now,
-            ActualDistance = GoogleMapsService.GetActualDistance(order.Addres, (BO.TheTypeShipment)courier.TypeShipment),
+            ActualDistance = await GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude, (BO.TheTypeShipment)courier.TypeShipment),
             EndDelivery = null,
             TimeEndDelivery = null
         };
@@ -417,8 +456,8 @@ internal static class DeliveryManager
             BO.ClosedDeliveryInListField.TypeOfOrder => query.OrderBy(x => x.OrderType),
             BO.ClosedDeliveryInListField.Address => query.OrderBy(x => x.Address),
             BO.ClosedDeliveryInListField.ShipmentType => query.OrderBy(x => x.ShipmentType),
-            BO.ClosedDeliveryInListField.AqualDistens => query.OrderBy(x => x.ActualDistens),
-            BO.ClosedDeliveryInListField.DelyveryTime => query.OrderBy(x => x.DelyveryTime),
+            BO.ClosedDeliveryInListField.ActualDistance => query.OrderBy(x => x.ActualDistance),
+            BO.ClosedDeliveryInListField.DeliveryTime => query.OrderBy(x => x.DeliveryTime),
             BO.ClosedDeliveryInListField.EndDelivery => query.OrderBy(x => x.EndDelivery),
             _ => query.OrderBy(x => x.DeliveryId)
         };

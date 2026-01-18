@@ -155,7 +155,7 @@ public partial class CourierListWindow : Window
     /// </list>
     /// The couriers are sorted by ID by default.
     /// </remarks>
-    private void UpdateCourierList()
+    private async Task UpdateCourierList()
     {
         // Convert filter value to appropriate boolean value
         bool? isActive = CourierFilter switch
@@ -166,24 +166,31 @@ public partial class CourierListWindow : Window
             _ => null
         };
 
-        // Call business layer to get the filtered courier list
-        var newList = Tools.GetSafeFromBl(() => 
-                s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive,
-                BO.CourierFieldSort.Id).Where(e => e.Id != 0),
-                new List<BO.CourierInList>());
+        try 
+        {
+            var courierEnumerable = await s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id);
+            var newList = courierEnumerable.Where(e => e.Id != 0);
 
-        if (CourierInList == null)
-        {
-            CourierInList = new ObservableCollection<BO.CourierInList>(newList);
-        }
-        else
-        {
-            CourierInList.Clear();
-            foreach (var item in newList)
+            if (CourierInList == null)
             {
-                CourierInList.Add(item);
+                CourierInList = new ObservableCollection<BO.CourierInList>(newList);
+            }
+            else
+            {
+                CourierInList.Clear();
+                foreach (var item in newList)
+                {
+                    CourierInList.Add(item);
+                }
             }
         }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"שגיאה בטעינת רשימת השליחים: {ex.Message}", "שגיאה",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+       
     }
 
     /// <summary>

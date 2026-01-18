@@ -1,6 +1,7 @@
 ﻿namespace Dal;
 using DalApi;
 using DO;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 /// <summary>
@@ -15,6 +16,7 @@ internal class OrderImplementation : IOrder
     /// <param name="order">The XElement containing order data.</param>
     /// <returns>An Order object populated with data from the XElement.</returns>
     /// <exception cref="FormatException">Thrown when required fields cannot be converted.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     private static Order getOrder(XElement order)
     {
         return new Order()
@@ -41,6 +43,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="order">The Order object to convert.</param>
     /// <returns>An XElement containing the order data.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     private static XElement createOrderElement(Order order)
     {
         return new XElement("Order",
@@ -65,6 +68,7 @@ internal class OrderImplementation : IOrder
     /// Creates a new order in the XML data store with an auto-generated ID.
     /// </summary>
     /// <param name="item">The order item to create.</param>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Order item)
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);
@@ -81,6 +85,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="id">The unique identifier of the order.</param>
     /// <returns>The Order object if found; otherwise, null.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Order? Read(int id)
     {
         XElement? orderElem =
@@ -95,6 +100,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="filter">A function to test each order for a condition.</param>
     /// <returns>The first Order that matches the filter, or null if none found.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Order? Read(Func<Order, bool> filter)
     {
         return XMLTools.LoadListFromXMLElement(Config.s_orders_xml).Elements()
@@ -107,6 +113,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="item">The order item with updated information.</param>
     /// <exception cref="DalDoesNotExistException">Thrown when the order with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Order item)
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);
@@ -126,6 +133,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="filter">An optional function to filter orders. If null, all orders are returned.</param>
     /// <returns>An IEnumerable of Order objects matching the filter criteria.</returns>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Order> ReadAll(Func<Order, bool>? filter = null)
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);
@@ -145,6 +153,7 @@ internal class OrderImplementation : IOrder
     /// </summary>
     /// <param name="id">The unique identifier of the order to delete.</param>
     /// <exception cref="DalDoesNotExistException">Thrown when the order with the specified ID does not exist.</exception>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);
@@ -160,6 +169,7 @@ internal class OrderImplementation : IOrder
     /// <summary>
     /// Deletes all orders from the XML data store.
     /// </summary>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         XElement ordersRootElem = XMLTools.LoadListFromXMLElement(Config.s_orders_xml);

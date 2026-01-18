@@ -40,7 +40,7 @@ public interface ICourier : IObservable
     /// <returns>A <see cref="BO.Courier"/> instance if found.</returns>
     /// <exception cref="BO.BlNoAccessException">Thrown when the requester is not a manager.</exception>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier does not exist.</exception>
-    BO.Courier? Read(int id, int courierId);
+    Task<BO.Courier?> Read(int id, int courierId);
 
     /// <summary>
     /// Updates an existing courier.
@@ -79,7 +79,7 @@ public interface ICourier : IObservable
     /// <param name="sort">Optional sort field.</param>
     /// <returns>An enumerable of <see cref="BO.CourierInList"/> items.</returns>
     /// <exception cref="BO.BlNoAccessException">Thrown when the requester is not a manager.</exception>
-    IEnumerable<BO.CourierInList> ReadAll(
+    Task<IEnumerable<BO.CourierInList>> ReadAll(
         int requesterId,
         bool? isActive,
         BO.CourierFieldSort? sort);

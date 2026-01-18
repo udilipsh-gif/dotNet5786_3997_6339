@@ -1,4 +1,5 @@
 ﻿using BO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -23,21 +24,21 @@ public partial class MapPopupWindow : Window
         DataContext = this;
         UserId = userId;
 
-        LoadMapData(order, shipmentType);
-        
+        LoadMapData(order, shipmentType).GetAwaiter().GetResult();  
+
         InitializeComponent();
     }
 
-    private void LoadMapData(OpenOrderInList order, TheTypeShipment shipmentType)
+    private async Task LoadMapData(OpenOrderInList order, TheTypeShipment shipmentType)
     {
         try
         {
             // Get full order details for coordinates
-            var fullOrder = s_bl.Order.Read(UserId, order.OrderId);
+            var fullOrder = await s_bl.Order.Read(UserId, order.OrderId);
             if (fullOrder == null) return;
 
             // Get route info (cached)
-            var route = Helpers.GoogleMapsService.GetRouteFromStore(
+            var route = await Helpers.GoogleMapsService.GetRouteFromStore(
                 fullOrder.Latitude, 
                 fullOrder.Longitude, 
                 shipmentType);
@@ -47,7 +48,7 @@ public partial class MapPopupWindow : Window
                 RouteInfo = $"מרחק: {route.DistanceText} | זמן משוער: {route.DurationText}";
                 
                 // Build static map URL
-                MapImageUrl = Helpers.GoogleMapsService.GetStaticMapUrlFromStore(
+                MapImageUrl = await Helpers.GoogleMapsService.GetStaticMapUrlFromStore(
                     fullOrder.Latitude,
                     fullOrder.Longitude,
                     shipmentType,

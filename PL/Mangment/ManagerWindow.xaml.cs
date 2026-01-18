@@ -166,7 +166,7 @@ public partial class ManagerWindow : Window
         int[]? newStats = null;
         try
         {
-             newStats = s_bl.Order.GetAllOrderStatistic(UserId);
+             newStats = s_bl.Order.GetAllOrderStatistic(UserId).GetAwaiter().GetResult();
         }
         catch(BlNoAccessException)
         {

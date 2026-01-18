@@ -52,9 +52,9 @@ public partial class OrderListWindow : Window, IWindowUpdater
     /// </summary>
     public BO.ScheduleStatus? SelectedScheduleFilter
     {
-        get => (BO.ScheduleStatus?)GetValue(SelectedScheduleFilterProperty); 
+        get => (BO.ScheduleStatus?)GetValue(SelectedScheduleFilterProperty);
         set => SetValue(SelectedScheduleFilterProperty, value);
-        
+
     }
 
     public static readonly DependencyProperty SelectedScheduleFilterProperty =
@@ -67,7 +67,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
     public BO.TypeOfOrder? SelectedTypeFilter
     {
         get => (BO.TypeOfOrder?)GetValue(SelectedTypeFilterProperty);
-        set =>  SetValue(SelectedTypeFilterProperty, value);
+        set => SetValue(SelectedTypeFilterProperty, value);
     }
 
     public static readonly DependencyProperty SelectedTypeFilterProperty =
@@ -78,8 +78,8 @@ public partial class OrderListWindow : Window, IWindowUpdater
     /// </summary>
     public BO.OrderStatus? SelectedOrderStatusFilter
     {
-        get => (BO.OrderStatus?)GetValue(SelectedOrderStatusFilterProperty); 
-        set =>  SetValue(SelectedOrderStatusFilterProperty, value);
+        get => (BO.OrderStatus?)GetValue(SelectedOrderStatusFilterProperty);
+        set => SetValue(SelectedOrderStatusFilterProperty, value);
     }
 
     public static readonly DependencyProperty SelectedOrderStatusFilterProperty =
@@ -93,23 +93,28 @@ public partial class OrderListWindow : Window, IWindowUpdater
             (SelectedTypeFilter == null || order.TypeOfOrder == SelectedTypeFilter) &&
             (SelectedOrderStatusFilter == null || order.OrderStatus == SelectedOrderStatusFilter);
 
-        var filteredResults = Tools.GetSafeFromBl<IEnumerable<BO.OrderInList>>(() =>
-            s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId),
-            new List<BO.OrderInList>()
-        );
+        try
+        {
+            var filteredResults = s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId).GetAwaiter().GetResult();
 
-        if (OrderList == null)
-        {
-            OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
-        }
-        else
-        {
-            OrderList.Clear();
-            foreach (var item in filteredResults)
+            if (OrderList == null)
             {
-                OrderList.Add(item);
+                OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
+            }
+            else
+            {
+                OrderList.Clear();
+                foreach (var item in filteredResults)
+                {
+                    OrderList.Add(item);
+                }
             }
         }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading orders: {ex.Message}");
+        }
+
     }
 
     public void UpdateState(params object?[] args)
@@ -156,8 +161,8 @@ public partial class OrderListWindow : Window, IWindowUpdater
     }
 
 
-    
-   
+
+
 
     private void btnCancelOrder_Click(object sender, RoutedEventArgs e)
     {

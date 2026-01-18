@@ -2,6 +2,7 @@
 using BlApi;
 
 using Helpers;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Implements the <see cref="IAdmin"/> interface and provides administrative operations for the system.
@@ -105,7 +106,7 @@ internal class AdminImplementation : IAdmin
     /// <param name="config">The configuration to set.</param>
     public void SetConfig(BO.Config config)
     {
-        AdminManager.SetConfig(config);
+        AdminManager.SetConfig(config).GetAwaiter().GetResult();
     }
 
     /// <summary>

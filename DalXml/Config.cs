@@ -1,4 +1,6 @@
-﻿namespace Dal;
+﻿using System.Runtime.CompilerServices;
+
+namespace Dal;
 
 /// <summary>
 /// Internal static configuration class that manages system-wide settings and auto-incrementing IDs.
@@ -32,7 +34,9 @@ internal static class Config
     /// </summary>
     internal static int NextOrderId
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetAndIncreaseConfigIntVal(s_data_config_xml, "NextOrderId");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private set => XMLTools.SetConfigIntVal(s_data_config_xml, "NextOrderId", value);
     }
 
@@ -42,7 +46,9 @@ internal static class Config
     /// </summary>
     internal static int NextDeliveryId
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetAndIncreaseConfigIntVal(s_data_config_xml, "NextDeliveryId");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private set => XMLTools.SetConfigIntVal(s_data_config_xml, "NextDeliveryId", value);
     }
 
@@ -52,7 +58,9 @@ internal static class Config
     /// </summary>
     internal static DateTime Clock
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigDateVal(s_data_config_xml, "Clock");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigDateVal(s_data_config_xml, "Clock", value);
     }
 
@@ -62,7 +70,9 @@ internal static class Config
     /// </summary>
     internal static int ManagerId
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<int>(s_data_config_xml, "ManagerId");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "ManagerId", value);
     }
 
@@ -72,7 +82,9 @@ internal static class Config
     /// </summary>
     internal static string PasswordManager
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "PasswordManager");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "PasswordManager", value);
     }
 
@@ -81,7 +93,9 @@ internal static class Config
     /// </summary>
     internal static string StoreAddress
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "StoreAddress");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "StoreAddress", value);
     }
 
@@ -91,7 +105,9 @@ internal static class Config
     /// </summary>
     internal static double Latitude
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<double>(s_data_config_xml, "Latitude");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "Latitude", value);
     }
 
@@ -101,7 +117,9 @@ internal static class Config
     /// </summary>
     internal static double Longitude
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<double>(s_data_config_xml, "Longitude");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "Longitude", value);
     }
 
@@ -111,7 +129,9 @@ internal static class Config
     /// </summary>
     internal static double MaxDeliveryRange
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<double>(s_data_config_xml, "MaxDeliveryRange");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "MaxDeliveryRange", value);
     }
 
@@ -120,7 +140,9 @@ internal static class Config
     /// </summary>
     internal static double AvgSpeedCar
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<double>(s_data_config_xml, "AvgSpeedCar");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "AvgSpeedCar", value);
     }
 
@@ -129,7 +151,9 @@ internal static class Config
     /// </summary>
     internal static double AvgSpeedMotorcycle
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<double>(s_data_config_xml, "AvgSpeedMotorcycle");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "AvgSpeedMotorcycle", value);
     }
 
@@ -138,7 +162,9 @@ internal static class Config
     /// </summary>
     internal static double AvgSpeedBike
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<double>(s_data_config_xml, "AvgSpeedBike");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "AvgSpeedBike", value);
     }
 
@@ -147,7 +173,9 @@ internal static class Config
     /// </summary>
     internal static double AvgSpeedFoot
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<double>(s_data_config_xml, "AvgSpeedFoot");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "AvgSpeedFoot", value);
     }
 
@@ -156,7 +184,9 @@ internal static class Config
     /// </summary>
     internal static TimeSpan MaxDeliveryTime
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<TimeSpan>(s_data_config_xml, "MaxDeliveryTime");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "MaxDeliveryTime", value);
     }
 
@@ -166,7 +196,9 @@ internal static class Config
     /// </summary>
     internal static TimeSpan RiskRange
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<TimeSpan>(s_data_config_xml, "RiskRange");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "RiskRange", value);
     }
 
@@ -176,34 +208,46 @@ internal static class Config
     /// </summary>
     internal static TimeSpan MaxTimeInactivity
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<TimeSpan>(s_data_config_xml, "MaxTimeInactivity");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "MaxTimeInactivity", value);
     }
 
     internal static string GoogleApiKey
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "GoogleApiKey");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "GoogleApiKey", value);
     }
 
     internal static string EmailAddress
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "EmailAddress");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "EmailAddress", value);
     }
     internal static string ScriptUrl
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "ScriptUrl");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "ScriptUrl", value);
     }
     internal static string ScriptPass
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "ScriptPass");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "ScriptPass", value);
     }
     internal static string TokenCallSms
     {
+        [MethodImpl(MethodImplOptions.Synchronized)]
         get => XMLTools.GetConfigGenericVal<string>(s_data_config_xml, "TokenCallSms");
+        [MethodImpl(MethodImplOptions.Synchronized)]
         set => XMLTools.SetConfigGenericVal(s_data_config_xml, "TokenCallSms", value);
     }
 
@@ -231,6 +275,7 @@ internal static class Config
     /// <item>MaxTimeInactivity: 15 minutes</item>
     /// </list>
     /// </remarks>
+    [MethodImpl(MethodImplOptions.Synchronized)]
     internal static void Reset()
     {
         NextOrderId = 100001;
