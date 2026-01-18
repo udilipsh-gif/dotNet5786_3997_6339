@@ -5,8 +5,6 @@ using System.Net;
 using System.Net.Mail;
 using System.Reflection;
 using System.Text;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace Helpers;
 
@@ -248,9 +246,8 @@ internal static class Tools
         bool hasChanges = false;
         DateTime now = AdminManager.Now;
 
-        // שליפת טווח חוסר הפעילות מהקונפיגורציה
         TimeSpan maxInactivity = s_dal.Config.MaxTimeInactivity;
-        // --- לוגיקה לעדכון שליחים (Couriers) ---
+
         var couriers = s_dal.Courier.ReadAll();
 
         foreach (var courier in couriers)

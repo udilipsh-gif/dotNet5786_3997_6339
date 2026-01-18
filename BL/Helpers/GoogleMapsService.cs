@@ -21,6 +21,8 @@ public static class GoogleMapsService
     /// </summary>
     private static readonly HttpClient s_httpClient = new();
 
+    private static readonly SemaphoreSlim _gateKeeper = new SemaphoreSlim(10);
+
     /// <summary>
     /// Thread-safe cache for storing distance calculations to avoid repeated API calls.
     /// Key format: "origin|destination|mode" (normalized to lowercase).
@@ -527,7 +529,7 @@ public static class GoogleMapsService
         string apiKey = AdminManager.GetConfig().GoogleApiKey
             ?? throw new BO.BlInvalidValueException("Google API Key is not configured.");
 
-        double storeLatitude = AdminManager.GetConfig().Latitude 
+        double storeLatitude = AdminManager.GetConfig().Latitude
             ?? throw new BO.BlInvalidValueException("Store Latitude is not configured.");
 
         double storeLongitude = AdminManager.GetConfig().Longitude
@@ -592,6 +594,41 @@ public static class GoogleMapsService
             throw new BO.BlDoesNotExistException($"Distance calculation error: {ex.Message}");
         }
     }
+
+
+
+
+    public static async Task<T> NetworkKeeper<T>(Func<Task<T>> action)
+    {
+        await _gateKeeper.WaitAsync();
+
+        try
+        {
+            await Task.Delay(100);
+            T result = await action();
+            
+            return result;
+        }
+        finally
+        {
+            _gateKeeper.Release();
+        }
+    }
+
+    //public static async Task NetworkKeeper(Func<Task> action)
+    //{
+    //    await _gateKeeper.WaitAsync();
+    //    try
+    //    {
+    //        await action();
+    //        await Task.Delay(100);
+    //    }
+    //    finally
+    //    {
+    //        _gateKeeper.Release();
+    //    }
+    //}
+
 
     /// <summary>
     /// Checks if a given ID belongs to the system manager.
