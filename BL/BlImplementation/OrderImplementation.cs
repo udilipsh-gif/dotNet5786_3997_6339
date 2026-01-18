@@ -181,12 +181,12 @@ internal class OrderImplementation : IOrder
     /// <remarks>
     /// Only managers can cancel orders.
     /// </remarks>
-    public void Cancel(int id, int orderId, bool token = false)
+    public async Task Cancel(int id, int orderId, bool token = false)
     {
         if (!Tools.CheckManger(id))
             throw new BO.BlNoAccessException();
 
-        OrderManager.Cancel(orderId, token);
+       await OrderManager.Cancel(orderId, token);
     }
 
     /// <summary>

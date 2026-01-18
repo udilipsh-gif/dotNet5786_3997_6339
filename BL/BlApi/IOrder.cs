@@ -93,7 +93,7 @@ public interface IOrder : IObservable
     /// <exception cref="BO.BlNoAccessException">Thrown when the user does not have manager privileges.</exception>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the order is not found.</exception>
     /// <exception cref="BO.BlInvalidOperationException">Thrown when the order cannot be cancelled in its current state.</exception>
-    void Cancel(int id, int orderId, bool token = false);
+    Task Cancel(int id, int orderId, bool token = false);
 
     /// <summary>
     /// Marks a delivery as completed with a specific outcome.

@@ -221,7 +221,7 @@ internal static class Tools
         return order.OrderStatus switch
         {
             DO.OrderStatus.COMPLETED => GetCompletedOrderScheduleStatus(order, delivery, maxDeliveryTime),
-            DO.OrderStatus.DELIVERING => await   GetDeliveringOrderScheduleStatus(order, maxDeliveryTime, riskRange),
+            DO.OrderStatus.DELIVERING => await GetDeliveringOrderScheduleStatus(order, maxDeliveryTime, riskRange),
             DO.OrderStatus.OPEN => GetOpenOrderScheduleStatus(order, maxDeliveryTime, riskRange),
             _ => BO.ScheduleStatus.CANCELLED
         };
@@ -481,7 +481,7 @@ internal static class Tools
     public static async Task<TimeSpan?> GetEstimatedDeliveryTime(DO.Order order)
     {
         var delivery = s_getLatestDelivery(order.Id);
-        return  delivery == null ? null : await GetEstimatedDeliveryTime(delivery);
+        return delivery == null ? null : await GetEstimatedDeliveryTime(delivery);
     }
 
     /// <summary>
@@ -656,52 +656,44 @@ internal static class Tools
         }
     }
     private static readonly HttpClient client = new HttpClient();
-    public static void SendEmailSkript(string toEmail, string subject, string body)
+    public static async Task SendEmailSkript(string toEmail, string subject, string body)
     {
-        string headUrl = "https://script.google.com/macros/s/";
+        string headUrl = ""; //"https://script.google.com/macros/s/";
 
         string endUrl = "/exec";
 
-        string scriptUrl =$"{headUrl}{AdminManager.GetConfig().ScriptUrl}{endUrl}";          //"https://script.google.com/macros/s/AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg/exec";
+        string scriptUrl = $"{headUrl}{AdminManager.GetConfig().ScriptUrl}{endUrl}";          //"https://script.google.com/macros/s/AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg/exec";
 
         string scriptPass = AdminManager.GetConfig().ScriptPass;                                                                ///"sdfjsak8796978akljdf54gdfgr44";
 
         string name = "חנות הספרים- מיני פרוייקט";
-        Task.Run(async () =>
+
+
+        try
         {
-            try
+            string requestUrl = $"{scriptUrl}?pas={scriptPass}" +
+                                 $"&address={Uri.EscapeDataString(toEmail)}" +
+                                 $"&sub={Uri.EscapeDataString(subject)}" +
+                                 $"&body={Uri.EscapeDataString(body)}" +
+                                 $"&from={Uri.EscapeDataString(name)}";
+
+            HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
+            if (!response.IsSuccessStatusCode)
             {
-                string requestUrl = $"{scriptUrl}?pas={scriptPass}" +
-                                     $"&address={Uri.EscapeDataString(toEmail)}" +
-                                     $"&sub={Uri.EscapeDataString(subject)}" +
-                                     $"&body={Uri.EscapeDataString(body)}" +
-                                     $"&from={Uri.EscapeDataString(name)}";
-
-                HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
-                if (!response.IsSuccessStatusCode)
-                {
-                      throw new SmtpException($"{response.StatusCode}");
-                    //Console.WriteLine($"Error sending email: {response.StatusCode}");
-                }
-                return;
-
+                throw new SmtpException($"{response.StatusCode}");
+                //Console.WriteLine($"Error sending email: {response.StatusCode}");
             }
-            catch (Exception ex)//שלב 7
-            {
-                throw new HttpRequestException($"{ex.Message}");
-                //Console.WriteLine($"Exception in SendEmail: {ex.Message}");
-            }
-            //catch (Exception ex)
-            //{
-            //    Console.Write($"שליחת סקריפט נכשלה  {ex.Message}");
-            //}
-        });
 
-        return;
 
+        }
+        catch (Exception ex)//שלב 7
+        {
+            throw new HttpRequestException($"{ex.Message}");
+            //Console.WriteLine($"Exception in SendEmail: {ex.Message}");
+        }
     }
 
-    public static void SendSms(string phone, string mane, string body)
+    public static async Task SendSms(string phone, string mane, string body)
     {
         throw new SmtpException("SMS sending not implemented");
     }
