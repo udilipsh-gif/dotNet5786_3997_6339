@@ -298,7 +298,7 @@ internal static class Config
         EmailAddress = "david48483@gmail.com";
         ScriptUrl = "AKfycbwzaZwF0Lv9iFC2_SWqSAgaIBUQlBDLLqJ9GlAxUS6dJCf4Sm7BqjcQy0nID1Zbip-0jQ";
         ScriptPass = "sdfjsak8796978akljdf54gdfgr44";
-        TokenCallSms = "########";
+        TokenCallSms = "WU1BUElL.apik_j2szxGbBK7FSC2mHXJ1MBQ.f3eQocFPKykDUClg3fsSXpuvpodW5qgiZKAlpST5a8c";
 
     }
 }
