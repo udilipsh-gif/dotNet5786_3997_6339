@@ -658,7 +658,7 @@ internal static class Tools
     private static readonly HttpClient client = new HttpClient();
     public static void SendEmailSkript(string toEmail, string subject, string body)
     {
-        string headUrl = "";// "https://script.google.com/macros/s/";
+        string headUrl = "https://script.google.com/macros/s/";
 
         string endUrl = "/exec";
 
