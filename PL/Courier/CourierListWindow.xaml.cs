@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel; 
+﻿using PL.Helpers;
+using System.Collections.ObjectModel; 
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,6 +27,9 @@ public partial class CourierListWindow : Window
     /// Business logic layer instance for accessing courier operations.
     /// </summary>
     static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+
 
     /// <summary>
     /// The ID of the currently logged-in manager performing operations.
@@ -137,9 +141,15 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void courierListObserver()
     {
-        Dispatcher.Invoke(() =>
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
+
+        Dispatcher.BeginInvoke(async () =>
         {
             UpdateCourierList();
+
+            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
+                courierListObserver();
         });
     }
 

@@ -374,26 +374,20 @@ public partial class ManagerWindow : Window
 
     private void btnStatistic_Click(object sender, RoutedEventArgs e)
     {
-        // בדיקה שהשולח הוא אכן כפתור או אלמנט עם Tag
         if (sender is FrameworkElement element && element.Tag != null)
         {
-            // שליפת האובייקט המקורי (ה-Enum) מתוך ה-Tag
             var tagValue = element.Tag;
 
-            // שימוש ב-Pattern Matching כדי לבדוק את הסוג
             switch (tagValue)
             {
-                // מקרה 1: ה-Tag הוא מסוג OrderStatus
                 case BO.OrderStatus orderStatus:
                     Tools.OpenOrActivateWindow<OrderListWindow>(this, orderStatus, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
                     break;
 
-                // מקרה 2: ה-Tag הוא מסוג ScheduleStatus
                 case BO.ScheduleStatus scheduleStatus:
                     Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, scheduleStatus, (BO.TypeOfOrder?)null);
                     break;
 
-                // מקרה ברירת מחדל (למשל אם נלחץ משהו אחר או null)
                 default:
                     Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
                     break;
