@@ -1,4 +1,5 @@
 ﻿using BO;
+using PL.Helpers;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
@@ -130,7 +131,7 @@ public partial class ManagerWindow : Window
     /// </remarks>
     private void ManagerWindow_Close(object? sender, EventArgs e)
     {
-        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
+        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(clockObserver));
         Tools.RunSafe(() => s_bl.Order.RemoveObserver(StatisticObserver));
     }
 
@@ -150,16 +151,39 @@ public partial class ManagerWindow : Window
     /// </remarks>
     private void ManagerWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        ClockObserver();
+        clockObserver();
         StatisticObserver();
-        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(clockObserver));
         Tools.RunSafe(() => s_bl.Order.AddObserver(StatisticObserver));
     }
+
+    private readonly ObserverMutex _clockMutex = new(); //stage 7
 
     /// <summary>
     /// Observer callback method for clock changes, updates the displayed time.
     /// </summary>
-    private void ClockObserver() => CurrentTime = s_bl.Admin.GetClock();
+   // private void clockObserver() => CurrentTime = s_bl.Admin.GetClock();//stage 5
+
+
+    private void clockObserver()
+    {
+        #region Stage 7 (for multithreading)
+        if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
+
+        Dispatcher.BeginInvoke(async () =>
+        {
+            // The actual work to be done on the UI thread
+            CurrentTime = s_bl.Admin.GetClock(); //stage 5
+
+            // After completing the work, check if a restart was requested
+            if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
+                clockObserver();
+        });
+        #endregion Stage 7 (for multithreading)
+    }
+
+
 
     private async void StatisticObserver()
     {

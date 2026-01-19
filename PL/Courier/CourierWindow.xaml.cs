@@ -1,4 +1,5 @@
 ﻿using BO;
+using PL.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -270,6 +271,8 @@ public partial class CourierWindow : Window
         }
     }
 
+
+    private readonly ObserverMutex _Mutex = new(); //stage 7
     /// <summary>
     /// Observer method that updates the courier data when changes occur in the business layer.
     /// </summary>
@@ -278,23 +281,37 @@ public partial class CourierWindow : Window
     /// This method is called whenever the business layer notifies of changes to the courier.
     /// It is skipped if a deletion operation is in progress to avoid accessing deleted data.
     /// </remarks>
-    private  async void CourierObserver()
+    private void CourierObserver()
     {
-        try
+
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
+
+        Dispatcher.BeginInvoke(async () =>
         {
-            CurrentCourier = await s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
+            bool windowIsOpen = true;
+            try
+            {
+           
+                CurrentCourier = await s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
                         ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
-        }
-        catch (BO.BlDoesNotExistException)
-        {
-            Close();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message);
-        }
 
-
+            }
+            catch (BO.BlDoesNotExistException)
+            {
+                windowIsOpen = false;
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (windowIsOpen is true &&await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    CourierObserver();
+            }
+        });
 
 
     }
