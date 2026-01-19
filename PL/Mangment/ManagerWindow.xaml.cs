@@ -47,7 +47,7 @@ public partial class ManagerWindow : Window
                                   {
                                       Id = e,
                                       Name = "סטטוס הזמנה: " + Tools.GetDescription(e),
-                                      Value = 0 
+                                      Value = 0
                                   });
 
             combinedList.AddRange(orderValues);
@@ -133,6 +133,7 @@ public partial class ManagerWindow : Window
     {
         Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(clockObserver));
         Tools.RunSafe(() => s_bl.Order.RemoveObserver(StatisticObserver));
+        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(StatisticObserver));
     }
 
     /// <summary>
@@ -155,6 +156,7 @@ public partial class ManagerWindow : Window
         StatisticObserver();
         Tools.RunSafe(() => s_bl.Admin.AddClockObserver(clockObserver));
         Tools.RunSafe(() => s_bl.Order.AddObserver(StatisticObserver));
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(StatisticObserver));
     }
 
     private readonly ObserverMutex _clockMutex = new(); //stage 7
@@ -176,6 +178,8 @@ public partial class ManagerWindow : Window
             // The actual work to be done on the UI thread
             CurrentTime = s_bl.Admin.GetClock(); //stage 5
 
+          
+
             // After completing the work, check if a restart was requested
             if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
                 clockObserver();
@@ -184,32 +188,42 @@ public partial class ManagerWindow : Window
     }
 
 
-
-    private async void StatisticObserver()
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+    private void StatisticObserver()
     {
-        int[]? newStats = null;
-        try
-        {
-             newStats = await s_bl.Order.GetAllOrderStatistic(UserId);
-        }
-        catch(BlNoAccessException)
-        {
-            MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
-            this.Close();
-        }
-        var enumList = EnumForStatistic;
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
 
-        if (enumList != null && newStats != null)
+        Dispatcher.BeginInvoke(async () =>
         {
-            var resultList = enumList.Zip(newStats, (labelObj, count) => new StatisticItem
+            bool windowIsOpen = true;
+            int[]? newStats = null;
+            try
             {
-                Id = labelObj.Id,     // אין צורך ב-dynamic
-                Name = labelObj.Name, // אין צורך ב-dynamic
-                Value = count         // העדכון מהסטטיסטיקה
-            }).ToList();
+                newStats = await s_bl.Order.GetAllOrderStatistic(UserId);
+            }
+            catch (BlNoAccessException)
+            {
+                windowIsOpen = false;
+                MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
+                Close();
+            }
+            var enumList = EnumForStatistic;
 
-            CombinedStatistics = resultList;
-        }
+            if (enumList != null && newStats != null)
+            {
+                var resultList = enumList.Zip(newStats, (labelObj, count) => new StatisticItem
+                {
+                    Id = labelObj.Id,     // אין צורך ב-dynamic
+                    Name = labelObj.Name, // אין צורך ב-dynamic
+                    Value = count         // העדכון מהסטטיסטיקה
+                }).ToList();
+
+                CombinedStatistics = resultList;
+            }
+            if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
+                StatisticObserver();
+        });
     }
 
     /// <summary>
@@ -260,6 +274,7 @@ public partial class ManagerWindow : Window
                 };
 
                 s_bl.Admin.ForwardClock(value);
+                StatisticObserver();
             }
             catch (Exception ex)
             {
@@ -372,8 +387,10 @@ public partial class ManagerWindow : Window
     private void btnOrderList_Click(object sender, RoutedEventArgs e)
         => Tools.OpenOrActivateWindow<OrderListWindow>(this);
 
+
     private void btnStatistic_Click(object sender, RoutedEventArgs e)
     {
+
         if (sender is FrameworkElement element && element.Tag != null)
         {
             var tagValue = element.Tag;

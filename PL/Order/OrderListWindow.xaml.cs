@@ -151,11 +151,15 @@ public partial class OrderListWindow : Window, IWindowUpdater
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(orderListObserver));
         orderListObserver();
     }
 
     private void Window_Closed(object sender, EventArgs e)
-        => Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
+    {
+        Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
+        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(orderListObserver));
+    }
 
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         => orderListObserver();
