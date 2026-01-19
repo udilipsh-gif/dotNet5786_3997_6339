@@ -500,4 +500,54 @@
     <EndDelivery>DELIVERED</EndDelivery>
     <TimeEndDelivery>2026-01-19T13:49:46.5200000</TimeEndDelivery>
   </Delivery>
+  <Delivery>
+    <Id>200051</Id>
+    <OrderId>100004</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T00:06:45.0000000</OrderDate>
+    <ActualDistance>7.822</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-19T00:06:45.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200052</Id>
+    <OrderId>100007</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T00:06:45.0000000</OrderDate>
+    <ActualDistance>8.303</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-19T00:06:45.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200053</Id>
+    <OrderId>100012</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T00:06:45.0000000</OrderDate>
+    <ActualDistance>3.651</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2026-01-19T00:06:45.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200054</Id>
+    <OrderId>100010</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T00:06:45.0000000</OrderDate>
+    <ActualDistance>8.446</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2026-01-19T00:06:45.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200055</Id>
+    <OrderId>100017</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T00:06:45.0000000</OrderDate>
+    <ActualDistance>2.718</ActualDistance>
+    <EndDelivery></EndDelivery>
+    <TimeEndDelivery></TimeEndDelivery>
+  </Delivery>
 </ArrayOfDeliverys>
