@@ -241,22 +241,6 @@
     <DistanceKmWalk>5.82</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100017</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 16</Details>
-    <Addres> סירקין 12, גבעתיים</Addres>
-    <Latitude>32.0775637</Latitude>
-    <Longitude>34.814622</Longitude>
-    <Name>Customer16</Name>
-    <Phone>0550433342</Phone>
-    <Weight>3</Weight>
-    <OrderDate>2026-01-16T22:33:42.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>1.9499761658266175</DistanceKm>
-    <DistanceKmRoad>2.702</DistanceKmRoad>
-    <DistanceKmWalk>2.297</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100015</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 14</Details>
@@ -795,9 +779,25 @@
     <Phone>0578004039</Phone>
     <Weight>4</Weight>
     <OrderDate>2026-01-16T22:33:42.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
+    <OrderStatus>REFUSED</OrderStatus>
     <DistanceKm>5.810287201777098</DistanceKm>
     <DistanceKmRoad>7.92</DistanceKmRoad>
     <DistanceKmWalk>6.31</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100017</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 16</Details>
+    <Addres> סירקין 12, גבעתיים</Addres>
+    <Latitude>32.0775637</Latitude>
+    <Longitude>34.814622</Longitude>
+    <Name>Customer16</Name>
+    <Phone>0550433342</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-16T22:33:42.0000000</OrderDate>
+    <OrderStatus>DELIVERING</OrderStatus>
+    <DistanceKm>1.9499761658266175</DistanceKm>
+    <DistanceKmRoad>2.702</DistanceKmRoad>
+    <DistanceKmWalk>2.297</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

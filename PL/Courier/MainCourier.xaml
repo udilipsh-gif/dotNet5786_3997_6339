@@ -201,7 +201,7 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel>
                                 <Label Content="סוג הזמנה:"/>
-                                <TextBlock Text="{Binding CurrentUser.OrderInProgress.TypeOfOrder}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding CurrentUser.OrderInProgress.TypeOfOrder,  Converter={StaticResource EnumDescriptionConverter}}" FontWeight="SemiBold"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1">
                                 <Label Content="מרחק אווירי:"/>
@@ -241,7 +241,7 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel>
                                 <Label Content="סטטוס הזמנה:"/>
-                                <TextBlock Text="{Binding CurrentUser.OrderInProgress.OrderStatus}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding CurrentUser.OrderInProgress.OrderStatus, Converter={StaticResource EnumDescriptionConverter}}" FontWeight="SemiBold"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1">
                                 <Label Content="זמן מירבי למשלוח:"/>

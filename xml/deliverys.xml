@@ -537,6 +537,16 @@
     <TypeShipment>CAR</TypeShipment>
     <OrderDate>2026-01-19T00:06:45.0000000</OrderDate>
     <ActualDistance>8.446</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2026-01-19T00:06:45.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200055</Id>
+    <OrderId>100017</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T00:06:45.0000000</OrderDate>
+    <ActualDistance>2.718</ActualDistance>
     <EndDelivery></EndDelivery>
     <TimeEndDelivery></TimeEndDelivery>
   </Delivery>
