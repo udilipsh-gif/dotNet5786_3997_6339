@@ -37,24 +37,24 @@ public partial class MapPopupWindow : Window
             var fullOrder = await s_bl.Order.Read(UserId, order.OrderId);
             if (fullOrder == null) return;
 
-            // Get route info (cached)
-            var route = await Helpers.GoogleMapsService.GetRouteFromStore(
-                fullOrder.Latitude, 
-                fullOrder.Longitude, 
-                shipmentType);
+            //// Get route info (cached)
+            //var route = await BO.Helpers.GoogleMapsService.GetRouteFromStore(
+            //    fullOrder.Latitude, 
+            //    fullOrder.Longitude, 
+            //    shipmentType);
 
-            if (route != null)
-            {
-                RouteInfo = $"מרחק: {route.DistanceText} | זמן משוער: {route.DurationText}";
+            //if (route != null)
+            //{
+            //    RouteInfo = $"מרחק: {route.DistanceText} | זמן משוער: {route.DurationText}";
                 
-                // Build static map URL
-                MapImageUrl = await Helpers.GoogleMapsService.GetStaticMapUrlFromStore(
-                    fullOrder.Latitude,
-                    fullOrder.Longitude,
-                    shipmentType,
-                    width: 380,
-                    height: 200);
-            }
+            //    // Build static map URL
+            //    MapImageUrl = await BO.Helpers.GoogleMapsService.GetStaticMapUrlFromStore(
+            //        fullOrder.Latitude,
+            //        fullOrder.Longitude,
+            //        shipmentType,
+            //        width: 380,
+            //        height: 200);
+            //}
         }
         catch
         {
