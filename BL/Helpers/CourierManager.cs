@@ -646,22 +646,29 @@ internal static class CourierManager
 
     private static void s_completeDeliveryNotObserv(int courierId, int deliveryId, BO.EndDelivery endDelivery)
     {
-
-        DO.Delivery delivery = Tools.GetAndValidateDelivery(deliveryId, courierId);
-
-        // Update delivery with completion details
-        delivery = delivery with
+        try
         {
-            EndDelivery = (DO.EndDelivery)endDelivery,
-            TimeEndDelivery = AdminManager.Now
-        };
-        lock (AdminManager.BlMutex)
-            s_dal.Delivery.Update(delivery);
-        Observer.NotifyItemUpdated(courierId);
-        OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
-        DeliveryManager.Observer.NotifyItemUpdated(deliveryId);
+            DO.Delivery? delivery;
+            lock (AdminManager.BlMutex)
+                delivery = s_dal.Delivery.Read(deliveryId);
 
+            if (delivery != null)
+            {
+                var updatedDelivery = delivery with
+                {
+                    EndDelivery = (DO.EndDelivery)endDelivery,
+                    TimeEndDelivery = AdminManager.Now
+                };
 
+                lock (AdminManager.BlMutex)
+                    s_dal.Delivery.Update(updatedDelivery);
+
+                Observer.NotifyItemUpdated(courierId);
+                OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
+                DeliveryManager.Observer.NotifyItemUpdated(deliveryId);
+            }
+        }
+        catch (Exception) {}
     }
 
 }
