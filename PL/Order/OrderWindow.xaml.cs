@@ -1,4 +1,5 @@
 ﻿using BO;
+using PL.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -42,7 +43,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     /// <summary>
     /// The ID of the currently logged-in manager.
     /// </summary>
-    private readonly int CURRENT_MANAGER_ID = 
+    private readonly int CURRENT_MANAGER_ID =
             Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().ManagerId);
 
     public bool IsUpdateMode => ButtonText == "Update";
@@ -66,7 +67,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
 
 
-   
+
 
     public OrderWindow(int id = 0)
     {
@@ -83,7 +84,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
          DependencyProperty.Register("CurrentOrder", typeof(BO.Order),
              typeof(OrderWindow), new PropertyMetadata(null));
 
-   
+
 
 
     private void OrderWindow_Loaded(object sender, EventArgs e)
@@ -133,7 +134,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
     }
 
-  
+
     /// <summary>
     /// btnCancel_Click - Handles the click event for the Cancel button to cancel the current order.
     /// </summary>
@@ -149,7 +150,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
         if (result != MessageBoxResult.Yes)
             return;
-        
+
 
         try
         {
@@ -157,8 +158,8 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
             bool StateToken = (btn?.CommandParameter as bool?).GetValueOrDefault();
 
 
-             await s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID, StateToken);
-           
+            await s_bl.Order.Cancel(CURRENT_MANAGER_ID, CurrentID, StateToken);
+
             MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה");
 
             Close();
@@ -180,27 +181,50 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         {
             MessageBox.Show($"שגיאה בביטול: {ex.Message}");
         }
-       
+
     }
+
+
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+
     /// <summary>
     /// orderObserver - Observes changes to the current order and updates the UI accordingly.
     /// </summary>
-    private async void OrderObserver()
+    private void OrderObserver()
     {
-        try
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
+
+        Dispatcher.BeginInvoke(async () =>
         {
-            CurrentOrder = await s_bl.Order.Read(CURRENT_MANAGER_ID, CurrentID)
-                        ?? throw new BO.BlDoesNotExistException($"The Order with id: {CurrentID} does not exist");
-        }
-        catch (BO.BlDoesNotExistException)
-        {
-            Close();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message);
-        }
+            bool windowIsOpen = true;
+
+            try
+            {
+                CurrentOrder = await s_bl.Order.Read(CURRENT_MANAGER_ID, CurrentID)
+                            ?? throw new BO.BlDoesNotExistException($"The Order with id: {CurrentID} does not exist");
+            }
+            catch (BO.BlDoesNotExistException)
+            {
+                windowIsOpen = false;
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    OrderObserver();
+            }
+        });
     }
+
+
+
+
+
     /// <summary>
     /// cleans up observers when the window is closed.
     /// </summary>

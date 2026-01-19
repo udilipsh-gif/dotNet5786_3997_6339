@@ -21,16 +21,6 @@
     <TimeEndDelivery></TimeEndDelivery>
   </Delivery>
   <Delivery>
-    <Id>200003</Id>
-    <OrderId>100009</OrderId>
-    <CourierId>5</CourierId>
-    <TypeShipment>CAR</TypeShipment>
-    <OrderDate>2026-01-19T13:52:07.0000000</OrderDate>
-    <ActualDistance>5.442</ActualDistance>
-    <EndDelivery></EndDelivery>
-    <TimeEndDelivery></TimeEndDelivery>
-  </Delivery>
-  <Delivery>
     <Id>200004</Id>
     <OrderId>100011</OrderId>
     <CourierId>270057971</CourierId>
@@ -99,16 +89,6 @@
     <ActualDistance>1.588</ActualDistance>
     <EndDelivery>DELIVERED</EndDelivery>
     <TimeEndDelivery>2026-01-19T13:54:01.3360000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200011</Id>
-    <OrderId>100045</OrderId>
-    <CourierId>5</CourierId>
-    <TypeShipment>CAR</TypeShipment>
-    <OrderDate>2026-01-19T13:52:07.0000000</OrderDate>
-    <ActualDistance>8.697</ActualDistance>
-    <EndDelivery></EndDelivery>
-    <TimeEndDelivery></TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200012</Id>
@@ -259,16 +239,6 @@
     <ActualDistance>0.327</ActualDistance>
     <EndDelivery>CONCELLED</EndDelivery>
     <TimeEndDelivery>2026-01-19T13:52:07.0000000</TimeEndDelivery>
-  </Delivery>
-  <Delivery>
-    <Id>200027</Id>
-    <OrderId>100031</OrderId>
-    <CourierId>5</CourierId>
-    <TypeShipment>CAR</TypeShipment>
-    <OrderDate>2026-01-19T15:09:55.1440000</OrderDate>
-    <ActualDistance>6.502</ActualDistance>
-    <EndDelivery></EndDelivery>
-    <TimeEndDelivery></TimeEndDelivery>
   </Delivery>
   <Delivery>
     <Id>200028</Id>
@@ -499,5 +469,35 @@
     <ActualDistance>11.779</ActualDistance>
     <EndDelivery>REFUSED</EndDelivery>
     <TimeEndDelivery>2026-01-19T16:13:13.9600000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200003</Id>
+    <OrderId>100009</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T13:52:07.0000000</OrderDate>
+    <ActualDistance>5.442</ActualDistance>
+    <EndDelivery>NOTFOUND</EndDelivery>
+    <TimeEndDelivery>2026-01-19T15:02:51.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200011</Id>
+    <OrderId>100045</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T13:52:07.0000000</OrderDate>
+    <ActualDistance>8.697</ActualDistance>
+    <EndDelivery>REFUSED</EndDelivery>
+    <TimeEndDelivery>2026-01-19T15:02:51.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200027</Id>
+    <OrderId>100031</OrderId>
+    <CourierId>5</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-01-19T15:09:55.1440000</OrderDate>
+    <ActualDistance>6.502</ActualDistance>
+    <EndDelivery>FAILED</EndDelivery>
+    <TimeEndDelivery>2026-01-19T15:02:51.0000000</TimeEndDelivery>
   </Delivery>
 </ArrayOfDeliverys>

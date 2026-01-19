@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using PL.Helpers;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,9 +18,9 @@ public partial class StartDeliveryWindow : Window
 
     public int UserId { get; private init; }
 
-    private int courierId { get;  init; }
+    private int courierId { get; init; }
 
-    private BO.TheTypeShipment typeShipment { get;  init; }
+    private BO.TheTypeShipment typeShipment { get; init; }
 
     public IEnumerable<Tools.SelectionItem> EnumTypeOfOrder
     {
@@ -51,7 +52,7 @@ public partial class StartDeliveryWindow : Window
         typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
 
-    public StartDeliveryWindow(int userId, int courierId, BO.TheTypeShipment TypeShipment,  IEnumerable<Tools.SelectionItem>? enumTypeOfOrder)
+    public StartDeliveryWindow(int userId, int courierId, BO.TheTypeShipment TypeShipment, IEnumerable<Tools.SelectionItem>? enumTypeOfOrder)
     {
         this.UserId = userId;
 
@@ -82,34 +83,48 @@ public partial class StartDeliveryWindow : Window
         Tools.RunSafe(() => s_bl.Courier.RemoveObserver(UserId, orderListObserver));
     }
 
-    private async void UpdateOrdersList()
+
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+
+    private void UpdateOrdersList()
     {
-        try
-        {
-            var DeliveryList = await s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null);
-
-            if (DeliveryListView == null)
-            {
-                DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
-            }
-            else
-            {
-                DeliveryListView.Clear(); // מחיקת הישנים
-                foreach (var item in DeliveryList)
-                {
-                    DeliveryListView.Add(item); // הוספת החדשים
-                }
-            }
-
-
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}", "שגיאה",
-                MessageBoxButton.OK, MessageBoxImage.Error);
-            DeliveryListView = new ObservableCollection<BO.OpenOrderInList>();
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
             return;
-        }
+
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                var DeliveryList = await s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null);
+
+                if (DeliveryListView == null)
+                {
+                    DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
+                }
+                else
+                {
+                    DeliveryListView.Clear(); // מחיקת הישנים
+                    foreach (var item in DeliveryList)
+                    {
+                        DeliveryListView.Add(item); // הוספת החדשים
+                    }
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}", "שגיאה",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                DeliveryListView = new ObservableCollection<BO.OpenOrderInList>();
+                return;
+            }
+            finally
+            {
+                if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    UpdateOrdersList();
+            }
+        });
     }
 
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -159,7 +174,7 @@ public partial class StartDeliveryWindow : Window
 
     private bool IsClickInsideButton(object originalSource)
     {
-        if(originalSource is DependencyObject depObj)
+        if (originalSource is DependencyObject depObj)
         {
             while (depObj != null)
             {

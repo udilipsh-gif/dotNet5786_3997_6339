@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using PL.Helpers;
+using System.Windows;
 
 
 namespace PL;
@@ -76,6 +77,23 @@ public partial class ConfigWindow : Window
         
     }
 
-    private void ConfigObserver() => Tools.RunSafe(() => Configuration = s_bl.Admin.GetConfig());
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+
+    private void ConfigObserver() => Tools.RunSafe(() => {
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
+
+        Dispatcher.BeginInvoke(async () =>
+        {
+
+
+            Configuration = s_bl.Admin.GetConfig();
+            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
+                ConfigObserver();
+        });
+
+
+
+    });
 
 }

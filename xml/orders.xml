@@ -193,22 +193,6 @@
     <DistanceKmWalk>5.723</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100009</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 8</Details>
-    <Addres> דרך מנחם בגין 120, תל אביב</Addres>
-    <Latitude>32.071223</Latitude>
-    <Longitude>34.7898718</Longitude>
-    <Name>Customer8</Name>
-    <Phone>0555253565</Phone>
-    <Weight>5</Weight>
-    <OrderDate>2026-01-17T13:52:07.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>3.9889715613405663</DistanceKm>
-    <DistanceKmRoad>5.442</DistanceKmRoad>
-    <DistanceKmWalk>4.494</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100011</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 10</Details>
@@ -287,22 +271,6 @@
     <DistanceKm>1.1739351085142646</DistanceKm>
     <DistanceKmRoad>1.588</DistanceKmRoad>
     <DistanceKmWalk>1.468</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100045</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 44</Details>
-    <Addres> שלמה המלך 20, קריית אונו</Addres>
-    <Latitude>32.0544159</Latitude>
-    <Longitude>34.8603455</Longitude>
-    <Name>Customer44</Name>
-    <Phone>0539802365</Phone>
-    <Weight>8</Weight>
-    <OrderDate>2026-01-18T13:52:07.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>5.605395774791734</DistanceKm>
-    <DistanceKmRoad>8.697</DistanceKmRoad>
-    <DistanceKmWalk>7.055</DistanceKmWalk>
   </Order>
   <Order>
     <Id>100038</Id>
@@ -447,22 +415,6 @@
     <DistanceKm>0.3295272429014937</DistanceKm>
     <DistanceKmRoad>0.327</DistanceKmRoad>
     <DistanceKmWalk>0.437</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100031</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 30</Details>
-    <Addres> המלך ג'ורג' 30, תל אביב</Addres>
-    <Latitude>32.0722931</Latitude>
-    <Longitude>34.7741392</Longitude>
-    <Name>Customer30</Name>
-    <Phone>0559445171</Phone>
-    <Weight>1</Weight>
-    <OrderDate>2026-01-19T13:52:07.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>5.1737421364224945</DistanceKm>
-    <DistanceKmRoad>6.502</DistanceKmRoad>
-    <DistanceKmWalk>5.666</DistanceKmWalk>
   </Order>
   <Order>
     <Id>100016</Id>
@@ -799,5 +751,53 @@
     <DistanceKm>8.815065197718857</DistanceKm>
     <DistanceKmRoad>11.779</DistanceKmRoad>
     <DistanceKmWalk>10.077</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100009</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 8</Details>
+    <Addres> דרך מנחם בגין 120, תל אביב</Addres>
+    <Latitude>32.071223</Latitude>
+    <Longitude>34.7898718</Longitude>
+    <Name>Customer8</Name>
+    <Phone>0555253565</Phone>
+    <Weight>5</Weight>
+    <OrderDate>2026-01-17T13:52:07.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm>3.9889715613405663</DistanceKm>
+    <DistanceKmRoad>5.442</DistanceKmRoad>
+    <DistanceKmWalk>4.494</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100045</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 44</Details>
+    <Addres> שלמה המלך 20, קריית אונו</Addres>
+    <Latitude>32.0544159</Latitude>
+    <Longitude>34.8603455</Longitude>
+    <Name>Customer44</Name>
+    <Phone>0539802365</Phone>
+    <Weight>8</Weight>
+    <OrderDate>2026-01-18T13:52:07.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>5.605395774791734</DistanceKm>
+    <DistanceKmRoad>8.697</DistanceKmRoad>
+    <DistanceKmWalk>7.055</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100031</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 30</Details>
+    <Addres> המלך ג'ורג' 30, תל אביב</Addres>
+    <Latitude>32.0722931</Latitude>
+    <Longitude>34.7741392</Longitude>
+    <Name>Customer30</Name>
+    <Phone>0559445171</Phone>
+    <Weight>1</Weight>
+    <OrderDate>2026-01-19T13:52:07.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm>5.1737421364224945</DistanceKm>
+    <DistanceKmRoad>6.502</DistanceKmRoad>
+    <DistanceKmWalk>5.666</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

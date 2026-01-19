@@ -1,4 +1,5 @@
 ﻿
+using PL.Helpers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -85,7 +86,7 @@ public partial class MainWindow : Window
             else if (user == "Courier")
             {
                 // אפשר לפתוח חלון שליח
-                if(userId != 0)
+                if (userId != 0)
                 {
                     Window window = new MainCourier(userId);
                     window.SetSoftOwner(this);
@@ -105,7 +106,7 @@ public partial class MainWindow : Window
         {
             MessageBox.Show(ex.Message);
         }
-        
+
 
     }
 
@@ -122,8 +123,19 @@ public partial class MainWindow : Window
 
         return true;
     }
+    private readonly ObserverMutex _clockMutex = new(); //stage 7
+    private void ClockObserver()
+    {
+        if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
 
-    private void ClockObserver() => CurrentTime = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock());
+        Dispatcher.BeginInvoke(async () =>
+        {
+            CurrentTime = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock());
+            if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
+                ClockObserver();
+        });
+    }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {

@@ -1,4 +1,5 @@
 ﻿using BO;
+using PL.Helpers;
 using System.Collections.ObjectModel;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -88,34 +89,47 @@ public partial class OrderListWindow : Window, IWindowUpdater
         DependencyProperty.Register(nameof(SelectedOrderStatusFilter), typeof(BO.OrderStatus?),
             typeof(OrderListWindow), new PropertyMetadata(null));
 
-    private async void LoadOrders()
+
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+    private void LoadOrders()
     {
         Func<BO.OrderInList, bool> filterPredicate = order =>
             (SelectedScheduleFilter == null || order.ScheduleStatus == SelectedScheduleFilter) &&
             (SelectedTypeFilter == null || order.TypeOfOrder == SelectedTypeFilter) &&
             (SelectedOrderStatusFilter == null || order.OrderStatus == SelectedOrderStatusFilter);
 
-        try
-        {
-            var filteredResults = await s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId);
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
 
-            if (OrderList == null)
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
             {
-                OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
-            }
-            else
-            {
-                OrderList.Clear();
-                foreach (var item in filteredResults)
+                var filteredResults = await s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId);
+
+                if (OrderList == null)
                 {
-                    OrderList.Add(item);
+                    OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
+                }
+                else
+                {
+                    OrderList.Clear();
+                    foreach (var item in filteredResults)
+                    {
+                        OrderList.Add(item);
+                    }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error loading orders: {ex.Message}");
-        }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading orders: {ex.Message}");
+            }
+            finally
+            {
+                if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    LoadOrders();
+            }
+        });
 
     }
 
@@ -182,7 +196,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
             bool StateToken = (button.CommandParameter as bool?).GetValueOrDefault();
             try
             {
-              await s_bl.Order.Cancel(CURRENT_MANAGER_ID, orderInList.OrderId, StateToken);
+                await s_bl.Order.Cancel(CURRENT_MANAGER_ID, orderInList.OrderId, StateToken);
                 MessageBox.Show($"הזמנה מס' {orderInList.OrderId} בוטלה בהצלחה");
             }
             catch (BO.BlDoesNotExistException ex)
@@ -193,11 +207,11 @@ public partial class OrderListWindow : Window, IWindowUpdater
             {
                 MessageBox.Show(ex.Message);
             }
-           
+
             catch (BLNoSendSmsException ex)
             {
                 MessageBox.Show($"הזמנה מס' {orderInList.OrderId} בוטלה בהצלחה ({ex.Message})");
-                
+
             }
             catch (Exception ex)
             {
