@@ -31,7 +31,7 @@ public partial class CourierListWindow : Window
     /// The ID of the currently logged-in manager performing operations.
     /// </summary>
     private int CURRENT_MANAGER_ID = Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().ManagerId);
-        
+
 
     public ICommand SelectCourierCommand { get; private set; }
 
@@ -87,7 +87,7 @@ public partial class CourierListWindow : Window
     /// Dependency property for the CourierFilter property.
     /// </summary>
     public static readonly DependencyProperty CourierFilterProperty =
-       DependencyProperty.Register(nameof(CourierFilter), typeof(BO.CourierFieldFilter), 
+       DependencyProperty.Register(nameof(CourierFilter), typeof(BO.CourierFieldFilter),
            typeof(CourierListWindow), new PropertyMetadata(BO.CourierFieldFilter.All));
 
     /// <summary>
@@ -119,7 +119,7 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void Window_Close(object? sender, EventArgs e)
     {
-       Tools.RunSafe(() =>  s_bl.Courier.RemoveObserver(courierListObserver));
+        Tools.RunSafe(() => s_bl.Courier.RemoveObserver(courierListObserver));
     }
 
     /// <summary>
@@ -166,7 +166,7 @@ public partial class CourierListWindow : Window
             _ => null
         };
 
-        try 
+        try
         {
             var courierEnumerable = await s_bl.Courier.ReadAll(CURRENT_MANAGER_ID, isActive, BO.CourierFieldSort.Id);
             var newList = courierEnumerable.Where(e => e.Id != 0);
@@ -190,7 +190,7 @@ public partial class CourierListWindow : Window
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-       
+
     }
 
     /// <summary>

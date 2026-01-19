@@ -671,5 +671,29 @@ internal static class Tools
         }
     }
 
-      
+    /// <summary>
+    /// Retrieves and validates a delivery for completion.
+    /// </summary>
+    /// <param name="deliveryId">The delivery ID to retrieve.</param>
+    /// <param name="courierId">The courier ID attempting to complete the delivery.</param>
+    /// <returns>The validated delivery object.</returns>
+    /// <exception cref="BO.BlDoesNotExistException">Thrown when the delivery is not found.</exception>
+    /// <exception cref="BO.BlInvalidValueException">Thrown when the courier is not assigned to this delivery.</exception>
+    public static DO.Delivery GetAndValidateDelivery(int deliveryId, int courierId)
+    {
+        DO.Delivery delivery;
+        lock (AdminManager.BlMutex)
+            delivery = s_dal.Delivery.Read(deliveryId)
+            ?? throw new BO.BlDoesNotExistException($"Delivery with ID {deliveryId} not found");
+
+        if (delivery.CourierId != courierId)
+        {
+            throw new BO.BlInvalidValueException(
+                $"Courier with ID {courierId} is not assigned to delivery {deliveryId}. " +
+                $"Assigned courier: {delivery.CourierId}");
+        }
+
+        return delivery;
+    }
+
 }

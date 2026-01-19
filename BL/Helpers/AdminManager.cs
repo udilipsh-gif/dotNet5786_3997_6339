@@ -1,5 +1,7 @@
 ﻿//using BO;
 using DO;
+using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace Helpers;
@@ -28,7 +30,7 @@ internal static class AdminManager //stage 4
     /// Method to update application's clock from any BL class as may be required
     /// </summary>
     /// <param name="newClock">updated clock value</param>
-    internal static void UpdateClock(DateTime newClock) //stage 4-7
+    internal static void UpdateClock(DateTime newClock) //stage 4-7 **********************************************************************
     {
         var oldClock = s_dal.Config.Clock; //stage 4
         s_dal.Config.Clock = newClock; //stage 4
@@ -292,7 +294,7 @@ internal static class AdminManager //stage 4
 
     private static Task? _simulateTask = null;
 
-    private static void clockRunner()
+    private static void clockRunner()  //**********************************************************************************************************stage 7
     {
         while (!s_stop)
         {
@@ -303,8 +305,10 @@ internal static class AdminManager //stage 4
             //for example: course registration simulation
 
 
-           // if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
-             //   _simulateTask = Task.Run(() => StudentManager.SimulateCourseRegistrationAndGrade());
+           if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
+            {
+                _simulateTask = Task.Run(() => CourierManager.CourierSimulation());
+            }
 
             //etc...
 
@@ -323,41 +327,79 @@ internal static class AdminManager //stage 4
     /// <returns>True if any changes were made to the database/lists, requiring a UI refresh.</returns>
     public static void PeriodicSystemUpdates(DateTime oldClock, DateTime newClock)
     {
-        if (oldClock.Year == newClock.Year) // nothing to do!
+        if (oldClock + TimeSpan.FromDays(7) >= newClock)
             return;
 
         if (s_periodicMutex.CheckAndSetInProgress())
             return;
-
-        TimeSpan maxInactivity = AdminManager.GetConfig().MaxTimeInactivity;
-
-        IEnumerable<DO.Courier> couriers;
-        lock (AdminManager.BlMutex)
-            couriers = s_dal.Courier.ReadAll();
-
-        foreach (var courier in couriers)
+        try
         {
-            DO.Delivery? lastDelivery;
+
+            TimeSpan maxInactivity = AdminManager.GetConfig().MaxTimeInactivity;
+            bool anyListChange = false;
+
+            IEnumerable<DO.Courier> couriers;
+            ILookup<int, DO.Delivery> deliveriesByCourier;
+
+
             lock (AdminManager.BlMutex)
-                lastDelivery = s_dal.Delivery.ReadAll(d => d.CourierId == courier.Id && d.EndDelivery != null)
-                                             .OrderByDescending(d => d.EndDelivery)
-                                             .FirstOrDefault();
-
-            if (lastDelivery != null && lastDelivery.TimeEndDelivery.HasValue)
             {
-                TimeSpan timeSinceLastDelivery = newClock - lastDelivery.TimeEndDelivery.Value;
+                couriers = s_dal.Courier.ReadAll(c => c.Active);
+                deliveriesByCourier = s_dal.Delivery.ReadAll()
+                                                    .ToLookup(d => d.CourierId);
+            }
 
-                if (courier.Active && timeSinceLastDelivery > maxInactivity)
+            foreach (var courier in couriers)
+            {
+                var courierDeliveries = deliveriesByCourier[courier.Id];
+
+                bool isCurrentlyDelivering = courierDeliveries.Any(d => d.EndDelivery == null);
+                if (isCurrentlyDelivering)
+                    continue;
+
+                DateTime lastActivityTime;
+
+                var lastCompletedDelivery = courierDeliveries
+                                            .Where(d => d.EndDelivery != null)
+                                            .OrderByDescending(d => d.TimeEndDelivery)
+                                            .FirstOrDefault();
+
+                if (lastCompletedDelivery != null && lastCompletedDelivery.TimeEndDelivery.HasValue)
                 {
-                    var updatedCourier = courier with { Active = false };
-                    lock (AdminManager.BlMutex)
-                        s_dal.Courier.Update(updatedCourier);
-                    //צריך להוסיף אובזרבר*******************************************************
+                    lastActivityTime = lastCompletedDelivery.TimeEndDelivery.Value;
+                }
+                else
+                {
+                    // מקרה קצה: שליח שמעולם לא ביצע משלוח
+                    lastActivityTime = courier.WorkingSince;
                 }
 
+                // חישוב הזמן שעבר
+                TimeSpan timeSinceActivity = newClock - lastActivityTime;
+
+                if (timeSinceActivity > maxInactivity)
+                {
+                    var updatedCourier = courier with { Active = false };
+
+                    lock (AdminManager.BlMutex)
+                        s_dal.Courier.Update(updatedCourier);
+
+                    // עדכון משקיפים
+                    anyListChange = true;
+                    CourierManager.Observer.NotifyItemUpdated(updatedCourier.Id);
+                }
+            }
+
+            if (anyListChange)
+            {
+                CourierManager.Observer.NotifyListUpdated();
             }
         }
-        return;
+        finally
+        {
+
+            s_periodicMutex.UnsetInProgress();
+        }
     }
 
     #endregion Stage 7 base

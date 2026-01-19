@@ -553,68 +553,115 @@ internal static class CourierManager
         };
     }
 
-    private static async Task CourierSimulation(DateTime newClock)
+    public static async Task CourierSimulation()
     {
         int managerId = AdminManager.GetConfig().ManagerId;
-        var allCoureier = await ReadAll(managerId, true, BO.CourierFieldSort.Id)
+
+        var allCouriers = await ReadAll(managerId, true, BO.CourierFieldSort.Id)
             ?? new List<BO.CourierInList>();
 
-        foreach (var curier in allCoureier)
+        bool anyListChange = false;
+
+        var simulationTasks = new List<Task>();
+
+        foreach (var courier in allCouriers)
         {
-            if(curier.DeliveryId is not null)
+            if (courier.DeliveryId is null)
             {
-                if(s_rand.Next(1, 100) <= 15)
+                if (s_rand.Next(1, 100) <= 15) 
                 {
-                    var openOrder = await DeliveryManager.GetOpen(curier.Id, null, null);
-                    var rendoOrder = openOrder[s_rand.Next(openOrder.Count)];
-                    if (s_rand.Next(1, 100) <= 50 && rendoOrder is BO.OpenOrderInList order)
-                        _ = Task.Run(()=> DeliveryManager.StartDelivery(curier.Id, order.OrderId));
-                }
-            }
-            else if(curier.DeliveryId is int id)
-            {
-                DO.Delivery? delivery;
-                lock (AdminManager.BlMutex)
-                    delivery = s_dal.Delivery.Read(id);
-
-                if (delivery is not null)
-                {
-                    TimeSpan? duration = await Tools.GetEstimatedDeliveryTime(delivery);
-
-                    if (duration is not null)
+                    simulationTasks.Add(Task.Run(async () =>
                     {
-                        DateTime estimatedArrival = delivery.OrderDate + duration.Value;
-
-                        if (newClock >= estimatedArrival)
+                        try
                         {
-                            var endDeliveryChance = s_rand.Next(1, 15);
-                            switch (endDeliveryChance)
+                            var openOrders = await DeliveryManager.GetOpen(courier.Id, null, null);
+
+                            if (openOrders != null && openOrders.Any())
                             {
-                                case < 2:
-                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.REFUSED);
-                                    break;
-                                case <= 5:
-                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.NOTFOUND);
-                                    break;
-                                case <= 8:
-                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.NOTFOUND);
-                                    break;
-                                default:
-                                    DeliveryManager.Deliver(curier.Id, id, BO.EndDelivery.DELIVERED);
-                                    break;
+                                var randomOrder = openOrders[s_rand.Next(openOrders.Count)];
+
+                                if (s_rand.Next(1, 100) <= 50 && randomOrder is BO.OpenOrderInList order)
+                                {
+                                    await DeliveryManager.StartDelivery(courier.Id, order.OrderId);
+                                    anyListChange = true;
+                                }
                             }
                         }
-                        else if (s_rand.Next(1, 100) <= 10)
-                        {
-                            await OrderManager.Cancel(delivery.OrderId);
-                        }
-                    }
+                        catch { }
+                    }));
                 }
             }
+            else
+            {
+                int currentDeliveryId = courier.DeliveryId.Value;
+
+                simulationTasks.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        DO.Delivery? delivery;
+                        lock (AdminManager.BlMutex)
+                            delivery = s_dal.Delivery.Read(currentDeliveryId);
+
+                        if (delivery is not null && delivery.EndDelivery == null)
+                        {
+                            TimeSpan? duration = await Tools.GetEstimatedDeliveryTime(delivery);
+
+                            if (duration is not null)
+                            {
+                                DateTime estimatedArrival = delivery.OrderDate + duration.Value;
+
+                                if (AdminManager.Now >= estimatedArrival)
+                                {
+                                    int chance = s_rand.Next(1, 100);
+                                    BO.EndDelivery endStatus;
+
+                                    if (chance <= 5) endStatus = BO.EndDelivery.REFUSED;       // 5%
+                                    else if (chance <= 20) endStatus = BO.EndDelivery.NOTFOUND; // 15%
+                                    else endStatus = BO.EndDelivery.DELIVERED;                  // 80%
+
+                                    s_completeDeliveryNotObserv(courier.Id, currentDeliveryId, endStatus);
+                                    anyListChange = true;
+                                }
+                                else if (s_rand.Next(1, 100) <= 10)
+                                {
+                                    await OrderManager.Cancel(delivery.OrderId);
+                                    anyListChange = true;
+                                }
+                            }
+                        }
+                    }
+                    catch {}
+                }));
+            }
         }
+        await Task.WhenAll(simulationTasks);
 
+        if (anyListChange)
+        {
+            Observer.NotifyListUpdated();
+            OrderManager.Observer.NotifyListUpdated();
+        }
+    }
 
+    private static void s_completeDeliveryNotObserv(int courierId, int deliveryId, BO.EndDelivery endDelivery)
+    {
+
+        DO.Delivery delivery = Tools.GetAndValidateDelivery(deliveryId, courierId);
+
+        // Update delivery with completion details
+        delivery = delivery with
+        {
+            EndDelivery = (DO.EndDelivery)endDelivery,
+            TimeEndDelivery = AdminManager.Now
+        };
+        lock (AdminManager.BlMutex)
+            s_dal.Delivery.Update(delivery);
+        Observer.NotifyItemUpdated(courierId);
+        OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
+        DeliveryManager.Observer.NotifyItemUpdated(deliveryId);
 
 
     }
+
 }
