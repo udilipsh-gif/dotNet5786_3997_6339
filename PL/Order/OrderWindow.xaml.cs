@@ -98,6 +98,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
             {
                 OrderObserver();
                 s_bl.Order.AddObserver(CurrentID, OrderObserver);
+                s_bl.Admin.AddClockObserver(OrderObserver);
             }
             catch (Exception ex)
             {
@@ -234,6 +235,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     {
         if (CurrentID != 0)
             Tools.RunSafe(() => s_bl.Order.RemoveObserver(CurrentID, OrderObserver));
+            Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(OrderObserver));
     }
 
     /// <summary>
