@@ -11,15 +11,10 @@
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	  <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
-	  <ApplicationIcon>ImageToStl.com_Gemini_Generated_Image_yr3r3vyr3r3vyr3r.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Images\image_login.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="ImageToStl.com_Gemini_Generated_Image_yr3r3vyr3r3vyr3r.ico" />
   </ItemGroup>
 
   <ItemGroup>
