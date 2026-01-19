@@ -95,7 +95,7 @@ public partial class StartDeliveryWindow : Window
         {
             try
             {
-                var DeliveryList = await s_bl.Order.GetOpen(UserId, courierId, SelectedFilter, null);
+                var DeliveryList = await s_bl.Delivery.GetOpen(UserId, courierId, SelectedFilter, null);
 
                 if (DeliveryListView == null)
                 {
@@ -209,7 +209,7 @@ public partial class StartDeliveryWindow : Window
     {
         try
         {
-            s_bl.Order.StartDelivery(UserId, courierId, selectedOrder.OrderId);
+            s_bl.Delivery.StartDelivery(UserId, courierId, selectedOrder.OrderId);
 
             MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
                 MessageBoxButton.OK, MessageBoxImage.Information);

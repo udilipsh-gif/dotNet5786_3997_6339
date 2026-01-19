@@ -24,4 +24,9 @@ internal class Bl : IBl
     /// Gets the order management service.
     /// </summary>
     public IOrder Order { get; } = new OrderImplementation();
+
+    /// <summary>
+    /// Gets the delivery management service.
+    /// </summary>
+    public IDelivery Delivery { get; } = new DeliveryImplementation();
 }
