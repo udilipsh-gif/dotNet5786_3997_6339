@@ -292,10 +292,8 @@ public partial class CourierWindow : Window
             bool windowIsOpen = true;
             try
             {
-           
                 CurrentCourier = await s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
-                        ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
-
+              ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
             }
             catch (BO.BlDoesNotExistException)
             {
@@ -308,12 +306,10 @@ public partial class CourierWindow : Window
             }
             finally
             {
-                if (windowIsOpen is true &&await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
                     CourierObserver();
             }
         });
-
-
     }
 
     /// <summary>
