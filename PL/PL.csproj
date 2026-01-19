@@ -11,10 +11,15 @@
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	  <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
+	  <ApplicationIcon>Images\ImageToStl.com_WhatsApp_Image_2026-01-19_at_15.04.52-removebg-preview.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Images\image_login.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\ImageToStl.com_WhatsApp_Image_2026-01-19_at_15.04.52-removebg-preview.ico" />
   </ItemGroup>
 
   <ItemGroup>
