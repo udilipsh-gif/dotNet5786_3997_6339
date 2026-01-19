@@ -26,13 +26,13 @@
 
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="354"/>
-            <ColumnDefinition Width="Auto" MinWidth="507.333"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" Background="{StaticResource SurfaceColor}" 
                 BorderBrush="{StaticResource BorderColor}" BorderThickness="1" CornerRadius="8" 
-                Margin="20,0,20,0" Padding="5">
+                Margin="20,0,20,0" Padding="5" MinWidth="354">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -166,6 +166,7 @@
                 BorderThickness="1" 
                 CornerRadius="8" 
                 Padding="15"
+                MinWidth="507"
                 Visibility="{Binding CurrentUser.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}}" Margin="3,0,0,0">
 
             <Grid>
