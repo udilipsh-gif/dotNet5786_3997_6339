@@ -274,7 +274,7 @@ public partial class ManagerWindow : Window
                 };
 
                 s_bl.Admin.ForwardClock(value);
-                StatisticObserver();
+                //StatisticObserver();
             }
             catch (Exception ex)
             {
