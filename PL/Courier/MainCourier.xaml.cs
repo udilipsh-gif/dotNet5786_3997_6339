@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using PL.Helpers;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace PL;
@@ -72,26 +73,41 @@ public partial class MainCourier : Window
             Tools.RunSafe(() => s_bl.Courier.RemoveObserver(USERID, GetCurier));
     }
 
-    private async void GetCurier()
+
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+    private void GetCurier()
     {
-        try
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
+
+        Dispatcher.BeginInvoke(async () =>
         {
-            CurrentUser =await s_bl.Courier.Read(USERID, USERID)
-                ?? throw new BO.BlDoesNotExistException();
-            if (CurrentUser.OrderInProgress is not null)
+            bool windowIsOpen = true;
+            try
             {
-                IsOrderInProgress = true;
+                CurrentUser = await s_bl.Courier.Read(USERID, USERID)
+                    ?? throw new BO.BlDoesNotExistException();
+                if (CurrentUser.OrderInProgress is not null)
+                {
+                    IsOrderInProgress = true;
+                }
             }
-        }
-        catch (BO.BlDoesNotExistException)
-        {
-            MessageBox.Show("שליח לא קיים", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-            Close();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+            catch (BO.BlDoesNotExistException)
+            {
+                windowIsOpen = false;
+                MessageBox.Show("שליח לא קיים", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    GetCurier();
+            }
+        });
     }
 
     private void ReportDelivery_Click(object sender, RoutedEventArgs e)
@@ -119,8 +135,8 @@ public partial class MainCourier : Window
                 {
                     s_bl.Order.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, status);
 
-                MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
-                
+                    MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
+
                 }
                 else
                 {
@@ -137,7 +153,7 @@ public partial class MainCourier : Window
 
     private void StartDelivery_Click(object sender, RoutedEventArgs e)
     {
-        if(CurrentUser?.OrderInProgress != null)
+        if (CurrentUser?.OrderInProgress != null)
         {
             MessageBox.Show("יש משלוח פעיל לסיום", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
@@ -194,9 +210,9 @@ public partial class MainCourier : Window
         }
         try
         {
-                s_bl.Courier.Update(USERID, CurrentUser);
-                MessageBox.Show("הפרטים נשמרו בהצלחה!");
-                IsEditMode = false;
+            s_bl.Courier.Update(USERID, CurrentUser);
+            MessageBox.Show("הפרטים נשמרו בהצלחה!");
+            IsEditMode = false;
         }
         catch (BO.BlInvalidValueException ex)
         {

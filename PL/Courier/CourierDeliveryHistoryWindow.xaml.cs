@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using PL.Helpers;
+using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace PL;
@@ -25,7 +26,7 @@ public partial class CourierDeliveryHistoryWindow : Window
 
     public ObservableCollection<BO.ClosedDeliveryInList> DeliveriesHistory
     {
-        get=> (ObservableCollection<BO.ClosedDeliveryInList>)GetValue(DeliveriesHistoryProperty);
+        get => (ObservableCollection<BO.ClosedDeliveryInList>)GetValue(DeliveriesHistoryProperty);
         set => SetValue(DeliveriesHistoryProperty, value);
     }
     public static readonly DependencyProperty DeliveriesHistoryProperty =
@@ -59,38 +60,46 @@ public partial class CourierDeliveryHistoryWindow : Window
         {
             Close();
         }
-       
+
     }
 
-
-    private async void OrderObserver()
+    private readonly ObserverMutex _Mutex = new(); //stage 7
+    private void OrderObserver()
     {
-        try
-        {
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
 
-            var newList = await s_bl.Order.GetClosed(MANAGER_ID, UserId, null, null)
-                           ?? throw new BO.BlDoesNotExistException($"The list for id: {UserId} does not exist");
-            if (DeliveriesHistory == null)
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
             {
-                DeliveriesHistory = new ObservableCollection<BO.ClosedDeliveryInList>(newList);
-            }
-            else
-            {
-                DeliveriesHistory.Clear(); // מחיקת הישנים
-                foreach (var item in newList)
+
+                var newList = await s_bl.Order.GetClosed(MANAGER_ID, UserId, null, null)
+                               ?? throw new BO.BlDoesNotExistException($"The list for id: {UserId} does not exist");
+                if (DeliveriesHistory == null)
                 {
-                    DeliveriesHistory.Add(item); // הוספת החדשים
+                    DeliveriesHistory = new ObservableCollection<BO.ClosedDeliveryInList>(newList);
+                }
+                else
+                {
+                    DeliveriesHistory.Clear(); // מחיקת הישנים
+                    foreach (var item in newList)
+                    {
+                        DeliveriesHistory.Add(item); // הוספת החדשים
+                    }
                 }
             }
-        }
-        catch (BO.BlDoesNotExistException ex)
-        {
-            MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
-        }
+            catch (BO.BlDoesNotExistException ex)
+            {
+                MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
+            }
+            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
+                OrderObserver();
+        });
     }
 
 }
