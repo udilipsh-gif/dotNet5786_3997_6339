@@ -29,5 +29,9 @@
   <ItemGroup>
     <Resource Include="Images\image_login.png" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
   
 </Project>
