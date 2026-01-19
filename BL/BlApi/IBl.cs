@@ -22,4 +22,9 @@ public interface IBl
     /// Gets the order management service.
     /// </summary>
     IOrder Order { get; }
+
+    /// <summary>
+    /// Gets the order management service.
+    /// </summary>
+    IDelivery Delivery { get; }
 }

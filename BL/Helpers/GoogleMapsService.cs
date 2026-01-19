@@ -250,9 +250,8 @@ public static class GoogleMapsService
             s_routeCache.TryAdd(cacheKey, routeInfo);
             return routeInfo;
         }
-        catch (Exception ex)
+        catch
         {
-            System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] Exception: {ex.Message}");
             return null;
         }
     }

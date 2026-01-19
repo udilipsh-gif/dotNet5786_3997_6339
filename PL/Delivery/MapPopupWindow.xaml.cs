@@ -11,8 +11,25 @@ public partial class MapPopupWindow : Window
 
     public OpenOrderInList Order { get; }
     public int UserId { get; }
-    public string? MapImageUrl { get; private set; }
-    public string? RouteInfo { get; private set; }
+    public string? MapImageUrl
+    {
+        get => (string) GetValue(MapImageUrlProperty);
+        set => SetValue(MapImageUrlProperty, value);
+    }
+
+    public static readonly DependencyProperty MapImageUrlProperty =
+    DependencyProperty.Register("MapImageUrl", typeof(string),
+    typeof(MapPopupWindow), new PropertyMetadata(string.Empty));
+
+    public string? RouteInfo
+    {
+        get => (string)GetValue(RouteInfoProperty);
+        set => SetValue(RouteInfoProperty, value);
+    }
+
+    public static readonly DependencyProperty RouteInfoProperty =
+    DependencyProperty.Register("RouteInfo", typeof(string),
+    typeof(MapPopupWindow), new PropertyMetadata(string.Empty));
 
     public event Action<OpenOrderInList>? OnCollectClicked;
 
@@ -24,37 +41,38 @@ public partial class MapPopupWindow : Window
         DataContext = this;
         UserId = userId;
 
-        LoadMapData(order, shipmentType).GetAwaiter().GetResult();  
+        LoadMapData(order, shipmentType);  
 
         InitializeComponent();
     }
 
-    private async Task LoadMapData(OpenOrderInList order, TheTypeShipment shipmentType)
+    private async void LoadMapData(OpenOrderInList order, TheTypeShipment shipmentType)
     {
         try
         {
             // Get full order details for coordinates
+
             var fullOrder = await s_bl.Order.Read(UserId, order.OrderId);
             if (fullOrder == null) return;
 
-            //// Get route info (cached)
-            //var route = await BO.Helpers.GoogleMapsService.GetRouteFromStore(
-            //    fullOrder.Latitude, 
-            //    fullOrder.Longitude, 
-            //    shipmentType);
+            // Get route info (cached)
+            var route = await s_bl.Delivery.GetRouteFromStore(
+                fullOrder.Latitude,
+                fullOrder.Longitude,
+                shipmentType);
 
-            //if (route != null)
-            //{
-            //    RouteInfo = $"מרחק: {route.DistanceText} | זמן משוער: {route.DurationText}";
-                
-            //    // Build static map URL
-            //    MapImageUrl = await BO.Helpers.GoogleMapsService.GetStaticMapUrlFromStore(
-            //        fullOrder.Latitude,
-            //        fullOrder.Longitude,
-            //        shipmentType,
-            //        width: 380,
-            //        height: 200);
-            //}
+            if (route != null)
+            {
+                RouteInfo = $"מרחק: {route.DistanceText} | זמן משוער: {route.DurationText}";
+
+                // Build static map URL
+                MapImageUrl = await s_bl.Delivery.GetStaticMapUrlFromStore(
+                    fullOrder.Latitude,
+                    fullOrder.Longitude,
+                    shipmentType,
+                    width: 380,
+                    height: 200);
+            }
         }
         catch
         {

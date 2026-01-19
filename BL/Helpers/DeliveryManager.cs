@@ -38,7 +38,7 @@ internal static class DeliveryManager
     /// Note: The sort parameter is currently not utilized in the implementation.
     /// All deliveries are returned in their default order from the data access layer.
     /// </remarks>
-    internal static IEnumerable<DO.Delivery> ReadAll(BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
+    internal static IEnumerable<DO.Delivery> ReadAll()
     {
         lock (AdminManager.BlMutex)
             return s_dal.Delivery.ReadAll().ToList();
@@ -252,7 +252,7 @@ internal static class DeliveryManager
 
         var results = await Task.WhenAll(tasks);
 
-        return [..s_sortOpenOrders(results, sort)];
+        return [.. s_sortOpenOrders(results, sort)];
     }
 
     /// <summary>
@@ -427,6 +427,15 @@ internal static class DeliveryManager
         OrderManager.Observer.NotifyListUpdated();
         CourierManager.Observer.NotifyListUpdated();
     }
+
+    public static async Task<GoogleMapsService.RouteInfo?> GetRouteFromStore(
+                     double destLat, double destLng, BO.TheTypeShipment shipmentType)
+        => await GoogleMapsService.GetRouteFromStore(destLat, destLng, shipmentType);
+
+
+    public static async Task<string?> GetStaticMapUrlFromStore(double destLat, double destLng,
+                               BO.TheTypeShipment shipmentType, int width = 400, int height = 300)
+        => await GoogleMapsService.GetStaticMapUrlFromStore(destLat, destLng, shipmentType, width, height);
 
     /// <summary>
     /// Notifies all relevant observers after a delivery is completed.

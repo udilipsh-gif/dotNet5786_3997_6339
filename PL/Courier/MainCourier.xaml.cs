@@ -133,7 +133,7 @@ public partial class MainCourier : Window
             {
                 if (selectedReason is BO.EndDelivery status)
                 {
-                    s_bl.Order.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, status);
+                    s_bl.Delivery.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, status);
 
                     MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
 
