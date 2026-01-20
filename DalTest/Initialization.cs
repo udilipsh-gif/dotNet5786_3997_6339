@@ -347,7 +347,7 @@ public static class Initialization
             {
                 EndDelivery.DELIVERED => orderDate.Add(duration),
                 EndDelivery.REFUSED => orderDate.Add(duration).AddMinutes(s_rand.Next(5, 31)),
-                EndDelivery.CONCELLED => orderDate,
+                EndDelivery.CONCELLED => orderDate.Add(duration/ s_rand.Next(1, 4)),
                 EndDelivery.NOTFOUND => orderDate.Add(duration).AddMinutes(s_rand.Next(10, 61)),
                 EndDelivery.FAILED => orderDate.Add(duration).AddMinutes(s_rand.Next(15, 91)),
                 _ => null,
@@ -384,7 +384,7 @@ public static class Initialization
             {
                 if (list_courier.Count == 0)
                 {
-                    throw new DO.DalDoesNotExistException("No matched couriers available for the order.");
+                    goto nextItaretion; // throw new DO.DalDoesNotExistException("No matched couriers available for the order.");//////////////////////////////נזרקה חריגה לא נתפסה
                 }
 
                 selectedCourier = list_courier[s_rand.Next(list_courier.Count)];// שלב 2 בחירת שליח אקראי מתוך רשימת השליחים המסוננת
@@ -479,8 +479,10 @@ public static class Initialization
                 EndDelivery = endDelivery,
                 TimeEndDelivery = timeEndDelivery
             });
+        nextItaretion:;
         }
         s_dal!.Config!.Clock = maxTime;
+      
     }
 
     /// <summary>

@@ -349,6 +349,10 @@ public partial class ManagerWindow : Window
                 Mouse.OverrideCursor = Cursors.Wait;
                 s_bl.Admin.InitializeDB();
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
             finally
             {
                 Mouse.OverrideCursor = null;
