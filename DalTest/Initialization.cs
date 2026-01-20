@@ -391,6 +391,9 @@ public static class Initialization
 
                 openDelivery = s_dal.Delivery.ReadAll(o => o.CourierId == selectedCourier.Id &&
                o.EndDelivery == null);
+
+                if (openDelivery.Any())
+                    list_courier.Remove(selectedCourier);
             }
             while (openDelivery.Any());
 
