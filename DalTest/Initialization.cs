@@ -381,7 +381,7 @@ public static class Initialization
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
             if (list_courier.Count == 0)
-                break;
+                continue;//break;
 
             DO.Courier selectedCourier = list_courier[s_rand.Next(list_courier.Count)];// שלב 2 בחירת שליח אקראי מתוך רשימת השליחים המסוננת
 
