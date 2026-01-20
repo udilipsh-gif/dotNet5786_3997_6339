@@ -285,12 +285,14 @@ public static class Initialization
                 Name = "Customer" + i,
                 Weight = s_rand.Next(1, 15),
                 Details = "Order details for order " + i,
-                OrderDate = s_dal.Config.Clock.AddDays(-s_rand.Next(0, 3)),
+                OrderDate = s_dal.Config.Clock,
                 DistanceKm = s_getDistance(storeLat, storeLng, double.Parse((string)address[1]), double.Parse((string)address[2])),
                 OrderStatus = OrderStatus.OPEN,
                 DistanceKmRoad = double.Parse((string)address[3]) / 1000.0,
                 DistanceKmWalk = double.Parse((string)address[4]) / 1000.0
             });
+
+            s_dal?.Config.Clock.AddMinutes(s_rand.Next(30, 60)); // שינוי התאריך לשבוע אחורה לכל הזמנה
         }
     }
 
@@ -465,7 +467,7 @@ public static class Initialization
                 TimeEndDelivery = timeEndDelivery
             });
         }
-        s_dal!.Config!.Clock = maxTime;
+        s_dal!.Config!.Clock = timeEndDelivery?.AddMinutes(s_rand.Next(15, 91)) ?? s_dal.Config.Clock;
 
     }
 
