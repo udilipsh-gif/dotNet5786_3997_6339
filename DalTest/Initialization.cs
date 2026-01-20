@@ -347,7 +347,7 @@ public static class Initialization
             {
                 EndDelivery.DELIVERED => orderDate.Add(duration),
                 EndDelivery.REFUSED => orderDate.Add(duration).AddMinutes(s_rand.Next(5, 31)),
-                EndDelivery.CONCELLED => orderDate.Add(duration/ s_rand.Next(1, 4)),
+                EndDelivery.CONCELLED => orderDate.Add(duration / s_rand.Next(1, 4)),
                 EndDelivery.NOTFOUND => orderDate.Add(duration).AddMinutes(s_rand.Next(10, 61)),
                 EndDelivery.FAILED => orderDate.Add(duration).AddMinutes(s_rand.Next(15, 91)),
                 _ => null,
@@ -482,7 +482,7 @@ public static class Initialization
         nextItaretion:;
         }
         s_dal!.Config!.Clock = maxTime;
-      
+
     }
 
     /// <summary>
