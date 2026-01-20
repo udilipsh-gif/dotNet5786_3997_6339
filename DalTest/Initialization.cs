@@ -368,37 +368,22 @@ public static class Initialization
             //var randomOrder = list_order[s_rand.Next(list_order.Count)];//הגרלת הזמנה אקראית מתוך הרשימה שלב 1
             var randomOrder = list_order[s_rand.Next(list_order.Count)];//הגרלת הזמנה אקראית מתוך הרשימה שלב 2
 
+            Dictionary<int, int> deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
+                .ToDictionary(d => d.CourierId, d => d.Id);
+
+
             //סינון שליחים לפי שלב 2 באמצעות תנאי מסנן אחד
-            var list_courier = s_dal?.Courier?.ReadAll(Courier => Courier.Active == true &&
-            MatchTypeShipmentAndOrder(Courier.TypeShipment, randomOrder.TypeOfOrder) &&
-            Courier.MaxDistanceDelivery >= randomOrder.DistanceKm)//לבדוק את המרחק של ההזמנה
+            var list_courier = s_dal?.Courier?.ReadAll(courier =>
+                 courier.Active == true &&
+                 MatchTypeShipmentAndOrder(courier.TypeShipment, randomOrder.TypeOfOrder) &&
+                 courier.MaxDistanceDelivery >= randomOrder.DistanceKm &&
+                 !deliveriesMap.ContainsKey(courier.Id)) // סינון שליחים שאין להם משלוח פעיל
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
+            if (list_courier.Count == 0)
+                break;
 
-            //#############################################הוספתי עכשיו שלב 7             ##################################################
-
-            DO.Courier selectedCourier;
-            IEnumerable<DO.Delivery> openDelivery;
-
-            do
-            {
-                if (list_courier.Count == 0)
-                {
-                    goto nextItaretion; // throw new DO.DalDoesNotExistException("No matched couriers available for the order.");//////////////////////////////נזרקה חריגה לא נתפסה
-                }
-
-                selectedCourier = list_courier[s_rand.Next(list_courier.Count)];// שלב 2 בחירת שליח אקראי מתוך רשימת השליחים המסוננת
-
-                openDelivery = s_dal.Delivery.ReadAll(o => o.CourierId == selectedCourier.Id &&
-               o.EndDelivery == null);
-
-                if (openDelivery.Any())
-                    list_courier.Remove(selectedCourier);
-            }
-            while (openDelivery.Any());
-
-            //#############################################סיום הוספה שלב 7             ##################################################
-
+            DO.Courier selectedCourier = list_courier[s_rand.Next(list_courier.Count)];// שלב 2 בחירת שליח אקראי מתוך רשימת השליחים המסוננת
 
             randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה 
             s_dal?.Order.Update(randomOrder);
@@ -479,7 +464,6 @@ public static class Initialization
                 EndDelivery = endDelivery,
                 TimeEndDelivery = timeEndDelivery
             });
-        nextItaretion:;
         }
         s_dal!.Config!.Clock = maxTime;
 
