@@ -55,12 +55,12 @@
                   SelectionMode="Single"
                   FlowDirection="RightToLeft">
 
-            <DataGrid.InputBindings>
-                <MouseBinding Gesture="LeftDoubleClick" 
-                              Command="{Binding SelectCourierCommand}"
-                              CommandParameter="{Binding ElementName=CourierGrid, Path=SelectedItem}" />
-            </DataGrid.InputBindings>
-
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <EventSetter Event="MouseDoubleClick" Handler="DataGrid_MouseDoubleClick"/>
+                </Style>
+            </DataGrid.RowStyle>
+            
             <DataGrid.Columns>
                 <DataGridTextColumn Header="מזהה" Binding="{Binding Id}"/>
 

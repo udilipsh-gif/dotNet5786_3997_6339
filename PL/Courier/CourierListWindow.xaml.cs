@@ -36,20 +36,11 @@ public partial class CourierListWindow : Window
     /// </summary>
     private int CURRENT_MANAGER_ID = Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().ManagerId);
 
-
-    public ICommand SelectCourierCommand { get; private set; }
-
-    public ICommand AddCourierCommand { get; private set; }
-
-
     /// <summary>
     /// Initializes a new instance of the CourierListWindow class.
     /// </summary>
     public CourierListWindow()
     {
-        SelectCourierCommand = new RelayCommand<BO.CourierInList>(Add_Edit_Courier_Click, CanSelectCourier);
-        AddCourierCommand = new RelayCommand(_ => Add_Edit_Courier_Click(null));
-
         InitializeComponent();
 
     }
@@ -217,9 +208,13 @@ public partial class CourierListWindow : Window
         UpdateCourierList();
     }
 
-    private bool CanSelectCourier(BO.CourierInList? selectedCourier)
+    private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        return selectedCourier != null;
+        if(sender is DataGridRow row 
+            && row.Item is BO.CourierInList selectedCourier)
+        {
+            Add_Edit_Courier_Click(selectedCourier);
+        }
     }
 
     /// <summary>

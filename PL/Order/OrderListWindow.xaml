@@ -65,8 +65,12 @@
                   ItemsSource="{Binding OrderList}"
                   IsReadOnly="True"
                   SelectionMode="Single"
-                  FlowDirection="RightToLeft"
-                  MouseDoubleClick="Add_Edit_Order_Click">
+                  FlowDirection="RightToLeft">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <EventSetter Event="MouseDoubleClick" Handler="Add_Edit_Order_Click"/>
+                </Style>
+            </DataGrid.RowStyle>
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="מזהה" Binding="{Binding OrderId}" Width="Auto"/>

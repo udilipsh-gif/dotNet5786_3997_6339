@@ -1,5 +1,6 @@
 ﻿using BO;
 using DalApi;
+using DO;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
@@ -167,7 +168,7 @@ internal static class OrderManager
             MaxDeliveryTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime,
             OrderStatus = (BO.OrderStatus)doOrder.OrderStatus,
             ScheduleStatus = await Tools.GetScheduleStatus(doOrder),
-            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder),
+            TimeLeftForDelivery = Tools.GetTimeLeftForDelivery(doOrder, (BO.OrderStatus)doOrder.OrderStatus),
             DeliveryPerOrderInLists = deliveryPerOrderInLists
         };
     }
