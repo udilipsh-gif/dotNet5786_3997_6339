@@ -375,7 +375,28 @@ public static class Initialization
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
 
-            var selectedCourier = list_courier[s_rand.Next(list_courier.Count)];//בחירת שליח אקראי מתוך רשימת השליחים המסוננת
+            //#############################################הוספתי עכשיו שלב 7             ##################################################
+
+            DO.Courier selectedCourier;
+            IEnumerable<DO.Delivery> openDelivery;
+
+            do
+            {
+                if (list_courier.Count == 0)
+                {
+                    throw new DO.DalDoesNotExistException("No matched couriers available for the order.");
+                }
+
+                selectedCourier = list_courier[s_rand.Next(list_courier.Count)];// שלב 2 בחירת שליח אקראי מתוך רשימת השליחים המסוננת
+
+                openDelivery = s_dal.Delivery.ReadAll(o => o.CourierId == selectedCourier.Id &&
+               o.EndDelivery == null);
+            }
+            while (openDelivery.Any());
+
+            //#############################################סיום הוספה שלב 7             ##################################################
+
+
             randomOrder = randomOrder with { OrderStatus = OrderStatus.DELIVERING };//עדכון סטטוס ההזמנה 
             s_dal?.Order.Update(randomOrder);
 
