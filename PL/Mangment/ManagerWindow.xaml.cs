@@ -2,6 +2,7 @@
 using PL.Helpers;
 using System.ComponentModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -114,6 +115,19 @@ public partial class ManagerWindow : Window
     /// </summary>
     public static readonly DependencyProperty CurrentTimeProperty =
         DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(ManagerWindow));
+
+
+    /// <summary>
+    /// Gets or sets whether the window controls are enabled.
+    /// </summary>
+    public bool IsWindowEnabled
+    {
+        get { return (bool)GetValue(IsWindowEnabledProperty); }
+        set { SetValue(IsWindowEnabledProperty, value); }
+    }
+
+    public static readonly DependencyProperty IsWindowEnabledProperty =
+        DependencyProperty.Register("IsWindowEnabled", typeof(bool), typeof(ManagerWindow), new PropertyMetadata(true));
 
 
     /// <summary>
@@ -300,13 +314,14 @@ public partial class ManagerWindow : Window
     /// <item><description>Displays a wait cursor during the operation</description></item>
     /// </list>
     /// </remarks>
-    private void ResetDB(object sender, RoutedEventArgs e)
+    private async void ResetDB(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show("Delete all data?", "ResetDB",
                                          MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result is MessageBoxResult.Yes)
         {
-            CloseAllWindowsExceptMain();
+            IsWindowEnabled = false;
+            Tools.TriggerReset();
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
@@ -314,6 +329,8 @@ public partial class ManagerWindow : Window
             }
             finally
             {
+                await Task.Delay(500);
+                IsWindowEnabled = true;
                 Mouse.OverrideCursor = null;
                 StatisticObserver();
             }
@@ -337,13 +354,14 @@ public partial class ManagerWindow : Window
     /// </list>
     /// Useful for development, testing, and demonstration purposes.
     /// </remarks>
-    private void InitDB(object sender, RoutedEventArgs e)
+    private async void InitDB(object sender, RoutedEventArgs e)
     {
         var result = MessageBox.Show("Do you want to initialize all data?", "InitDB",
                                          MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result is MessageBoxResult.Yes)
         {
-            CloseAllWindowsExceptMain();
+            IsWindowEnabled = false;
+            Tools.TriggerReset();
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
@@ -355,29 +373,10 @@ public partial class ManagerWindow : Window
             }
             finally
             {
+                await Task.Delay(500);
+                IsWindowEnabled = true;
                 Mouse.OverrideCursor = null;
                 StatisticObserver();
-            }
-        }
-
-    }
-
-
-    /// <summary>
-    /// Closes all open windows except the main window (MainWindow).
-    /// </summary>
-    /// <remarks>
-    /// Iterates through all currently open application windows and closes any window
-    /// that is not the main window. Used when performing database operations to ensure
-    /// no stale data is displayed in other windows.
-    /// </remarks>
-    private void CloseAllWindowsExceptMain()
-    {
-        foreach (Window window in Application.Current.Windows)
-        {
-            if (window != this && window.GetType() != typeof(MainWindow))
-            {
-                window.Close();
             }
         }
 

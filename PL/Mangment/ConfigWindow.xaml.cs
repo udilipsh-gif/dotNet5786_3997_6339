@@ -40,12 +40,14 @@ public partial class ConfigWindow : Window
 
     private void ConfigWindow_Loaded(object sender, RoutedEventArgs e)
     {
+        Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Admin.AddConfigObserver(ConfigObserver));
         ConfigObserver();
     }
 
     private void ConfigWindow_Close(object? sender, EventArgs e)
     {
+        Tools.ResetRequested -= () => this.Close();
         Tools.RunSafe(() => s_bl.Admin.RemoveConfigObserver(ConfigObserver));
     }
 

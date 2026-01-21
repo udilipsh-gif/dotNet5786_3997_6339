@@ -99,6 +99,7 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Courier.AddObserver(courierListObserver));
         UpdateCourierList();
     }
@@ -114,6 +115,7 @@ public partial class CourierListWindow : Window
     /// </remarks>
     private void Window_Close(object? sender, EventArgs e)
     {
+        Tools.ResetRequested -= () => this.Close();
         Tools.RunSafe(() => s_bl.Courier.RemoveObserver(courierListObserver));
     }
 
@@ -210,10 +212,19 @@ public partial class CourierListWindow : Window
 
     private void DataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if(sender is DataGridRow row 
+        if (sender is DataGridRow row
             && row.Item is BO.CourierInList selectedCourier)
         {
             Add_Edit_Courier_Click(selectedCourier);
+        }
+    }
+
+    private void AddCourierClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button
+            && button.Tag.ToString() == "AddCourier")
+        {
+            Add_Edit_Courier_Click(null);
         }
     }
 

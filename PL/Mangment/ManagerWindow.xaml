@@ -10,7 +10,7 @@
         Loaded="ManagerWindow_Loaded"
         Closed="ManagerWindow_Close">
 
-    <Grid>
+    <Grid IsEnabled="{Binding IsWindowEnabled}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>

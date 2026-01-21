@@ -67,6 +67,7 @@ public partial class StartDeliveryWindow : Window
 
     private void StartDeliveryWindow_Loaded(object sender, EventArgs e)
     {
+        Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
         Tools.RunSafe(() => s_bl.Courier.AddObserver(UserId, orderListObserver));
         UpdateOrdersList();
@@ -79,6 +80,7 @@ public partial class StartDeliveryWindow : Window
 
     private void StartDeliveryWindow_Closed(object sender, EventArgs e)
     {
+        Tools.ResetRequested -= () => this.Close();
         Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
         Tools.RunSafe(() => s_bl.Courier.RemoveObserver(UserId, orderListObserver));
     }

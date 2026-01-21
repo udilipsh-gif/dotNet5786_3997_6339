@@ -93,10 +93,11 @@
         </DataGrid>
 
         <Button Grid.Row="2" 
+                Tag="AddCourier"
                 Content="+ הוסף שליח חדש" 
                 HorizontalAlignment="Right" 
                 Width="180" 
                 Margin="0,15,0,0"
-                Command="{Binding AddCourierCommand}"/>
+                Click="AddCourierClick"/>
     </Grid>
 </Window>
