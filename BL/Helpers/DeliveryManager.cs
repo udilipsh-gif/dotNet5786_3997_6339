@@ -532,9 +532,15 @@ internal static class DeliveryManager
 
     private static async void s_sendEmilNewDelivery(DO.Delivery delivery)
     {
+        DO.Courier courier;
 
-        var courier = s_dal.Courier.Read(delivery.CourierId); //CourierManager.Read(delivery.CourierId);
-        var order = s_dal.Order.Read(delivery.OrderId);
+        lock (AdminManager.BlMutex)
+             courier = s_dal.Courier.Read(delivery.CourierId); //CourierManager.Read(delivery.CourierId);
+
+        DO.Order order;
+
+        lock (AdminManager.BlMutex)
+             order = s_dal.Order.Read(delivery.OrderId);
 
 
         string body =

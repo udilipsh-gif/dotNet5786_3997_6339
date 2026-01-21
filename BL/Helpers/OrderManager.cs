@@ -1,4 +1,4 @@
-﻿using BlApi;
+﻿
 using BO;
 using DalApi;
 
@@ -20,7 +20,7 @@ internal static class OrderManager
     /// <summary>
     /// Data access layer instance for database operations.
     /// </summary>
-    private static readonly IDal s_dal = DalApi.Factory.Get;
+    private static readonly IDal s_dal = Factory.Get;
 
     /// <summary>
     /// Observer manager for notifying UI components about order changes.
@@ -553,8 +553,13 @@ internal static class OrderManager
 
     private static async void s_sendEmilNewOrder(DO.Order doOrder)
     {
-        Dictionary<int, int> deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
+
+        Dictionary<int, int> deliveriesMap;
+
+        lock (AdminManager.BlMutex)
+            deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
                .ToDictionary(d => d.CourierId, d => d.Id);
+
         List<DO.Courier> list_courier;
 
         lock (AdminManager.BlMutex)
