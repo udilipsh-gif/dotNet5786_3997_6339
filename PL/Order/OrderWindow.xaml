@@ -74,10 +74,10 @@
                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TypeShipment, Converter={StaticResource EnumDescriptionConverter}}"/>
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="התחלה:" FontWeight="Bold" Margin="0,0,5,2"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OrderDate, StringFormat='{}{0:dd/MM HH:mm}'}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OrderDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}"/>
 
                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="סיום:" FontWeight="Bold" Margin="0,0,5,2"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding TimeEndDelivery, StringFormat='{}{0:dd/MM HH:mm}'}"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding TimeEndDelivery, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}"/>
 
                                         <TextBlock Grid.Row="4" Grid.Column="0" Text="סטטוס:" FontWeight="Bold" Margin="0,0,5,0"/>
                                         <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding EndDelivery}"/>

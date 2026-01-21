@@ -64,8 +64,8 @@
                                     <Separator Margin="0,10"/>
 
                                     <TextBlock Text="זמנים" FontWeight="Bold" Margin="0,0,0,5"/>
-                                    <TextBlock Text="{Binding OrderTime, StringFormat='נוצר: {0:dd/MM HH:mm}'}"/>
-                                    <TextBlock Text="{Binding StartDeliveryTime, StringFormat='יצא: {0:dd/MM HH:mm}'}"/>
+                                    <TextBlock Text="{Binding OrderTime, StringFormat='נוצר: {0:dd/MM/yyyy HH:mm}'}"/>
+                                    <TextBlock Text="{Binding StartDeliveryTime, StringFormat='יצא: {0:dd/MM/yyyy HH:mm}'}"/>
                                     <TextBlock Text="{Binding TimeRemaining, StringFormat='נותר: {0:dd\\:hh\\:mm}'}" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
                                 </StackPanel>
                             </DataTemplate>
