@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using System.Threading.Tasks;
 
 namespace Helpers;
@@ -535,32 +536,33 @@ internal static class DeliveryManager
         DO.Courier courier;
 
         lock (AdminManager.BlMutex)
-             courier = s_dal.Courier.Read(delivery.CourierId); //CourierManager.Read(delivery.CourierId);
+            courier = s_dal.Courier.Read(delivery.CourierId)??throw new BlDoesNotExistException($"courier whith {delivery.CourierId} not found");                        //CourierManager.Read(delivery.CourierId);
 
         DO.Order order;
 
         lock (AdminManager.BlMutex)
-             order = s_dal.Order.Read(delivery.OrderId);
+             order = s_dal.Order.Read(delivery.OrderId) ?? throw new BlDoesNotExistException($"order whith {delivery.OrderId} not found");
 
+        string typeOfOrderebrew = Tools.ConvertTipeOrderToHebrew(order.TypeOfOrder);
 
         string body =
-$@"
-<div style='font-family:Lucida Sans Unicode; direction:rtl'>
-<h2>📦 איזה כיף! ראינו שהתחלת משלוח חדש</h2>
-<b>שלום {courier.Name} היקר!!!</b><br><br>
+            $@"
+            <div style='font-family:Lucida Sans Unicode; direction:rtl'>
+            <h2>🚚 איזה כיף! ראינו שהתחלת משלוח חדש</h2>
+            <b>שלום {courier.Name} היקר!!!</b><br><br>
 
-<table style='border-collapse:collapse'>
-<tr><td><b>מספר הזמנה:</b></td><td>{order.Id}</td></tr>
-<tr><td><b>שם:</b></td><td>{order.Name}</td></tr>
-<tr><td><b>כתובת:</b></td><td>{order.Addres}</td></tr>
-<tr><td><b>טלפון:</b></td><td>{order.Phone}</td></tr>
-<tr><td><b>פרטים:</b></td><td>{order.Details}</td></tr>
-<tr><td><b>סוג משלוח:</b></td><td>{order.TypeOfOrder}</td></tr>
-<tr><td><b>משקל:</b></td><td>{order.Weight}</td></tr>
-<tr><td><b>תאריך הזמנה:</b></td><td>{order.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
-</table>
-</div>
-";
+            <table style='border-collapse:collapse'>
+            <tr><td><b>מספר הזמנה:</b></td><td>{order.Id}</td></tr>
+            <tr><td><b>שם:</b></td><td>{order.Name}</td></tr>
+            <tr><td><b>כתובת:</b></td><td>{order.Addres}</td></tr>
+            <tr><td><b>טלפון:</b></td><td>{order.Phone}</td></tr>
+            <tr><td><b>פרטים:</b></td><td>{order.Details}</td></tr>
+            <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}</td></tr>
+            <tr><td><b>משקל:</b></td><td>{order.Weight}</td></tr>
+            <tr><td><b>תאריך הזמנה:</b></td><td>{order.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
+            </table>
+            </div>
+            ";
 
         await Tools.SendEmailSkript(
               courier.Email, "התחלת משלוח חדש", body);

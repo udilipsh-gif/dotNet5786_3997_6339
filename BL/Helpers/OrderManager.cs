@@ -572,7 +572,7 @@ internal static class OrderManager
                 ?? new List<DO.Courier>();
 
 
-
+        string typeOfOrderebrew = Tools.ConvertTipeOrderToHebrew(doOrder.TypeOfOrder);
 
         try
         {
@@ -582,22 +582,22 @@ internal static class OrderManager
 
 
                     $@"
-<div style='font-family:Lucida Sans Unicode; direction:rtl'>
-<h2>📦 איזה כיף! ראינו שיש הזמנה חדשה שמתאימה לך!</h2>
-<b>שלום {courier.Name} היקר!!!</b><br><br>
+                    <div style='font-family:Lucida Sans Unicode; direction:rtl'>
+                    <h2>📦 איזה כיף! ראינו שיש הזמנה חדשה שמתאימה לך!</h2>
+                    <b>שלום {courier.Name} היקר!!!</b><br><br>
 
-<table style='border-collapse:collapse'>
-<tr><td><b>מספר הזמנה:</b></td><td>{doOrder.Id}</td></tr>
-<tr><td><b>שם:</b></td><td>{doOrder.Name}</td></tr>
-<tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
-<tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
-<tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
-<tr><td><b>סוג משלוח:</b></td><td>{doOrder.TypeOfOrder}</td></tr>
-<tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
-<tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
-</table>
-</div>
-"
+                    <table style='border-collapse:collapse'>
+                    <tr><td><b>מספר הזמנה:</b></td><td>{doOrder.Id}</td></tr>
+                    <tr><td><b>שם:</b></td><td>{doOrder.Name}</td></tr>
+                    <tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
+                    <tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
+                    <tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
+                    <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}</td></tr>
+                    <tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
+                    <tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
+                    </table>
+                    </div>
+                    "
 
 
                 //courier.Email,
