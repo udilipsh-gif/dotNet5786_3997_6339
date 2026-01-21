@@ -39,6 +39,7 @@ public partial class CourierDeliveryHistoryWindow : Window
     {
         try
         {
+            Tools.ResetRequested += () => this.Close();
             OrderObserver();
             s_bl.Order.AddObserver(OrderObserver);
         }
@@ -54,6 +55,7 @@ public partial class CourierDeliveryHistoryWindow : Window
     {
         try
         {
+            Tools.ResetRequested -= () => this.Close();
             s_bl.Order.RemoveObserver(OrderObserver);
         }
         catch (Exception)

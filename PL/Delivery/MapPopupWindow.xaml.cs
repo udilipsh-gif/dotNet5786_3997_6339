@@ -110,4 +110,14 @@ public partial class MapPopupWindow : Window
             this.DragMove();
         }
     }
+
+    private void MapPopupWindow_Loaded(object sender, EventArgs e)
+    {
+        Tools.ResetRequested += () => this.Close();
+    }
+
+    private void MapPopupWindow_Closed(object sender, EventArgs e)
+    {
+        Tools.ResetRequested -= () => this.Close();
+    }
 }

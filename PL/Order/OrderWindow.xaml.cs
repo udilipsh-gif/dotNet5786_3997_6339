@@ -89,6 +89,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
 
     private void OrderWindow_Loaded(object sender, EventArgs e)
     {
+        Tools.ResetRequested += () => this.Close();
         if (CurrentID != 0)
         {
             ButtonText = "Update";
@@ -233,6 +234,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     /// <param name="e"></param>
     private void OrderWindow_Closed(object sender, EventArgs e)
     {
+        Tools.ResetRequested -= () => this.Close();
         if (CurrentID != 0)
             Tools.RunSafe(() => s_bl.Order.RemoveObserver(CurrentID, OrderObserver));
             Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(OrderObserver));

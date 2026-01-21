@@ -194,14 +194,14 @@ public static class Tools
         };
 
         EventHandler parentStateChanged = null!;
-        parentStateChanged = (s, e) =>
-        {
-            if (parent.WindowState == WindowState.Minimized)
-                child.WindowState = WindowState.Minimized;
-            else if (parent.WindowState != WindowState.Minimized &&
-                     child.WindowState == WindowState.Minimized)
-                child.WindowState = WindowState.Normal;
-        };
+        //parentStateChanged = (s, e) =>
+        //{
+        //    if (parent.WindowState == WindowState.Minimized)
+        //        child.WindowState = WindowState.Minimized;
+        //    else if (parent.WindowState != WindowState.Minimized &&
+        //             child.WindowState == WindowState.Minimized)
+        //        child.WindowState = WindowState.Normal;
+        //};
 
         parent.Closed += parentClosed;
         parent.StateChanged += parentStateChanged;
@@ -213,7 +213,12 @@ public static class Tools
         };
     }
 
-   
+    public static event Action? ResetRequested;
 
-    
+    public static void TriggerReset()
+    {
+        ResetRequested?.Invoke();
+    }
+
+
 }

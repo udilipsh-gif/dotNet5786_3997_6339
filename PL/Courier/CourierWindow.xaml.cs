@@ -112,6 +112,7 @@ public partial class CourierWindow : Window
     /// <param name="e">Event arguments.</param>
     private void CourierWindow_Loaded(object sender, EventArgs e)
     {
+        Tools.ResetRequested += () => this.Close();
         if (CURRENT_ID != 0)
         {
             ButtonText = "Update";
@@ -203,6 +204,7 @@ public partial class CourierWindow : Window
     /// <param name="e">Event arguments.</param>
     private void CourierWindow_Closed(object sender, EventArgs e)
     {
+        Tools.ResetRequested -= () => this.Close();
         if (CURRENT_ID != 0)
             s_bl.Courier.RemoveObserver(CURRENT_ID, CourierObserver);
     }

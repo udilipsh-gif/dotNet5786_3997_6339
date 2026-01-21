@@ -62,6 +62,7 @@ public partial class MainCourier : Window
 
     private void MainCourier_Loaded(object sender, RoutedEventArgs e)
     {
+        Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Courier.AddObserver(USERID, GetCurier));
         IsOrderInProgress = false;
         GetCurier();
@@ -69,6 +70,7 @@ public partial class MainCourier : Window
 
     private void MainCourier_Closed(object sender, EventArgs e)
     {
+        Tools.ResetRequested -= () => this.Close();
         if (USERID != 0)
             Tools.RunSafe(() => s_bl.Courier.RemoveObserver(USERID, GetCurier));
     }

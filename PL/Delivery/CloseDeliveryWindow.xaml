@@ -6,7 +6,9 @@
         Height="250" Width="350"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        Loaded="CloseDeliveryWindow_Loaded"
+        Closed="CloseDeliveryWindow_Closed">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>

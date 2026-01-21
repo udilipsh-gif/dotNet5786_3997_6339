@@ -8,7 +8,9 @@
         Background="Transparent"
         Topmost="True"
         Deactivated="Window_Deactivated"
-        FlowDirection="RightToLeft">
+        FlowDirection="RightToLeft"
+        Loaded="MapPopupWindow_Loaded"
+        Closed="MapPopupWindow_Closed">
 
     <Border Background="White" 
             BorderBrush="{StaticResource PrimaryColor}" 

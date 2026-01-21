@@ -72,4 +72,15 @@ public partial class CloseDeliveryWindow : Window
         DialogResult = false;
         this.Close();
     }
+
+    private void CloseDeliveryWindow_Loaded(object sender, EventArgs e)
+    {
+        Tools.ResetRequested += () => this.Close();
+    }
+
+    private void CloseDeliveryWindow_Closed(object sender, EventArgs e)
+    {
+        Tools.ResetRequested -= () => this.Close();
+    }
+
 }
