@@ -302,6 +302,8 @@ internal static class DeliveryManager
             s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
 
         s_notifyAllObservers(delivery.OrderId, courier.Id);
+
+        s_sendEmilNewDelivery(delivery);
     }
 
     /// <summary>
@@ -526,5 +528,36 @@ internal static class DeliveryManager
 
             _ => []
         };
+    }
+
+    private static async void s_sendEmilNewDelivery(DO.Delivery delivery)
+    {
+
+        var courier = s_dal.Courier.Read(delivery.CourierId); //CourierManager.Read(delivery.CourierId);
+        var order = s_dal.Order.Read(delivery.OrderId);
+
+
+        string body =
+$@"
+<div style='font-family:Lucida Sans Unicode; direction:rtl'>
+<h2>📦 איזה כיף! ראינו שהתחלת משלוח חדש</h2>
+<b>שלום {courier.Name} היקר!!!</b><br><br>
+
+<table style='border-collapse:collapse'>
+<tr><td><b>מספר הזמנה:</b></td><td>{order.Id}</td></tr>
+<tr><td><b>שם:</b></td><td>{order.Name}</td></tr>
+<tr><td><b>כתובת:</b></td><td>{order.Addres}</td></tr>
+<tr><td><b>טלפון:</b></td><td>{order.Phone}</td></tr>
+<tr><td><b>פרטים:</b></td><td>{order.Details}</td></tr>
+<tr><td><b>סוג משלוח:</b></td><td>{order.TypeOfOrder}</td></tr>
+<tr><td><b>משקל:</b></td><td>{order.Weight}</td></tr>
+<tr><td><b>תאריך הזמנה:</b></td><td>{order.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
+</table>
+</div>
+";
+
+        await Tools.SendEmailSkript(
+              courier.Email, "התחלת משלוח חדש", body);
+
     }
 }
