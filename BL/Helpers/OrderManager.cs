@@ -1,6 +1,7 @@
-﻿using BO;
+﻿using BlApi;
+using BO;
 using DalApi;
-using DO;
+
 using System.Net.Mail;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ internal static class OrderManager
     /// <summary>
     /// Data access layer instance for database operations.
     /// </summary>
-    private static readonly IDal s_dal = Factory.Get;
+    private static readonly IDal s_dal = DalApi.Factory.Get;
 
     /// <summary>
     /// Observer manager for notifying UI components about order changes.
@@ -126,6 +127,8 @@ internal static class OrderManager
         lock (AdminManager.BlMutex)
             s_dal.Order.Create(doOrder);
         Observer.NotifyListUpdated();
+
+        s_sendEmilNewOrder(doOrder);
     }
 
     /// <summary>
@@ -261,7 +264,7 @@ internal static class OrderManager
                 .GroupBy(d => d.OrderId)
                 .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
         }
-            
+
 
         Func<BO.OrderInList, bool> filter = customPredicate ?? (_ => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortSelector(orderBy);
@@ -274,7 +277,7 @@ internal static class OrderManager
                 return await s_convertToBoOrderOptimized(doOrder, deliveriesMap);
             }).ToList();
         }
-           
+
 
         var allBoOrders = await Task.WhenAll(conversionTasks);
         var result = allBoOrders
@@ -402,19 +405,19 @@ internal static class OrderManager
         List<BO.DeliveryPerOrderInList> deliveries;
         lock (AdminManager.BlMutex)
             deliveries = (from doDelivery in s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
-                         let courier = s_dal.Courier.Read(doDelivery.CourierId)
-                         select new BO.DeliveryPerOrderInList
-                         {
-                             DeliveryId = doDelivery.Id,
-                             CourierId = courier.Id,
-                             CourierName = courier.Name,
-                             TypeShipment = (BO.TheTypeShipment)courier.TypeShipment,
-                             OrderDate = doDelivery.OrderDate,
-                             EndDelivery = doDelivery.EndDelivery.HasValue
-                                 ? (BO.EndDelivery)doDelivery.EndDelivery.Value
-                                 : null,
-                             TimeEndDelivery = doDelivery.TimeEndDelivery
-                         }).ToList();
+                          let courier = s_dal.Courier.Read(doDelivery.CourierId)
+                          select new BO.DeliveryPerOrderInList
+                          {
+                              DeliveryId = doDelivery.Id,
+                              CourierId = courier.Id,
+                              CourierName = courier.Name,
+                              TypeShipment = (BO.TheTypeShipment)courier.TypeShipment,
+                              OrderDate = doDelivery.OrderDate,
+                              EndDelivery = doDelivery.EndDelivery.HasValue
+                                  ? (BO.EndDelivery)doDelivery.EndDelivery.Value
+                                  : null,
+                              TimeEndDelivery = doDelivery.TimeEndDelivery
+                          }).ToList();
 
         return deliveries.Any() ? [.. deliveries] : null;
     }
@@ -548,6 +551,73 @@ internal static class OrderManager
         }
     }
 
+    private static async void s_sendEmilNewOrder(DO.Order doOrder)
+    {
+        Dictionary<int, int> deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
+               .ToDictionary(d => d.CourierId, d => d.Id);
+        List<DO.Courier> list_courier;
+
+        lock (AdminManager.BlMutex)
+            list_courier = s_dal?.Courier?.ReadAll(courier =>
+             courier.Active == true &&
+             s_matchTypeShipmentAndOrder(courier.TypeShipment, doOrder.TypeOfOrder) &&
+             courier.MaxDistanceDelivery >= doOrder.DistanceKm &&
+             !deliveriesMap.ContainsKey(courier.Id)) // סינון שליחים שאין להם משלוח פעיל
+             ?.ToList()
+                ?? new List<DO.Courier>();
+
+
+
+
+        try
+        {
+            foreach (var courier in list_courier)
+            {
+                await Tools.SendEmailSkript(courier.Email, "נכנסה הזמנה מתאימה עבורך ",
+
+
+                    $@"
+<div style='font-family:Lucida Sans Unicode; direction:rtl'>
+<h2>📦 איזה כיף! ראינו שיש הזמנה חדשה שמתאימה לך!</h2>
+<b>שלום {courier.Name} היקר!!!</b><br><br>
+
+<table style='border-collapse:collapse'>
+<tr><td><b>מספר הזמנה:</b></td><td>{doOrder.Id}</td></tr>
+<tr><td><b>שם:</b></td><td>{doOrder.Name}</td></tr>
+<tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
+<tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
+<tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
+<tr><td><b>סוג משלוח:</b></td><td>{doOrder.TypeOfOrder}</td></tr>
+<tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
+<tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
+</table>
+</div>
+"
+
+
+                //courier.Email,
+                //"הזמנה חדשה זמינה למשלוח",
+                //$"שלום {courier.Name},\n" +
+                //$"הזמנה חדשה זמינה למשלוח:\n" +
+                //// $"מספר הזמנה: {doOrder.Id}\n" +
+                //$"שם: {doOrder.Name}\n" +
+                //$"כתובת: {doOrder.Addres}\n" +
+                //$"טלפון: {doOrder.Phone}\n" +
+                //$"פרטים: {doOrder.Details}\n" +
+                //$"סוג משלוח: {doOrder.TypeOfOrder}\n" +
+                //$"משקל: {doOrder.Weight} ק\"ג\n" +
+                //$"תאריך הזמנה: {doOrder.OrderDate}\n"
+                );
+                await Task.Delay(100);
+            }
+        }
+        catch
+        { }
+
+    }
+
+
+
     /// <summary>
     /// Creates a filter predicate function based on the specified field and value.
     /// </summary>
@@ -595,6 +665,17 @@ internal static class OrderManager
             BO.OrderInListField.TimeLeftForDelivery => o => o.TimeLeftForDelivery,
             BO.OrderInListField.TotalTimeOfDelivery => o => o.TotalTimeOfDelivery,
             _ => o => o.OrderStatus
+        };
+    }
+
+    private static bool s_matchTypeShipmentAndOrder(DO.TheTypeShipment courierType, DO.TypeOfOrder order)
+    {
+        return order switch
+        {
+            DO.TypeOfOrder.STANDART => true,
+            DO.TypeOfOrder.FAST_DELIVERY => courierType == DO.TheTypeShipment.MOTORCYCLE || courierType == DO.TheTypeShipment.CAR,
+            DO.TypeOfOrder.DELIVER_IMMEDIATELY => courierType == DO.TheTypeShipment.MOTORCYCLE,
+            _ => false
         };
     }
 

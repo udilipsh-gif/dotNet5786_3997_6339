@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 
+
 /// <summary>
 /// Static class for initializing the data store with sample data for couriers, orders, deliveries, and configuration settings.
 /// </summary>
@@ -282,15 +283,17 @@ public static class Initialization
                 Addres = (string)address[0],
                 Latitude = double.Parse((string)address[1]),
                 Longitude = double.Parse((string)address[2]),
-                Name = "Customer" + i,
+                Name = "Customer" + (i + 1),
                 Weight = s_rand.Next(1, 15),
-                Details = "Order details for order " + i,
-                OrderDate = s_dal.Config.Clock.AddDays(-s_rand.Next(0, 3)),
+                Details = "Order details for order " + (i + 1),
+                OrderDate = s_dal.Config.Clock,
                 DistanceKm = s_getDistance(storeLat, storeLng, double.Parse((string)address[1]), double.Parse((string)address[2])),
                 OrderStatus = OrderStatus.OPEN,
                 DistanceKmRoad = double.Parse((string)address[3]) / 1000.0,
                 DistanceKmWalk = double.Parse((string)address[4]) / 1000.0
             });
+
+            s_dal?.Config.Clock.AddMinutes(s_rand.Next(30, 60)); // שינוי התאריך לשבוע אחורה לכל הזמנה
         }
     }
 
@@ -356,7 +359,7 @@ public static class Initialization
 
 
         DateTime? timeEndDelivery;
-        DateTime globalMaxTime = DateTime.MinValue;
+        DateTime tempMaxTime = DateTime.MinValue;
         DateTime maxTime = DateTime.MinValue;
 
         for (int i = 0; i < 50; i++)
@@ -381,7 +384,7 @@ public static class Initialization
                  ?.ToList()
                  ?? throw new DalisNotAvailable("Courier");
             if (list_courier.Count == 0)
-                break;
+                continue;//break;
 
             DO.Courier selectedCourier = list_courier[s_rand.Next(list_courier.Count)];// שלב 2 בחירת שליח אקראי מתוך רשימת השליחים המסוננת
 
@@ -413,29 +416,54 @@ public static class Initialization
 
             DateTime orderDate;
 
-            var delivery = s_dal!.Delivery.ReadAll(d => d.OrderId == randomOrder.Id).ToList();//מציאת משלוחים על ההזמנה הזו
+            //var delivery = s_dal!.Delivery.ReadAll(d => d.OrderId == randomOrder.Id).ToList();//מציאת משלוחים על ההזמנה הזו
+            var deliveries = s_dal!.Delivery.ReadAll();
+
+            var maxEndTimeByOrder =//מציאת הזמן המקסימלי של משלוחים קודמים על ההזמנה הזו
+                deliveries
+                .Where(d => d.OrderId == randomOrder.Id)
+                .Select(d => d.TimeEndDelivery)
+                .DefaultIfEmpty(DateTime.MinValue)
+                .Max() ?? DateTime.MinValue;
+
+            var maxEndTimeByCourier =//מציאת הזמן המקסימלי של משלוחים קודמים על השליח הזה
+                deliveries
+                .Where(d => d.CourierId == selectedCourier.Id)
+                .Select(d => d.TimeEndDelivery)
+                .DefaultIfEmpty(DateTime.MinValue)
+                .Max() ?? DateTime.MinValue;
 
 
-            maxTime = (maxTime > globalMaxTime) ? maxTime : globalMaxTime;//שמירת הזמן המקסימלי
-            // בדיקה אם יש בכלל משלוחים קודמים
-            if (delivery.Count > 0)
-            {
-                DateTime maxEndTime = delivery.Max(d => d.TimeEndDelivery) ?? DateTime.MinValue;
-                globalMaxTime = maxEndTime;
-                // קביעת הזמן החדש לזמן הסיום האחרון + 10 דק 
-                orderDate = maxEndTime.AddMinutes(s_rand.Next(10, 100));
+            maxTime = (maxTime > tempMaxTime) ? maxTime : tempMaxTime;//שמירת הזמן המקסימלי
+                                                                      // בדיקה אם יש בכלל משלוחים קודמים
+                                                                      // if (delivery.Count > 0)
+            if (maxEndTimeByOrder != DateTime.MinValue || maxEndTimeByCourier != DateTime.MinValue)
 
-            }
+                orderDate = (maxEndTimeByOrder > maxEndTimeByCourier ? maxEndTimeByOrder.AddMinutes(s_rand.Next(10, 100)) : maxEndTimeByCourier.AddMinutes(s_rand.Next(10, 100)));
+
             else
-            {
-                orderDate = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
-            }
+                orderDate = s_dal!.Config!.Clock.AddHours(s_rand.Next(0, 720));//720 שעות זה 30 יום אחורה
+                                                                                //else
+                                                                                //    orderDate = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
+
+
+            //    DateTime maxEndTime = delivery.Max(d => d.TimeEndDelivery) ?? DateTime.MinValue;
+            //    globalMaxTime = maxEndTime;
+            //    // קביעת הזמן החדש לזמן הסיום האחרון + 10 דק 
+            //    orderDate = maxEndTime.AddMinutes(s_rand.Next(10, 100));
+
+            //}
+            //else
+            //{
+            //    orderDate = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
+            //}
 
 
 
             EndDelivery getEndDelivery = (EndDelivery)s_rand.Next(0, 6);
 
             timeEndDelivery = getTimeEndDelivery(orderDate, duration, getEndDelivery);
+            tempMaxTime = timeEndDelivery ?? DateTime.MinValue;
 
             s_dal?.Order.Update(randomOrder with
             {
