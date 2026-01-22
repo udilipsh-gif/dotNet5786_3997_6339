@@ -287,7 +287,7 @@ public partial class ManagerWindow : Window
                     _ => throw new BO.BlInvalidValueException("Invalid time unit")
                 };
 
-                s_bl.Admin.ForwardClock(value);
+                Task.Run(()=> s_bl.Admin.ForwardClock(value));
                 //StatisticObserver();
             }
             catch (Exception ex)
@@ -325,11 +325,10 @@ public partial class ManagerWindow : Window
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
-                s_bl.Admin.ResetDB();
+                await Task.Run(() => s_bl.Admin.ResetDB());
             }
             finally
             {
-                await Task.Delay(500);
                 IsWindowEnabled = true;
                 Mouse.OverrideCursor = null;
                 StatisticObserver();
@@ -365,7 +364,7 @@ public partial class ManagerWindow : Window
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
-                s_bl.Admin.InitializeDB();
+                await Task.Run(() => s_bl.Admin.InitializeDB());
             }
             catch (Exception ex)
             {
@@ -373,7 +372,6 @@ public partial class ManagerWindow : Window
             }
             finally
             {
-                await Task.Delay(500);
                 IsWindowEnabled = true;
                 Mouse.OverrideCursor = null;
                 StatisticObserver();
