@@ -481,16 +481,6 @@
     <TimeEndDelivery>2026-02-11T10:55:16.0080000</TimeEndDelivery>
   </Delivery>
   <Delivery>
-    <Id>200049</Id>
-    <OrderId>100004</OrderId>
-    <CourierId>206964053</CourierId>
-    <TypeShipment>CAR</TypeShipment>
-    <OrderDate>2026-02-11T18:50:49.5999999</OrderDate>
-    <ActualDistance>13.88</ActualDistance>
-    <EndDelivery></EndDelivery>
-    <TimeEndDelivery></TimeEndDelivery>
-  </Delivery>
-  <Delivery>
     <Id>200050</Id>
     <OrderId>100029</OrderId>
     <CourierId>295180680</CourierId>
@@ -499,5 +489,45 @@
     <ActualDistance>3.526</ActualDistance>
     <EndDelivery></EndDelivery>
     <TimeEndDelivery></TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200049</Id>
+    <OrderId>100004</OrderId>
+    <CourierId>206964053</CourierId>
+    <TypeShipment>CAR</TypeShipment>
+    <OrderDate>2026-02-11T18:50:49.5999999</OrderDate>
+    <ActualDistance>13.88</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2027-05-25T16:52:23.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200051</Id>
+    <OrderId>100003</OrderId>
+    <CourierId>0</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2027-05-25T16:52:23.0000000</OrderDate>
+    <ActualDistance>0</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2027-05-25T16:52:23.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200052</Id>
+    <OrderId>100005</OrderId>
+    <CourierId>0</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2027-05-25T16:52:23.0000000</OrderDate>
+    <ActualDistance>0</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2027-05-25T16:52:23.0000000</TimeEndDelivery>
+  </Delivery>
+  <Delivery>
+    <Id>200053</Id>
+    <OrderId>100006</OrderId>
+    <CourierId>0</CourierId>
+    <TypeShipment>FOOT</TypeShipment>
+    <OrderDate>2027-05-25T16:52:23.0000000</OrderDate>
+    <ActualDistance>0</ActualDistance>
+    <EndDelivery>CONCELLED</EndDelivery>
+    <TimeEndDelivery>2027-05-25T16:52:23.0000000</TimeEndDelivery>
   </Delivery>
 </ArrayOfDeliverys>

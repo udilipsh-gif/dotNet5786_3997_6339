@@ -532,7 +532,7 @@ internal static class CourierManager
 
         var estimatedTimeTask = Tools.GetEstimatedDeliveryTime(delivery);
 
-
+        
         var actualDistanceTask = GoogleMapsService.GetActualDistance(
             order.Latitude,
             order.Longitude,
