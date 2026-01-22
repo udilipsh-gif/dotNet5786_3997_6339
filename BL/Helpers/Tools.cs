@@ -650,24 +650,24 @@ internal static class Tools
         //string encodedMessage = Uri.EscapeDataString(name+" "+body);
         string headUrl = "https://www.call2all.co.il/ym/api/SendSms";
         string token = AdminManager.GetConfig().TokenCallSms;
-        string tokenUrl= $"{headUrl}?token={token}&phones={phone}&message={name + " " + body}";
+        string tokenUrl = $"{headUrl}?token={token}&phones={phone}&message={name + " " + body}";
 
         try
-        {           
+        {
             HttpResponseMessage response = await client.GetAsync(tokenUrl);
 
-           
+
             string result = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-              throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + response.StatusCode);
+                throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + response.StatusCode);
             }
-           
+
         }
         catch (Exception ex)
         {
-          throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + ex.Message);
+            throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + ex.Message);
         }
     }
 
@@ -695,5 +695,19 @@ internal static class Tools
 
         return delivery;
     }
+
+    public static (string word, string imoje) ConvertTipeOrderToHebrew(DO.TypeOfOrder typeOrder)
+    {
+        return typeOrder switch
+        {
+            DO.TypeOfOrder.STANDART => ("רגיל","🚶‍"),
+            DO.TypeOfOrder.FAST_DELIVERY => ("משלוח מהיר","🏃‍♂️"),
+            DO.TypeOfOrder.DELIVER_IMMEDIATELY => ("משלוח מיידי","🚀"),
+            _ => ("לא ידוע","❓")
+        };
+    }
+
+
+
 
 }

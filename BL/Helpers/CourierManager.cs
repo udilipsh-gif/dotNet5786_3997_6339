@@ -529,7 +529,9 @@ internal static class CourierManager
         var actualDistance = await actualDistanceTask;
         var scheduleStatus = await scheduleStatusTask;
 
-        DateTime maxDeliveryTime = order.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
+        DateTime maxDeliveryTime;
+        lock (AdminManager.BlMutex)
+             maxDeliveryTime = order.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
 
         // 4. יצירת האובייקט
         return new BO.OrderInProgress
@@ -549,7 +551,7 @@ internal static class CourierManager
             MaxDeliveryTime = maxDeliveryTime,
             OrderStatus = BO.OrderStatus.DELIVERING,
             ScheduleStatus = scheduleStatus,
-            TimeRemaining = maxDeliveryTime - AdminManager.Now
+            TimeRemaining = maxDeliveryTime -AdminManager.Now
         };
     }
 
