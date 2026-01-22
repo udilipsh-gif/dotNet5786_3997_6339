@@ -230,13 +230,9 @@ public static class GoogleMapsService
 
             string? status = doc.Root?.Element("status")?.Value;
 
-            System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] URL: {url}");
-            System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] Status: {status}");
-
             if (status != "OK")
             {
                 string? errorMsg = doc.Root?.Element("error_message")?.Value;
-                System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] Error: {errorMsg}");
                 return null;
             }
 
@@ -313,9 +309,8 @@ public static class GoogleMapsService
             s_routeCache.TryAdd(cacheKey, routeInfo);
             return routeInfo;
         }
-        catch (Exception ex)
+        catch
         {
-            System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] Exception: {ex.Message}");
             return null;
         }
     }
