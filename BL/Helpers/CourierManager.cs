@@ -369,8 +369,8 @@ internal static class CourierManager
     /// <returns>A CourierInList object with summary information.</returns>
     private static async Task<BO.CourierInList> s_convertToCourierInList(DO.Courier doCourier)
     {
-       Dictionary<int, int?> deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
-                .ToDictionary(d => d.CourierId, d => d?.Id);
+        Dictionary<int, int?> deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
+                 .ToDictionary(d => d.CourierId, d => d?.Id);
 
         return new BO.CourierInList
         {
@@ -548,7 +548,11 @@ internal static class CourierManager
 
         DateTime maxDeliveryTime;
         lock (AdminManager.BlMutex)
-             maxDeliveryTime = order.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
+            maxDeliveryTime = order.OrderDate.Add(s_dal.Config.MaxDeliveryTime);
+
+        TimeSpan timeRemaining;
+
+        timeRemaining = maxDeliveryTime - AdminManager.Now;
 
         // 4. יצירת האובייקט
         return new BO.OrderInProgress
@@ -568,7 +572,7 @@ internal static class CourierManager
             MaxDeliveryTime = maxDeliveryTime,
             OrderStatus = BO.OrderStatus.DELIVERING,
             ScheduleStatus = scheduleStatus,
-            TimeRemaining = maxDeliveryTime -AdminManager.Now
+            TimeRemaining = timeRemaining
         };
     }
 
@@ -587,7 +591,7 @@ internal static class CourierManager
         {
             if (courier.DeliveryId is null)
             {
-                if (s_rand.Next(1, 100) <= 15) 
+                if (s_rand.Next(1, 100) <= 15)
                 {
                     simulationTasks.Add(Task.Run(async () =>
                     {
@@ -650,7 +654,7 @@ internal static class CourierManager
                             }
                         }
                     }
-                    catch {}
+                    catch { }
                 }));
             }
         }
@@ -687,7 +691,7 @@ internal static class CourierManager
                 DeliveryManager.Observer.NotifyItemUpdated(deliveryId);
             }
         }
-        catch (Exception) {}
+        catch (Exception) { }
     }
 
 }
