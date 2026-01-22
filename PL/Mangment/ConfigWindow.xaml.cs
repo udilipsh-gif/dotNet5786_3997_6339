@@ -1,4 +1,5 @@
 ﻿using PL.Helpers;
+using System.Threading.Tasks;
 using System.Windows;
 
 
@@ -56,11 +57,11 @@ public partial class ConfigWindow : Window
         this.Close();
     }
 
-    private void BtuSave_Click(object? sender, EventArgs e)
+    private async void BtuSave_Click(object? sender, EventArgs e)
     {
         try
         {
-            s_bl.Admin.SetConfig(Configuration);
+            await s_bl.Admin.SetConfig(Configuration);
             MessageBox.Show(
             "הנתונים נשמרו בהצלחה",
             "שמירה",

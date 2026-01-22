@@ -163,6 +163,8 @@ public static class GoogleMapsService
     /// </summary>
     private static void s_prepareHttpClient()
     {
+       
+
         s_httpClient.DefaultRequestHeaders.Clear();
         s_httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
     }

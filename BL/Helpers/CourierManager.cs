@@ -591,7 +591,7 @@ internal static class CourierManager
         {
             if (courier.DeliveryId is null)
             {
-                if (s_rand.Next(1, 100) <= 15)
+                if (s_rand.Next(1, 100) <= 100)
                 {
                     simulationTasks.Add(Task.Run(async () =>
                     {

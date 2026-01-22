@@ -104,9 +104,9 @@ internal class AdminImplementation : IAdmin
     /// Updates the system configuration.
     /// </summary>
     /// <param name="config">The configuration to set.</param>
-    public void SetConfig(BO.Config config)
+    public async Task SetConfig(BO.Config config)
     {
-        AdminManager.SetConfig(config).GetAwaiter().GetResult();
+        await AdminManager.SetConfig(config);                   //.GetAwaiter().GetResult();
     }
 
     /// <summary>

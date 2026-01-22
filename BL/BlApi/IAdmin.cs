@@ -106,7 +106,7 @@ public interface IAdmin
     /// </list>
     /// Note: Some values like auto-increment IDs cannot be modified through this method.
     /// </remarks>
-    void SetConfig(BO.Config config);
+    Task SetConfig(BO.Config config);
 
     /// <summary>
     /// Registers an observer to be notified when the system configuration changes.

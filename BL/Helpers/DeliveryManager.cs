@@ -563,9 +563,12 @@ internal static class DeliveryManager
             </table>
             </div>
             ";
-
-        await Tools.SendEmailSkript(
-              courier.Email, "התחלת משלוח חדש", body);
+        try
+        {
+            await Tools.SendEmailSkript(
+                  courier.Email, "התחלת משלוח חדש", body);
+        }
+        catch { }
 
     }
 }
