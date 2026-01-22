@@ -686,6 +686,8 @@ internal static class CourierManager
                 lock (AdminManager.BlMutex)
                     s_dal.Delivery.Update(updatedDelivery);
 
+                DeliveryManager.UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
+
                 Observer.NotifyItemUpdated(courierId);
                 OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
                 DeliveryManager.Observer.NotifyItemUpdated(deliveryId);

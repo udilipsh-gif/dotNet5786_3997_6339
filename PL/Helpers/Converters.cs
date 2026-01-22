@@ -368,6 +368,21 @@ public class OrderStatusToVisibilityConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+public class RunStopSimulatorConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+       if(value is bool isRunning)
+        {
+            return isRunning ? "הפעל סימולציה" : "עצור סימולציה";
+        }
+        return "הפעל סימולציה";
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
 
 public class StatusToColorConverter : IValueConverter
 {

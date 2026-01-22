@@ -237,7 +237,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         Tools.ResetRequested -= () => this.Close();
         if (CurrentID != 0)
             Tools.RunSafe(() => s_bl.Order.RemoveObserver(CurrentID, OrderObserver));
-            Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(OrderObserver));
+        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(OrderObserver));
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
+    private async void btnAddUpdate_Click(object sender, RoutedEventArgs e)
     {
         if (CurrentOrder == null || string.IsNullOrEmpty(CurrentOrder.Name))
         {
@@ -257,12 +257,12 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         {
             if (sender is Button button && button.Tag.ToString() is "Add")
             {
-                s_bl.Order.Create(CURRENT_MANAGER_ID, CurrentOrder);
+                await s_bl.Order.Create(CURRENT_MANAGER_ID, CurrentOrder);
                 MessageBox.Show("Order added successfully!");
             }
             else
             {
-                s_bl.Order.Update(CURRENT_MANAGER_ID, CurrentOrder);
+                await s_bl.Order.Update(CURRENT_MANAGER_ID, CurrentOrder);
                 MessageBox.Show("Details updated successfully!");
             }
 
@@ -270,15 +270,15 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         }
         catch (BO.BlInvalidValueException ex)
         {
-            MessageBox.Show($"ערך חסר או לא חוקי: {ex.Message}");
+            MessageBox.Show($"ערך חסר או לא חוקי: {ex.Message}", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch (BO.BlAlreadyExistsException ex)
         {
-            MessageBox.Show($"שגיאה מסוג: {ex.Message}");
+            MessageBox.Show( $"שגיאה מסוג: {ex.Message}", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"שגיאה כללית: {ex.Message}");
+            MessageBox.Show($"שגיאה כללית: {ex.Message}", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

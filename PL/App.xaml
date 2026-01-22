@@ -29,6 +29,7 @@
         <local:OrderStatusToVisibilityConverter x:Key="OrderStatusToVisibilityConverter"/>
         <local:CourierFieldFilter x:Key="CourierFieldFilterKey" />
         <local:StatusToColorConverter x:Key="StatusToColorConverter"/>
+        <local:RunStopSimulatorConverter x:Key="RunStopSimulatorConverter"/>
 
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI"/>

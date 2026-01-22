@@ -442,7 +442,7 @@ public static class Initialization
                 orderDate = (maxEndTimeByOrder > maxEndTimeByCourier ? maxEndTimeByOrder.AddMinutes(s_rand.Next(10, 100)) : maxEndTimeByCourier.AddMinutes(s_rand.Next(10, 100)));
 
             else
-                orderDate = s_dal!.Config!.Clock.AddHours(s_rand.Next(0, 720));//720 שעות זה 30 יום אחורה
+                orderDate = s_dal!.Config!.Clock.AddHours(s_rand.Next(0, 72));//720 שעות זה 30 יום אחורה
                                                                                 //else
                                                                                 //    orderDate = (DateTime)(s_dal!.Config!.Clock.AddHours(-s_rand.Next(0, duration.Hours)));
 

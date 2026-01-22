@@ -383,7 +383,7 @@ internal static class DeliveryManager
     /// <param name="orderId">The order ID to update.</param>
     /// <param name="endDelivery">The delivery outcome status.</param>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the order is not found.</exception>
-    private static void UpdateOrderStatusAfterDelivery(int orderId, BO.EndDelivery endDelivery)
+    internal static void UpdateOrderStatusAfterDelivery(int orderId, BO.EndDelivery endDelivery)
     {
         DO.Order order;
         lock (AdminManager.BlMutex)
