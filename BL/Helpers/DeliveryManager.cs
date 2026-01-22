@@ -543,7 +543,7 @@ internal static class DeliveryManager
         lock (AdminManager.BlMutex)
              order = s_dal.Order.Read(delivery.OrderId) ?? throw new BlDoesNotExistException($"order whith {delivery.OrderId} not found");
 
-        string typeOfOrderebrew = Tools.ConvertTipeOrderToHebrew(order.TypeOfOrder);
+        var (typeOfOrderebrew, emoje) = Tools.ConvertTipeOrderToHebrew(order.TypeOfOrder);
 
         string body =
             $@"
@@ -557,7 +557,7 @@ internal static class DeliveryManager
             <tr><td><b>כתובת:</b></td><td>{order.Addres}</td></tr>
             <tr><td><b>טלפון:</b></td><td>{order.Phone}</td></tr>
             <tr><td><b>פרטים:</b></td><td>{order.Details}</td></tr>
-            <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}</td></tr>
+            <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}{emoje}</td></tr>
             <tr><td><b>משקל:</b></td><td>{order.Weight}</td></tr>
             <tr><td><b>תאריך הזמנה:</b></td><td>{order.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
             </table>

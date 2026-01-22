@@ -540,8 +540,6 @@ internal static class OrderManager
                 throw new BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
         }
 
-
-
         finally
         {
             DeliveryManager.Observer.NotifyItemUpdated(delivery.Id);
@@ -572,7 +570,7 @@ internal static class OrderManager
                 ?? new List<DO.Courier>();
 
 
-        string typeOfOrderebrew = Tools.ConvertTipeOrderToHebrew(doOrder.TypeOfOrder);
+        var (typeOfOrderebrew, emoje) = Tools.ConvertTipeOrderToHebrew(doOrder.TypeOfOrder);
 
         try
         {
@@ -592,7 +590,7 @@ internal static class OrderManager
                     <tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
                     <tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
                     <tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
-                    <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}</td></tr>
+                    <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}{emoje}</td></tr>
                     <tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
                     <tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
                     </table>

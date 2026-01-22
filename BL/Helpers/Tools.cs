@@ -696,14 +696,14 @@ internal static class Tools
         return delivery;
     }
 
-    public static string ConvertTipeOrderToHebrew(DO.TypeOfOrder typeOrder)
+    public static (string word, string imoje) ConvertTipeOrderToHebrew(DO.TypeOfOrder typeOrder)
     {
         return typeOrder switch
         {
-            DO.TypeOfOrder.STANDART => "רגיל",
-            DO.TypeOfOrder.FAST_DELIVERY => "משלוח מהיר",
-            DO.TypeOfOrder.DELIVER_IMMEDIATELY => "משלוח מיידי",
-            _ => "לא ידוע"
+            DO.TypeOfOrder.STANDART => ("רגיל","🚶‍"),
+            DO.TypeOfOrder.FAST_DELIVERY => ("משלוח מהיר","🏃‍♂️"),
+            DO.TypeOfOrder.DELIVER_IMMEDIATELY => ("משלוח מיידי","🚀"),
+            _ => ("לא ידוע","❓")
         };
     }
 
