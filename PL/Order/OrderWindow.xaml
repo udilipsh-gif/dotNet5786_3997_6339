@@ -160,9 +160,14 @@
                             </StackPanel>
                         </Grid>
 
+                        <Label Content="זמן מקסימלי למסירה:" Margin="0,10,0,0"/>
+                        <TextBox Text="{Binding CurrentOrder.MaxDeliveryTime, Converter={StaticResource EnumDescriptionConverter}}" IsReadOnly="True" Background="#F5F5F5" Foreground="Gray"/>
+
                         <Label Content="עמידה בזמנים:" Margin="0,10,0,0"/>
                         <TextBox Text="{Binding CurrentOrder.ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}}" IsReadOnly="True" Background="#F5F5F5" Foreground="Gray"/>
 
+                        
+                        
                         <Grid Margin="0,10,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
