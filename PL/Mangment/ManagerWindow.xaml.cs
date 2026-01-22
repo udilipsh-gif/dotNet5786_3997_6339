@@ -1,10 +1,6 @@
 ﻿using BO;
 using PL.Helpers;
-using System.ComponentModel;
-using System.Globalization;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 
 namespace PL;
@@ -129,6 +125,23 @@ public partial class ManagerWindow : Window
     public static readonly DependencyProperty IsWindowEnabledProperty =
         DependencyProperty.Register("IsWindowEnabled", typeof(bool), typeof(ManagerWindow), new PropertyMetadata(true));
 
+    public int ClockSpeed
+    {
+        get { return (int)GetValue(ClockSpeedProperty); }
+        set { SetValue(ClockSpeedProperty, value); }
+    }
+
+    public static readonly DependencyProperty ClockSpeedProperty =
+        DependencyProperty.Register("ClockSpeed", typeof(int), typeof(ManagerWindow), new PropertyMetadata(1));
+
+    public bool RunStopSimulator
+    {
+        get { return (bool)GetValue(RunStopSimulatorProperty); }
+        set { SetValue(RunStopSimulatorProperty, value); }
+    }
+
+    public static readonly DependencyProperty RunStopSimulatorProperty =
+        DependencyProperty.Register("RunStopSimulator", typeof(bool), typeof(ManagerWindow), new PropertyMetadata(true));
 
     /// <summary>
     /// Handles the window close event, performs cleanup operations.
@@ -247,6 +260,20 @@ public partial class ManagerWindow : Window
     /// <param name="e">Event arguments.</param>
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
         => Tools.OpenOrActivateWindow<CourierListWindow>(this);
+
+    private void btnSimulator_Click(object sender, RoutedEventArgs e)
+    {
+        if(sender is null) return;
+        if (RunStopSimulator)
+        {
+            s_bl.Admin.StartSimulator(ClockSpeed);
+            RunStopSimulator = false;
+        }else
+        {
+            s_bl.Admin.StopSimulator();
+            RunStopSimulator = true;
+        }
+    }
 
 
     /// <summary>

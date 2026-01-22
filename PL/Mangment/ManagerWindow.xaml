@@ -31,15 +31,20 @@
         </Border>
 
         <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="חנות הספרים שלי - לוח בקרה" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="חנות הספרים שלי - לוח בקרה" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
 
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10">
+            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,10">
                 <TextBlock Text="שעון מערכת: " FontSize="18" VerticalAlignment="Center" Foreground="{StaticResource SubTextColor}"/>
                 <TextBlock Text="{Binding CurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
                            Language="he-IL" 
@@ -48,7 +53,7 @@
                            Foreground="{StaticResource PrimaryColor}"/>
             </StackPanel>
 
-            <WrapPanel Grid.Row="2" Margin="0,10">
+            <WrapPanel Grid.Row="2" Grid.Column="0" Margin="0,10">
                 <TextBlock Text="הרץ זמן קדימה:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"/>
 
                 <Button Content="דקה" Tag="Minute" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
@@ -58,6 +63,12 @@
                 <Button Content="חודש" Tag="Month" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
                 <Button Content="שנה" Tag="Year" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
             </WrapPanel>
+            <Label Grid.Row="0" Grid.Column="1" Content="קצב התקדמות השעון:" 
+                   Style="{StaticResource ModernLabel}"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ClockSpeed}" IsEnabled="{Binding RunStopSimulator}"/>
+            <Button Grid.Row="2" Grid.Column="1" Click="btnSimulator_Click" 
+                    Content="{Binding RunStopSimulator, Mode=OneWay, Converter={StaticResource RunStopSimulatorConverter}}"/>
+
         </Grid>
 
         <ScrollViewer Grid.Row="2" Margin="20,0,20,20" Padding="10">
