@@ -161,6 +161,7 @@ public partial class ManagerWindow : Window
         Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(clockObserver));
         Tools.RunSafe(() => s_bl.Order.RemoveObserver(StatisticObserver));
         Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(StatisticObserver));
+        Task.Run(() => s_bl.Admin.StopSimulator());
     }
 
     /// <summary>
@@ -261,16 +262,17 @@ public partial class ManagerWindow : Window
     private void btnCourierList_Click(object sender, RoutedEventArgs e)
         => Tools.OpenOrActivateWindow<CourierListWindow>(this);
 
-    private void btnSimulator_Click(object sender, RoutedEventArgs e)
+    private async void btnSimulator_Click(object sender, RoutedEventArgs e)
     {
         if(sender is null) return;
         if (RunStopSimulator)
         {
-            s_bl.Admin.StartSimulator(ClockSpeed);
+            int speed = ClockSpeed; 
+            await Task.Run(() => s_bl.Admin.StartSimulator(speed));
             RunStopSimulator = false;
         }else
         {
-            s_bl.Admin.StopSimulator();
+            await Task.Run(() => s_bl.Admin.StopSimulator());
             RunStopSimulator = true;
         }
     }
