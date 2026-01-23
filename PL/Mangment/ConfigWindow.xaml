@@ -3,12 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PL"
         Title="הגדרות מערכת" 
-        Height="650" Width="900"
+        Height="650" Width="700"
         FlowDirection="RightToLeft"
         WindowStartupLocation="CenterScreen"
         Loaded="ConfigWindow_Loaded"
         Closed="ConfigWindow_Close"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
+    <Window.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="AcceptsReturn" Value="True"/>
+            <Setter Property="MinHeight" Value="25"/>
+            <Setter Property="MaxHeight" Value="100"/>
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        </Style>
+    </Window.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
