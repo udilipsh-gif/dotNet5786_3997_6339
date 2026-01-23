@@ -208,5 +208,81 @@ public static class Tools
         ResetRequested?.Invoke();
     }
 
+    public class RelayCommand : ICommand
+    {
+
+        private readonly Action<object?> _execute;
+        private readonly Predicate<object?>? _canExecute;
+
+        public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+        public bool CanExecute(object? parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+    }
+
+    public static readonly DependencyProperty MoveFocusToProperty =
+            DependencyProperty.RegisterAttached(
+                "MoveFocusTo",
+                typeof(Control),
+                typeof(Tools),
+                new PropertyMetadata(null, OnMoveFocusToChanged));
+
+    // Get Method
+    public static Control GetMoveFocusTo(DependencyObject obj)
+    {
+        return (Control)obj.GetValue(MoveFocusToProperty);
+    }
+
+    // Set Method
+    public static void SetMoveFocusTo(DependencyObject obj, Control value)
+    {
+        obj.SetValue(MoveFocusToProperty, value);
+    }
+
+    private static void OnMoveFocusToChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is Control control)
+        {
+            control.KeyDown -= Control_KeyDown;
+            control.PreviewKeyDown -= Control_KeyDown;
+
+            if (e.NewValue is Control)
+            {
+                control.KeyDown += Control_KeyDown;
+            }
+        }
+    }
+
+    private static void Control_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is Control source && e.Key == Key.Enter)
+        {
+            var target = GetMoveFocusTo(source);
+
+            if (target != null)
+            {
+                e.Handled = true;
+
+                target.Focus();
+            }
+        }
+    }
+
 
 }

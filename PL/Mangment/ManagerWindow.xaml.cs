@@ -1,447 +1,433 @@
 ﻿using BO;
 using PL.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace PL;
-
-/// <summary>
-/// Interaction logic for ManagerWindow.xaml - the main application window and navigation hub.
-/// </summary>
-/// <remarks>
-/// This window serves as the primary entry point for the application, providing:
-/// <list type="bullet">
-/// <item><description>System clock display and manipulation controls</description></item>
-/// <item><description>Configuration management interface</description></item>
-/// <item><description>Navigation to courier, order, and delivery management windows</description></item>
-/// <item><description>Database initialization and reset operations</description></item>
-/// <item><description>Real-time updates through observer pattern for clock and configuration changes</description></item>
-/// </list>
-/// Implements INotifyPropertyChanged for data binding support.
-/// </remarks>
-public partial class ManagerWindow : Window
+namespace PL
 {
-
-    int UserId = 0;
-
-    public class StatisticItem
+    /// <summary>
+    /// Interaction logic for ManagerWindow.xaml - The central administrative dashboard.
+    /// </summary>
+    /// <remarks>
+    /// This window provides the main interface for system administrators.
+    /// Key features include:
+    /// <list type="bullet">
+    /// <item><description>System Clock Management (View, Forward, Simulate)</description></item>
+    /// <item><description>Real-time Statistics Dashboard (Orders, Schedule)</description></item>
+    /// <item><description>Navigation to Sub-Modules (Couriers, Orders, Config)</description></item>
+    /// <item><description>Database Operations (Reset, Initialize)</description></item>
+    /// </list>
+    /// </remarks>
+    public partial class ManagerWindow : Window
     {
-        public object Id { get; set; } = 0;
-        public string Name { get; set; } = string.Empty;
-        public int Value { get; set; }
-    }
+        #region Private Fields & Constants
 
+        /// <summary>
+        /// The ID of the currently logged-in administrator.
+        /// </summary>
+        private readonly int _userId;
 
-    public IEnumerable<StatisticItem> EnumForStatistic
-    {
-        get
+        /// <summary>
+        /// Instance of the Business Logic layer.
+        /// </summary>
+        private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
+        /// <summary>
+        /// Mutex for synchronizing clock updates to prevent race conditions.
+        /// </summary>
+        private readonly ObserverMutex _clockMutex = new();
+
+        /// <summary>
+        /// Mutex for synchronizing statistics updates.
+        /// </summary>
+        private readonly ObserverMutex _statsMutex = new();
+
+        #endregion
+
+        #region Inner Types
+
+        /// <summary>
+        /// Represents a single item in the statistics dashboard.
+        /// Used for binding to the ItemsControl in the UI.
+        /// </summary>
+        public class StatisticItem
         {
-            var combinedList = new List<StatisticItem>(); // שינינו ל-StatisticItem
+            /// <summary>
+            /// The underlying Enum value (OrderStatus or ScheduleStatus).
+            /// </summary>
+            public object Id { get; set; } = 0;
 
-            var orderValues = Enum.GetValues(typeof(BO.OrderStatus))
-                                  .Cast<BO.OrderStatus>()
-                                  .Select(e => new StatisticItem // יצירת המופע האמיתי
-                                  {
-                                      Id = e,
-                                      Name = "סטטוס הזמנה: " + Tools.GetDescription(e),
-                                      Value = 0
-                                  });
+            /// <summary>
+            /// The display name for the button.
+            /// </summary>
+            public string Name { get; set; } = string.Empty;
 
-            combinedList.AddRange(orderValues);
-
-            var scheduleValues = Enum.GetValues(typeof(BO.ScheduleStatus))
-                                     .Cast<BO.ScheduleStatus>()
-                                     .Select(e => new StatisticItem // יצירת המופע האמיתי
-                                     {
-                                         Id = e,
-                                         Name = "סטטוס לו\"ז: " + Tools.GetDescription(e),
-                                         Value = 0
-                                     });
-
-            combinedList.AddRange(scheduleValues);
-
-            return combinedList;
+            /// <summary>
+            /// The current count/value to display.
+            /// </summary>
+            public int Value { get; set; }
         }
-    }
 
-    public IEnumerable<StatisticItem> CombinedStatistics
-    {
-        get { return (IEnumerable<StatisticItem>)GetValue(CombinedStatisticsProperty); }
-        set { SetValue(CombinedStatisticsProperty, value); }
-    }
+        #endregion
 
-    public static readonly DependencyProperty CombinedStatisticsProperty =
-        DependencyProperty.Register(nameof(CombinedStatistics),
-            typeof(IEnumerable<StatisticItem>),
-            typeof(ManagerWindow));
+        #region Dependency Properties
 
-
-    /// <summary>
-    /// Initializes a new instance of the ManagerWindow class.
-    /// </summary>
-    public ManagerWindow(int id)
-    {
-        InitializeComponent();
-
-        UserId = id;
-
-        DataContext = this;
-    }
-
-    /// <summary>
-    /// Business logic layer instance for accessing system operations.
-    /// </summary>
-    private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
-    /// <summary>
-    /// Gets or sets the current system clock time displayed in the UI.
-    /// </summary>
-    /// <remarks>
-    /// This property is bound to the UI and automatically updates when the system clock advances.
-    /// It reflects the business clock time, which may differ from the actual system time.
-    /// </remarks>
-    public DateTime CurrentTime
-    {
-        get { return (DateTime)GetValue(CurrentTimeProperty); }
-        set { SetValue(CurrentTimeProperty, value); }
-    }
-
-    /// <summary>
-    /// Dependency property for the CurrentTime property.
-    /// </summary>
-    public static readonly DependencyProperty CurrentTimeProperty =
-        DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(ManagerWindow));
-
-
-    /// <summary>
-    /// Gets or sets whether the window controls are enabled.
-    /// </summary>
-    public bool IsWindowEnabled
-    {
-        get { return (bool)GetValue(IsWindowEnabledProperty); }
-        set { SetValue(IsWindowEnabledProperty, value); }
-    }
-
-    public static readonly DependencyProperty IsWindowEnabledProperty =
-        DependencyProperty.Register("IsWindowEnabled", typeof(bool), typeof(ManagerWindow), new PropertyMetadata(true));
-
-    public int ClockSpeed
-    {
-        get { return (int)GetValue(ClockSpeedProperty); }
-        set { SetValue(ClockSpeedProperty, value); }
-    }
-
-    public static readonly DependencyProperty ClockSpeedProperty =
-        DependencyProperty.Register("ClockSpeed", typeof(int), typeof(ManagerWindow), new PropertyMetadata(1));
-
-    public bool RunStopSimulator
-    {
-        get { return (bool)GetValue(RunStopSimulatorProperty); }
-        set { SetValue(RunStopSimulatorProperty, value); }
-    }
-
-    public static readonly DependencyProperty RunStopSimulatorProperty =
-        DependencyProperty.Register("RunStopSimulator", typeof(bool), typeof(ManagerWindow), new PropertyMetadata(true));
-
-    /// <summary>
-    /// Handles the window close event, performs cleanup operations.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// This method:
-    /// <list type="bullet">
-    /// <item><description>Removes clock observer registration</description></item>
-    /// <item><description>Removes configuration observer registration</description></item>
-    /// </list>
-    /// Ensures proper cleanup to prevent memory leaks.
-    /// </remarks>
-    private void ManagerWindow_Close(object? sender, EventArgs e)
-    {
-        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(clockObserver));
-        Tools.RunSafe(() => s_bl.Order.RemoveObserver(StatisticObserver));
-        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(StatisticObserver));
-        Task.Run(() => s_bl.Admin.StopSimulator());
-    }
-
-    /// <summary>
-    /// Handles the window loaded event, initializes the window state and observers.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// This method:
-    /// <list type="bullet">
-    /// <item><description>Loads the current system clock time</description></item>
-    /// <item><description>Registers a clock observer for real-time updates</description></item>
-    /// <item><description>Loads the current system configuration</description></item>
-    /// <item><description>Registers a configuration observer for real-time updates</description></item>
-    /// </list>
-    /// </remarks>
-    private void ManagerWindow_Loaded(object sender, RoutedEventArgs e)
-    {
-        clockObserver();
-        StatisticObserver();
-        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(clockObserver));
-        Tools.RunSafe(() => s_bl.Order.AddObserver(StatisticObserver));
-        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(StatisticObserver));
-    }
-
-    private readonly ObserverMutex _clockMutex = new(); //stage 7
-
-    /// <summary>
-    /// Observer callback method for clock changes, updates the displayed time.
-    /// </summary>
-   // private void clockObserver() => CurrentTime = s_bl.Admin.GetClock();//stage 5
-
-
-    private void clockObserver()
-    {
-        #region Stage 7 (for multithreading)
-        if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
-            return;
-
-        Dispatcher.BeginInvoke(async () =>
+        /// <summary>
+        /// Collection of statistics items displayed in the dashboard.
+        /// </summary>
+        public IEnumerable<StatisticItem> CombinedStatistics
         {
-            // The actual work to be done on the UI thread
-            CurrentTime = s_bl.Admin.GetClock(); //stage 5
+            get { return (IEnumerable<StatisticItem>)GetValue(CombinedStatisticsProperty); }
+            set { SetValue(CombinedStatisticsProperty, value); }
+        }
 
-          
+        public static readonly DependencyProperty CombinedStatisticsProperty =
+            DependencyProperty.Register(nameof(CombinedStatistics), typeof(IEnumerable<StatisticItem>), typeof(ManagerWindow));
 
-            // After completing the work, check if a restart was requested
-            if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
-                clockObserver();
-        });
-        #endregion Stage 7 (for multithreading)
-    }
-
-
-    private readonly ObserverMutex _Mutex = new(); //stage 7
-    private void StatisticObserver()
-    {
-        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
-            return;
-
-        Dispatcher.BeginInvoke(async () =>
+        /// <summary>
+        /// The current simulated system time.
+        /// </summary>
+        public DateTime CurrentTime
         {
-            bool windowIsOpen = true;
-            int[]? newStats = null;
+            get { return (DateTime)GetValue(CurrentTimeProperty); }
+            set { SetValue(CurrentTimeProperty, value); }
+        }
+
+        public static readonly DependencyProperty CurrentTimeProperty =
+            DependencyProperty.Register(nameof(CurrentTime), typeof(DateTime), typeof(ManagerWindow));
+
+        /// <summary>
+        /// Controls whether the window controls are enabled (e.g., disabled during DB reset).
+        /// </summary>
+        public bool IsWindowEnabled
+        {
+            get { return (bool)GetValue(IsWindowEnabledProperty); }
+            set { SetValue(IsWindowEnabledProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsWindowEnabledProperty =
+            DependencyProperty.Register(nameof(IsWindowEnabled), typeof(bool), typeof(ManagerWindow), new PropertyMetadata(true));
+
+        /// <summary>
+        /// The speed factor for the time simulator.
+        /// </summary>
+        public int ClockSpeed
+        {
+            get { return (int)GetValue(ClockSpeedProperty); }
+            set { SetValue(ClockSpeedProperty, value); }
+        }
+
+        public static readonly DependencyProperty ClockSpeedProperty =
+            DependencyProperty.Register(nameof(ClockSpeed), typeof(int), typeof(ManagerWindow), new PropertyMetadata(1));
+
+        /// <summary>
+        /// State of the simulator (True = Running, False = Stopped).
+        /// </summary>
+        public bool RunStopSimulator
+        {
+            get { return (bool)GetValue(RunStopSimulatorProperty); }
+            set { SetValue(RunStopSimulatorProperty, value); }
+        }
+
+        public static readonly DependencyProperty RunStopSimulatorProperty =
+            DependencyProperty.Register(nameof(RunStopSimulator), typeof(bool), typeof(ManagerWindow), new PropertyMetadata(true));
+
+        #endregion
+
+        #region Constructor & Lifecycle
+
+        /// <summary>
+        /// Initializes a new instance of the ManagerWindow.
+        /// </summary>
+        /// <param name="id">The ID of the user logging in.</param>
+        public ManagerWindow(int id)
+        {
+            InitializeComponent();
+            _userId = id;
+            DataContext = this;
+        }
+
+        /// <summary>
+        /// Called when the window is loaded. Initializes observers.
+        /// </summary>
+        private void ManagerWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Initial fetch
+            ClockObserver();
+            StatisticObserver();
+
+            // Register observers
+            Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
+            Tools.RunSafe(() => s_bl.Order.AddObserver(StatisticObserver));
+        }
+
+        /// <summary>
+        /// Called when the window is closed. Cleans up observers and stops simulator.
+        /// </summary>
+        private void ManagerWindow_Close(object? sender, EventArgs e)
+        {
+            Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
+            Tools.RunSafe(() => s_bl.Order.RemoveObserver(StatisticObserver));
+
+            // Stop simulator in background
+            Task.Run(() => s_bl.Admin.StopSimulator());
+        }
+
+        #endregion
+
+        #region Observers & Logic
+
+        /// <summary>
+        /// Helper property to generate the initial template for statistics (with 0 values).
+        /// </summary>
+        private IEnumerable<StatisticItem> InitialStatsTemplate
+        {
+            get
+            {
+                var combinedList = new List<StatisticItem>();
+
+                var orderValues = Enum.GetValues(typeof(BO.OrderStatus))
+                                      .Cast<BO.OrderStatus>()
+                                      .Select(e => new StatisticItem
+                                      {
+                                          Id = e,
+                                          Name = "סטטוס הזמנה: " + Tools.GetDescription(e),
+                                          Value = 0
+                                      });
+                combinedList.AddRange(orderValues);
+
+                var scheduleValues = Enum.GetValues(typeof(BO.ScheduleStatus))
+                                         .Cast<BO.ScheduleStatus>()
+                                         .Select(e => new StatisticItem
+                                         {
+                                             Id = e,
+                                             Name = "סטטוס לו\"ז: " + Tools.GetDescription(e),
+                                             Value = 0
+                                         });
+                combinedList.AddRange(scheduleValues);
+
+                return combinedList;
+            }
+        }
+
+        /// <summary>
+        /// Observer callback for clock updates.
+        /// Handles UI thread synchronization using Dispatcher and Mutex.
+        /// </summary>
+        private void ClockObserver()
+        {
+            if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())
+                return;
+
+            Dispatcher.BeginInvoke(async () =>
+            {
+                CurrentTime = s_bl.Admin.GetClock();
+
+                if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    ClockObserver();
+            });
+        }
+
+        /// <summary>
+        /// Observer callback for statistic updates.
+        /// Handles data fetching, UI binding, and error handling for DB access.
+        /// </summary>
+        private void StatisticObserver()
+        {
+            if (_statsMutex.CheckAndSetLoadInProgressOrRestartRequired())
+                return;
+
+            Task.Run(() =>
+            {
+                Dispatcher.BeginInvoke(async () =>
+                {
+                    bool windowIsOpen = true;
+                    int[]? newStats = null;
+
+                    try
+                    {
+                        newStats = await s_bl.Order.GetAllOrderStatistic(_userId);
+
+                        if (windowIsOpen && newStats != null)
+                        {
+                            var template = InitialStatsTemplate;
+                            CombinedStatistics = template.Zip(newStats, (item, count) =>
+                            {
+                                item.Value = count;
+                                return item;
+                            }).ToList();
+                        }
+                    }
+                    catch (BlNoAccessException)
+                    {
+                        windowIsOpen = false;
+                        MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
+                        Close();
+                    }
+                    finally
+                    {
+                        if (windowIsOpen && await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested())
+                            StatisticObserver();
+                    }
+                });
+            });
+        }
+
+        #endregion
+
+        #region UI Event Handlers (Navigation & Actions)
+
+        /// <summary>
+        /// Opens the Courier List window.
+        /// </summary>
+        private void btnCourierList_Click(object sender, RoutedEventArgs e)
+            => Tools.OpenOrActivateWindow<CourierListWindow>(this);
+
+        /// <summary>
+        /// Opens the Order List window.
+        /// </summary>
+        private void btnOrderList_Click(object sender, RoutedEventArgs e)
+            => Tools.OpenOrActivateWindow<OrderListWindow>(this);
+
+        /// <summary>
+        /// Opens the Configuration window.
+        /// </summary>
+        private void btnConfig_Click(object sender, RoutedEventArgs e)
+            => Tools.OpenOrActivateWindow<ConfigWindow>(this);
+
+        /// <summary>
+        /// Toggles the Time Simulator On/Off.
+        /// </summary>
+        private async void btnSimulator_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is null) return;
+
+            if (RunStopSimulator)
+            {
+                int speed = ClockSpeed;
+                await Task.Run(() => s_bl.Admin.StartSimulator(speed));
+                RunStopSimulator = false;
+            }
+            else
+            {
+                await Task.Run(() => s_bl.Admin.StopSimulator());
+                RunStopSimulator = true;
+            }
+        }
+
+        /// <summary>
+        /// Advances the system clock by a specific unit based on the button clicked.
+        /// </summary>
+        private void ClockForward_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.Tag != null)
+            {
+                string tagValue = element.Tag.ToString() ?? string.Empty;
+
+                try
+                {
+                    var unit = tagValue switch
+                    {
+                        "Minute" => BO.TimeUnit.MINUTE,
+                        "Hour" => BO.TimeUnit.HOUR,
+                        "Day" => BO.TimeUnit.DAY,
+                        "Week" => BO.TimeUnit.WEEK,
+                        "Month" => BO.TimeUnit.MONTH,
+                        "Year" => BO.TimeUnit.YEAR,
+                        _ => throw new BO.BlInvalidValueException("Invalid time unit")
+                    };
+
+                    s_bl.Admin.ForwardClock(unit);
+                }
+                catch (BO.BLTemporaryNotAvailableException ex)
+                {
+                    MessageBox.Show(ex.Message, "לא ניתן לעדכן", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Filters the order list based on the clicked statistic button.
+        /// </summary>
+        private void btnStatistic_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.Tag != null)
+            {
+                switch (element.Tag)
+                {
+                    case BO.OrderStatus orderStatus:
+                        Tools.OpenOrActivateWindow<OrderListWindow>(this, orderStatus, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
+                        break;
+
+                    case BO.ScheduleStatus scheduleStatus:
+                        Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, scheduleStatus, (BO.TypeOfOrder?)null);
+                        break;
+
+                    default:
+                        Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Resets the database after user confirmation.
+        /// </summary>
+        private async void ResetDB(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Delete all data?", "ResetDB",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                await PerformDbOperation(() => s_bl.Admin.ResetDB());
+            }
+        }
+
+        /// <summary>
+        /// Initializes the database with sample data.
+        /// </summary>
+        private async void InitDB(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Do you want to initialize all data?", "InitDB",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                await PerformDbOperation(() => s_bl.Admin.InitializeDB());
+            }
+        }
+
+        /// <summary>
+        /// Helper method to execute DB operations with UI blocking and cursor updates.
+        /// </summary>
+        private async Task PerformDbOperation(Func<Task> dbAction)
+        {
+            IsWindowEnabled = false;
+            Tools.TriggerReset();
+            Mouse.OverrideCursor = Cursors.Wait;
+
             try
             {
-                newStats = await s_bl.Order.GetAllOrderStatistic(UserId);
-            }
-            catch (BlNoAccessException)
-            {
-                windowIsOpen = false;
-                MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
-                Close();
-            }
-            var enumList = EnumForStatistic;
-
-            if (enumList != null && newStats != null)
-            {
-                var resultList = enumList.Zip(newStats, (labelObj, count) => new StatisticItem
-                {
-                    Id = labelObj.Id,     // אין צורך ב-dynamic
-                    Name = labelObj.Name, // אין צורך ב-dynamic
-                    Value = count         // העדכון מהסטטיסטיקה
-                }).ToList();
-
-                CombinedStatistics = resultList;
-            }
-            if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
-                StatisticObserver();
-        });
-    }
-
-    /// <summary>
-    /// Handles the courier list button click event, opens the courier management window.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">Event arguments.</param>
-    private void btnCourierList_Click(object sender, RoutedEventArgs e)
-        => Tools.OpenOrActivateWindow<CourierListWindow>(this);
-
-    private async void btnSimulator_Click(object sender, RoutedEventArgs e)
-    {
-        if(sender is null) return;
-        if (RunStopSimulator)
-        {
-            int speed = ClockSpeed; 
-            await Task.Run(() => s_bl.Admin.StartSimulator(speed));
-            RunStopSimulator = false;
-        }else
-        {
-            await Task.Run(() => s_bl.Admin.StopSimulator());
-            RunStopSimulator = true;
-        }
-    }
-
-
-    /// <summary>
-    /// Handles the clock forward button clicks, advances the system clock by the specified time unit.
-    /// </summary>
-    /// <param name="sender">The button that was clicked.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// The time unit is determined by the button's Tag property value:
-    /// <list type="bullet">
-    /// <item><description>"Minute" - advances clock by 1 minute</description></item>
-    /// <item><description>"Hour" - advances clock by 1 hour</description></item>
-    /// <item><description>"Day" - advances clock by 1 day</description></item>
-    /// <item><description>"Week" - advances clock by 1 week</description></item>
-    /// <item><description>"Month" - advances clock by 1 month</description></item>
-    /// <item><description>"Year" - advances clock by 1 year</description></item>
-    /// </list>
-    /// All registered clock observers are notified after the clock is advanced.
-    /// </remarks>
-    private void ClockForward_Click(object sender, RoutedEventArgs e)
-    {
-
-        if (sender is FrameworkElement element && element.Tag != null)
-        {
-
-            string tagValue = element.Tag.ToString() ?? string.Empty;
-
-            try
-            {
-                var value = tagValue switch
-                {
-                    "Minute" => BO.TimeUnit.MINUTE,
-                    "Hour" => BO.TimeUnit.HOUR,
-                    "Day" => BO.TimeUnit.DAY,
-                    "Week" => BO.TimeUnit.WEEK,
-                    "Month" => BO.TimeUnit.MONTH,
-                    "Year" => BO.TimeUnit.YEAR,
-                    _ => throw new BO.BlInvalidValueException("Invalid time unit")
-                };
-
-                Task.Run(()=> s_bl.Admin.ForwardClock(value));
-                //StatisticObserver();
+                await Task.Run(dbAction);
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-        }
-    }
-
-
-    /// <summary>
-    /// Handles the reset database button click, prompts for confirmation and resets all data.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// This is a destructive operation that:
-    /// <list type="bullet">
-    /// <item><description>Prompts the user for confirmation</description></item>
-    /// <item><description>Closes all open child windows</description></item>
-    /// <item><description>Clears all couriers, orders, and deliveries from the database</description></item>
-    /// <item><description>Resets configuration to defaults</description></item>
-    /// <item><description>Resets auto-increment ID counters</description></item>
-    /// <item><description>Displays a wait cursor during the operation</description></item>
-    /// </list>
-    /// </remarks>
-    private async void ResetDB(object sender, RoutedEventArgs e)
-    {
-        var result = MessageBox.Show("Delete all data?", "ResetDB",
-                                         MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (result is MessageBoxResult.Yes)
-        {
-            IsWindowEnabled = false;
-            Tools.TriggerReset();
-            try
-            {
-                Mouse.OverrideCursor = Cursors.Wait;
-                await Task.Run(() => s_bl.Admin.ResetDB());
-            }
             finally
             {
                 IsWindowEnabled = true;
                 Mouse.OverrideCursor = null;
-                StatisticObserver();
+                StatisticObserver(); // Force refresh stats
             }
         }
 
+        #endregion
     }
-
-    /// <summary>
-    /// Handles the initialize database button click, prompts for confirmation and initializes sample data.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">Event arguments.</param>
-    /// <remarks>
-    /// This operation:
-    /// <list type="bullet">
-    /// <item><description>Prompts the user for confirmation</description></item>
-    /// <item><description>Closes all open child windows</description></item>
-    /// <item><description>Resets the database (calls ResetDB internally)</description></item>
-    /// <item><description>Populates the database with sample couriers, orders, and deliveries</description></item>
-    /// <item><description>Displays a wait cursor during the operation</description></item>
-    /// </list>
-    /// Useful for development, testing, and demonstration purposes.
-    /// </remarks>
-    private async void InitDB(object sender, RoutedEventArgs e)
-    {
-        var result = MessageBox.Show("Do you want to initialize all data?", "InitDB",
-                                         MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (result is MessageBoxResult.Yes)
-        {
-            IsWindowEnabled = false;
-            Tools.TriggerReset();
-            try
-            {
-                Mouse.OverrideCursor = Cursors.Wait;
-                await Task.Run(() => s_bl.Admin.InitializeDB());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-            finally
-            {
-                IsWindowEnabled = true;
-                Mouse.OverrideCursor = null;
-                StatisticObserver();
-            }
-        }
-
-    }
-
-    /// <summary>
-    /// Handles the order list button click event, opens the order management window.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void btnOrderList_Click(object sender, RoutedEventArgs e)
-        => Tools.OpenOrActivateWindow<OrderListWindow>(this);
-
-
-    private void btnStatistic_Click(object sender, RoutedEventArgs e)
-    {
-
-        if (sender is FrameworkElement element && element.Tag != null)
-        {
-            var tagValue = element.Tag;
-
-            switch (tagValue)
-            {
-                case BO.OrderStatus orderStatus:
-                    Tools.OpenOrActivateWindow<OrderListWindow>(this, orderStatus, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
-                    break;
-
-                case BO.ScheduleStatus scheduleStatus:
-                    Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, scheduleStatus, (BO.TypeOfOrder?)null);
-                    break;
-
-                default:
-                    Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
-                    break;
-            }
-        }
-    }
-
-    private void btnConfig_Click(object sender, RoutedEventArgs e)
-        => Tools.OpenOrActivateWindow<ConfigWindow>(this);
 }

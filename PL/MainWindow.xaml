@@ -11,8 +11,24 @@
         Loaded="MainWindow_Loaded"
         Closed="MainWindow_Close">
 
-    <Grid ShowGridLines="False">
+    <Window.Resources>
+        <Style x:Key="LoginFieldStyle" TargetType="Control">
+            <Setter Property="Background" Value="#70CCCCCC"/>
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template" Value="{StaticResource {x:Type TextBox}}"/>
+        </Style>
 
+        <Style x:Key="LoginPasswordStyle" TargetType="PasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}">
+            <Setter Property="Background" Value="#70CCCCCC"/>
+        </Style>
+        <Style x:Key="LoginTextStyle" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Background" Value="#70CCCCCC"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid ShowGridLines="False">
         <Grid.Background>
             <ImageBrush ImageSource="/Images/image_login.png" Stretch="UniformToFill">
                 <ImageBrush.RelativeTransform>
@@ -22,19 +38,22 @@
         </Grid.Background>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="1.9*"/>
+            <RowDefinition Height="2.1*"/>
             <RowDefinition Height="2*"/>
-            <RowDefinition Height="1.2*"/>
+            <RowDefinition Height="1.3*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" 
-               Language="he-IL" 
-               Text="{Binding CurrentTime}" 
-               HorizontalAlignment="Center" 
-               Foreground="{StaticResource PrimaryDarkColor}"
-               FontWeight="Bold"
-                   FontSize="20"
-               Margin="10"/>
+                   Text="{Binding CurrentTime}" 
+                   HorizontalAlignment="Center" 
+                   Foreground="White"
+                   FontWeight="Bold"
+                   FontSize="28"
+                   Margin="10">
+            <TextBlock.Effect>
+                <DropShadowEffect BlurRadius="5" ShadowDepth="0" Color="Black" Opacity="0.8"/>
+            </TextBlock.Effect>
+        </TextBlock>
 
         <Border Grid.Row="1" 
                 Width="300"
@@ -43,61 +62,40 @@
                 BorderBrush="{StaticResource BorderColor}"
                 BorderThickness="1"
                 CornerRadius="8"
-                Padding="15">
-            <!--  זה ירד מהבורדר של שורה 1 כמו כן הפדינג היה 25-->
-            <!--Background="{StaticResource SurfaceColor}"-->
+                Padding="15,15,15,0">
 
             <Border.Effect>
                 <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="#000"/>
             </Border.Effect>
 
             <StackPanel>
-                <Border Grid.Row="2"
-                        Background="{StaticResource PrimaryColor}" 
-                        CornerRadius="12" 
-                        Padding="10,4" 
-                        HorizontalAlignment="Left" 
-                        VerticalAlignment="Center"
-                        Margin="0,5">
-
-                    <TextBlock Text="תעודת זהות:" 
-                               Foreground="White" 
-                               FontSize="14" 
-                               FontWeight="SemiBold"/>
+                <Border Style="{StaticResource LabelPillStyle}">
+                    <TextBlock Text="תעודת זהות:" Style="{StaticResource LabelTextStyle}"/>
                 </Border>
+
                 <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" 
                          MaxLength="9"
-                         Background="#70CCCCCC"
-                         
-                       
+                         Style="{StaticResource LoginTextStyle}"
+                         local:Tools.MoveFocusTo="{Binding ElementName=UserPasswordBox}"
                          local:Tools.NumericOnly="True"/>
 
-                <Border Grid.Row="2"
-                        Background="{StaticResource PrimaryColor}" 
-                        CornerRadius="12" 
-                        Padding="10,4" 
-                        HorizontalAlignment="Left" 
-                        VerticalAlignment="Center"
-                        Margin="0,5">
-
-                    <TextBlock Text="סיסמה:" 
-                               Foreground="White" 
-                               FontSize="14" 
-                               FontWeight="SemiBold"/>
+                <Border Style="{StaticResource LabelPillStyle}">
+                    <TextBlock Text="סיסמה:" Style="{StaticResource LabelTextStyle}"/>
                 </Border>
-                <PasswordBox x:Name="UserPasswordBox" Background="#70CCCCCC">
+
+                <PasswordBox x:Name="UserPasswordBox" Margin="0,0,00,10"
+                             Style="{StaticResource LoginPasswordStyle}">
                     <PasswordBox.InputBindings>
                         <KeyBinding Key="Enter" 
-                                    
                                     Command="{Binding LoginCommand}" 
                                     CommandParameter="{Binding ElementName=UserPasswordBox}"/>
                     </PasswordBox.InputBindings>
                 </PasswordBox>
 
                 <Button Content="התחבר" 
-                        Margin="0,20,0,0"
+                        Margin="0,20"
                         Command="{Binding LoginCommand}" 
-                        CommandParameter="{Binding ElementName=UserPasswordBox}"/>
+                        CommandParameter="{Binding ElementName=UserPasswordBox}" />
             </StackPanel>
         </Border>
     </Grid>

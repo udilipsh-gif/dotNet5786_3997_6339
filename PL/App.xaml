@@ -31,6 +31,22 @@
         <local:StatusToColorConverter x:Key="StatusToColorConverter"/>
         <local:RunStopSimulatorConverter x:Key="RunStopSimulatorConverter"/>
 
+        <Style x:Key="LabelPillStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,10,0,-5"/>
+            <Setter Property="Panel.ZIndex" Value="1"/>
+        </Style>
+
+        <Style x:Key="LabelTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="14"/>

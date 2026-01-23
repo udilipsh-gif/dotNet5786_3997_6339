@@ -218,25 +218,30 @@ internal static class AdminManager //stage 4
             ConfigUpdatedObservers?.Invoke(); // stage 5
     }
 
-    internal static void ResetDB() //stage 4-7
+    internal static async Task ResetDB() //stage 4-7
     {
-        lock (BlMutex) //stage 7
+        await Task.Run(() =>
         {
-            s_dal.ResetDB(); //stage 4
-            AdminManager.UpdateClock(AdminManager.Now); //stage 5 - needed since we want the label on Pl to be updated
-            ConfigUpdatedObservers?.Invoke(); //stage 5 - needed to update PL 
-        }
+            lock (BlMutex) //stage 7
+            {
+                s_dal.ResetDB(); //stage 4
+            }
+        });
+        AdminManager.UpdateClock(AdminManager.Now); //stage 5 - needed since we want the label on Pl to be updated
+        ConfigUpdatedObservers?.Invoke(); //stage 5 - needed to update PL 
     }
 
-    internal static void InitializeDB() //stage 4-7
+    internal static async Task InitializeDB() //stage 4-7
     {
-        lock (BlMutex) //stage 7
+        await Task.Run(() =>
         {
-            
-            DalTest.Initialization.Do(); //stage 4
-            AdminManager.UpdateClock(AdminManager.Now);  //stage 5 - needed since we want the label on Pl to be updated           
-            ConfigUpdatedObservers?.Invoke(); //stage 5 - needed for update the PL
-        }
+            lock (BlMutex) //stage 7
+            {
+                DalTest.Initialization.Do(); //stage 4
+            }
+        });
+        AdminManager.UpdateClock(AdminManager.Now);  //stage 5 - needed since we want the label on Pl to be updated           
+        ConfigUpdatedObservers?.Invoke(); //stage 5 - needed for update the PL
     }
 
     #endregion Stage 4-7

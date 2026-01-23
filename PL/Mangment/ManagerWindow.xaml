@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:PL"
         Title="ניהול המערכת" 
-        Height="600" Width="800"
+        Height="600" Width="850"
+        MinHeight="500" MinWidth="700"
         WindowStartupLocation="CenterScreen"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         FlowDirection="RightToLeft"
@@ -17,15 +18,23 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" Padding="10">
+        <Border Grid.Row="0" 
+                Background="{StaticResource SurfaceColor}" 
+                BorderBrush="{StaticResource BorderColor}" 
+                BorderThickness="0,0,0,1" 
+                Padding="10">
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="ניהול שליחים" Click="btnCourierList_Click" Width="120"/>
-                <Button Content="ניהול הזמנות" Click="btnOrderList_Click" Width="120" ToolTip="טבלת הזמנות - הצג רשימה, מיין וסנן"/>
-                <Button Content="הגדרות" Click="btnConfig_Click" Width="120"/>
+                <Button Content="ניהול שליחים" Click="btnCourierList_Click" Width="120" Margin="5"/>
+                <Button Content="ניהול הזמנות" Click="btnOrderList_Click" Width="120" Margin="5"
+                        ToolTip="טבלת הזמנות - הצג רשימה, מיין וסנן"/>
+                <Button Content="הגדרות" Click="btnConfig_Click" Width="120" Margin="5"/>
 
                 <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                    <Button Content="איפוס נתונים" Click="ResetDB" Width="120" Style="{StaticResource DestructiveButtonStyle}"/>
-                    <Button Content="אתחול נתונים" Click="InitDB" Width="120" Style="{StaticResource SecondaryButtonStyle}"/>
+                    <Button Content="איפוס נתונים" Click="ResetDB" Width="120" Margin="5"
+                            Style="{StaticResource DestructiveButtonStyle}"/>
+                    <Button Content="אתחול נתונים" Click="InitDB" Width="120" Margin="5"
+                            Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>
             </StackPanel>
         </Border>
@@ -33,42 +42,72 @@
         <Grid Grid.Row="1" Margin="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="220"/>
             </Grid.ColumnDefinitions>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="חנות הספרים שלי - לוח בקרה" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
+                <TextBlock Grid.Row="0" 
+                           Text="חנות הספרים שלי - לוח בקרה" 
+                           Style="{StaticResource HeaderTextStyle}" 
+                           HorizontalAlignment="Left"/>
 
-            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,10">
-                <TextBlock Text="שעון מערכת: " FontSize="18" VerticalAlignment="Center" Foreground="{StaticResource SubTextColor}"/>
-                <TextBlock Text="{Binding CurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
-                           Language="he-IL" 
-                           FontSize="20" 
-                           FontWeight="Bold" 
-                           Foreground="{StaticResource PrimaryColor}"/>
-            </StackPanel>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10">
+                    <TextBlock Text="שעון מערכת: " 
+                               FontSize="18" 
+                               VerticalAlignment="Center" 
+                               Foreground="{StaticResource SubTextColor}"/>
 
-            <WrapPanel Grid.Row="2" Grid.Column="0" Margin="0,10">
-                <TextBlock Text="הרץ זמן קדימה:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CurrentTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
+                               Language="he-IL" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Foreground="{StaticResource PrimaryColor}"/>
+                </StackPanel>
 
-                <Button Content="דקה" Tag="Minute" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
-                <Button Content="שעה" Tag="Hour" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
-                <Button Content="יום" Tag="Day" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
-                <Button Content="שבוע" Tag="Week" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
-                <Button Content="חודש" Tag="Month" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
-                <Button Content="שנה" Tag="Year" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60"/>
-            </WrapPanel>
-            <Label Grid.Row="0" Grid.Column="1" Content="קצב התקדמות השעון:" 
-                   Style="{StaticResource ModernLabel}"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ClockSpeed}" IsEnabled="{Binding RunStopSimulator}"/>
-            <Button Grid.Row="2" Grid.Column="1" Click="btnSimulator_Click" 
-                    Content="{Binding RunStopSimulator, Mode=OneWay, Converter={StaticResource RunStopSimulatorConverter}}"/>
+                <WrapPanel Grid.Row="2" Margin="0,10">
+                    <TextBlock Text="הרץ זמן קדימה:" 
+                               VerticalAlignment="Center" 
+                               Margin="0,0,10,0" 
+                               FontWeight="Bold"/>
 
+                    <Button Content="דקה" Tag="Minute" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="שעה" Tag="Hour" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="יום" Tag="Day" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="שבוע" Tag="Week" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="חודש" Tag="Month" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="שנה" Tag="Year" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                </WrapPanel>
+            </Grid>
+
+            <Border Grid.Column="1" 
+                    VerticalAlignment="Top"
+                    Background="{StaticResource BackgroundColor}"
+                    BorderBrush="{StaticResource BorderColor}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+
+                <StackPanel>
+                    <Border Style="{StaticResource LabelPillStyle}" HorizontalAlignment="Center">
+                        <TextBlock Text="קצב התקדמות" Style="{StaticResource LabelTextStyle}"/>
+                    </Border>
+
+                    <TextBox Text="{Binding ClockSpeed}" 
+                             Margin="0,10"
+                             IsEnabled="{Binding RunStopSimulator}" 
+                             local:Tools.NumericOnly="True"/>
+
+                    <Button Click="btnSimulator_Click" 
+                            Margin="0,5" 
+                            Content="{Binding RunStopSimulator, Mode=OneWay, Converter={StaticResource RunStopSimulatorConverter}}"/>
+                </StackPanel>
+            </Border>
         </Grid>
 
         <ScrollViewer Grid.Row="2" Margin="20,0,20,20" Padding="10">
@@ -83,10 +122,10 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button Style="{StaticResource StatisticButtonStyle}"
-                        Click="btnStatistic_Click"
-                        Tag="{Binding Id}"
-                        Width="200"  
-                        Margin="10"/>
+                                Click="btnStatistic_Click"
+                                Tag="{Binding Id}"
+                                Width="200"  
+                                Margin="10"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
 

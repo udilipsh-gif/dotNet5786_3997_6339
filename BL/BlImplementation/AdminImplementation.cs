@@ -19,9 +19,10 @@ internal class AdminImplementation : IAdmin
     /// <remarks>
     /// This operation typically deletes or clears existing data and restores default configuration.
     /// </remarks>
-    public void ResetDB()
+    public async Task ResetDB()
     {
-        AdminManager.ResetDB();
+        AdminManager.ThrowOnSimulatorIsRunning();
+        await AdminManager.ResetDB();
     }
 
     /// <summary>
@@ -30,10 +31,11 @@ internal class AdminImplementation : IAdmin
     /// <remarks>
     /// This method first calls <see cref="ResetDB"/> and then populates the system with initial data.
     /// </remarks>
-    public void InitializeDB()
+    public async Task InitializeDB()
     {
-        ResetDB();
-        AdminManager.InitializeDB();
+        AdminManager.ThrowOnSimulatorIsRunning();
+        await ResetDB();
+        await AdminManager.InitializeDB();
     }
 
     /// <summary>
@@ -57,7 +59,7 @@ internal class AdminImplementation : IAdmin
     /// </remarks>
     public void ForwardClock(BO.TimeUnit unit)
     {
-
+        AdminManager.ThrowOnSimulatorIsRunning();
         switch (unit)
         {
             case BO.TimeUnit.MINUTE:
@@ -106,6 +108,7 @@ internal class AdminImplementation : IAdmin
     /// <param name="config">The configuration to set.</param>
     public async Task SetConfig(BO.Config config)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         await AdminManager.SetConfig(config);                   //.GetAwaiter().GetResult();
     }
 

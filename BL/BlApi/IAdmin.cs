@@ -30,7 +30,7 @@ public interface IAdmin
     /// </list>
     /// This is a destructive operation and should be used with caution, typically only in development or testing scenarios.
     /// </remarks>
-    void ResetDB();
+    Task ResetDB();
 
     /// <summary>
     /// Initializes the database with initial/sample data.
@@ -46,7 +46,7 @@ public interface IAdmin
     /// </list>
     /// Useful for development, testing, and demonstration purposes.
     /// </remarks>
-    void InitializeDB();
+    Task InitializeDB();
 
     /// <summary>
     /// Gets the current business clock time.

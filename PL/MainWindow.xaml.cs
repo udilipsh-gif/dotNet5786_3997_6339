@@ -1,211 +1,234 @@
-﻿
-using PL.Helpers;
+﻿using PL.Helpers;
+using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-
-namespace PL;
-
-public partial class MainWindow : Window
+namespace PL
 {
-    private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
-    public ICommand LoginCommand { get; private set; }
-
     /// <summary>
-    /// Gets or sets the current system clock time displayed in the UI.
+    /// Interaction logic for MainWindow.xaml - The entry point and login screen.
     /// </summary>
-    /// <remarks>
-    /// This property is bound to the UI and automatically updates when the system clock advances.
-    /// It reflects the business clock time, which may differ from the actual system time.
-    /// </remarks>
-    public DateTime CurrentTime
+    public partial class MainWindow : Window
     {
-        get { return (DateTime)GetValue(CurrentTimeProperty); }
-        set { SetValue(CurrentTimeProperty, value); }
-    }
+        #region Private Constants & Fields
 
-    /// <summary>
-    /// Dependency property for the CurrentTime property.
-    /// </summary>
-    public static readonly DependencyProperty CurrentTimeProperty =
-        DependencyProperty.Register("CurrentTime", typeof(DateTime), typeof(MainWindow));
+        // Constants for user roles returned by the BL
+        private const string ROLE_MANAGER = "Manager";
+        private const string ROLE_COURIER = "Courier";
 
-    public string UserId
-    {
-        get { return (string)GetValue(UserIdProperty); }
-        set { SetValue(UserIdProperty, value); }
-    }
+        /// <summary>
+        /// Instance of the Business Logic layer.
+        /// </summary>
+        private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-    public static readonly DependencyProperty UserIdProperty =
-        DependencyProperty.Register("UserId", typeof(string), typeof(MainWindow));
+        /// <summary>
+        /// Mutex to handle safe thread synchronization for the clock observer.
+        /// </summary>
+        private readonly ObserverMutex _clockMutex = new();
 
+        #endregion
 
-    /// <summary>
-    /// Initializes a new instance of the MainWindow class.
-    /// </summary>
-    public MainWindow()
-    {
-        LoginCommand = new RelayCommand(ExecuteLogin, CanLogin);
+        #region Properties & Commands
 
-        InitializeComponent();
-    }
+        /// <summary>
+        /// Command executed when the login button is clicked or Enter is pressed.
+        /// </summary>
+        public ICommand LoginCommand { get; private set; }
 
-    private void ExecuteLogin(object? parameter)
-    {
-        try
+        #endregion
+
+        #region Dependency Properties
+
+        /// <summary>
+        /// Gets or sets the User ID entered by the user.
+        /// Bound two-way to the text box in the UI.
+        /// </summary>
+        public string UserId
         {
-            var passwordBox = parameter as PasswordBox;
-            if (passwordBox == null || string.IsNullOrEmpty(passwordBox.Password))
+            get { return (string)GetValue(UserIdProperty); }
+            set { SetValue(UserIdProperty, value); }
+        }
+
+        public static readonly DependencyProperty UserIdProperty =
+            DependencyProperty.Register(nameof(UserId), typeof(string), typeof(MainWindow));
+
+        /// <summary>
+        /// Gets or sets the current simulated system time.
+        /// Updates automatically via the clock observer.
+        /// </summary>
+        public DateTime CurrentTime
+        {
+            get { return (DateTime)GetValue(CurrentTimeProperty); }
+            set { SetValue(CurrentTimeProperty, value); }
+        }
+
+        public static readonly DependencyProperty CurrentTimeProperty =
+            DependencyProperty.Register(nameof(CurrentTime), typeof(DateTime), typeof(MainWindow));
+
+        #endregion
+
+        #region Constructor & Initialization
+
+        /// <summary>
+        /// Initializes a new instance of the MainWindow class.
+        /// </summary>
+        public MainWindow()
+        {
+            // Initialize command before UI to ensure binding works correctly
+            LoginCommand = new Tools.RelayCommand(ExecuteLogin, CanLogin);
+
+            InitializeComponent();
+        }
+
+        /// <summary>
+        /// Event handler for Window Loaded. Initializes the clock observer.
+        /// </summary>
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            ClockObserver(); // Initial fetch
+            Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
+        }
+
+        /// <summary>
+        /// Event handler for Window Closing. Cleans up the clock observer.
+        /// </summary>
+        private void MainWindow_Close(object sender, EventArgs e)
+        {
+            Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
+        }
+
+        #endregion
+
+        #region Login Logic
+
+        /// <summary>
+        /// Validates whether the login command can be executed.
+        /// </summary>
+        /// <param name="parameter">The PasswordBox control passed as a parameter.</param>
+        /// <returns>True if both User ID and Password are provided; otherwise, false.</returns>
+        private bool CanLogin(object? parameter)
+        {
+            if (string.IsNullOrEmpty(UserId))
+                return false;
+
+            if (parameter is not PasswordBox passwordBox || string.IsNullOrEmpty(passwordBox.Password))
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Executes the login process using the provided credentials.
+        /// </summary>
+        /// <param name="parameter">The PasswordBox control containing the password.</param>
+        private void ExecuteLogin(object? parameter)
+        {
+            // 1. Validate Input Controls
+            if (parameter is not PasswordBox passwordBox)
+                return;
+
+            if (string.IsNullOrEmpty(passwordBox.Password))
             {
-                MessageBox.Show("נא להזין סיסמה", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowMessage("נא להזין סיסמה", MessageBoxImage.Warning);
                 return;
             }
+
             if (string.IsNullOrEmpty(UserId))
             {
-                MessageBox.Show("נא להזין תעודת זהות", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowMessage("נא להזין תעודת זהות", MessageBoxImage.Warning);
                 return;
             }
+
             if (!int.TryParse(UserId, out int userId))
             {
-                MessageBox.Show("תעודת זהות לא תקינה", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowMessage("תעודת זהות חייבת להכיל ספרות בלבד", MessageBoxImage.Error);
                 return;
             }
 
-            string? user = s_bl.Courier.Login(userId, passwordBox.Password);
-
-            UserId = string.Empty;
-            passwordBox.Clear();
-
-            if (user == "Manager")
+            // 2. Attempt Login
+            try
             {
-                Tools.OpenOrActivateWindow<ManagerWindow>(this, userId);
-                return;
+                string? userRole = s_bl.Courier.Login(userId, passwordBox.Password);
+
+                // Clear credentials from UI upon success
+                UserId = string.Empty;
+                passwordBox.Clear();
+
+                // 3. Navigate based on role
+                NavigateToUserDashboard(userRole, userId);
             }
-            else if (user == "Courier")
+            catch (BO.BlIncorrectPasswordException)
             {
-                // אפשר לפתוח חלון שליח
-                if (userId != 0)
-                {
-                    Window window = new MainCourier(userId);
-                    window.SetSoftOwner(this);
-                    window.Show();
-                }
-
-                return;
+                ShowMessage("שם משתמש או סיסמה שגויים", MessageBoxImage.Warning);
+                passwordBox.Clear();
+                passwordBox.Focus();
             }
-
-            //throw new BlNoAccessException("לא הצלחנו לחבר אותך");
-        }
-        catch (BO.BlIncorrectPasswordException)
-        {
-            MessageBox.Show("הסיסמה לא נכונה");
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message);
+            catch (Exception ex)
+            {
+                ShowMessage($"שגיאה במערכת: {ex.Message}", MessageBoxImage.Error);
+            }
         }
 
-
-    }
-
-    private bool CanLogin(object? parameter)
-    {
-        // 1. בדיקה שיש תעודת זהות (מקושרת ב-Binding)
-        if (string.IsNullOrEmpty(this.UserId))
-            return false;
-
-        // 2. בדיקה שיש סיסמה (התקבלה כפרמטר מה-Binding)
-        var passwordBox = parameter as PasswordBox;
-        if (passwordBox == null || string.IsNullOrEmpty(passwordBox.Password))
-            return false;
-
-        return true;
-    }
-    private readonly ObserverMutex _clockMutex = new(); //stage 7
-    private void ClockObserver()
-    {
-        if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
-            return;
-
-        Dispatcher.BeginInvoke(async () =>
+        /// <summary>
+        /// Handles navigation to the appropriate window based on the user role.
+        /// </summary>
+        private void NavigateToUserDashboard(string? role, int userId)
         {
-            CurrentTime = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock());
-            if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
-                ClockObserver();
-        });
-    }
+            switch (role)
+            {
+                case ROLE_MANAGER:
+                    Tools.OpenOrActivateWindow<ManagerWindow>(this, userId);
+                    break;
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-    {
-        ClockObserver();
-        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
-    }
+                case ROLE_COURIER:
+                    if (userId != 0)
+                    {
+                        var courierWindow = new MainCourier(userId);
+                        courierWindow.SetSoftOwner(this);
+                        courierWindow.Show();
+                    }
+                    break;
 
-    private void MainWindow_Close(object sender, System.EventArgs e)
-    {
-        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
+                default:
+                    throw new BO.BlNoAccessException("שגיאת הרשאה: תפקיד לא מזוהה.");
+            }
+        }
 
-    }
-}
+        /// <summary>
+        /// Helper method to display message boxes.
+        /// </summary>
+        private void ShowMessage(string message, MessageBoxImage icon)
+        {
+            MessageBox.Show(message, "כניסה למערכת", MessageBoxButton.OK, icon);
+        }
 
+        #endregion
 
-public class RelayCommand : ICommand
-{
-    private readonly Action<object?> _execute;
-    private readonly Predicate<object?>? _canExecute;
+        #region Clock Observer
 
-    public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
-    {
-        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-        _canExecute = canExecute;
-    }
+        /// <summary>
+        /// Observer callback method to update the UI with the current simulated time.
+        /// Uses a Mutex to prevent race conditions during UI updates.
+        /// </summary>
+        private void ClockObserver()
+        {
+            // Check if an update is already in progress
+            if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())
+                return;
 
-    public event EventHandler? CanExecuteChanged
-    {
-        add { CommandManager.RequerySuggested += value; }
-        remove { CommandManager.RequerySuggested -= value; }
-    }
+            Dispatcher.BeginInvoke(async () =>
+            {
+                // Fetch time on a background thread to keep UI responsive
+                CurrentTime = await Task.Run(() => s_bl.Admin.GetClock());
 
-    public bool CanExecute(object? parameter)
-    {
-        return _canExecute == null || _canExecute(parameter);
-    }
+                // Release lock and check if another update is pending
+                if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    ClockObserver();
+            });
+        }
 
-    public void Execute(object? parameter)
-    {
-        _execute(parameter);
-    }
-}
-
-public class RelayCommand<T> : ICommand
-{
-    private readonly Action<T?> _execute;
-    private readonly Predicate<T?>? _canExecute;
-
-    public RelayCommand(Action<T?> execute, Predicate<T?>? canExecute = null)
-    {
-        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-        _canExecute = canExecute;
-    }
-
-    public event EventHandler? CanExecuteChanged
-    {
-        add { CommandManager.RequerySuggested += value; }
-        remove { CommandManager.RequerySuggested -= value; }
-    }
-
-    public bool CanExecute(object? parameter)
-    {
-        if (parameter == null && default(T) != null)
-            return false;
-
-        return _canExecute == null || _canExecute((T?)parameter);
-    }
-
-    public void Execute(object? parameter)
-    {
-        _execute((T?)parameter);
+        #endregion
     }
 }
