@@ -239,42 +239,53 @@ namespace PL
         /// </summary>
         private void StatisticObserver()
         {
+            // בדיקת נעילה
             if (_statsMutex.CheckAndSetLoadInProgressOrRestartRequired())
                 return;
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                Dispatcher.BeginInvoke(async () =>
+                try
                 {
-                    bool windowIsOpen = true;
-                    int[]? newStats = null;
+                    // 1. שליפת הנתונים מתבצעת ברקע! (מחוץ ל-Dispatcher)
+                    // זה החלק הכבד, ועכשיו הוא לא יתקע את הממשק
+                    var newStats = await s_bl.Order.GetAllOrderStatistic(_userId);
 
-                    try
+                    // 2. עדכון הממשק מתבצע רק לאחר שהנתונים הגיעו
+                    if (newStats != null)
                     {
-                        newStats = await s_bl.Order.GetAllOrderStatistic(_userId);
-
-                        if (windowIsOpen && newStats != null)
+                        Dispatcher.Invoke(() =>
                         {
+                            // הפעולות הויזואליות חייבות להיות ב-Dispatcher
                             var template = InitialStatsTemplate;
                             CombinedStatistics = template.Zip(newStats, (item, count) =>
                             {
                                 item.Value = count;
                                 return item;
                             }).ToList();
-                        }
+                        });
                     }
-                    catch (BlNoAccessException)
+
+                    // 3. שחרור נעילה ובדיקה לריצה חוזרת (עדיין ברקע)
+                    if (await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested())
                     {
-                        windowIsOpen = false;
+                        StatisticObserver();
+                    }
+                }
+                catch (BlNoAccessException)
+                {
+                    // טיפול בשגיאות ממשק משתמש חייב להיות ב-Dispatcher
+                    Dispatcher.Invoke(() =>
+                    {
                         MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
                         Close();
-                    }
-                    finally
-                    {
-                        if (windowIsOpen && await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested())
-                            StatisticObserver();
-                    }
-                });
+                    });
+                }
+                catch (Exception)
+                {
+                    // במקרה של שגיאה אחרת, חשוב לשחרר את הנעילה
+                    await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested();
+                }
             });
         }
 
