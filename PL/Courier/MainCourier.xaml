@@ -126,7 +126,7 @@
 
                             <Label Content="מרחק מירבי למשלוח:" Margin="0,2"/>
                             <TextBox Text="{Binding CurrentUser.MaxDistanceDelivery, Mode=TwoWay}" 
-                 local:Tools.NumericOnly="True" MaxLength="2" Margin="0,2"/>
+                 local:Tools.NumericOnly="True" MaxLength="3" Margin="0,2"/>
                         </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
