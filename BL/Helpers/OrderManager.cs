@@ -92,7 +92,8 @@ internal static class OrderManager
     {
         s_validateOrderFields(boOrder);
 
-        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres);
+        var apiKey = AdminManager.GetConfig().GoogleApiKey;
+        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres,apiKey);
 
         var distance = Tools.GetDistance(
             addressCoordinates?.Lat ?? 0,
@@ -188,7 +189,8 @@ internal static class OrderManager
     {
         s_validateOrderFields(boOrder);
 
-        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres);
+        var apiKey = AdminManager.GetConfig().GoogleApiKey;
+        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres, apiKey);
 
         DO.Order doOrder = new DO.Order
         {

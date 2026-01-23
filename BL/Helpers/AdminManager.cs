@@ -96,10 +96,10 @@ internal static class AdminManager //stage 4
     /// <summary>
     /// Method for setting current configuration variables values for any BL class that may need it
     /// </summary>
-    //[MethodImpl(MethodImplOptions.Synchronized)] //stage 7 ******************************************************************************************
-    internal static async Task SetConfig(BO.Config configuration) //stage 4
+    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7 ******************************************************************************************
+    internal static void SetConfig(BO.Config configuration) //stage 4
     {
-        AdminManager.ThrowOnSimulatorIsRunning();////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+       
         ////////////////////////////////////////////////////////////////////////////////////////לא ברור לי מה היתה ההוא אמינא פה , כמו כן בדוגמא של דן הבדיקה כן מול s_dal ולא מול אדמין מנג'ר
         bool configChanged = false; // stage 5
 
@@ -130,7 +130,9 @@ internal static class AdminManager //stage 4
         if (AdminManager.GetConfig().StoreAddress != configuration.StoreAddress)
         {
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
-            (double Lat, double Lon)? adressCoordinates = await GoogleMapsService.GetGeocodingAsync(address) ??
+
+            string api = configuration.GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API key cannot be null.");
+            (double Lat, double Lon)? adressCoordinates =Task.Run(()=> GoogleMapsService.GetGeocodingAsync(address,api)).Result ??
                 throw new BO.BlInvalidValueException("Geocoding failed.");
             configuration.Latitude = adressCoordinates?.Lat;
             configuration.Longitude = adressCoordinates?.Lon;

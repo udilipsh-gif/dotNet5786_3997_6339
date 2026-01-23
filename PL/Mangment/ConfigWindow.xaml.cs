@@ -139,14 +139,14 @@ namespace PL
         /// <summary>
         /// Handles the Save button click. Validates and saves changes to the BL.
         /// </summary>
-        private async void BtuSave_Click(object? sender, EventArgs e)
+        private void BtuSave_Click(object? sender, EventArgs e)
         {
             try
             {
                 // Validate required fields (Basic validation example)
                 if (Configuration == null) return;
 
-                await s_bl.Admin.SetConfig(Configuration);
+                 s_bl.Admin.SetConfig(Configuration);
 
                 MessageBox.Show(
                     "הנתונים נשמרו בהצלחה",

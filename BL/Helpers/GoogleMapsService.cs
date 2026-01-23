@@ -442,9 +442,10 @@ public static class GoogleMapsService
     /// - RANGE_INTERPOLATED: Interpolated between two points (rejected)
     /// - GEOMETRIC_CENTER: Center of an area (rejected)
     /// </remarks>
-    public static async Task<(double Lat, double Lng)?> GetGeocodingAsync(string address)
+    public static async Task<(double Lat, double Lng)?> GetGeocodingAsync(string address, string api)
     {
-        var apiKey = AdminManager.GetConfig().GoogleApiKey;
+        string apiKey = api;//הוספתי שליחת ארגומנט כדי לא לגשת לגט קונפיג מטרד אחד, כי הוא נעול עכשיו
+        // var apiKey = AdminManager.GetConfig().GoogleApiKey;
         string url = $"https://maps.googleapis.com/maps/api/geocode/xml?address={Uri.EscapeDataString(address)}&key={apiKey}";
 
         try
