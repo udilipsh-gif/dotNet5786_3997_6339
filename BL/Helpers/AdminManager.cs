@@ -99,21 +99,21 @@ internal static class AdminManager //stage 4
     [MethodImpl(MethodImplOptions.Synchronized)] //stage 7 ******************************************************************************************
     internal static void SetConfig(BO.Config configuration) //stage 4
     {
-       
+
         ////////////////////////////////////////////////////////////////////////////////////////לא ברור לי מה היתה ההוא אמינא פה , כמו כן בדוגמא של דן הבדיקה כן מול s_dal ולא מול אדמין מנג'ר
         bool configChanged = false; // stage 5
 
-                                    //if (s_dal.Config.MaxRange != configuration.MaxRange) //stage 4
-                                    //{
-                                    //    s_dal.Config.MaxRange = configuration.MaxRange;
-                                    //    configChanged = true;
-                                    //}
+        //if (s_dal.Config.MaxRange != configuration.MaxRange) //stage 4
+        //{
+        //    s_dal.Config.MaxRange = configuration.MaxRange;
+        //    configChanged = true;
+        //}
         //TO_DO: //stage 4//i did, yuda
         //add a condition+assignment for each configuration property
         //...
         if (AdminManager.GetConfig().ManagerId != configuration.ManagerId)
         {
-            if(!Tools.IsValidId(configuration.ManagerId)) 
+            if (!Tools.IsValidId(configuration.ManagerId))
                 throw new BO.BlInvalidValueException("Invalid Manager ID.");
             s_dal.Config.ManagerId = configuration.ManagerId;
             //AdminManager.GetConfig().ManagerId = configuration.ManagerId;
@@ -132,7 +132,7 @@ internal static class AdminManager //stage 4
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
 
             string api = configuration.GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API key cannot be null.");
-            (double Lat, double Lon)? adressCoordinates =Task.Run(()=> GoogleMapsService.GetGeocodingAsync(address,api)).Result ??
+            (double Lat, double Lon)? adressCoordinates = Task.Run(() => GoogleMapsService.GetGeocodingAsync(address, api)).Result ??
                 throw new BO.BlInvalidValueException("Geocoding failed.");
             configuration.Latitude = adressCoordinates?.Lat;
             configuration.Longitude = adressCoordinates?.Lon;
@@ -167,7 +167,7 @@ internal static class AdminManager //stage 4
         }
         if (AdminManager.GetConfig().AvgSpeedCar != configuration.AvgSpeedCar)
         {
-            s_dal .Config.AvgSpeedCar = configuration.AvgSpeedCar;
+            s_dal.Config.AvgSpeedCar = configuration.AvgSpeedCar;
             //AdminManager.GetConfig().AvgSpeedCar = configuration.AvgSpeedCar;
             configChanged = true;
         }
@@ -324,7 +324,7 @@ internal static class AdminManager //stage 4
 
     private static Task? _simulateTask = null;
 
-    private static void clockRunner()  //**********************************************************************************************************stage 7
+    private static void clockRunner()  //***********************stage 7
     {
         while (!s_stop)
         {
@@ -335,7 +335,7 @@ internal static class AdminManager //stage 4
             //for example: course registration simulation
 
 
-           if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
+            if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
             {
                 _simulateTask = Task.Run(() => CourierManager.CourierSimulation());
             }

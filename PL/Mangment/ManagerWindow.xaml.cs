@@ -224,12 +224,19 @@ namespace PL
             if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())
                 return;
 
-            Dispatcher.BeginInvoke(async () =>
+            Task.Run(async() =>
             {
-                CurrentTime = s_bl.Admin.GetClock();
+                var currentTime = s_bl.Admin.GetClock();
+
+                _=Dispatcher.BeginInvoke(() =>
+                {
+                    CurrentTime = currentTime;
+
+                });
 
                 if (await _clockMutex.UnsetLoadInProgressAndCheckRestartRequested())
                     ClockObserver();
+
             });
         }
 

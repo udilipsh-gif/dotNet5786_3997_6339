@@ -64,6 +64,9 @@ public partial class MainCourier : Window
     {
         Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Courier.AddObserver(USERID, GetCurier));
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(GetCurier));
+
+
         IsOrderInProgress = false;
         GetCurier();
     }
@@ -72,7 +75,11 @@ public partial class MainCourier : Window
     {
         Tools.ResetRequested -= () => this.Close();
         if (USERID != 0)
+        {
             Tools.RunSafe(() => s_bl.Courier.RemoveObserver(USERID, GetCurier));
+            Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(GetCurier));
+
+        }
     }
 
 
@@ -93,6 +100,11 @@ public partial class MainCourier : Window
                 {
                     IsOrderInProgress = true;
                 }
+
+                //else
+                //{
+                //    IsOrderInProgress = false;
+                //}
             }
             catch (BO.BlDoesNotExistException)
             {
