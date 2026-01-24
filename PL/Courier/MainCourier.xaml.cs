@@ -84,55 +84,13 @@ public partial class MainCourier : Window
 
 
     private readonly ObserverMutex _Mutex = new(); //stage 7
-    private void GetCurier()
+    private async void GetCurier()
     {
         if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
             return;
-        //Task.Run(async () =>
-        //{
-        //    bool windowIsOpen = true;
-        //    try
-        //    {
-        //        var currentUser = await s_bl.Courier.Read(USERID, USERID)
-        //            ?? throw new BO.BlDoesNotExistException();
-        //        if (currentUser.OrderInProgress is not null)
-        //        {
-        //            IsOrderInProgress = true;
-        //        }
-
-
-        //        _ = Dispatcher.BeginInvoke(() =>
-        //        {
-        //            CurrentUser = currentUser;
-
-        //        });
-
-
-        //        //else
-        //        //{
-        //        //    IsOrderInProgress = false;
-        //        //}
-        //    }
-        //    catch (BO.BlDoesNotExistException)
-        //    {
-        //        windowIsOpen = false;
-        //        MessageBox.Show("שליח לא קיים", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        Close();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-        //    }
-        //    finally
-        //    {
-        //        if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
-        //            GetCurier();
-        //    }
-        //});
-
-
-        Dispatcher.BeginInvoke(async () =>
-        {
+       
+       
+        
             bool windowIsOpen = true;
             try
             {
@@ -165,8 +123,7 @@ public partial class MainCourier : Window
                 if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
                     GetCurier();
             }
-        });
-    }
+            }
 
     private void ReportDelivery_Click(object sender, RoutedEventArgs e)
     {
