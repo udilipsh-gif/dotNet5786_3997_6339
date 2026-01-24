@@ -145,7 +145,7 @@
     <DistanceKmWalk>7.358</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100046</Id>
+    <Id>100020</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 46</Details>
     <Addres> ארלוזורוב 10, רמת גן</Addres>
@@ -673,7 +673,7 @@
     <DistanceKmWalk>1.047</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100015</Id>
+    <Id>100046</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 15</Details>
     <Addres> בן גוריון 100, רמת גן</Addres>

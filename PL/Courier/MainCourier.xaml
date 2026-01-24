@@ -205,7 +205,7 @@
                                         <TextBlock Text="{Binding StartDeliveryTime, StringFormat='יצא: {0:dd/MM HH:mm}'}"/>
                                         <TextBlock Text="{Binding EstimatedDeliveryTime, StringFormat='צפי: {0:dd/MM HH:mm}'}"/>
                                         <TextBlock Text="{Binding MaxDeliveryTime, StringFormat='התחייבות: {0:dd/MM HH:mm}'}"/>
-                                        <TextBlock Text="{Binding TimeRemaining, StringFormat='נותר: {0:dd\\:hh\\:mm}'}" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
+                                        <TextBlock Text="{Binding TimeRemaining, Converter={StaticResource TimeSpanConverter}, StringFormat='נותר: {0:dd\\:hh\\:mm}'}" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
                                         <TextBlock Text="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}, StringFormat='מצב הזמנה: {0}'}"
                                                                   Background="{Binding ScheduleStatusScheduleStatus, Converter={StaticResource StatusToColorConverter}}"/>
                                     </StackPanel>

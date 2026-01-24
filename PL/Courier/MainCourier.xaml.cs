@@ -84,13 +84,13 @@ public partial class MainCourier : Window
 
 
     private readonly ObserverMutex _Mutex = new(); //stage 7
-    private void GetCurier()
+    private async void GetCurier()
     {
         if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
             return;
-
-        Dispatcher.BeginInvoke(async () =>
-        {
+       
+       
+        
             bool windowIsOpen = true;
             try
             {
@@ -100,6 +100,8 @@ public partial class MainCourier : Window
                 {
                     IsOrderInProgress = true;
                 }
+
+
 
                 //else
                 //{
@@ -121,8 +123,7 @@ public partial class MainCourier : Window
                 if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
                     GetCurier();
             }
-        });
-    }
+            }
 
     private void ReportDelivery_Click(object sender, RoutedEventArgs e)
     {
