@@ -254,16 +254,12 @@ namespace PL
             {
                 try
                 {
-                    // 1. שליפת הנתונים מתבצעת ברקע! (מחוץ ל-Dispatcher)
-                    // זה החלק הכבד, ועכשיו הוא לא יתקע את הממשק
                     var newStats = await s_bl.Order.GetAllOrderStatistic(_userId);
 
-                    // 2. עדכון הממשק מתבצע רק לאחר שהנתונים הגיעו
                     if (newStats != null)
                     {
                         Dispatcher.Invoke(() =>
                         {
-                            // הפעולות הויזואליות חייבות להיות ב-Dispatcher
                             var template = InitialStatsTemplate;
                             CombinedStatistics = template.Zip(newStats, (item, count) =>
                             {
@@ -272,8 +268,6 @@ namespace PL
                             }).ToList();
                         });
                     }
-
-                    // 3. שחרור נעילה ובדיקה לריצה חוזרת (עדיין ברקע)
                     if (await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested())
                     {
                         StatisticObserver();
@@ -281,14 +275,13 @@ namespace PL
                 }
                 catch (BlNoAccessException)
                 {
-                    // טיפול בשגיאות ממשק משתמש חייב להיות ב-Dispatcher
                     Dispatcher.Invoke(() =>
                     {
                         MessageBox.Show("המערכת אותחלה מחדש נא להתחבר שוב", "התחברות", MessageBoxButton.OK, MessageBoxImage.Stop);
                         Close();
                     });
                 }
-                catch (Exception)
+                finally
                 {
                     // במקרה של שגיאה אחרת, חשוב לשחרר את הנעילה
                     await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested();

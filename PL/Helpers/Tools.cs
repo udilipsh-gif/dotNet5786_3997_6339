@@ -8,7 +8,6 @@ namespace PL;
 
 public static class Tools
 {
-    // Attached Property for numeric-only validation
     public static readonly DependencyProperty NumericOnlyProperty =
         DependencyProperty.RegisterAttached(
             "NumericOnly",

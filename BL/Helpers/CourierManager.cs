@@ -246,17 +246,27 @@ internal static class CourierManager
     /// containing courier summary information including delivery statistics.
     /// </returns>
     internal static async Task<IEnumerable<BO.CourierInList>> ReadAll(
-        int requesterId,
-        bool? isActive,
-        BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
+     int requesterId,
+     bool? isActive,
+     BO.CourierFieldSort? sort = BO.CourierFieldSort.Id)
     {
-        IEnumerable<DO.Courier>? couriers;
+        IEnumerable<DO.Courier> couriers;
+        IEnumerable<DO.Delivery> allDeliveries;
+
         lock (AdminManager.BlMutex)
             couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive).ToList();
+        lock (AdminManager.BlMutex)
+            allDeliveries = s_dal.Delivery.ReadAll().ToList(); 
+       
+        var deliveriesByCourier = allDeliveries.ToLookup(d => d.CourierId);
+
         var sortedCouriers = s_sortCouriers(couriers, sort);
 
-        var tasks = sortedCouriers.Select(s_convertToCourierInList);
-        return await Task.WhenAll(tasks);
+        var resultList = sortedCouriers.Select(c =>
+            s_convertToCourierInList(c, deliveriesByCourier[c.Id])
+        );
+
+        return await Task.Run(() => resultList.ToList());
     }
 
     /// <summary>
@@ -295,7 +305,7 @@ internal static class CourierManager
     {
         IEnumerable<DO.Delivery>? courierDeliveries;
         lock (AdminManager.BlMutex)
-            courierDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == courierId);
+            courierDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == courierId).ToList();
 
         if (!courierDeliveries.Any())
             return;
@@ -343,7 +353,12 @@ internal static class CourierManager
     /// <returns>A business object courier with calculated statistics.</returns>
     private static async Task<BO.Courier> s_convertToBObject(DO.Courier doCourier)
     {
-        var orderInProgress = await s_getOrderInProgress(doCourier.Id);
+        IEnumerable<DO.Delivery> allDeliveries;
+
+        lock (AdminManager.BlMutex)
+            allDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == doCourier.Id).ToList();
+
+        var orderInProgress = await s_getOrderInProgress(allDeliveries);
 
         return new BO.Courier
         {
@@ -356,8 +371,8 @@ internal static class CourierManager
             MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
             WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = s_getDeliveryOnTimeCount(doCourier),
-            DeliveryLate = s_getDeliveryLateCount(doCourier),
+            DeliveryOnTime = s_getDeliveryOnTimeCount(allDeliveries),
+            DeliveryLate = s_getDeliveryLateCount(allDeliveries),
             OrderInProgress = orderInProgress
         };
     }
@@ -367,10 +382,9 @@ internal static class CourierManager
     /// </summary>
     /// <param name="doCourier">The data object to convert.</param>
     /// <returns>A CourierInList object with summary information.</returns>
-    private static async Task<BO.CourierInList> s_convertToCourierInList(DO.Courier doCourier)
+    private static BO.CourierInList s_convertToCourierInList(DO.Courier doCourier, IEnumerable<DO.Delivery> courierDeliveries)
     {
-        Dictionary<int, int?> deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
-                 .ToDictionary(d => d.CourierId, d => d?.Id);
+        var activeDelivery = courierDeliveries.FirstOrDefault(d => d.EndDelivery == null);
 
         return new BO.CourierInList
         {
@@ -379,9 +393,11 @@ internal static class CourierManager
             Active = doCourier.Active,
             TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
             WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = s_getDeliveryOnTimeCount(doCourier),
-            DeliveryLate = s_getDeliveryLateCount(doCourier),
-            DeliveryId = deliveriesMap.GetValueOrDefault(doCourier.Id)
+
+            DeliveryOnTime = s_getDeliveryOnTimeCount(courierDeliveries),
+            DeliveryLate = s_getDeliveryLateCount(courierDeliveries),
+
+            DeliveryId = activeDelivery?.Id
         };
     }
 
@@ -414,18 +430,17 @@ internal static class CourierManager
     /// is less than or equal to the MaxDeliveryTime configured in the system.
     /// Only deliveries with EndDelivery status of DELIVERED are counted.
     /// </remarks>
-    private static int s_getDeliveryOnTimeCount(DO.Courier doCourier)
+    private static int s_getDeliveryOnTimeCount(IEnumerable<DO.Delivery>? courierDeliveries)
     {
         var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
-        int count;
-        lock (AdminManager.BlMutex)
-            count = s_dal.Delivery.ReadAll(d =>
-            d.CourierId == doCourier.Id &&
+        if (courierDeliveries is null)
+            return 0;
+
+        return courierDeliveries.Count(d =>
             d.EndDelivery == DO.EndDelivery.DELIVERED &&
-            d.TimeEndDelivery - d.OrderDate <= maxDeliveryTime
-        ).Count();
-        return count;
+            (d.TimeEndDelivery - d.OrderDate) <= maxDeliveryTime
+        );
     }
 
     /// <summary>
@@ -438,18 +453,17 @@ internal static class CourierManager
     /// exceeds the MaxDeliveryTime configured in the system.
     /// Only deliveries with EndDelivery status of DELIVERED are counted.
     /// </remarks>
-    private static int s_getDeliveryLateCount(DO.Courier doCourier)
+    private static int s_getDeliveryLateCount(IEnumerable<DO.Delivery>? courierDeliveries)
     {
         var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
-        int count;
-        lock (AdminManager.BlMutex)
-            count = s_dal.Delivery.ReadAll(d =>
-            d.CourierId == doCourier.Id &&
+        if (courierDeliveries is null)
+            return 0;
+
+        return courierDeliveries.Count(d =>
             d.EndDelivery == DO.EndDelivery.DELIVERED &&
-            d.TimeEndDelivery - d.OrderDate > maxDeliveryTime
-        ).Count();
-        return count;
+            (d.TimeEndDelivery - d.OrderDate) > maxDeliveryTime
+        );
     }
 
     /// <summary>
@@ -468,36 +482,17 @@ internal static class CourierManager
     ///   <item><description>Are associated with an order in DELIVERING status</description></item>
     /// </list>
     /// </remarks>
-    private static async Task<BO.OrderInProgress?> s_getOrderInProgress(int courierId)
+    private static async Task<BO.OrderInProgress?> s_getOrderInProgress(IEnumerable<DO.Delivery> deliveries)
     {
-        IEnumerable<DO.Delivery> activeDeliveries;
-        lock (AdminManager.BlMutex)
-            activeDeliveries = s_dal.Delivery.ReadAll(d =>
-            d.CourierId == courierId &&
-            d.EndDelivery == null &&
-            s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING
-        ).ToList();
 
-        if (!activeDeliveries.Any())
+        if (!deliveries.Any())
             return null;
 
-        return await s_createOrderInProgress(activeDeliveries.First());
-    }
+        var activeDelivery = deliveries.FirstOrDefault(d => d.EndDelivery == null);
 
-    private static async Task<int?> s_getActiveDelyvery(int courierId)
-    {
-        IEnumerable<DO.Delivery> activeDeliveries;
-        lock (AdminManager.BlMutex)
-            activeDeliveries = s_dal.Delivery.ReadAll(d =>
-            d.CourierId == courierId &&
-            d.EndDelivery == null &&
-            s_dal.Order.Read(d.OrderId)?.OrderStatus == DO.OrderStatus.DELIVERING
-        ).ToList();
-
-        if (!activeDeliveries.Any())
-            return null;
-
-        return activeDeliveries.First().Id;
+        return activeDelivery is null
+            ? null
+            : await s_createOrderInProgress(activeDelivery);
     }
 
     /// <summary>
