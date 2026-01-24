@@ -88,6 +88,48 @@ public partial class MainCourier : Window
     {
         if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
             return;
+        //Task.Run(async () =>
+        //{
+        //    bool windowIsOpen = true;
+        //    try
+        //    {
+        //        var currentUser = await s_bl.Courier.Read(USERID, USERID)
+        //            ?? throw new BO.BlDoesNotExistException();
+        //        if (currentUser.OrderInProgress is not null)
+        //        {
+        //            IsOrderInProgress = true;
+        //        }
+
+
+        //        _ = Dispatcher.BeginInvoke(() =>
+        //        {
+        //            CurrentUser = currentUser;
+
+        //        });
+
+
+        //        //else
+        //        //{
+        //        //    IsOrderInProgress = false;
+        //        //}
+        //    }
+        //    catch (BO.BlDoesNotExistException)
+        //    {
+        //        windowIsOpen = false;
+        //        MessageBox.Show("שליח לא קיים", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        Close();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+        //    }
+        //    finally
+        //    {
+        //        if (windowIsOpen is true && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+        //            GetCurier();
+        //    }
+        //});
+
 
         Dispatcher.BeginInvoke(async () =>
         {
@@ -100,6 +142,8 @@ public partial class MainCourier : Window
                 {
                     IsOrderInProgress = true;
                 }
+
+
 
                 //else
                 //{
