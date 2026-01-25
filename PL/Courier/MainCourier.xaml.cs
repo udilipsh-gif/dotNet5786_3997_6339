@@ -102,43 +102,46 @@ public partial class MainCourier : Window
                     // מכיוון שאנחנו ב-async void שנקרא מה-UI, אין צורך ב-Dispatcher בדרך כלל,
                     // אבל ליתר ביטחון נשתמש בגישה ישירה כי אנחנו בקונטקסט הנכון.
 
+                
+                Dispatcher.Invoke(() =>
+                {
                     CurrentUser = null;
                     CurrentUser = courierState;
+                
 
-                    // עדכון דגלים לתצוגה
-                    if (CurrentUser?.OrderInProgress is not null)
-                    {
-                        IsOrderInProgress = true;
+                // עדכון דגלים לתצוגה
+                if (CurrentUser?.OrderInProgress is not null)
+                {
+                    IsOrderInProgress = true;
 
-                        // טריק קטן: אם זה העדכון השני (המלא), 
-                        // לפעמים צריך לרענן את ה-Binding אם זה אותו מופע אובייקט בזיכרון.
-                        // אבל כאן יצרנו אובייקט אחד והוספנו לו שדה, אז SetValue יקפיץ את ה-UI.
-                    }
-                    else
-                    {
-                        IsOrderInProgress = false;
-                    }
-
+                    // טריק קטן: אם זה העדכון השני (המלא), 
+                    // לפעמים צריך לרענן את ה-Binding אם זה אותו מופע אובייקט בזיכרון.
+                    // אבל כאן יצרנו אובייקט אחד והוספנו לו שדה, אז SetValue יקפיץ את ה-UI.
                 }
-                ;
+                else
+                {
+                    IsOrderInProgress = false;
+                }
+                });
             }
-            catch (BO.BlDoesNotExistException)
-            {
-                windowIsOpen = false;
-                MessageBox.Show("שליח לא קיים", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-                Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                // שחרור הנעילה ובדיקה אם צריך להריץ שוב
-                if (windowIsOpen && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
-                    GetCurier();
-            }
-        });
+            ;
+        }
+        catch (BO.BlDoesNotExistException)
+        {
+            windowIsOpen = false;
+            MessageBox.Show("שליח לא קיים", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+            Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        finally
+        {
+            // שחרור הנעילה ובדיקה אם צריך להריץ שוב
+            if (windowIsOpen && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                GetCurier();
+        }
 
     }
 
