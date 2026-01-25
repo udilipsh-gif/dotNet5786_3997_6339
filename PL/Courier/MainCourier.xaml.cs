@@ -114,8 +114,7 @@ public partial class MainCourier : Window
                 {
                     IsOrderInProgress = false;
                 }
-            }
-            });
+            };
         }
         catch (BO.BlDoesNotExistException)
         {
