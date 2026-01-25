@@ -93,7 +93,7 @@ internal static class OrderManager
         s_validateOrderFields(boOrder);
 
         var apiKey = AdminManager.GetConfig().GoogleApiKey;
-        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres,apiKey);
+        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres, apiKey);
 
         var distance = Tools.GetDistance(
             addressCoordinates?.Lat ?? 0,
@@ -267,7 +267,7 @@ internal static class OrderManager
         Func<BO.OrderInList, bool> filter = customPredicate ?? (_ => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortSelector(orderBy);
 
-        IEnumerable<Task<BO.OrderInList>>? conversionTasks;
+        IEnumerable<Task<BO.OrderInList>>? conversionTasks;////////////////////////////////////
         lock (AdminManager.BlMutex)
         {
             conversionTasks = s_dal.Order.ReadAll().Select(async doOrder =>
@@ -678,6 +678,38 @@ internal static class OrderManager
             DO.TypeOfOrder.DELIVER_IMMEDIATELY => courierType == DO.TheTypeShipment.MOTORCYCLE,
             _ => false
         };
+    }
+
+    public static void UpdateDistanceForOrders()
+    {
+        List<DO.Order> allOrders;
+
+        lock (AdminManager.BlMutex)
+            allOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN).ToList();
+
+        var config = AdminManager.GetConfig();
+
+        foreach(var order in allOrders)
+        {
+            try
+            {
+                if (config.Latitude is double storeLat && config.Longitude is double storeLon)
+                {
+                    double newDistance = Tools.GetDistance(storeLat, storeLon,
+                        order.Latitude, order.Longitude);
+
+                    lock (AdminManager.BlMutex)
+                        s_dal.Order.Update(order with { DistanceKm = newDistance});
+
+                }
+                else
+                    throw new BO.BlDoesNotExistException("כתובת חנות לא מעודכנת");
+            }
+            catch { }
+
+        };
+
+        Observer.NotifyListUpdated();
     }
 
 }

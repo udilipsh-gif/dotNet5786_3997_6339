@@ -256,8 +256,8 @@ internal static class CourierManager
         lock (AdminManager.BlMutex)
             couriers = s_dal.Courier.ReadAll(c => isActive == null || c.Active == isActive).ToList();
         lock (AdminManager.BlMutex)
-            allDeliveries = s_dal.Delivery.ReadAll().ToList(); 
-       
+            allDeliveries = s_dal.Delivery.ReadAll().ToList();
+
         var deliveriesByCourier = allDeliveries.ToLookup(d => d.CourierId);
 
         var sortedCouriers = s_sortCouriers(couriers, sort);
@@ -527,11 +527,12 @@ internal static class CourierManager
 
         var estimatedTimeTask = Tools.GetEstimatedDeliveryTime(delivery);
 
-        
-        var actualDistanceTask = GoogleMapsService.GetActualDistance(
+
+        var actualDistanceTask = GoogleMapsService.NetworkKeeper(() =>
+            GoogleMapsService.GetActualDistance(
             order.Latitude,
             order.Longitude,
-            (BO.TheTypeShipment)courier.TypeShipment);
+            (BO.TheTypeShipment)courier.TypeShipment));
 
         var scheduleStatusTask = Tools.GetScheduleStatus(order, delivery);
 

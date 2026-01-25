@@ -100,26 +100,18 @@ internal static class AdminManager //stage 4
     internal static void SetConfig(BO.Config configuration) //stage 4
     {
 
-        ////////////////////////////////////////////////////////////////////////////////////////לא ברור לי מה היתה ההוא אמינא פה , כמו כן בדוגמא של דן הבדיקה כן מול s_dal ולא מול אדמין מנג'ר
         bool configChanged = false; // stage 5
 
-        //if (s_dal.Config.MaxRange != configuration.MaxRange) //stage 4
-        //{
-        //    s_dal.Config.MaxRange = configuration.MaxRange;
-        //    configChanged = true;
-        //}
-        //TO_DO: //stage 4//i did, yuda
-        //add a condition+assignment for each configuration property
-        //...
-        if (AdminManager.GetConfig().ManagerId != configuration.ManagerId)
+        var config = AdminManager.GetConfig();
+
+        if (config.ManagerId != configuration.ManagerId)
         {
             if (!Tools.IsValidId(configuration.ManagerId))
                 throw new BO.BlInvalidValueException("Invalid Manager ID.");
             s_dal.Config.ManagerId = configuration.ManagerId;
-            //AdminManager.GetConfig().ManagerId = configuration.ManagerId;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().PasswordManager != configuration.PasswordManager)
+        if (config.PasswordManager != configuration.PasswordManager)
         {
             if (!Tools.IsStrongPassword(configuration.PasswordManager))
                 throw new BO.BlInvalidValueException("Weak password for Manager.");
@@ -127,7 +119,7 @@ internal static class AdminManager //stage 4
             //AdminManager.GetConfig().PasswordManager = configuration.PasswordManager;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().StoreAddress != configuration.StoreAddress)
+        if (config.StoreAddress != configuration.StoreAddress)
         {
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
 
@@ -146,92 +138,93 @@ internal static class AdminManager //stage 4
             s_dal.Config.Longitude = adressCoordinates?.Lon ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
             //AdminManager.GetConfig().Longitude = adressCoordinates?.Lon ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
             configChanged = true;
+            Task.Run(OrderManager.UpdateDistanceForOrders);
         }
-        if (AdminManager.GetConfig().Latitude != configuration.Latitude)
-        {
-            s_dal.Config.Latitude = configuration.Latitude;
-            //AdminManager.GetConfig().Latitude = configuration.Latitude;
-            configChanged = true;
-        }
-        if (AdminManager.GetConfig().Longitude != configuration.Longitude)
-        {
-            s_dal.Config.Longitude = configuration.Longitude;
-            //AdminManager.GetConfig().Longitude = configuration.Longitude;
-            configChanged = true;
-        }
-        if (AdminManager.GetConfig().MaxDeliveryRange != configuration.MaxDeliveryRange)
+        //if (config.Latitude != configuration.Latitude)
+        //{
+        //    s_dal.Config.Latitude = configuration.Latitude;
+        //    //AdminManager.GetConfig().Latitude = configuration.Latitude;
+        //    configChanged = true;
+        //}
+        //if (config.Longitude != configuration.Longitude)
+        //{
+        //    s_dal.Config.Longitude = configuration.Longitude;
+        //    //AdminManager.GetConfig().Longitude = configuration.Longitude;
+        //    configChanged = true;
+        //}
+        if (config.MaxDeliveryRange != configuration.MaxDeliveryRange)
         {
             s_dal.Config.MaxDeliveryRange = configuration.MaxDeliveryRange;
             //  AdminManager.GetConfig().MaxDeliveryRange = configuration.MaxDeliveryRange;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().AvgSpeedCar != configuration.AvgSpeedCar)
+        if (config.AvgSpeedCar != configuration.AvgSpeedCar)
         {
             s_dal.Config.AvgSpeedCar = configuration.AvgSpeedCar;
             //AdminManager.GetConfig().AvgSpeedCar = configuration.AvgSpeedCar;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().AvgSpeedMotorcycle != configuration.AvgSpeedMotorcycle)
+        if (config.AvgSpeedMotorcycle != configuration.AvgSpeedMotorcycle)
         {
             s_dal.Config.AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
             //AdminManager.GetConfig().AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().AvgSpeedBike != configuration.AvgSpeedBike)
+        if (config.AvgSpeedBike != configuration.AvgSpeedBike)
         {
             s_dal.Config.AvgSpeedBike = configuration.AvgSpeedBike;
             //AdminManager.GetConfig().AvgSpeedBike = configuration.AvgSpeedBike;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().AvgSpeedFoot != configuration.AvgSpeedFoot)
+        if (config.AvgSpeedFoot != configuration.AvgSpeedFoot)
         {
             s_dal.Config.AvgSpeedFoot = configuration.AvgSpeedFoot;
             //AdminManager.GetConfig().AvgSpeedFoot = configuration.AvgSpeedFoot;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().MaxDeliveryTime != configuration.MaxDeliveryTime)
+        if (config.MaxDeliveryTime != configuration.MaxDeliveryTime)
         {
             s_dal.Config.MaxDeliveryTime = configuration.MaxDeliveryTime;
             //AdminManager.GetConfig().MaxDeliveryTime = configuration.MaxDeliveryTime;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().RiskRange != configuration.RiskRange)
+        if (config.RiskRange != configuration.RiskRange)
         {
             s_dal.Config.RiskRange = configuration.RiskRange;
             //AdminManager.GetConfig().RiskRange = configuration.RiskRange;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().MaxTimeInactivity != configuration.MaxTimeInactivity)
+        if (config.MaxTimeInactivity != configuration.MaxTimeInactivity)
         {
             s_dal.Config.MaxTimeInactivity = configuration.MaxTimeInactivity;
             //AdminManager.GetConfig().MaxTimeInactivity = configuration.MaxTimeInactivity;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().GoogleApiKey != configuration.GoogleApiKey)
+        if (config.GoogleApiKey != configuration.GoogleApiKey)
         {
             s_dal.Config.GoogleApiKey = configuration.GoogleApiKey;
             //AdminManager.GetConfig().GoogleApiKey = configuration.GoogleApiKey;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().EmailAddress != configuration.EmailAddress)
+        if (config.EmailAddress != configuration.EmailAddress)
         {
             s_dal.Config.EmailAddress = configuration.EmailAddress ?? string.Empty;
             //AdminManager.GetConfig().EmailAddress = configuration.EmailAddress ?? string.Empty;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().ScriptUrl != configuration.ScriptUrl)
+        if (config.ScriptUrl != configuration.ScriptUrl)
         {
             s_dal.Config.ScriptUrl = configuration.ScriptUrl;
             //AdminManager.GetConfig().ScriptUrl = configuration.ScriptUrl;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().ScriptPass != configuration.ScriptPass)
+        if (config.ScriptPass != configuration.ScriptPass)
         {
             s_dal.Config.ScriptPass = configuration.ScriptPass;
             //AdminManager.GetConfig().ScriptPass = configuration.ScriptPass;
             configChanged = true;
         }
-        if (AdminManager.GetConfig().TokenCallSms != configuration.TokenCallSms)
+        if (config.TokenCallSms != configuration.TokenCallSms)
         {
             s_dal.Config.TokenCallSms = configuration.TokenCallSms;
             //AdminManager.GetConfig().TokenCallSms = configuration.TokenCallSms;

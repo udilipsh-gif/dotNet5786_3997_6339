@@ -105,7 +105,6 @@ namespace PL
         /// </summary>
         private void ConfigObserver()
         {
-            // בדיקה אם כבר מתבצעת טעינה
             if (_observerMutex.CheckAndSetLoadInProgressOrRestartRequired())
                 return;
 

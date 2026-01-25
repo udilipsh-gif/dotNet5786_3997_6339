@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Xml.Linq;
 
 namespace Helpers;
@@ -22,13 +23,6 @@ public static class GoogleMapsService
     private static readonly HttpClient s_httpClient = new();
 
     private static readonly SemaphoreSlim _gateKeeper = new SemaphoreSlim(10);
-
-    /// <summary>
-    /// Thread-safe cache for storing distance calculations to avoid repeated API calls.
-    /// Key format: "origin|destination|mode" (normalized to lowercase).
-    /// Value: Distance in kilometers.
-    /// </summary> 
-    private static readonly ConcurrentDictionary<string, double> s_distanceCache = new();
 
     /// <summary>
     /// Cache for route data (polyline, duration, distance) to avoid repeated API calls.
@@ -82,55 +76,6 @@ public static class GoogleMapsService
         public string DistanceText { get; set; } = string.Empty;
     }
 
-    /// <summary>
-    /// Initializes the distance cache with predefined address data.
-    /// Should be called once at application startup.
-    /// Uses double-checked locking pattern for thread safety.
-    /// </summary>
-    public static void InitializeDistanceCache()
-    {
-        if (s_cacheInitialized) return;
-
-        lock (s_cacheLock)
-        {
-            if (s_cacheInitialized) return;
-
-            string storeAddress = AdminManager.GetConfig().StoreAddress ?? "";
-            string storeAddressLower = storeAddress.ToLowerInvariant();
-
-            foreach (var address in Addresses)
-            {
-                string destination = ((string)address[0]).ToLowerInvariant();
-
-                if (double.TryParse((string)address[3], out double drivingMeters) && drivingMeters > 0)
-                {
-                    string drivingKey = $"{storeAddressLower}|{destination}|driving";
-                    s_distanceCache.TryAdd(drivingKey, drivingMeters / 1000.0);
-                }
-
-                if (double.TryParse((string)address[4], out double walkingMeters) && walkingMeters > 0)
-                {
-                    string walkingKey = $"{storeAddressLower}|{destination}|walking";
-                    s_distanceCache.TryAdd(walkingKey, walkingMeters / 1000.0);
-                }
-            }
-
-            s_cacheInitialized = true;
-        }
-    }
-
-    /// <summary>
-    /// Clears the distance cache and resets initialization flag.
-    /// Call this when the store address changes.
-    /// </summary>
-    public static void ClearDistanceCache()
-    {
-        lock (s_cacheLock)
-        {
-            s_distanceCache.Clear();
-            s_cacheInitialized = false;
-        }
-    }
 
     /// <summary>
     /// Clears the route cache.
@@ -205,10 +150,10 @@ public static class GoogleMapsService
     /// or null if the route calculation fails.
     /// </returns>
     public static async Task<RouteInfo?> GetRoute(double originLat, double originLng,
-                                       double destLat, double destLng,
-                                       string mode = "driving")
+                                               double destLat, double destLng,
+                                               string mode = "driving")
     {
-        string cacheKey = $"{originLat:F6},{originLng:F6}|{destLat:F6},{destLng:F6}|{mode}".ToLowerInvariant();
+        string cacheKey = $"{originLat:F6},{originLng:F6}|{destLat:F6},{destLng:F6}|{mode}|shortest".ToLowerInvariant();
 
         if (s_routeCache.TryGetValue(cacheKey, out var cachedRoute))
             return cachedRoute;
@@ -220,10 +165,11 @@ public static class GoogleMapsService
             string destination = $"{destLat},{destLng}";
 
             string url = $"https://maps.googleapis.com/maps/api/directions/xml" +
-                        $"?origin={origin}" +
-                        $"&destination={destination}" +
-                        $"&mode={mode}" +
-                        $"&key={apiKey}";
+                         $"?origin={origin}" +
+                         $"&destination={destination}" +
+                         $"&alternatives=true" +
+                         $"&mode={mode}" +
+                         $"&key={apiKey}";
 
             s_prepareHttpClient();
 
@@ -233,81 +179,26 @@ public static class GoogleMapsService
             string? status = doc.Root?.Element("status")?.Value;
 
             if (status != "OK")
-            {
-                string? errorMsg = doc.Root?.Element("error_message")?.Value;
-                return null;
-            }
-
-            var route = doc.Root?.Element("route");
-            var leg = route?.Element("leg");
-
-            if (route == null || leg == null)
                 return null;
 
-            var routeInfo = s_parseRouteInfo(route, leg);
-            s_routeCache.TryAdd(cacheKey, routeInfo);
-            return routeInfo;
-        }
-        catch
-        {
-            return null;
-        }
-    }
+            var routes = doc.Root?.Elements("route");
 
-    /// <summary>
-    /// Gets route between two addresses (not coordinates).
-    /// Results are cached to minimize API calls.
-    /// </summary>
-    /// <param name="originAddress">The origin address string.</param>
-    /// <param name="destinationAddress">The destination address string.</param>
-    /// <param name="mode">Travel mode: "driving", "walking", "bicycling", or "transit". Defaults to "driving".</param>
-    /// <returns>
-    /// A <see cref="RouteInfo"/> object containing route details if successful,
-    /// or null if the route calculation fails.
-    /// </returns>
-    public static async Task<RouteInfo?> GetRouteByAddress(string originAddress, string destinationAddress, string mode = "driving")
-    {
-        string cacheKey = $"{originAddress}|{destinationAddress}|{mode}".ToLowerInvariant();
-
-        if (s_routeCache.TryGetValue(cacheKey, out var cachedRoute))
-            return cachedRoute;
-
-        try
-        {
-            string apiKey = AdminManager.GetConfig().GoogleApiKey;
-            string origin = Uri.EscapeDataString(originAddress);
-            string destination = Uri.EscapeDataString(destinationAddress);
-
-            string url = $"https://maps.googleapis.com/maps/api/directions/xml" +
-                        $"?origin={origin}" +
-                        $"&destination={destination}" +
-                        $"&mode={mode}" +
-                        $"&key={apiKey}";
-
-            s_prepareHttpClient();
-
-            string xmlContent = await s_httpClient.GetStringAsync(url);
-            XDocument doc = XDocument.Parse(xmlContent);
-
-            string? status = doc.Root?.Element("status")?.Value;
-
-            System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] Address URL: {url}");
-            System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] Status: {status}");
-
-            if (status != "OK")
-            {
-                string? errorMsg = doc.Root?.Element("error_message")?.Value;
-                System.Diagnostics.Debug.WriteLine($"[GoogleMapsService] Error: {errorMsg}");
+            if (routes == null || !routes.Any())
                 return null;
-            }
+            var shortestRoute = routes
+                .OrderBy(r =>
+                {
+                    var distVal = r.Element("leg")?.Element("distance")?.Element("value")?.Value;
+                    return int.TryParse(distVal, out int val) ? val : int.MaxValue;
+                })
+                .FirstOrDefault();
 
-            var route = doc.Root?.Element("route");
-            var leg = route?.Element("leg");
+            var leg = shortestRoute?.Element("leg");
 
-            if (route == null || leg == null)
+            if (shortestRoute == null || leg == null)
                 return null;
 
-            var routeInfo = s_parseRouteInfo(route, leg);
+            var routeInfo = s_parseRouteInfo(shortestRoute, leg);
             s_routeCache.TryAdd(cacheKey, routeInfo);
             return routeInfo;
         }
@@ -341,27 +232,6 @@ public static class GoogleMapsService
     }
 
     /// <summary>
-    /// Gets route from store to a destination using address string.
-    /// </summary>
-    /// <param name="destinationAddress">The destination address string.</param>
-    /// <param name="shipmentType">The type of shipment/vehicle to determine travel mode.</param>
-    /// <returns>
-    /// A <see cref="RouteInfo"/> object containing route details if successful,
-    /// or null if the route calculation fails.
-    /// </returns>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown when store address is not configured.
-    /// </exception>
-    public static async Task<RouteInfo?> GetRoute(string destinationAddress, BO.TheTypeShipment shipmentType)
-    {
-        var config = AdminManager.GetConfig();
-        string storeAddress = config.StoreAddress ?? throw new InvalidOperationException("Store address not configured");
-
-        string mode = s_getTravelMode(shipmentType);
-        return await GetRouteByAddress(storeAddress, destinationAddress, mode);
-    }
-
-    /// <summary>
     /// Builds a Static Map URL with route overlay.
     /// </summary>
     /// <param name="originLat">Origin latitude coordinate.</param>
@@ -380,12 +250,16 @@ public static class GoogleMapsService
         string apiKey = AdminManager.GetConfig().GoogleApiKey;
         string encodedPath = Uri.EscapeDataString(encodedPolyline);
 
-        return await Task.FromResult($"https://maps.googleapis.com/maps/api/staticmap" +
+        var Url = await Task.FromResult($"https://maps.googleapis.com/maps/api/staticmap" +
                $"?size={width}x{height}" +
                $"&markers=color:green|label:S|{originLat},{originLng}" +
                $"&markers=color:red|label:D|{destLat},{destLng}" +
                $"&path=enc:{encodedPath}" +
                $"&key={apiKey}");
+
+        Debug.WriteLine($"Store = {originLat},{originLng}. Address = {destLat},{destLng}");
+        Debug.WriteLine(Url);
+        return Url;
     }
 
     /// <summary>
@@ -404,7 +278,8 @@ public static class GoogleMapsService
                                                     BO.TheTypeShipment shipmentType,
                                                     int width = 400, int height = 300)
     {
-        var route = await GetRouteFromStore(destLat, destLng, shipmentType);
+        var route = await GoogleMapsService.NetworkKeeper(() => 
+            GetRouteFromStore(destLat, destLng, shipmentType));
         if (route == null || string.IsNullOrEmpty(route.EncodedPolyline))
             return null;
 
@@ -444,8 +319,7 @@ public static class GoogleMapsService
     /// </remarks>
     public static async Task<(double Lat, double Lng)?> GetGeocodingAsync(string address, string api)
     {
-        string apiKey = api;//הוספתי שליחת ארגומנט כדי לא לגשת לגט קונפיג מטרד אחד, כי הוא נעול עכשיו
-        // var apiKey = AdminManager.GetConfig().GoogleApiKey;
+        string apiKey = api;
         string url = $"https://maps.googleapis.com/maps/api/geocode/xml?address={Uri.EscapeDataString(address)}&key={apiKey}";
 
         try
@@ -521,79 +395,21 @@ public static class GoogleMapsService
     /// </remarks>
     public static async Task<double?> GetActualDistance(double latitude, double longitude, BO.TheTypeShipment typeShipment)
     {
-        InitializeDistanceCache();
+        double? storeLat = AdminManager.GetConfig().Latitude;
+        double? storeLng = AdminManager.GetConfig().Longitude;
 
-        string apiKey = AdminManager.GetConfig().GoogleApiKey
-            ?? throw new BO.BlInvalidValueException("Google API Key is not configured.");
-
-        double storeLatitude = AdminManager.GetConfig().Latitude
-            ?? throw new BO.BlInvalidValueException("Store Latitude is not configured.");
-
-        double storeLongitude = AdminManager.GetConfig().Longitude
-            ?? throw new BO.BlInvalidValueException("Store Longitude is not configured.");
+        if (storeLat is null || storeLng is null)
+            throw new BO.BlInvalidValueException("Store coordinates are not configured.");
 
         string mode = s_getTravelMode(typeShipment);
-        string cacheKey = $"{storeLatitude}|{storeLongitude}|{latitude}|{longitude}|{mode}".ToLowerInvariant();
 
-        // Check if distance already exists in cache
-        if (s_distanceCache.TryGetValue(cacheKey, out double cachedDistance))
-        {
-            return cachedDistance;
-        }
+        RouteInfo? routeInfo = await GetRoute(storeLat.Value, storeLng.Value, latitude, longitude, mode);
 
-        string url = $"https://maps.googleapis.com/maps/api/distancematrix/xml" +
-                    $"?origins={Uri.EscapeDataString($"{storeLatitude},{storeLongitude}")}" +
-                    $"&destinations={Uri.EscapeDataString($"{latitude},{longitude}")}" +
-                    $"&mode={mode}" +
-                    $"&key={apiKey}";
+        if (routeInfo is null)
+            return null;
 
-        try
-        {
-            s_prepareHttpClient();
-            HttpResponseMessage response = await s_httpClient.GetAsync(url);
-
-            if (!response.IsSuccessStatusCode)
-                throw new Exception("Failed to get distance matrix data.");
-
-            string xmlContent = await response.Content.ReadAsStringAsync();
-            XDocument doc = XDocument.Parse(xmlContent);
-            string? status = doc.Element("DistanceMatrixResponse")?.Element("status")?.Value;
-
-            if (status == "ZERO_RESULTS")
-                throw new BO.BlInvalidValueException("The address was not found in Google's database.");
-
-            if (status != "OK")
-                throw new Exception($"Distance Matrix API returned status: {status}");
-
-            var element = doc.Element("DistanceMatrixResponse")?
-                             .Element("row")?
-                             .Element("element");
-
-            var elementStatus = element?.Element("status")?.Value;
-            if (elementStatus != "OK")
-                throw new BO.BlInvalidValueException("Unable to calculate distance for the provided address.");
-
-            var distanceElement = element?.Element("distance");
-            if (distanceElement == null)
-                return null;
-
-            double distance = double.Parse(distanceElement.Element("value")!.Value);
-            double distanceKm = distance / 1000.0;
-            s_distanceCache.TryAdd(cacheKey, distanceKm);
-            return distanceKm;
-        }
-        catch (BO.BlInvalidValueException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            throw new BO.BlDoesNotExistException($"Distance calculation error: {ex.Message}");
-        }
+        return routeInfo.DistanceKm;
     }
-
-
-
 
     public static async Task<T> NetworkKeeper<T>(Func<Task<T>> action)
     {
@@ -612,34 +428,6 @@ public static class GoogleMapsService
         }
     }
 
-    //public static async Task NetworkKeeper(Func<Task> action)
-    //{
-    //    await _gateKeeper.WaitAsync();
-    //    try
-    //    {
-    //        await action();
-    //        await Task.Delay(100);
-    //    }
-    //    finally
-    //    {
-    //        _gateKeeper.Release();
-    //    }
-    //}
-
-
-    /// <summary>
-    /// Checks if a given ID belongs to the system manager.
-    /// </summary>
-    /// <param name="id">The ID to verify.</param>
-    /// <returns>True if the ID matches the manager ID configured in the system; otherwise, false.</returns>
-    /// <remarks>
-    /// This method is used for authorization checks to determine if a user has manager privileges.
-    /// The manager ID is retrieved from the system configuration.
-    /// </remarks>
-    public static bool CheckManager(int id)
-    {
-        return id == AdminManager.GetConfig().ManagerId;
-    }
 
     /// <summary>
     /// Predefined address data for caching distance calculations.

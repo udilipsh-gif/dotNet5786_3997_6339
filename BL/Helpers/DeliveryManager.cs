@@ -146,10 +146,11 @@ internal static class DeliveryManager
             {
                 try
                 {
-                    actualDistance = await GoogleMapsService.GetActualDistance(
-                        order.Latitude,
-                        order.Longitude,
-                        (BO.TheTypeShipment)courier.TypeShipment);
+                    actualDistance = await GoogleMapsService.NetworkKeeper(() =>
+                        GoogleMapsService.GetActualDistance(
+                            order.Latitude,
+                            order.Longitude,
+                            (BO.TheTypeShipment)courier.TypeShipment));
                 }
                 catch
                 {
@@ -234,7 +235,9 @@ internal static class DeliveryManager
         {
             var maxDeliveryTime = doOrder.OrderDate + config.MaxDeliveryTime;
 
-            var distance = await GoogleMapsService.GetActualDistance(doOrder.Latitude, doOrder.Longitude, (BO.TheTypeShipment)doCourier.TypeShipment);
+            var distance = await GoogleMapsService.NetworkKeeper(() =>
+                GoogleMapsService.GetActualDistance(doOrder.Latitude, doOrder.Longitude,
+                (BO.TheTypeShipment)doCourier.TypeShipment));
 
             return new BO.OpenOrderInList
             {
@@ -284,6 +287,9 @@ internal static class DeliveryManager
         if (!courier.Active)
             throw new BO.BlInvalidOperationException("שגיאה שליח לא פעיל");
 
+        var actualDistance = await GoogleMapsService.NetworkKeeper(() => 
+            GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude,
+            (BO.TheTypeShipment)courier.TypeShipment));
 
         DO.Delivery delivery = new DO.Delivery
         {
@@ -292,7 +298,7 @@ internal static class DeliveryManager
             CourierId = courier.Id,
             TypeShipment = courier.TypeShipment,
             OrderDate = AdminManager.Now,
-            ActualDistance = await GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude, (BO.TheTypeShipment)courier.TypeShipment),
+            ActualDistance = actualDistance,
             EndDelivery = null,
             TimeEndDelivery = null
         };
@@ -433,7 +439,8 @@ internal static class DeliveryManager
 
     public static async Task<GoogleMapsService.RouteInfo?> GetRouteFromStore(
                      double destLat, double destLng, BO.TheTypeShipment shipmentType)
-        => await GoogleMapsService.GetRouteFromStore(destLat, destLng, shipmentType);
+        => await GoogleMapsService.NetworkKeeper(() =>
+            GoogleMapsService.GetRouteFromStore(destLat, destLng, shipmentType));
 
 
     public static async Task<string?> GetStaticMapUrlFromStore(double destLat, double destLng,
@@ -536,12 +543,12 @@ internal static class DeliveryManager
         DO.Courier courier;
 
         lock (AdminManager.BlMutex)
-            courier = s_dal.Courier.Read(delivery.CourierId)??throw new BlDoesNotExistException($"courier whith {delivery.CourierId} not found");                        //CourierManager.Read(delivery.CourierId);
+            courier = s_dal.Courier.Read(delivery.CourierId) ?? throw new BlDoesNotExistException($"courier whith {delivery.CourierId} not found");                        //CourierManager.Read(delivery.CourierId);
 
         DO.Order order;
 
         lock (AdminManager.BlMutex)
-             order = s_dal.Order.Read(delivery.OrderId) ?? throw new BlDoesNotExistException($"order whith {delivery.OrderId} not found");
+            order = s_dal.Order.Read(delivery.OrderId) ?? throw new BlDoesNotExistException($"order whith {delivery.OrderId} not found");
 
         var (typeOfOrderebrew, emoje) = Tools.ConvertTipeOrderToHebrew(order.TypeOfOrder);
 

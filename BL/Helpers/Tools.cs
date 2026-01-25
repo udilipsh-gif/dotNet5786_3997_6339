@@ -470,7 +470,9 @@ internal static class Tools
                 order = s_dal.Order.Read(delivery.OrderId)
                     ?? throw new BO.BlDoesNotExistException($"Order with ID={delivery.OrderId} does not exist");
 
-            actualDistance = await GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude, (BO.TheTypeShipment)courier.TypeShipment) ?? 0;
+            actualDistance = await GoogleMapsService.NetworkKeeper(() =>
+                GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude,
+                (BO.TheTypeShipment)courier.TypeShipment)) ?? 0;
             lock (AdminManager.BlMutex)
                 s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
         }

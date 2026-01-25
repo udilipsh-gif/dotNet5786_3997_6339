@@ -2,12 +2,12 @@
 <config>
   <NextOrderId>100051</NextOrderId>
   <NextDeliveryId>200051</NextDeliveryId>
-  <Clock>28/01/2026 02:45:32</Clock>
+  <Clock>28/01/2026 04:23:23</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
-  <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
-  <Latitude>32.0936195</Latitude>
-  <Longitude>34.8229463</Longitude>
+  <StoreAddress>אהרונוביץ 35 בני ברק</StoreAddress>
+  <Latitude>32.088596</Latitude>
+  <Longitude>34.839067</Longitude>
   <MaxDeliveryRange>25</MaxDeliveryRange>
   <AvgSpeedCar>30</AvgSpeedCar>
   <AvgSpeedMotorcycle>50</AvgSpeedMotorcycle>
