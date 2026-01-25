@@ -355,8 +355,8 @@ internal static class DeliveryManager
             TimeEndDelivery = AdminManager.Now
         };
         lock (AdminManager.BlMutex) {
-            UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
             s_dal.Delivery.Update(delivery);
+            UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
         }
         s_notifyDeliveryCompleted(deliveryId, delivery.OrderId, courierId);
     }
