@@ -131,14 +131,64 @@ internal static class CourierManager
     ///   <item><description>OrderInProgress: Details of the current active delivery, if any</description></item>
     /// </list>
     /// </remarks>
-    internal static async Task<BO.Courier?> Read(int id)
+    //internal static async Task<BO.Courier?> Read(int id)
+    //{
+    //    DO.Courier doCourier;
+    //    lock (AdminManager.BlMutex)
+    //        doCourier = s_dal.Courier.Read(id)
+    //            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
+
+    //    return await s_convertToBObject(doCourier);
+    //}
+    public static async IAsyncEnumerable<BO.Courier> Read(int id)
     {
+        // 1. שליפת הנתונים הגולמיים (מהירה ובטוחה בתוך נעילה)
         DO.Courier doCourier;
+        IEnumerable<DO.Delivery> allDeliveries;
+
         lock (AdminManager.BlMutex)
+        {
             doCourier = s_dal.Courier.Read(id)
                 ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
 
-        return await s_convertToBObject(doCourier);
+            allDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == id).ToList();
+        }
+
+        // 2. בניית האובייקט הבסיסי (ללא חישובים כבדים)
+        var boCourier = new BO.Courier
+        {
+            Id = doCourier.Id,
+            Name = doCourier.Name,
+            Phone = doCourier.Phone,
+            Email = doCourier.Email,
+            Password = doCourier.Password,
+            Active = doCourier.Active,
+            MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
+            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
+            WorkingSince = doCourier.WorkingSince,
+            DeliveryOnTime = s_getDeliveryOnTimeCount(allDeliveries),
+            DeliveryLate = s_getDeliveryLateCount(allDeliveries),
+            OrderInProgress = null // בינתיים ריק
+        };
+
+        // === הזרמה ראשונה: נתונים בסיסיים ל-UI ===
+        yield return boCourier;
+
+        // 3. בדיקה האם יש צורך בחישוב כבד (רק אם יש משלוח פעיל)
+        var activeDelivery = allDeliveries.FirstOrDefault(d => d.EndDelivery == null);
+
+        if (activeDelivery != null)
+        {
+            // ביצוע החישוב הכבד (פנייה לגוגל וכו')
+            // שים לב: זה קורה מחוץ לנעילה הראשית כי s_getOrderInProgress מטפל בנעילות בעצמו איפה שצריך
+            var heavyOrderDetails = await s_getOrderInProgress(allDeliveries);
+
+            // עדכון האובייקט הקיים
+            boCourier.OrderInProgress = heavyOrderDetails;
+
+            // === הזרמה שנייה: נתונים מלאים ===
+            yield return boCourier;
+        }
     }
 
     /// <summary>
@@ -668,25 +718,27 @@ internal static class CourierManager
         try
         {
             DO.Delivery? delivery;
-            lock (AdminManager.BlMutex)
-                delivery = s_dal.Delivery.Read(deliveryId);
-
-            if (delivery != null)
             {
-                var updatedDelivery = delivery with
-                {
-                    EndDelivery = (DO.EndDelivery)endDelivery,
-                    TimeEndDelivery = AdminManager.Now
-                };
-
                 lock (AdminManager.BlMutex)
+                    delivery = s_dal.Delivery.Read(deliveryId);
+
+                if (delivery != null)
+                {
+                    var updatedDelivery = delivery with
+                    {
+                        EndDelivery = (DO.EndDelivery)endDelivery,
+                        TimeEndDelivery = AdminManager.Now
+                    };
+
+
+                    DeliveryManager.UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
                     s_dal.Delivery.Update(updatedDelivery);
 
-                DeliveryManager.UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
 
-                Observer.NotifyItemUpdated(courierId);
-                OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
-                DeliveryManager.Observer.NotifyItemUpdated(deliveryId);
+                    Observer.NotifyItemUpdated(courierId);
+                    OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);
+                    DeliveryManager.Observer.NotifyItemUpdated(deliveryId);
+                }
             }
         }
         catch (Exception) { }

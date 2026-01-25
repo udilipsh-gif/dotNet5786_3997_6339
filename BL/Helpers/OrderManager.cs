@@ -124,7 +124,7 @@ internal static class OrderManager
             s_dal.Order.Create(doOrder);
         Observer.NotifyListUpdated();
 
-        _ = s_sendEmailNewOrder(doOrder);
+        s_sendEmailNewOrder(doOrder);
     }
 
     /// <summary>
@@ -458,9 +458,6 @@ internal static class OrderManager
     private static void s_cancelOpenOrder(DO.Order doOrder)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
-        lock (AdminManager.BlMutex)
-            s_dal.Order.Update(doOrder);
-        Observer.NotifyItemUpdated(doOrder.Id);
 
         DO.Delivery delivery = new DO.Delivery
         {
@@ -473,8 +470,12 @@ internal static class OrderManager
             TimeEndDelivery = AdminManager.Now,
             ActualDistance = 0
         };
-        lock (AdminManager.BlMutex)
+        lock (AdminManager.BlMutex) { 
+            s_dal.Order.Update(doOrder);
             s_dal.Delivery.Create(delivery);
+        }
+
+        Observer.NotifyItemUpdated(doOrder.Id);
     }
 
     /// <summary>
@@ -488,9 +489,7 @@ internal static class OrderManager
     private static async Task s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool token)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
-        lock (AdminManager.BlMutex)
-            s_dal.Order.Update(doOrder);
-        Observer.NotifyItemUpdated(doOrder.Id);
+ 
 
         DO.Delivery? delivery;
         lock (AdminManager.BlMutex)
@@ -499,11 +498,14 @@ internal static class OrderManager
                         select d).FirstOrDefault()
                ?? throw new BO.BlDoesNotExistException("לא נמצא משלוח עבור הזמנה זו");
         lock (AdminManager.BlMutex)
+        {
             s_dal.Delivery.Update(delivery with
             {
                 EndDelivery = DO.EndDelivery.CONCELLED,
                 TimeEndDelivery = AdminManager.Now
             });
+            s_dal.Order.Update(doOrder);
+        }
 
         DO.Courier? courier;
         lock (AdminManager.BlMutex)
@@ -548,14 +550,14 @@ internal static class OrderManager
 
         finally
         {
-            DeliveryManager.Observer.NotifyItemUpdated(delivery.Id);
             CourierManager.Observer.NotifyItemUpdated(delivery.CourierId);
+            CourierManager.Observer.NotifyListUpdated();
             Observer.NotifyItemUpdated(orderId);
             Observer.NotifyListUpdated();
         }
     }
 
-    private static async Task s_sendEmailNewOrder(DO.Order doOrder)
+    private static async void s_sendEmailNewOrder(DO.Order doOrder)
     {
 
         Dictionary<int, int> deliveriesMap;

@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
   <NextOrderId>100051</NextOrderId>
-  <NextDeliveryId>200077</NextDeliveryId>
-  <Clock>28/01/2026 06:08:23</Clock>
+  <NextDeliveryId>200045</NextDeliveryId>
+  <Clock>28/01/2026 03:53:46</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
-  <StoreAddress>אהרונוביץ 35 בני ברק</StoreAddress>
-  <Latitude>32.088596</Latitude>
-  <Longitude>34.839067</Longitude>
+  <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
+  <Latitude>32.0936195</Latitude>
+  <Longitude>34.8229463</Longitude>
   <MaxDeliveryRange>25</MaxDeliveryRange>
   <AvgSpeedCar>30</AvgSpeedCar>
   <AvgSpeedMotorcycle>50</AvgSpeedMotorcycle>

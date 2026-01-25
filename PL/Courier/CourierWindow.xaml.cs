@@ -44,7 +44,7 @@ public partial class CourierWindow : Window
     /// <summary>
     /// Gets or sets the current courier being displayed or edited.
     /// </summary>
-    public BO.Courier CurrentCourier
+    public BO.Courier? CurrentCourier
     {
         get => (BO.Courier)GetValue(CurrentCourierProperty);
         set => SetValue(CurrentCourierProperty, value);
@@ -267,7 +267,7 @@ public partial class CourierWindow : Window
     /// </remarks>
     private void PasswordChanged(object sender, RoutedEventArgs e)
     {
-        if (sender is PasswordBox passwordBox)
+        if (sender is PasswordBox passwordBox && CurrentCourier is not null)
         {
             CurrentCourier.Password = passwordBox.Password;
         }
@@ -285,8 +285,7 @@ public partial class CourierWindow : Window
     /// </remarks>
     private void CourierObserver()
     {
-
-        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
             return;
 
         Dispatcher.BeginInvoke(async () =>
@@ -294,8 +293,14 @@ public partial class CourierWindow : Window
             bool windowIsOpen = true;
             try
             {
-                CurrentCourier = await s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID)
-              ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
+                await foreach (var courier in s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID))
+                {
+                    CurrentCourier = null;
+
+                    CurrentCourier = courier
+                        ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
+
+                }
             }
             catch (BO.BlDoesNotExistException)
             {

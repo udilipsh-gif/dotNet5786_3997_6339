@@ -91,18 +91,29 @@ public partial class MainCourier : Window
 
         try
         {
-            var currentUser = await Task.Run(async () =>
+            // שימוש ב-Streaming: קבלת הנתונים בזרם
+            await foreach (var courierState in s_bl.Courier.Read(USERID, USERID))
             {
-                return await s_bl.Courier.Read(USERID, USERID);
-            });
+                // עדכון ה-UI
+                // מכיוון שאנחנו ב-async void שנקרא מה-UI, אין צורך ב-Dispatcher בדרך כלל,
+                // אבל ליתר ביטחון נשתמש בגישה ישירה כי אנחנו בקונטקסט הנכון.
 
-            if (currentUser == null) throw new BO.BlDoesNotExistException();
+                CurrentUser = null;
+                CurrentUser = courierState;
 
-            CurrentUser = currentUser;
+                // עדכון דגלים לתצוגה
+                if (CurrentUser?.OrderInProgress is not null)
+                {
+                    IsOrderInProgress = true;
 
-            if (CurrentUser.OrderInProgress is not null)
-            {
-                IsOrderInProgress = true;
+                    // טריק קטן: אם זה העדכון השני (המלא), 
+                    // לפעמים צריך לרענן את ה-Binding אם זה אותו מופע אובייקט בזיכרון.
+                    // אבל כאן יצרנו אובייקט אחד והוספנו לו שדה, אז SetValue יקפיץ את ה-UI.
+                }
+                else
+                {
+                    IsOrderInProgress = false;
+                }
             }
         }
         catch (BO.BlDoesNotExistException)
@@ -117,6 +128,7 @@ public partial class MainCourier : Window
         }
         finally
         {
+            // שחרור הנעילה ובדיקה אם צריך להריץ שוב
             if (windowIsOpen && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
             {
                 GetCurier();

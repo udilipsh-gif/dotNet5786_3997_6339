@@ -40,12 +40,15 @@ internal class CourierImplementation : ICourier
     /// <returns>A <see cref="BO.Courier"/> instance if found.</returns>
     /// <exception cref="BO.BlNoAccessException">Thrown when the user does not have manager privileges.</exception>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier does not exist.</exception>
-    public async Task<BO.Courier?> Read(int requesterId, int courierId)
+    public async IAsyncEnumerable<BO.Courier?> Read(int requesterId, int courierId)
     {
         if (!Tools.CheckManger(requesterId) && requesterId != courierId)
             throw new BO.BlNoAccessException();
 
-        return await CourierManager.Read(courierId);
+        await foreach (var courier in CourierManager.Read(courierId))
+        {
+            yield return courier;
+        }
     }
 
     /// <summary>

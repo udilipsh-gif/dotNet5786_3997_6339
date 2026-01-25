@@ -1,7 +1,7 @@
-﻿using BO;
-using DalApi;
-using System;
+﻿using DalApi;
+using BO;
 using System.Collections;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mail;
@@ -131,10 +131,12 @@ internal static class Tools
     /// </remarks>
     public static double GetDistance(DO.Order order)
     {
-        double storeLatitude = AdminManager.GetConfig().Latitude ??
+        var config = AdminManager.GetConfig();
+
+        double storeLatitude = config.Latitude ??
             throw new InvalidOperationException("Latitude is not set in configuration.");
 
-        double storeLongitude = AdminManager.GetConfig().Longitude ??
+        double storeLongitude = config.Longitude ??
             throw new InvalidOperationException("Longitude is not set in configuration.");
 
         return GetDistance(order.Latitude, order.Longitude, storeLatitude, storeLongitude);
@@ -165,7 +167,7 @@ internal static class Tools
     /// </list>
     /// </returns>
     /// <exception cref="Exception">Thrown when the delivery has an unknown status.</exception>
-    public static BO.OrderStatus s_getOrderStatus(DO.Order order, DO.Delivery? delivery)
+    public static BO.OrderStatus GetOrderStatus(DO.Order order, DO.Delivery? delivery)
     {
         if (delivery is null)
             return BO.OrderStatus.OPEN;
@@ -187,10 +189,10 @@ internal static class Tools
     /// </summary>
     /// <param name="order">The order to evaluate.</param>
     /// <returns>The business logic order status based on the most recent delivery attempt.</returns>
-    public static BO.OrderStatus s_getOrderStatus(DO.Order order)
+    public static BO.OrderStatus GetOrderStatus(DO.Order order)
     {
         var delivery = s_getLatestDelivery(order.Id);
-        return s_getOrderStatus(order, delivery);
+        return GetOrderStatus(order, delivery);
     }
 
     /// <summary>
@@ -213,10 +215,11 @@ internal static class Tools
     /// </exception>
     public static async Task<BO.ScheduleStatus> GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
     {
-        TimeSpan riskRange = AdminManager.GetConfig()?.RiskRange ??
+        var config = AdminManager.GetConfig();
+        TimeSpan riskRange = config?.RiskRange ??
             throw new Exception("Risk range not configured");
 
-        DateTime maxDeliveryTime = order.OrderDate + (AdminManager.GetConfig()?.MaxDeliveryTime ??
+        DateTime maxDeliveryTime = order.OrderDate + (config?.MaxDeliveryTime ??
             throw new Exception("Max Delivery Time not configured"));
 
         return order.OrderStatus switch
@@ -247,14 +250,27 @@ internal static class Tools
         DO.Delivery? delivery,
         DateTime maxDeliveryTime)
     {
-        delivery ??= s_getLatestDelivery(order.Id);
+        try
+        {
+            lock (AdminManager.BlMutex)
+                if (delivery is null)
+                    s_getLatestDelivery(order.Id);
 
-        DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
-            throw new Exception("Order completed but delivery not found");
+            DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
+                throw new Exception("Order completed but delivery not found");
 
-        return maxDeliveryTime >= timeEndDelivery
-            ? BO.ScheduleStatus.ONTYME
-            : BO.ScheduleStatus.LATE;
+            return maxDeliveryTime >= timeEndDelivery
+           ? BO.ScheduleStatus.ONTYME
+           : BO.ScheduleStatus.LATE;
+        }
+        catch(Exception ex)
+        {
+            Debug.WriteLine($"orderId = {order.Id}. DeliveryId = {delivery?.Id}");
+            Debug.WriteLine(ex);
+
+            throw new Exception(ex.Message);
+        }
+        
     }
 
     /// <summary>
@@ -522,7 +538,7 @@ internal static class Tools
     /// <returns>The time remaining as a TimeSpan.</returns>
     public static TimeSpan GetTimeLeftForDelivery(DO.Order order)
     {
-        BO.OrderStatus status = s_getOrderStatus(order);
+        BO.OrderStatus status = GetOrderStatus(order);
         return GetTimeLeftForDelivery(order, status);
     }
 
@@ -551,10 +567,12 @@ internal static class Tools
     /// <returns>The most recent delivery, or null if no deliveries exist.</returns>
     private static DO.Delivery? s_getLatestDelivery(int orderId)
     {
-        return DeliveryManager.ReadAll()
-            .Where(d => d.OrderId == orderId)
-            .OrderByDescending(d => d.Id)
-            .FirstOrDefault();
+        DO.Delivery? lastDelivery;
+        lock (AdminManager.BlMutex)
+            lastDelivery = DeliveryManager.ReadAll(d => d.OrderId == orderId)
+                .OrderByDescending(d => d.Id)
+                .FirstOrDefault();
+        return lastDelivery;
     }
 
     /// <summary>
@@ -563,9 +581,7 @@ internal static class Tools
     /// <param name="id">The ID to verify.</param>
     /// <returns>True if the ID matches the manager ID; otherwise, false.</returns>
     public static bool CheckManger(int id)
-    {
-        return id == AdminManager.GetConfig().ManagerId;
-    }
+        => id == AdminManager.GetConfig().ManagerId;
 
     ///// <summary>
     ///// Sends an email using SMTP via Gmail's SMTP server.
