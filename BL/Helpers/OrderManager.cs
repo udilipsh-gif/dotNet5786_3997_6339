@@ -1,5 +1,4 @@
-﻿using BO;
-using DalApi;
+﻿using DalApi;
 
 namespace Helpers;
 
@@ -92,14 +91,15 @@ internal static class OrderManager
     {
         s_validateOrderFields(boOrder);
 
-        var apiKey = AdminManager.GetConfig().GoogleApiKey;
-        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres, apiKey);
+        var config = AdminManager.GetConfig();
+
+        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres, config.GoogleApiKey);
 
         var distance = Tools.GetDistance(
             addressCoordinates?.Lat ?? 0,
             addressCoordinates?.Lng ?? 0,
-            s_dal.Config.Latitude ?? 0,
-            s_dal.Config.Longitude ?? 0);
+            config.Latitude ?? 0,
+            config.Longitude ?? 0);
 
         lock (AdminManager.BlMutex)
             if (distance == 0 || distance > s_dal.Config.MaxDeliveryRange)
@@ -256,6 +256,9 @@ internal static class OrderManager
         BO.OrderInListField? orderBy = BO.OrderInListField.OrderId)
     {
         Dictionary<int, List<DO.Delivery>>? deliveriesMap;
+
+        List<DO.Order> allDoOrders;
+
         lock (AdminManager.BlMutex)
         {
             deliveriesMap = s_dal.Delivery.ReadAll()
@@ -263,19 +266,16 @@ internal static class OrderManager
                 .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
         }
 
+        lock (AdminManager.BlMutex)
+            allDoOrders = s_dal.Order.ReadAll().ToList();
+
 
         Func<BO.OrderInList, bool> filter = customPredicate ?? (_ => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortSelector(orderBy);
 
-        IEnumerable<Task<BO.OrderInList>>? conversionTasks;////////////////////////////////////
-        lock (AdminManager.BlMutex)
-        {
-            conversionTasks = s_dal.Order.ReadAll().Select(async doOrder =>
-            {
-                return await s_convertToBoOrderOptimized(doOrder, deliveriesMap);
-            }).ToList();
-        }
-
+        var conversionTasks = allDoOrders.Select(doOrder =>
+            s_convertToBoOrderOptimized(doOrder, deliveriesMap)
+        );
 
         var allBoOrders = await Task.WhenAll(conversionTasks);
         var result = allBoOrders
@@ -400,24 +400,34 @@ internal static class OrderManager
     /// </returns>
     private static List<BO.DeliveryPerOrderInList>? s_createDeliveryPerOrderInList(int orderId)
     {
-        List<BO.DeliveryPerOrderInList> deliveries;
+        List<DO.Delivery> deliveries;
         lock (AdminManager.BlMutex)
-            deliveries = (from doDelivery in s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
-                          let courier = s_dal.Courier.Read(doDelivery.CourierId)
-                          select new BO.DeliveryPerOrderInList
-                          {
-                              DeliveryId = doDelivery.Id,
-                              CourierId = courier.Id,
-                              CourierName = courier.Name,
-                              TypeShipment = (BO.TheTypeShipment)courier.TypeShipment,
-                              OrderDate = doDelivery.OrderDate,
-                              EndDelivery = doDelivery.EndDelivery.HasValue
-                                  ? (BO.EndDelivery)doDelivery.EndDelivery.Value
-                                  : null,
-                              TimeEndDelivery = doDelivery.TimeEndDelivery
-                          }).ToList();
+            deliveries = s_dal.Delivery.ReadAll(d => d.OrderId == orderId).ToList();
 
-        return deliveries.Any() ? [.. deliveries] : null;
+        if (!deliveries.Any()) return null;
+
+        var courierIds = deliveries.Select(d => d.CourierId).Distinct();
+        Dictionary<int, DO.Courier> couriers;
+
+        lock (AdminManager.BlMutex)
+            couriers = s_dal.Courier.ReadAll(c => courierIds.Contains(c.Id))
+                           .ToDictionary(c => c.Id); // מילון לגישה מהירה
+
+        // 3. יצירת הרשימה בזיכרון
+        return deliveries.Select(d =>
+        {
+            var courier = couriers.GetValueOrDefault(d.CourierId);
+            return new BO.DeliveryPerOrderInList
+            {
+                DeliveryId = d.Id,
+                CourierId = d.CourierId,
+                CourierName = courier != null ? courier.Name : string.Empty, // טיפול ב-Null למקרה קיצון
+                TypeShipment = courier != null ? (BO.TheTypeShipment)courier.TypeShipment : BO.TheTypeShipment.FOOT,
+                OrderDate = d.OrderDate,
+                EndDelivery = d.EndDelivery.HasValue ? (BO.EndDelivery)d.EndDelivery : null,
+                TimeEndDelivery = d.TimeEndDelivery
+            };
+        }).ToList();
     }
 
     /// <summary>
@@ -513,9 +523,9 @@ internal static class OrderManager
 
         }
 
-        catch (BLNoSendEmailException ex)
+        catch (BO.BLNoSendEmailException ex)
         {
-            exceptionMail = new BLNoSendEmailException($"Failed to send email notification {ex.Message}");
+            exceptionMail = new BO.BLNoSendEmailException($"Failed to send email notification {ex.Message}");
         }
 
         try
@@ -528,14 +538,14 @@ internal static class OrderManager
                       $"הזמנה מספר {orderId} בוטלה על ידי המנהל");
             }
         }
-        catch (BLNoSendSmsException)
+        catch (BO.BLNoSendSmsException)
         {
-            exceptionSms = new BLNoSendSmsException("Failed to send sms notification");
+            exceptionSms = new BO.BLNoSendSmsException("Failed to send sms notification");
         }
         try
         {
             if (exceptionMail is not null && exceptionSms is not null)
-                throw new BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
+                throw new BO.BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
         }
 
         finally
@@ -689,7 +699,7 @@ internal static class OrderManager
 
         var config = AdminManager.GetConfig();
 
-        foreach(var order in allOrders)
+        foreach (var order in allOrders)
         {
             try
             {
@@ -699,7 +709,7 @@ internal static class OrderManager
                         order.Latitude, order.Longitude);
 
                     lock (AdminManager.BlMutex)
-                        s_dal.Order.Update(order with { DistanceKm = newDistance});
+                        s_dal.Order.Update(order with { DistanceKm = newDistance });
 
                 }
                 else
@@ -707,7 +717,8 @@ internal static class OrderManager
             }
             catch { }
 
-        };
+        }
+        ;
 
         Observer.NotifyListUpdated();
     }
