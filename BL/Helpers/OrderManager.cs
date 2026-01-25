@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using System.Diagnostics;
 
 namespace Helpers;
 
@@ -38,6 +39,8 @@ internal static class OrderManager
     /// </remarks>
     public static async Task<int[]> GetAllOrderStatistic()
     {
+        Debug.WriteLine($"📊 GetAllOrderStatistic called at {AdminManager.Now}");
+        
         List<DO.Order> allOrders;
         lock (AdminManager.BlMutex)
             allOrders = s_dal.Order.ReadAll().ToList();
@@ -68,6 +71,7 @@ internal static class OrderManager
             results[item.Index] = item.Count;
         }
 
+        Debug.WriteLine($"✅ GetAllOrderStatistic completed");
         return results;
     }
 
