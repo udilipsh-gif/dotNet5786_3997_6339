@@ -98,8 +98,12 @@ public partial class MainCourier : Window
                 // מכיוון שאנחנו ב-async void שנקרא מה-UI, אין צורך ב-Dispatcher בדרך כלל,
                 // אבל ליתר ביטחון נשתמש בגישה ישירה כי אנחנו בקונטקסט הנכון.
 
-                CurrentUser = null;
-                CurrentUser = courierState;
+                
+                Dispatcher.Invoke(() =>
+                {
+                    CurrentUser = null;
+                    CurrentUser = courierState;
+                
 
                 // עדכון דגלים לתצוגה
                 if (CurrentUser?.OrderInProgress is not null)
@@ -114,7 +118,9 @@ public partial class MainCourier : Window
                 {
                     IsOrderInProgress = false;
                 }
-            };
+                });
+            }
+            ;
         }
         catch (BO.BlDoesNotExistException)
         {
@@ -130,7 +136,7 @@ public partial class MainCourier : Window
         {
             // שחרור הנעילה ובדיקה אם צריך להריץ שוב
             if (windowIsOpen && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
-                 GetCurier();
+                GetCurier();
         }
 
     }
