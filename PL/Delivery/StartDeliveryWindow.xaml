@@ -7,7 +7,7 @@
         Title="בחירת הזמנה"
         Loaded="StartDeliveryWindow_Loaded"
         Closed="StartDeliveryWindow_Closed"
-        Height="450" Width="850"
+        Height="450" Width="1010"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -93,6 +93,19 @@
                     </DataGridTextColumn.ElementStyle>
 
                 </DataGridTextColumn>
+
+                <DataGridTextColumn Header="כתובת איסוף"
+                     Binding="{Binding Path=DataContext.StoreAddress, RelativeSource={RelativeSource AncestorType=Window}  }"
+                     Width="Auto"
+                     ElementStyle="{StaticResource WrappedTextCellStyle}"
+                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
+                <DataGridTextColumn Header="כתובת נמען"
+                     Binding="{Binding Address}"
+                     Width="Auto"
+                     ElementStyle="{StaticResource WrappedTextCellStyle}"
+                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+
 
                 <DataGridTextColumn Header="מרחק אווירי"
                                     Binding="{Binding DistanceKm, StringFormat=N2}"
