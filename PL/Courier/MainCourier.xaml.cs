@@ -91,7 +91,13 @@ public partial class MainCourier : Window
 
         try
         {
-            var currentUser = await Task.Run(async () =>
+            string light="light";
+            var currentUser = s_bl.Courier.Read(USERID, USERID,light);
+
+            CurrentUser = currentUser;
+
+
+            currentUser = await Task.Run(async () =>
             {
                 return await s_bl.Courier.Read(USERID, USERID);
             });

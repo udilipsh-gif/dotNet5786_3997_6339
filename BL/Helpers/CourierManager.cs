@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -140,6 +141,36 @@ internal static class CourierManager
 
         return await s_convertToBObject(doCourier);
     }
+//#####################################################################################################################תוספת שלי לחישוב קל
+    internal static BO.Courier? Read(int id, string light)
+    {
+        DO.Courier doCourier;
+        lock (AdminManager.BlMutex)
+            doCourier = s_dal.Courier.Read(id)
+                ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
+
+        IEnumerable<DO.Delivery> allDeliveries;
+
+        lock (AdminManager.BlMutex)
+            allDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == doCourier.Id).ToList();
+
+        return new BO.Courier
+        {
+            Id = doCourier.Id,
+            Name = doCourier.Name,
+            Phone = doCourier.Phone,
+            Email = doCourier.Email,
+            Password = doCourier.Password,
+            Active = doCourier.Active,
+            MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
+            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
+            WorkingSince = doCourier.WorkingSince,
+            DeliveryOnTime = s_getDeliveryOnTimeCount(allDeliveries),
+            DeliveryLate = s_getDeliveryLateCount(allDeliveries),
+            OrderInProgress = null
+        };
+    }
+//###############################################################################################################עד כאן
 
     /// <summary>
     /// Updates an existing courier's information in the system.

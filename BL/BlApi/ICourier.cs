@@ -42,6 +42,8 @@ public interface ICourier : IObservable
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier does not exist.</exception>
     Task<BO.Courier?> Read(int id, int courierId);
 
+    BO.Courier? Read(int id, int courierId, string light);
+
     /// <summary>
     /// Updates an existing courier.
     /// </summary>
