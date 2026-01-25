@@ -22,6 +22,17 @@ public partial class StartDeliveryWindow : Window
 
     private BO.TheTypeShipment typeShipment { get; init; }
 
+    public string? StoreAddress
+    {
+        get { return (string)GetValue(StoreAddressProperty); }
+        set { SetValue(StoreAddressProperty, value); }
+    }
+
+    public static readonly DependencyProperty StoreAddressProperty =
+        DependencyProperty.Register("StoreAddress", typeof(string), typeof(StartDeliveryWindow), new PropertyMetadata(null));
+
+
+
     public IEnumerable<Tools.SelectionItem> EnumTypeOfOrder
     {
         get => (IEnumerable<Tools.SelectionItem>)GetValue(EnumTypeOfOrderProperty);
@@ -62,6 +73,9 @@ public partial class StartDeliveryWindow : Window
 
         this.EnumTypeOfOrder = enumTypeOfOrder ?? new List<Tools.SelectionItem>();
 
+       
+        this.StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
+
         InitializeComponent();
     }
 
@@ -70,6 +84,8 @@ public partial class StartDeliveryWindow : Window
         Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
         Tools.RunSafe(() => s_bl.Courier.AddObserver(UserId, orderListObserver));
+       // Tools.RunSafe(() => s_bl.Admin.AddConfigObserver(orderListObserver));
+
         UpdateOrdersList();
 
 
@@ -97,7 +113,10 @@ public partial class StartDeliveryWindow : Window
         {
             try
             {
+                StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
+
                 var DeliveryList = await s_bl.Delivery.GetOpen(UserId, courierId, SelectedFilter, null);
+
 
                 if (DeliveryListView == null)
                 {
