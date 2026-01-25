@@ -35,7 +35,7 @@ internal static class AdminManager //stage 4
         var oldClock = s_dal.Config.Clock; //stage 4
         s_dal.Config.Clock = newClock; //stage 4
 
-        Task.Run(() => PeriodicSystemUpdates(oldClock, newClock));
+        //Task.Run(() => PeriodicSystemUpdates(oldClock, newClock));
 
         //if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
         //{
@@ -56,8 +56,8 @@ internal static class AdminManager //stage 4
         //}
 
         //TO_DO: //stage 7
-        //if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
-        //    _periodicTask = Task.Run(() => StudentManager.PeriodicStudentsUpdates(oldClock, newClock));
+        if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
+            _periodicTask = Task.Run(() => PeriodicSystemUpdates(oldClock, newClock));
         //...
 
         //Calling all the observers of clock update
@@ -350,27 +350,29 @@ internal static class AdminManager //stage 4
     /// <returns>True if any changes were made to the database/lists, requiring a UI refresh.</returns>
     public static void PeriodicSystemUpdates(DateTime oldClock, DateTime newClock)
     {
-        if (oldClock + TimeSpan.FromDays(7) >= newClock)
+        if (oldClock + TimeSpan.FromHours(1) >= newClock)
             return;
+        var config = AdminManager.GetConfig();
 
         if (s_periodicMutex.CheckAndSetInProgress())
             return;
+
+        bool anyListChange = false;
+
         try
         {
-
-            TimeSpan maxInactivity = AdminManager.GetConfig().MaxTimeInactivity;
-            bool anyListChange = false;
+            TimeSpan maxInactivity = config.MaxTimeInactivity;
 
             IEnumerable<DO.Courier> couriers;
             ILookup<int, DO.Delivery> deliveriesByCourier;
 
 
             lock (AdminManager.BlMutex)
-            {
                 couriers = s_dal.Courier.ReadAll(c => c.Active);
+
+            lock (AdminManager.BlMutex)
                 deliveriesByCourier = s_dal.Delivery.ReadAll()
                                                     .ToLookup(d => d.CourierId);
-            }
 
             foreach (var courier in couriers)
             {
@@ -413,13 +415,14 @@ internal static class AdminManager //stage 4
                 }
             }
 
+
+        }
+        finally
+        {
             if (anyListChange)
             {
                 CourierManager.Observer.NotifyListUpdated();
             }
-        }
-        finally
-        {
 
             s_periodicMutex.UnsetInProgress();
         }

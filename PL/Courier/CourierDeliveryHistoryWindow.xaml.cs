@@ -1,6 +1,7 @@
 ﻿using PL.Helpers;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace PL;
 
@@ -66,42 +67,50 @@ public partial class CourierDeliveryHistoryWindow : Window
     }
 
     private readonly ObserverMutex _Mutex = new(); //stage 7
-    private void OrderObserver()
+    private async void OrderObserver()
     {
-        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
             return;
 
-        Dispatcher.BeginInvoke(async () =>
+        try
         {
-            try
-            {
+            var newList = await s_bl.Delivery.GetClosed(MANAGER_ID, UserId, null, null)
+                          ?? throw new BO.BlDoesNotExistException($"The list for id: {UserId} does not exist");
 
-                var newList = await s_bl.Delivery.GetClosed(MANAGER_ID, UserId, null, null)
-                               ?? throw new BO.BlDoesNotExistException($"The list for id: {UserId} does not exist");
+            // 2. עדכון ה-UI במקרה של הצלחה
+            Application.Current.Dispatcher.Invoke(() =>
+            {
                 if (DeliveriesHistory == null)
                 {
                     DeliveriesHistory = new ObservableCollection<BO.ClosedDeliveryInList>(newList);
                 }
                 else
                 {
-                    DeliveriesHistory.Clear(); // מחיקת הישנים
+                    DeliveriesHistory.Clear();
                     foreach (var item in newList)
                     {
-                        DeliveriesHistory.Add(item); // הוספת החדשים
+                        DeliveriesHistory.Add(item);
                     }
                 }
-            }
-            catch (BO.BlDoesNotExistException ex)
+            });
+        }
+        catch (Exception ex) 
+        {
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}");
-            }
-            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())//אם מישהו ביקש ריסטארט בזמן שהריצה הייתה בעיצומה
-                OrderObserver();
-        });
-    }
+                string msg = (ex is BO.BlDoesNotExistException) ?
+                             $"שגיאה בטעינת הנתונים: {ex.Message}" :
+                             $"שגיאה כללית: {ex.Message}";
 
+                MessageBox.Show(msg, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+            });
+        }
+        finally
+        {
+            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+            {
+                OrderObserver();
+            }
+        }
+    }
 }

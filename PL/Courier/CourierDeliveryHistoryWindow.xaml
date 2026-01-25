@@ -35,8 +35,8 @@
                     </DataGridTextColumn>
                 <DataGridTextColumn Header="כתובת יעד" Binding="{Binding Address}" Width="*"/>
                 <DataGridTextColumn Header="רכב" Binding="{Binding ShipmentType, Converter={StaticResource EnumDescriptionConverter}}" Width="Auto"/>
-                <DataGridTextColumn Header="מרחק בפועל" Binding="{Binding ActualDistens, StringFormat=N2}" Width="Auto"/>
-                <DataGridTextColumn Header="זמן ביצוע" Binding="{Binding DelyveryTime, Converter={StaticResource TimeSpanConverter}}" Width="Auto"/>
+                <DataGridTextColumn Header="מרחק בפועל" Binding="{Binding ActualDistance, StringFormat=N2}" Width="Auto"/>
+                <DataGridTextColumn Header="זמן ביצוע" Binding="{Binding DeliveryTime, Converter={StaticResource TimeSpanConverter}}" Width="Auto"/>
                 <DataGridTextColumn Header="סטטוס סיום" Binding="{Binding EndDelivery, Converter={StaticResource EnumDescriptionConverter}}" FontWeight="Bold" Width="Auto">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource WrappedTextCellStyle}">
