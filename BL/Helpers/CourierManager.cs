@@ -167,7 +167,23 @@ internal static class CourierManager
             WorkingSince = doCourier.WorkingSince,
             DeliveryOnTime = s_getDeliveryOnTimeCount(allDeliveries),
             DeliveryLate = s_getDeliveryLateCount(allDeliveries),
-            OrderInProgress = null
+            OrderInProgress = new OrderInProgress()
+            {
+                DeliveryId = -1,
+                OrderId = -1,
+                TypeOfOrder =BO.TypeOfOrder.STANDART,
+                Address = "",
+                Distance = 0,
+                CustomerName = "",
+                CustomerPhone = "",
+                OrderTime = DateTime.MinValue,
+                StartDeliveryTime = DateTime.MinValue,
+                EstimatedDeliveryTime = DateTime.MinValue,
+                MaxDeliveryTime = DateTime.MinValue,
+                OrderStatus = BO.OrderStatus.OPEN ,
+                ScheduleStatus = BO.ScheduleStatus.ONTYME ,
+                TimeRemaining = TimeSpan.Zero
+            }
         };
     }
 //###############################################################################################################עד כאן
