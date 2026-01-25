@@ -49,6 +49,7 @@
                    Foreground="White"
                    FontWeight="Bold"
                    FontSize="28"
+                   Language="he-IL"
                    Margin="10">
             <TextBlock.Effect>
                 <DropShadowEffect BlurRadius="5" ShadowDepth="0" Color="Black" Opacity="0.8"/>

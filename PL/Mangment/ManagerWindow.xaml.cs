@@ -258,7 +258,7 @@ namespace PL
 
                     if (newStats != null)
                     {
-                        Dispatcher.Invoke(() =>
+                        Application.Current.Dispatcher.Invoke(() =>
                         {
                             var template = InitialStatsTemplate;
                             CombinedStatistics = template.Zip(newStats, (item, count) =>
@@ -268,10 +268,7 @@ namespace PL
                             }).ToList();
                         });
                     }
-                    if (await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested())
-                    {
-                        StatisticObserver();
-                    }
+                   
                 }
                 catch (BlNoAccessException)
                 {
@@ -283,8 +280,8 @@ namespace PL
                 }
                 finally
                 {
-                    // במקרה של שגיאה אחרת, חשוב לשחרר את הנעילה
-                    await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested();
+                    if (await _statsMutex.UnsetLoadInProgressAndCheckRestartRequested())
+                        StatisticObserver();
                 }
             });
         }

@@ -39,10 +39,11 @@ internal static class DeliveryManager
     /// Note: The sort parameter is currently not utilized in the implementation.
     /// All deliveries are returned in their default order from the data access layer.
     /// </remarks>
-    internal static IEnumerable<DO.Delivery> ReadAll()
+    internal static IEnumerable<DO.Delivery> ReadAll(Func<DO.Delivery, bool>? customPredicate = null)
     {
+        Func<DO.Delivery, bool> filter = customPredicate ?? (_ => true);
         lock (AdminManager.BlMutex)
-            return s_dal.Delivery.ReadAll().ToList();
+            return s_dal.Delivery.ReadAll(filter).ToList();
     }
 
     /// <summary>
@@ -87,7 +88,7 @@ internal static class DeliveryManager
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         // Validate order status without expensive full conversion
-        BO.OrderStatus currentStatus = Tools.s_getOrderStatus(doOrder);
+        BO.OrderStatus currentStatus = Tools.GetOrderStatus(doOrder);
 
         if (currentStatus is not BO.OrderStatus.OPEN)
             throw new BO.BlInvalidOperationException("Order is not open for selection");
@@ -353,13 +354,10 @@ internal static class DeliveryManager
             EndDelivery = (DO.EndDelivery)endDelivery,
             TimeEndDelivery = AdminManager.Now
         };
-        lock (AdminManager.BlMutex)
+        lock (AdminManager.BlMutex) {
+            UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
             s_dal.Delivery.Update(delivery);
-
-        // Update order status based on delivery outcome
-        UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
-
-        // Notify all observers
+        }
         s_notifyDeliveryCompleted(deliveryId, delivery.OrderId, courierId);
     }
 

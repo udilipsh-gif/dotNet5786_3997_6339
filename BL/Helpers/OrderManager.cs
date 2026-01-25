@@ -1,5 +1,4 @@
-﻿using BO;
-using DalApi;
+﻿using DalApi;
 
 namespace Helpers;
 
@@ -92,19 +91,19 @@ internal static class OrderManager
     {
         s_validateOrderFields(boOrder);
 
-        var apiKey = AdminManager.GetConfig().GoogleApiKey;
-        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres, apiKey);
+        var config = AdminManager.GetConfig();
+
+        var addressCoordinates = await GoogleMapsService.GetGeocodingAsync(boOrder.Addres, config.GoogleApiKey);
 
         var distance = Tools.GetDistance(
             addressCoordinates?.Lat ?? 0,
             addressCoordinates?.Lng ?? 0,
-            s_dal.Config.Latitude ?? 0,
-            s_dal.Config.Longitude ?? 0);
+            config.Latitude ?? 0,
+            config.Longitude ?? 0);
 
-        lock (AdminManager.BlMutex)
-            if (distance == 0 || distance > s_dal.Config.MaxDeliveryRange)
-                throw new BO.BlInvalidOperationException(
-                    $"The distance {distance} KM exceeds the delivery range {s_dal.Config.MaxDeliveryRange} KM");
+        if (distance == 0 || distance > config.MaxDeliveryRange)
+            throw new BO.BlInvalidOperationException(
+                $"The distance {distance} KM exceeds the delivery range {config.MaxDeliveryRange} KM");
 
         DO.Order doOrder = new DO.Order
         {
@@ -125,7 +124,7 @@ internal static class OrderManager
             s_dal.Order.Create(doOrder);
         Observer.NotifyListUpdated();
 
-        s_sendEmilNewOrder(doOrder);
+        s_sendEmailNewOrder(doOrder);
     }
 
     /// <summary>
@@ -256,6 +255,9 @@ internal static class OrderManager
         BO.OrderInListField? orderBy = BO.OrderInListField.OrderId)
     {
         Dictionary<int, List<DO.Delivery>>? deliveriesMap;
+
+        List<DO.Order> allDoOrders;
+
         lock (AdminManager.BlMutex)
         {
             deliveriesMap = s_dal.Delivery.ReadAll()
@@ -263,19 +265,16 @@ internal static class OrderManager
                 .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).ToList());
         }
 
+        lock (AdminManager.BlMutex)
+            allDoOrders = s_dal.Order.ReadAll().ToList();
+
 
         Func<BO.OrderInList, bool> filter = customPredicate ?? (_ => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortSelector(orderBy);
 
-        IEnumerable<Task<BO.OrderInList>>? conversionTasks;////////////////////////////////////
-        lock (AdminManager.BlMutex)
-        {
-            conversionTasks = s_dal.Order.ReadAll().Select(async doOrder =>
-            {
-                return await s_convertToBoOrderOptimized(doOrder, deliveriesMap);
-            }).ToList();
-        }
-
+        var conversionTasks = allDoOrders.Select(doOrder =>
+            s_convertToBoOrderOptimized(doOrder, deliveriesMap)
+        );
 
         var allBoOrders = await Task.WhenAll(conversionTasks);
         var result = allBoOrders
@@ -400,24 +399,34 @@ internal static class OrderManager
     /// </returns>
     private static List<BO.DeliveryPerOrderInList>? s_createDeliveryPerOrderInList(int orderId)
     {
-        List<BO.DeliveryPerOrderInList> deliveries;
+        List<DO.Delivery> deliveries;
         lock (AdminManager.BlMutex)
-            deliveries = (from doDelivery in s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
-                          let courier = s_dal.Courier.Read(doDelivery.CourierId)
-                          select new BO.DeliveryPerOrderInList
-                          {
-                              DeliveryId = doDelivery.Id,
-                              CourierId = courier.Id,
-                              CourierName = courier.Name,
-                              TypeShipment = (BO.TheTypeShipment)courier.TypeShipment,
-                              OrderDate = doDelivery.OrderDate,
-                              EndDelivery = doDelivery.EndDelivery.HasValue
-                                  ? (BO.EndDelivery)doDelivery.EndDelivery.Value
-                                  : null,
-                              TimeEndDelivery = doDelivery.TimeEndDelivery
-                          }).ToList();
+            deliveries = s_dal.Delivery.ReadAll(d => d.OrderId == orderId).ToList();
 
-        return deliveries.Any() ? [.. deliveries] : null;
+        if (!deliveries.Any()) return null;
+
+        var courierIds = deliveries.Select(d => d.CourierId).Distinct();
+        Dictionary<int, DO.Courier> couriers;
+
+        lock (AdminManager.BlMutex)
+            couriers = s_dal.Courier.ReadAll(c => courierIds.Contains(c.Id))
+                           .ToDictionary(c => c.Id); // מילון לגישה מהירה
+
+        // 3. יצירת הרשימה בזיכרון
+        return deliveries.Select(d =>
+        {
+            var courier = couriers.GetValueOrDefault(d.CourierId);
+            return new BO.DeliveryPerOrderInList
+            {
+                DeliveryId = d.Id,
+                CourierId = d.CourierId,
+                CourierName = courier != null ? courier.Name : string.Empty, // טיפול ב-Null למקרה קיצון
+                TypeShipment = courier != null ? (BO.TheTypeShipment)courier.TypeShipment : BO.TheTypeShipment.FOOT,
+                OrderDate = d.OrderDate,
+                EndDelivery = d.EndDelivery.HasValue ? (BO.EndDelivery)d.EndDelivery : null,
+                TimeEndDelivery = d.TimeEndDelivery
+            };
+        }).ToList();
     }
 
     /// <summary>
@@ -449,9 +458,6 @@ internal static class OrderManager
     private static void s_cancelOpenOrder(DO.Order doOrder)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
-        lock (AdminManager.BlMutex)
-            s_dal.Order.Update(doOrder);
-        Observer.NotifyItemUpdated(doOrder.Id);
 
         DO.Delivery delivery = new DO.Delivery
         {
@@ -464,8 +470,12 @@ internal static class OrderManager
             TimeEndDelivery = AdminManager.Now,
             ActualDistance = 0
         };
-        lock (AdminManager.BlMutex)
+        lock (AdminManager.BlMutex) { 
+            s_dal.Order.Update(doOrder);
             s_dal.Delivery.Create(delivery);
+        }
+
+        Observer.NotifyItemUpdated(doOrder.Id);
     }
 
     /// <summary>
@@ -479,23 +489,23 @@ internal static class OrderManager
     private static async Task s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool token)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
-        lock (AdminManager.BlMutex)
-            s_dal.Order.Update(doOrder);
-        Observer.NotifyItemUpdated(doOrder.Id);
+ 
 
         DO.Delivery? delivery;
         lock (AdminManager.BlMutex)
-            delivery = (from d in s_dal.Delivery.ReadAll()
-                        where d.OrderId == doOrder.Id
+            delivery = (from d in s_dal.Delivery.ReadAll(d => d.OrderId == doOrder.Id)
                         orderby d.Id descending
                         select d).FirstOrDefault()
                ?? throw new BO.BlDoesNotExistException("לא נמצא משלוח עבור הזמנה זו");
         lock (AdminManager.BlMutex)
+        {
             s_dal.Delivery.Update(delivery with
             {
                 EndDelivery = DO.EndDelivery.CONCELLED,
                 TimeEndDelivery = AdminManager.Now
             });
+            s_dal.Order.Update(doOrder);
+        }
 
         DO.Courier? courier;
         lock (AdminManager.BlMutex)
@@ -513,9 +523,9 @@ internal static class OrderManager
 
         }
 
-        catch (BLNoSendEmailException ex)
+        catch (BO.BLNoSendEmailException ex)
         {
-            exceptionMail = new BLNoSendEmailException($"Failed to send email notification {ex.Message}");
+            exceptionMail = new BO.BLNoSendEmailException($"Failed to send email notification {ex.Message}");
         }
 
         try
@@ -528,26 +538,26 @@ internal static class OrderManager
                       $"הזמנה מספר {orderId} בוטלה על ידי המנהל");
             }
         }
-        catch (BLNoSendSmsException)
+        catch (BO.BLNoSendSmsException)
         {
-            exceptionSms = new BLNoSendSmsException("Failed to send sms notification");
+            exceptionSms = new BO.BLNoSendSmsException("Failed to send sms notification");
         }
         try
         {
             if (exceptionMail is not null && exceptionSms is not null)
-                throw new BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
+                throw new BO.BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
         }
 
         finally
         {
-            DeliveryManager.Observer.NotifyItemUpdated(delivery.Id);
             CourierManager.Observer.NotifyItemUpdated(delivery.CourierId);
+            CourierManager.Observer.NotifyListUpdated();
             Observer.NotifyItemUpdated(orderId);
             Observer.NotifyListUpdated();
         }
     }
 
-    private static async void s_sendEmilNewOrder(DO.Order doOrder)
+    private static async void s_sendEmailNewOrder(DO.Order doOrder)
     {
 
         Dictionary<int, int> deliveriesMap;
@@ -574,42 +584,30 @@ internal static class OrderManager
         {
             foreach (var courier in list_courier)
             {
-                await Tools.SendEmailSkript(courier.Email, "נכנסה הזמנה מתאימה עבורך ",
+                await GoogleMapsService.NetworkKeeper<object?>(async () =>
+                {
+                    await Tools.SendEmailSkript(courier.Email, "נכנסה הזמנה מתאימה עבורך ",
+          $@"
+          <div style='font-family:Lucida Sans Unicode; direction:rtl'>
+          <h2>📦 איזה כיף! ראינו שיש הזמנה חדשה שמתאימה לך!</h2>
+          <b>שלום {courier.Name} היקר!!!</b><br><br>
 
-
-                    $@"
-                    <div style='font-family:Lucida Sans Unicode; direction:rtl'>
-                    <h2>📦 איזה כיף! ראינו שיש הזמנה חדשה שמתאימה לך!</h2>
-                    <b>שלום {courier.Name} היקר!!!</b><br><br>
-
-                    <table style='border-collapse:collapse'>
-                    <tr><td><b>מספר הזמנה:</b></td><td>{doOrder.Id}</td></tr>
-                    <tr><td><b>שם:</b></td><td>{doOrder.Name}</td></tr>
-                    <tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
-                    <tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
-                    <tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
-                    <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}{emoje}</td></tr>
-                    <tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
-                    <tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
-                    </table>
-                    </div>
-                    "
-
-
-                //courier.Email,
-                //"הזמנה חדשה זמינה למשלוח",
-                //$"שלום {courier.Name},\n" +
-                //$"הזמנה חדשה זמינה למשלוח:\n" +
-                //// $"מספר הזמנה: {doOrder.Id}\n" +
-                //$"שם: {doOrder.Name}\n" +
-                //$"כתובת: {doOrder.Addres}\n" +
-                //$"טלפון: {doOrder.Phone}\n" +
-                //$"פרטים: {doOrder.Details}\n" +
-                //$"סוג משלוח: {doOrder.TypeOfOrder}\n" +
-                //$"משקל: {doOrder.Weight} ק\"ג\n" +
-                //$"תאריך הזמנה: {doOrder.OrderDate}\n"
+          <table style='border-collapse:collapse'>
+          <tr><td><b>מספר הזמנה:</b></td><td>{doOrder.Id}</td></tr>
+          <tr><td><b>שם:</b></td><td>{doOrder.Name}</td></tr>
+          <tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
+          <tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
+          <tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
+          <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}{emoje}</td></tr>
+          <tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
+          <tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
+          </table>
+          </div>
+          "
+                    );
+                    return null;
+                }
                 );
-                await Task.Delay(100);
             }
         }
         catch
@@ -680,37 +678,38 @@ internal static class OrderManager
         };
     }
 
-    public static void UpdateDistanceForOrders()
+    public static Task UpdateDistanceForOrders()
     {
-        List<DO.Order> allOrders;
-
-        lock (AdminManager.BlMutex)
-            allOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN).ToList();
-
-        var config = AdminManager.GetConfig();
-
-        foreach(var order in allOrders)
+        return Task.Run(() =>
         {
-            try
+            List<DO.Order> allOrders;
+
+            lock (AdminManager.BlMutex)
+                allOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN).ToList();
+
+            var config = AdminManager.GetConfig();
+
+            foreach (var order in allOrders)
             {
-                if (config.Latitude is double storeLat && config.Longitude is double storeLon)
+                try
                 {
-                    double newDistance = Tools.GetDistance(storeLat, storeLon,
-                        order.Latitude, order.Longitude);
+                    if (config.Latitude is double storeLat && config.Longitude is double storeLon)
+                    {
+                        double newDistance = Tools.GetDistance(storeLat, storeLon,
+                            order.Latitude, order.Longitude);
 
-                    lock (AdminManager.BlMutex)
-                        s_dal.Order.Update(order with { DistanceKm = newDistance});
+                        lock (AdminManager.BlMutex)
+                            s_dal.Order.Update(order with { DistanceKm = newDistance });
 
+                    }
+                    else
+                        throw new BO.BlDoesNotExistException("כתובת חנות לא מעודכנת");
                 }
-                else
-                    throw new BO.BlDoesNotExistException("כתובת חנות לא מעודכנת");
+                catch { }
+
             }
-            catch { }
-
-        };
-
-        Observer.NotifyListUpdated();
+            Observer.NotifyListUpdated();
+        });
     }
-
 }
 

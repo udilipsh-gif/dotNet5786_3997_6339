@@ -40,7 +40,7 @@ public interface ICourier : IObservable
     /// <returns>A <see cref="BO.Courier"/> instance if found.</returns>
     /// <exception cref="BO.BlNoAccessException">Thrown when the requester is not a manager.</exception>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier does not exist.</exception>
-    Task<BO.Courier?> Read(int id, int courierId);
+    IAsyncEnumerable<BO.Courier?> Read(int id, int courierId);
 
     BO.Courier? Read(int id, int courierId, string light);
 
