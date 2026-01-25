@@ -101,10 +101,9 @@ internal static class OrderManager
             config.Latitude ?? 0,
             config.Longitude ?? 0);
 
-        lock (AdminManager.BlMutex)
-            if (distance == 0 || distance > s_dal.Config.MaxDeliveryRange)
-                throw new BO.BlInvalidOperationException(
-                    $"The distance {distance} KM exceeds the delivery range {s_dal.Config.MaxDeliveryRange} KM");
+        if (distance == 0 || distance > config.MaxDeliveryRange)
+            throw new BO.BlInvalidOperationException(
+                $"The distance {distance} KM exceeds the delivery range {config.MaxDeliveryRange} KM");
 
         DO.Order doOrder = new DO.Order
         {
@@ -125,7 +124,7 @@ internal static class OrderManager
             s_dal.Order.Create(doOrder);
         Observer.NotifyListUpdated();
 
-        s_sendEmilNewOrder(doOrder);
+        _ = s_sendEmailNewOrder(doOrder);
     }
 
     /// <summary>
@@ -495,8 +494,7 @@ internal static class OrderManager
 
         DO.Delivery? delivery;
         lock (AdminManager.BlMutex)
-            delivery = (from d in s_dal.Delivery.ReadAll()
-                        where d.OrderId == doOrder.Id
+            delivery = (from d in s_dal.Delivery.ReadAll(d => d.OrderId == doOrder.Id)
                         orderby d.Id descending
                         select d).FirstOrDefault()
                ?? throw new BO.BlDoesNotExistException("לא נמצא משלוח עבור הזמנה זו");
@@ -557,7 +555,7 @@ internal static class OrderManager
         }
     }
 
-    private static async void s_sendEmilNewOrder(DO.Order doOrder)
+    private static async Task s_sendEmailNewOrder(DO.Order doOrder)
     {
 
         Dictionary<int, int> deliveriesMap;
@@ -584,42 +582,30 @@ internal static class OrderManager
         {
             foreach (var courier in list_courier)
             {
-                await Tools.SendEmailSkript(courier.Email, "נכנסה הזמנה מתאימה עבורך ",
+                await GoogleMapsService.NetworkKeeper<object?>(async () =>
+                {
+                    await Tools.SendEmailSkript(courier.Email, "נכנסה הזמנה מתאימה עבורך ",
+          $@"
+          <div style='font-family:Lucida Sans Unicode; direction:rtl'>
+          <h2>📦 איזה כיף! ראינו שיש הזמנה חדשה שמתאימה לך!</h2>
+          <b>שלום {courier.Name} היקר!!!</b><br><br>
 
-
-                    $@"
-                    <div style='font-family:Lucida Sans Unicode; direction:rtl'>
-                    <h2>📦 איזה כיף! ראינו שיש הזמנה חדשה שמתאימה לך!</h2>
-                    <b>שלום {courier.Name} היקר!!!</b><br><br>
-
-                    <table style='border-collapse:collapse'>
-                    <tr><td><b>מספר הזמנה:</b></td><td>{doOrder.Id}</td></tr>
-                    <tr><td><b>שם:</b></td><td>{doOrder.Name}</td></tr>
-                    <tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
-                    <tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
-                    <tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
-                    <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}{emoje}</td></tr>
-                    <tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
-                    <tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
-                    </table>
-                    </div>
-                    "
-
-
-                //courier.Email,
-                //"הזמנה חדשה זמינה למשלוח",
-                //$"שלום {courier.Name},\n" +
-                //$"הזמנה חדשה זמינה למשלוח:\n" +
-                //// $"מספר הזמנה: {doOrder.Id}\n" +
-                //$"שם: {doOrder.Name}\n" +
-                //$"כתובת: {doOrder.Addres}\n" +
-                //$"טלפון: {doOrder.Phone}\n" +
-                //$"פרטים: {doOrder.Details}\n" +
-                //$"סוג משלוח: {doOrder.TypeOfOrder}\n" +
-                //$"משקל: {doOrder.Weight} ק\"ג\n" +
-                //$"תאריך הזמנה: {doOrder.OrderDate}\n"
+          <table style='border-collapse:collapse'>
+          <tr><td><b>מספר הזמנה:</b></td><td>{doOrder.Id}</td></tr>
+          <tr><td><b>שם:</b></td><td>{doOrder.Name}</td></tr>
+          <tr><td><b>כתובת:</b></td><td>{doOrder.Addres}</td></tr>
+          <tr><td><b>טלפון:</b></td><td>{doOrder.Phone}</td></tr>
+          <tr><td><b>פרטים:</b></td><td>{doOrder.Details}</td></tr>
+          <tr><td><b>סוג משלוח:</b></td><td>{typeOfOrderebrew}{emoje}</td></tr>
+          <tr><td><b>משקל:</b></td><td>{doOrder.Weight}</td></tr>
+          <tr><td><b>תאריך הזמנה:</b></td><td>{doOrder.OrderDate:dd/MM/yyyy HH:mm}</td></tr>
+          </table>
+          </div>
+          "
+                    );
+                    return null;
+                }
                 );
-                await Task.Delay(100);
             }
         }
         catch
@@ -690,38 +676,38 @@ internal static class OrderManager
         };
     }
 
-    public static void UpdateDistanceForOrders()
+    public static Task UpdateDistanceForOrders()
     {
-        List<DO.Order> allOrders;
-
-        lock (AdminManager.BlMutex)
-            allOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN).ToList();
-
-        var config = AdminManager.GetConfig();
-
-        foreach (var order in allOrders)
+        return Task.Run(() =>
         {
-            try
+            List<DO.Order> allOrders;
+
+            lock (AdminManager.BlMutex)
+                allOrders = s_dal.Order.ReadAll(o => o.OrderStatus == DO.OrderStatus.OPEN).ToList();
+
+            var config = AdminManager.GetConfig();
+
+            foreach (var order in allOrders)
             {
-                if (config.Latitude is double storeLat && config.Longitude is double storeLon)
+                try
                 {
-                    double newDistance = Tools.GetDistance(storeLat, storeLon,
-                        order.Latitude, order.Longitude);
+                    if (config.Latitude is double storeLat && config.Longitude is double storeLon)
+                    {
+                        double newDistance = Tools.GetDistance(storeLat, storeLon,
+                            order.Latitude, order.Longitude);
 
-                    lock (AdminManager.BlMutex)
-                        s_dal.Order.Update(order with { DistanceKm = newDistance });
+                        lock (AdminManager.BlMutex)
+                            s_dal.Order.Update(order with { DistanceKm = newDistance });
 
+                    }
+                    else
+                        throw new BO.BlDoesNotExistException("כתובת חנות לא מעודכנת");
                 }
-                else
-                    throw new BO.BlDoesNotExistException("כתובת חנות לא מעודכנת");
+                catch { }
+
             }
-            catch { }
-
-        }
-        ;
-
-        Observer.NotifyListUpdated();
+            Observer.NotifyListUpdated();
+        });
     }
-
 }
 

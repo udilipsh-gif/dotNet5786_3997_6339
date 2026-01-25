@@ -645,6 +645,8 @@ internal static class Tools
             throw new BLNoSendEmailException($"{ex.Message}");
             //Console.WriteLine($"Exception in SendEmail: {ex.Message}");
         }
+
+        return;
     }
 
     public static async Task SendSms(string phone, string name, string body)
