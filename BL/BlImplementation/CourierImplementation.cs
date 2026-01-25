@@ -50,15 +50,15 @@ internal class CourierImplementation : ICourier
             yield return courier;
         }
     }
-    //#############################################################################################תוספת שלי לחישוב קל
-    public BO.Courier? Read(int requesterId, int courierId, string light)
-    {
-        if (!Tools.CheckManger(requesterId) && requesterId != courierId)
-            throw new BO.BlNoAccessException();
+    ////#############################################################################################תוספת שלי לחישוב קל
+    //public BO.Courier? Read(int requesterId, int courierId, string light)
+    //{
+    //    if (!Tools.CheckManger(requesterId) && requesterId != courierId)
+    //        throw new BO.BlNoAccessException();
 
-        return  CourierManager.Read(courierId, light);
-    }
-    //###############################################################################################
+    //    return  CourierManager.Read(courierId, light);
+    //}
+    ////###############################################################################################
 
     /// <summary>
     /// Updates an existing courier.

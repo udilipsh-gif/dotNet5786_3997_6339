@@ -130,9 +130,7 @@ public partial class MainCourier : Window
         {
             // שחרור הנעילה ובדיקה אם צריך להריץ שוב
             if (windowIsOpen && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
-            {
-                GetCurier();
-            }
+                 GetCurier();
         }
 
     }
