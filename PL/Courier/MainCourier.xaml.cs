@@ -94,7 +94,11 @@ public partial class MainCourier : Window
             string light="light";
             var currentUser = s_bl.Courier.Read(USERID, USERID,light);
 
-            CurrentUser = currentUser;
+            Dispatcher.Invoke(() =>
+            {
+                CurrentUser = currentUser;
+            });
+            
 
 
             currentUser = await Task.Run(async () =>
@@ -104,12 +108,18 @@ public partial class MainCourier : Window
 
             if (currentUser == null) throw new BO.BlDoesNotExistException();
 
-            CurrentUser = currentUser;
+            Dispatcher.Invoke(() =>
+            {
+                CurrentUser = currentUser;
+           
+
+          
 
             if (CurrentUser.OrderInProgress is not null)
             {
                 IsOrderInProgress = true;
             }
+            });
         }
         catch (BO.BlDoesNotExistException)
         {
