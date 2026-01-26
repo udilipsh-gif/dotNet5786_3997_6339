@@ -1,65 +1,194 @@
 ﻿using PL.Helpers;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace PL;
 
 /// <summary>
-/// Interaction logic for MainCourier.xaml
+/// Main window for courier operations in the presentation layer.
+/// Provides courier profile management, delivery operations, and real-time updates.
 /// </summary>
-public partial class MainCourier : Window
+/// <remarks>
+/// This window implements INotifyPropertyChanged for data binding and uses the Observer pattern
+/// to receive real-time updates from the business logic layer about courier and delivery status changes.
+/// </remarks>
+public partial class MainCourier : Window, INotifyPropertyChanged
 {
+    #region Services & Constants
+    
+    /// <summary>
+    /// Business logic layer interface instance for accessing courier and delivery services.
+    /// </summary>
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
+    
+    /// <summary>
+    /// Current date and time from the system clock.
+    /// </summary>
+    private static DateTime CURRENT_DATE = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock());
+    
+    /// <summary>
+    /// The unique identifier of the logged-in courier user.
+    /// </summary>
     private readonly int USERID;
+    
+    /// <summary>
+    /// Mutex for managing concurrent observer callbacks and preventing race conditions.
+    /// </summary>
+    private readonly ObserverMutex _Mutex = new();
+    
+    #endregion
 
+    #region INotifyPropertyChanged Implementation
+    
+    /// <summary>
+    /// Occurs when a property value changes.
+    /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Raises the PropertyChanged event for the specified property.
+    /// </summary>
+    /// <param name="propertyName">The name of the property that changed. If omitted, uses the caller member name.</param>
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Backing field for the CurrentCourier property.
+    /// </summary>
+    private BO.Courier? _currentCourier;
+    
+    /// <summary>
+    /// Gets or sets the current courier entity being displayed and managed.
+    /// </summary>
+    /// <value>
+    /// The courier object containing all courier information including personal details,
+    /// delivery statistics, and current order information.
+    /// </value>
+    public BO.Courier? CurrentCourier
+    {
+        get => _currentCourier;
+        set
+        {
+            if (_currentCourier != value)
+            {
+                _currentCourier = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Backing field for the IsEditMode property.
+    /// </summary>
+    private bool _IsEditMode = false;
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the window is in edit mode.
+    /// </summary>
+    /// <value>
+    /// <c>true</c> if the courier details can be edited; otherwise, <c>false</c>.
+    /// </value>
+    public bool IsEditMode
+    {
+        get => _IsEditMode;
+        set
+        {
+            if (_IsEditMode != value)
+            {
+                _IsEditMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Backing field for the IsOrderInProgress property.
+    /// </summary>
+    private bool _IsOrderInProgress = false;
+    
+    /// <summary>
+    /// Gets or sets a value indicating whether the courier has an active order in progress.
+    /// </summary>
+    /// <value>
+    /// <c>true</c> if an order is currently being delivered; otherwise, <c>false</c>.
+    /// </value>
+    public bool IsOrderInProgress
+    {
+        get => _IsOrderInProgress;
+        set
+        {
+            if (_IsOrderInProgress != value)
+            {
+                _IsOrderInProgress = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Backing field for the DisplayTimeRemaining property.
+    /// </summary>
+    private TimeSpan? _displayTimeRemaining;
+    
+    /// <summary>
+    /// Gets or sets the time remaining for the current delivery.
+    /// </summary>
+    /// <value>
+    /// A <see cref="TimeSpan"/> representing the time left to complete the delivery,
+    /// or <c>null</c> if no delivery is in progress.
+    /// </value>
+    public TimeSpan? DisplayTimeRemaining
+    {
+        get => _displayTimeRemaining;
+        set
+        {
+            if (_displayTimeRemaining != value)
+            {
+                _displayTimeRemaining = value;
+                OnPropertyChanged(); 
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the list of available vehicle types for courier selection.
+    /// </summary>
+    /// <value>
+    /// An enumerable collection of <see cref="BO.TheTypeShipment"/> values.
+    /// </value>
+    public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
+     Enum.GetValues(typeof(BO.TheTypeShipment)).Cast<BO.TheTypeShipment>();
+
+    #endregion
+
+    #region Constructor & Loading
+    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainCourier"/> class.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the courier user.</param>
     public MainCourier(int userId)
     {
         USERID = userId;
 
         InitializeComponent();
+
+        DataContext = this;
     }
 
     /// <summary>
-    /// List of all vehicle/shipment types for the ComboBox.
+    /// Handles the Loaded event of the MainCourier window.
+    /// Initializes the window state, loads courier data, and registers observers.
     /// </summary>
-    public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
-     Enum.GetValues(typeof(BO.TheTypeShipment)).Cast<BO.TheTypeShipment>();
-
-
-    public bool IsEditMode
-    {
-        get => (bool)GetValue(IsEditModeProperty);
-        set => SetValue(IsEditModeProperty, value);
-    }
-
-    public static readonly DependencyProperty IsEditModeProperty =
-        DependencyProperty.Register("IsEditMode", typeof(bool),
-        typeof(MainCourier), new PropertyMetadata(false));
-
-    public BO.Courier? CurrentUser
-    {
-        get => (BO.Courier?)GetValue(CurrentUserProperty);
-        set => SetValue(CurrentUserProperty, value);
-    }
-
-    /// <summary>
-    /// Dependency property for the CurrentCourier object.
-    /// </summary>
-    public static readonly DependencyProperty CurrentUserProperty =
-        DependencyProperty.Register("CurrentUser", typeof(BO.Courier),
-            typeof(MainCourier), new PropertyMetadata(null));
-
-    public bool IsOrderInProgress
-    {
-        get => (bool)GetValue(IsOrderInProgressProperty);
-        set => SetValue(IsOrderInProgressProperty, value);
-    }
-
-    public static readonly DependencyProperty IsOrderInProgressProperty =
-        DependencyProperty.Register("IsOrderInProgress", typeof(bool),
-            typeof(MainCourier), new PropertyMetadata(false));
-
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
     private void MainCourier_Loaded(object sender, RoutedEventArgs e)
     {
         IsOrderInProgress = false;
@@ -69,6 +198,12 @@ public partial class MainCourier : Window
         Tools.RunSafe(() => s_bl.Admin.AddClockObserver(GetCurier));
     }
 
+    /// <summary>
+    /// Handles the Closed event of the MainCourier window.
+    /// Unregisters observers and cleans up resources.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void MainCourier_Closed(object sender, EventArgs e)
     {
         Tools.ResetRequested -= () => this.Close();
@@ -76,90 +211,34 @@ public partial class MainCourier : Window
         {
             Tools.RunSafe(() => s_bl.Courier.RemoveObserver(USERID, GetCurier));
             Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(GetCurier));
-
         }
     }
 
+    #endregion
 
-    private readonly ObserverMutex _Mutex = new(); //stage 7
-    private async void GetCurier()
-    {
-        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
-            return;
+    #region CRUD Operations
 
-        bool windowIsOpen = true;
-
-        await Dispatcher.Invoke(async () =>
-        {
-
-
-            try
-            {
-                // שימוש ב-Streaming: קבלת הנתונים בזרם
-                await foreach (var courierState in s_bl.Courier.Read(USERID, USERID))
-                {
-                    // עדכון ה-UI
-                    // מכיוון שאנחנו ב-async void שנקרא מה-UI, אין צורך ב-Dispatcher בדרך כלל,
-                    // אבל ליתר ביטחון נשתמש בגישה ישירה כי אנחנו בקונטקסט הנכון.
-
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        CurrentUser = null;
-                        CurrentUser = courierState;
-
-
-                        // עדכון דגלים לתצוגה
-                        if (CurrentUser?.OrderInProgress is not null)
-                        {
-                            IsOrderInProgress = true;
-
-                            // טריק קטן: אם זה העדכון השני (המלא), 
-                            // לפעמים צריך לרענן את ה-Binding אם זה אותו מופע אובייקט בזיכרון.
-                            // אבל כאן יצרנו אובייקט אחד והוספנו לו שדה, אז SetValue יקפיץ את ה-UI.
-                        }
-                        else
-                        {
-                            IsOrderInProgress = false;
-                        }
-                    });
-                }
-            ;
-            }
-            catch (BO.BlDoesNotExistException)
-            {
-                windowIsOpen = false;
-                MessageBox.Show("שליח לא קיים", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-                Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                // שחרור הנעילה ובדיקה אם צריך להריץ שוב
-                if (windowIsOpen && await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
-                    GetCurier();
-            }
-        });
-
-    }
-
-
+    /// <summary>
+    /// Handles the ReportDelivery button click event.
+    /// Opens a dialog to complete the current delivery with a status reason.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+    /// <remarks>
+    /// Validates that a delivery is in progress before allowing completion.
+    /// Opens a modal dialog for the courier to select the delivery completion status.
+    /// </remarks>
     private void ReportDelivery_Click(object sender, RoutedEventArgs e)
     {
-        if (CurrentUser?.OrderInProgress == null)
+        if (CurrentCourier?.OrderInProgress == null)
         {
             MessageBox.Show("אין משלוח פעיל לסיום", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        // פתיחת חלון בחירת סיבת סיום
         var selectionWindow = new CloseDeliveryWindow();
         selectionWindow.Owner = Window.GetWindow(this);
 
-        // הצגת החלון כ-Modal Dialog
         bool? result = selectionWindow.ShowDialog();
 
         if (result == true && selectionWindow.IsConfirmed)
@@ -170,10 +249,9 @@ public partial class MainCourier : Window
             {
                 if (selectedReason is BO.EndDelivery status)
                 {
-                    s_bl.Delivery.Deliver(USERID, USERID, CurrentUser.OrderInProgress.DeliveryId, status);
+                    s_bl.Delivery.Deliver(USERID, USERID, CurrentCourier.OrderInProgress.DeliveryId, status);
 
                     MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
-
                 }
                 else
                 {
@@ -184,18 +262,31 @@ public partial class MainCourier : Window
             {
                 MessageBox.Show($"שגיאה בסיום המשלוח: {ex.Message}", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         }
     }
 
+    /// <summary>
+    /// Handles the StartDelivery button click event.
+    /// Opens a window to select and start a new delivery based on the courier's vehicle type.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+    /// <remarks>
+    /// Validates that no delivery is currently in progress.
+    /// Determines allowed order types based on the courier's vehicle type:
+    /// - BIKE/FOOT: Standard orders only
+    /// - CAR: Standard and Fast Delivery orders
+    /// - MOTORCYCLE: All order types including immediate delivery
+    /// </remarks>
     private void StartDelivery_Click(object sender, RoutedEventArgs e)
     {
-        if (CurrentUser?.OrderInProgress != null)
+        if (CurrentCourier?.OrderInProgress != null)
         {
             MessageBox.Show("יש משלוח פעיל לסיום", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
-        IEnumerable<BO.TypeOfOrder> allowedTypes = CurrentUser!.TypeShipment switch
+        
+        IEnumerable<BO.TypeOfOrder> allowedTypes = CurrentCourier!.TypeShipment switch
         {
             BO.TheTypeShipment.BIKE or BO.TheTypeShipment.FOOT =>
                 new[] { BO.TypeOfOrder.STANDART },
@@ -211,17 +302,35 @@ public partial class MainCourier : Window
 
         var enumTypeOfOrder = Tools.GetEnumList(allowedTypes);
 
-        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, this, USERID, USERID, CurrentUser!.TypeShipment, enumTypeOfOrder);
+        Tools.OpenOrActivateWindow<StartDeliveryWindow>(window => window.UserId == USERID, this, USERID, USERID, CurrentCourier!.TypeShipment, enumTypeOfOrder);
     }
 
+    /// <summary>
+    /// Handles the CourierDeliveryHistory button click event.
+    /// Opens a window displaying the courier's complete delivery history.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
     private void CureierDeliveryHistory_Click(object sender, RoutedEventArgs e)
          => Tools.OpenOrActivateWindow<CourierDeliveryHistoryWindow>(window => window.UserId == USERID, this, USERID);
 
+    /// <summary>
+    /// Handles the EditCourier button click event.
+    /// Enables edit mode for modifying courier profile details.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
     private void EditCureier_Click(object sender, RoutedEventArgs e)
     {
         IsEditMode = true;
     }
 
+    /// <summary>
+    /// Handles the CloseCourierEdit button click event.
+    /// Exits edit mode and reloads the original courier data, discarding any unsaved changes.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
     private void CloseCureierEdit_Click(object sender, RoutedEventArgs e)
     {
         IsEditMode = false;
@@ -229,25 +338,28 @@ public partial class MainCourier : Window
     }
 
     /// <summary>
-    /// Handles the add/update button click event, validates and saves courier data.
+    /// Handles the SaveUpdate button click event.
+    /// Validates and saves the modified courier data to the business logic layer.
     /// </summary>
     /// <param name="sender">The source of the event.</param>
-    /// <param name="e">Event arguments.</param>
+    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
     /// <remarks>
-    /// Performs basic validation before submitting data to the business logic layer.
-    /// Creates a new courier if in add mode, updates existing courier if in update mode.
-    /// Closes the window upon successful operation.
+    /// Performs validation to ensure required fields are filled.
+    /// Updates the courier information through the business logic layer.
+    /// Exits edit mode upon successful save.
     /// </remarks>
+    /// <exception cref="BO.BlInvalidValueException">Thrown when courier data is invalid.</exception>
+    /// <exception cref="BO.BlAlreadyExistsException">Thrown when a conflict occurs with existing data.</exception>
     private void btnSaveUpdate_Click(object sender, RoutedEventArgs e)
     {
-        if (CurrentUser == null || string.IsNullOrEmpty(CurrentUser.Name))
+        if (CurrentCourier == null || string.IsNullOrEmpty(CurrentCourier.Name))
         {
             MessageBox.Show("Please enter a name");
             return;
         }
         try
         {
-            s_bl.Courier.Update(USERID, CurrentUser);
+            s_bl.Courier.Update(USERID, CurrentCourier);
             MessageBox.Show("הפרטים נשמרו בהצלחה!");
             IsEditMode = false;
         }
@@ -264,4 +376,83 @@ public partial class MainCourier : Window
             MessageBox.Show($"General error: {ex.Message}");
         }
     }
+
+    #endregion
+
+    #region Logic & Helpers
+    
+    /// <summary>
+    /// Asynchronously retrieves and updates the courier data from the business logic layer.
+    /// Implements the Observer pattern to receive real-time updates.
+    /// </summary>
+    /// <remarks>
+    /// This method runs on a background thread to avoid blocking the UI.
+    /// Uses the ObserverMutex to prevent concurrent updates and race conditions.
+    /// Automatically updates the UI through the Dispatcher when new data arrives.
+    /// Handles cases where the courier no longer exists by closing the window.
+    /// </remarks>
+    /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier with the specified ID does not exist.</exception>
+    private void GetCurier()
+    {
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
+            return;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                BO.Courier? freshCourier = null;
+
+                await foreach (var courier in s_bl.Courier.Read(USERID, USERID))
+                {
+                    freshCourier = null;
+
+                    freshCourier = courier
+                      ?? throw new BO.BlDoesNotExistException($"The Courier with id: {USERID} does not exist");
+
+                    if (CurrentCourier is null)
+                        await Dispatcher.BeginInvoke(() =>
+                        {
+                            CurrentCourier = courier;
+                            DisplayTimeRemaining = courier.OrderInProgress?.TimeRemaining;
+                        });
+                }
+
+                if (freshCourier == null)
+                    throw new BO.BlDoesNotExistException($"The Courier with id: {USERID} does not exist");
+
+                await Dispatcher.BeginInvoke(() =>
+                {
+                    if (CurrentCourier != freshCourier)
+                    {
+                        CurrentCourier = freshCourier;
+                        DisplayTimeRemaining = freshCourier.OrderInProgress?.TimeRemaining;
+                    }
+                    else
+                    {
+                        OnPropertyChanged(nameof(CurrentCourier));
+                        DisplayTimeRemaining = freshCourier.OrderInProgress?.TimeRemaining;
+                    }
+                });
+            }
+            catch (BO.BlDoesNotExistException)
+            {
+                await Dispatcher.BeginInvoke(() =>
+                {
+                    Close();
+                });
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.BeginInvoke(() => MessageBox.Show(ex.Message));
+            }
+            finally
+            {
+                if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    GetCurier();
+            }
+        });
+    }
+    
+    #endregion
 }

@@ -54,44 +54,44 @@
                                 </Grid.RowDefinitions>
 
                                 <Label Grid.Row="0" Grid.Column="0" Content="שם:"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentUser.Name}" 
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentCourier.Name}" 
                        Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                                 <Label Grid.Row="1" Grid.Column="0" Content="טלפון:"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentUser.Phone}" 
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentCourier.Phone}" 
                        Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                                 <Label Grid.Row="2" Grid.Column="0" Content="אימייל:"/>
-                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentUser.Email}" 
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentCourier.Email}" 
                        Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                                 <Label Grid.Row="3" Grid.Column="0" Content="סטטוס:"/>
                                 <TextBlock Grid.Row="3" Grid.Column="1" 
-                       Text="{Binding CurrentUser.Active, Converter={StaticResource BooleanToHebrewConverter}}"
+                       Text="{Binding CurrentCourier.Active, Converter={StaticResource BooleanToHebrewConverter}}"
                        Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                                 <Label Grid.Row="4" Grid.Column="0" Content="כלי רכב:"/>
-                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CurrentUser.TypeShipment, 
+                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CurrentCourier.TypeShipment, 
                        Converter={StaticResource EnumDescriptionConverter}}" 
                        Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                                 <Label Grid.Row="5" Grid.Column="0" Content="מרחק מקסימלי:"/>
                                 <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="5">
-                                    <TextBlock Text="{Binding CurrentUser.MaxDistanceDelivery}" 
+                                    <TextBlock Text="{Binding CurrentCourier.MaxDistanceDelivery}" 
                            Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
                                     <TextBlock Text=" KM" Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
                                 </StackPanel>
 
                                 <Label Grid.Row="6" Grid.Column="0" Content="התחיל לעבוד:"/>
                                 <TextBlock Grid.Row="6" Grid.Column="1" 
-                       Text="{Binding CurrentUser.WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" 
+                       Text="{Binding CurrentCourier.WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" 
                        Style="{StaticResource ModernTextBlock}" FontWeight="Normal"/>
 
                                 <Label Grid.Row="7" Grid.Column="0" Content="דירוג:" VerticalAlignment="Top"/>
                                 <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Margin="5">
-                                    <TextBlock Text="{Binding CurrentUser.DeliveryOnTime}" Foreground="Green" FontWeight="Bold" ToolTip="משלוחים בזמן"/>
+                                    <TextBlock Text="{Binding CurrentCourier.DeliveryOnTime}" Foreground="Green" FontWeight="Bold" ToolTip="משלוחים בזמן"/>
                                     <TextBlock Text=" / "/>
-                                    <TextBlock Text="{Binding CurrentUser.DeliveryLate}" Foreground="Red" FontWeight="Bold" ToolTip="משלוחים באיחור"/>
+                                    <TextBlock Text="{Binding CurrentCourier.DeliveryLate}" Foreground="Red" FontWeight="Bold" ToolTip="משלוחים באיחור"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
@@ -99,24 +99,24 @@
                         <!-- מצב עריכה -->
                         <StackPanel Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
                             <Label Content="שם:" Margin="0,2"/>
-                            <TextBox Text="{Binding CurrentUser.Name, Mode=TwoWay}" Margin="0,2"/>
+                            <TextBox Text="{Binding CurrentCourier.Name, Mode=TwoWay}" Margin="0,2"/>
 
                             <Label Content="תעודת זהות:" Margin="0,2"/>
-                            <TextBox Text="{Binding CurrentUser.Id}" Margin="0,2" IsReadOnly="True"/>
+                            <TextBox Text="{Binding CurrentCourier.Id}" Margin="0,2" IsReadOnly="True"/>
 
                             <Label Content="טלפון:" Margin="0,2"/>
-                            <TextBox Text="{Binding CurrentUser.Phone, Mode=TwoWay}" Margin="0,2" local:Tools.NumericOnly="True" MaxLength="10"/>
+                            <TextBox Text="{Binding CurrentCourier.Phone, Mode=TwoWay}" Margin="0,2" local:Tools.NumericOnly="True" MaxLength="10"/>
 
                             <Label Content="מייל:" Margin="0,2"/>
-                            <TextBox Text="{Binding CurrentUser.Email, Mode=TwoWay}" Margin="0,2"/>
+                            <TextBox Text="{Binding CurrentCourier.Email, Mode=TwoWay}" Margin="0,2"/>
 
                             <Label Content="סיסמה:" Margin="0,2"/>
-                            <TextBox Text="{Binding CurrentUser.Password, Mode=TwoWay}" Margin="0,2"/>
+                            <TextBox Text="{Binding CurrentCourier.Password, Mode=TwoWay}" Margin="0,2"/>
 
                             <Label Content="רכב:" Margin="0,2"/>
                             <ComboBox ItemsSource="{Binding VehicleTypesList}" 
                   Style="{StaticResource ModernComboBox}"
-                  SelectedItem="{Binding CurrentUser.TypeShipment, Mode=TwoWay}" Margin="0,2">
+                  SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}" Margin="0,2">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
@@ -125,7 +125,7 @@
                             </ComboBox>
 
                             <Label Content="מרחק מירבי למשלוח:" Margin="0,2"/>
-                            <TextBox Text="{Binding CurrentUser.MaxDistanceDelivery, Mode=TwoWay}" 
+                            <TextBox Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}" 
                  local:Tools.NumericOnly="True" MaxLength="3" Margin="0,2"/>
                         </StackPanel>
                         </StackPanel>
@@ -137,8 +137,8 @@
                         <StackPanel Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}">
                             <Button Content="יציאה למשלוח חדש" 
                                 Click="StartDelivery_Click" 
-                                Visibility="{Binding CurrentUser.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Invert}"
-                                IsEnabled="{Binding CurrentUser.Active}"
+                                Visibility="{Binding CurrentCourier.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Invert}"
+                                IsEnabled="{Binding CurrentCourier.Active}"
                                 Background="{StaticResource AccentColor}" Foreground="Black"/>
 
                             <Button Content="עריכת פרטים" Click="EditCureier_Click" Style="{StaticResource SecondaryButtonStyle}"/>
@@ -161,7 +161,7 @@
                     CornerRadius="8"
                     Padding="15"
                     Width="200"
-                    Visibility="{Binding CurrentUser.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}}">
+                    Visibility="{Binding CurrentCourier.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}}">
                         <!--משלוח פעיל-->
                 <Grid>
                     <Grid.RowDefinitions>
@@ -172,7 +172,7 @@
 
                     <TextBlock Text="📦 משלוח פעיל" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentColor}" HorizontalAlignment="Center" Margin="0,0,0,15"/>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="10">
-                        <ContentControl Content="{Binding CurrentUser.OrderInProgress}">
+                        <ContentControl Content="{Binding CurrentCourier.OrderInProgress}">
                             <ContentControl.ContentTemplate>
                                 <DataTemplate>
                                     <StackPanel>
@@ -205,7 +205,13 @@
                                         <TextBlock Text="{Binding StartDeliveryTime, StringFormat='יצא: {0:dd/MM HH:mm}'}"/>
                                         <TextBlock Text="{Binding EstimatedDeliveryTime, StringFormat='צפי: {0:dd/MM HH:mm}'}"/>
                                         <TextBlock Text="{Binding MaxDeliveryTime, StringFormat='התחייבות: {0:dd/MM HH:mm}'}"/>
-                                        <TextBlock Text="{Binding TimeRemaining, Converter={StaticResource TimeSpanConverter}, StringFormat='נותר: {0:dd\\:hh\\:mm}'}" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
+                                        <TextBlock Text="{Binding DisplayTimeRemaining, 
+                                                                  RelativeSource={RelativeSource AncestorType=Window}, 
+                                                                  Converter={StaticResource TimeSpanConverter}, 
+                                                                  StringFormat='נותר: {0:dd\\:hh\\:mm}'}" 
+                                                                           FontWeight="Bold" 
+                                                                           TextWrapping="Wrap" 
+                                                                           Foreground="{StaticResource PrimaryColor}"/>
                                         <TextBlock Text="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}, StringFormat='מצב הזמנה: {0}'}"
                                                                   Background="{Binding ScheduleStatusScheduleStatus, Converter={StaticResource StatusToColorConverter}}"/>
                                     </StackPanel>

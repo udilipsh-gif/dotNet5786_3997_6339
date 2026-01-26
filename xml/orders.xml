@@ -1,803 +1,803 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfOrder>
   <Order>
-    <Id>100022</Id>
+    <Id>100025</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 22</Details>
-    <Addres> הרב קוק 18, בני ברק</Addres>
-    <Latitude>32.0865247</Latitude>
-    <Longitude>34.8262516</Longitude>
-    <Name>Customer22</Name>
-    <Phone>0518143926</Phone>
-    <Weight>13</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>0.8481326745372985</DistanceKm>
-    <DistanceKmRoad>1.367</DistanceKmRoad>
-    <DistanceKmWalk>1.047</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100021</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 21</Details>
-    <Addres> דרך העצמאות 15, יהוד</Addres>
-    <Latitude>32.0283799</Latitude>
-    <Longitude>34.9558353</Longitude>
-    <Name>Customer21</Name>
-    <Phone>0542837354</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>14.472326860986904</DistanceKm>
-    <DistanceKmRoad>11.185</DistanceKmRoad>
-    <DistanceKmWalk>7.358</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100026</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 26</Details>
-    <Addres> דרך ההגנה 40, תל אביב</Addres>
-    <Latitude>32.0540338</Latitude>
-    <Longitude>34.7869603</Longitude>
-    <Name>Customer26</Name>
-    <Phone>0544826400</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>5.556261027862877</DistanceKm>
-    <DistanceKmRoad>9.038</DistanceKmRoad>
-    <DistanceKmWalk>6.506</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100049</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 49</Details>
-    <Addres> ז'בוטינסקי 55, רמת גן</Addres>
-    <Latitude>32.0854799</Latitude>
-    <Longitude>34.8101674</Longitude>
-    <Name>Customer49</Name>
-    <Phone>0515227895</Phone>
-    <Weight>2</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>1.506134049503399</DistanceKm>
-    <DistanceKmRoad>1.772</DistanceKmRoad>
-    <DistanceKmWalk>1.697</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100045</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 45</Details>
-    <Addres> אלוף שדה 15, רמת גן</Addres>
-    <Latitude>32.0594879</Latitude>
-    <Longitude>34.8249646</Longitude>
-    <Name>Customer45</Name>
-    <Phone>0514002688</Phone>
-    <Weight>4</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>3.8000219110957776</DistanceKm>
-    <DistanceKmRoad>4.698</DistanceKmRoad>
-    <DistanceKmWalk>4.569</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100029</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 29</Details>
-    <Addres> אוסישקין 50, רמת השרון</Addres>
-    <Latitude>32.1422739</Latitude>
-    <Longitude>34.8434807</Longitude>
-    <Name>Customer29</Name>
-    <Phone>0563666127</Phone>
-    <Weight>8</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>5.7453704967910735</DistanceKm>
-    <DistanceKmRoad>7.103</DistanceKmRoad>
-    <DistanceKmWalk>7.016</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100012</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 12</Details>
-    <Addres> הרצל 60, רמת גן</Addres>
-    <Latitude>32.0850858</Latitude>
-    <Longitude>34.8155354</Longitude>
-    <Name>Customer12</Name>
-    <Phone>0559769309</Phone>
-    <Weight>13</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>1.1780665716551981</DistanceKm>
-    <DistanceKmRoad>1.949</DistanceKmRoad>
-    <DistanceKmWalk>1.528</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100031</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 31</Details>
-    <Addres> פרישמן 10, תל אביב</Addres>
-    <Latitude>32.0798034</Latitude>
-    <Longitude>34.7688166</Longitude>
-    <Name>Customer31</Name>
-    <Phone>0516573405</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>5.325908949809462</DistanceKm>
-    <DistanceKmRoad>6.705</DistanceKmRoad>
-    <DistanceKmWalk>6.009</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100020</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 20</Details>
-    <Addres> יגאל אלון 60, תל אביב</Addres>
-    <Latitude>32.0619207</Latitude>
-    <Longitude>34.7927464</Longitude>
-    <Name>Customer20</Name>
-    <Phone>0571349081</Phone>
-    <Weight>9</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>4.5299101150789465</DistanceKm>
-    <DistanceKmRoad>8.326</DistanceKmRoad>
-    <DistanceKmWalk>5.292</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100011</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 11</Details>
-    <Addres> בלפור 40, בת ים</Addres>
-    <Latitude>32.0261767</Latitude>
-    <Longitude>34.7449781</Longitude>
-    <Name>Customer11</Name>
-    <Phone>0520826134</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>10.498811066950152</DistanceKm>
-    <DistanceKmRoad>14.614</DistanceKmRoad>
-    <DistanceKmWalk>11.734</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100002</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 2</Details>
+    <Details>Order details for order 25</Details>
     <Addres> גיסין 25, פתח תקווה</Addres>
     <Latitude>32.0976387</Latitude>
     <Longitude>34.8797159</Longitude>
-    <Name>Customer2</Name>
-    <Phone>0549426322</Phone>
-    <Weight>9</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
+    <Name>Customer25</Name>
+    <Phone>0513504690</Phone>
+    <Weight>8</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
     <DistanceKm>5.366347877267379</DistanceKm>
     <DistanceKmRoad>6.395</DistanceKmRoad>
     <DistanceKmWalk>5.893</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100041</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 41</Details>
-    <Addres> רוקח 10, רמת גן</Addres>
-    <Latitude>32.0876832</Latitude>
-    <Longitude>34.8111166</Longitude>
-    <Name>Customer41</Name>
-    <Phone>0590611338</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>1.2952401384992114</DistanceKm>
-    <DistanceKmRoad>2.103</DistanceKmRoad>
-    <DistanceKmWalk>1.626</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100008</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 8</Details>
-    <Addres> העצמאות 30, בת ים</Addres>
-    <Latitude>32.0231832</Latitude>
-    <Longitude>34.7465895</Longitude>
-    <Name>Customer8</Name>
-    <Phone>0535443835</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>10.635862115948113</DistanceKm>
-    <DistanceKmRoad>14.429</DistanceKmRoad>
-    <DistanceKmWalk>11.887</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100025</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 25</Details>
-    <Addres> הרב קוק 20, הרצליה</Addres>
-    <Latitude>32.161374</Latitude>
-    <Longitude>34.8408944</Longitude>
-    <Name>Customer25</Name>
-    <Phone>0536958588</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>7.721205943110178</DistanceKm>
-    <DistanceKmRoad>8.778</DistanceKmRoad>
-    <DistanceKmWalk>8.642</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100005</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 5</Details>
-    <Addres> ויצמן 20, גבעתיים</Addres>
-    <Latitude>32.0737141</Latitude>
-    <Longitude>34.8083944</Longitude>
-    <Name>Customer5</Name>
-    <Phone>0524340637</Phone>
-    <Weight>8</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>2.6035763676867902</DistanceKm>
-    <DistanceKmRoad>3.465</DistanceKmRoad>
-    <DistanceKmWalk>3.131</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100035</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 35</Details>
-    <Addres> אלנבי 80, תל אביב</Addres>
-    <Latitude>32.0678218</Latitude>
-    <Longitude>34.7710389</Longitude>
-    <Name>Customer35</Name>
-    <Phone>0532430854</Phone>
-    <Weight>7</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>5.66970382035033</DistanceKm>
-    <DistanceKmRoad>7.12</DistanceKmRoad>
-    <DistanceKmWalk>6.334</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100003</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 3</Details>
-    <Addres> אהרונוביץ' 12, בני ברק</Addres>
-    <Latitude>32.090832</Latitude>
-    <Longitude>34.8386345</Longitude>
-    <Name>Customer3</Name>
-    <Phone>0537174631</Phone>
-    <Weight>9</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>1.510039737793367</DistanceKm>
-    <DistanceKmRoad>2.02</DistanceKmRoad>
-    <DistanceKmWalk>1.982</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100018</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 18</Details>
-    <Addres> אליהו סעדון 20, אור יהודה</Addres>
-    <Latitude>32.0255384</Latitude>
-    <Longitude>34.8549182</Longitude>
-    <Name>Customer18</Name>
-    <Phone>0524159376</Phone>
-    <Weight>4</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>8.147814112086843</DistanceKm>
-    <DistanceKmRoad>12.238</DistanceKmRoad>
-    <DistanceKmWalk>9.905</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100028</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 28</Details>
-    <Addres> משה דיין 20, ראשון לציון</Addres>
-    <Latitude>32.0009662</Latitude>
-    <Longitude>34.7665794</Longitude>
-    <Name>Customer28</Name>
-    <Phone>0536470318</Phone>
-    <Weight>7</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>11.591659605647417</DistanceKm>
-    <DistanceKmRoad>16.891</DistanceKmRoad>
-    <DistanceKmWalk>13.088</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100004</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 4</Details>
-    <Addres> ארלוזורוב 90, תל אביב</Addres>
-    <Latitude>32.0854282</Latitude>
-    <Longitude>34.7806379</Longitude>
-    <Name>Customer4</Name>
-    <Phone>0533326848</Phone>
-    <Weight>2</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>4.088473329191639</DistanceKm>
-    <DistanceKmRoad>5.603</DistanceKmRoad>
-    <DistanceKmWalk>4.724</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100006</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 6</Details>
-    <Addres> דב הוז 30, חולון</Addres>
-    <Latitude>32.0236133</Latitude>
-    <Longitude>34.7667955</Longitude>
-    <Name>Customer6</Name>
-    <Phone>0519346351</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>9.412567365945739</DistanceKm>
-    <DistanceKmRoad>11.864</DistanceKmRoad>
-    <DistanceKmWalk>10.636</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100010</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 10</Details>
-    <Addres> לה גווארדיה 20, תל אביב</Addres>
-    <Latitude>32.059112</Latitude>
-    <Longitude>34.788742</Longitude>
-    <Name>Customer10</Name>
-    <Phone>0502399762</Phone>
-    <Weight>6</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>5.010889072759089</DistanceKm>
-    <DistanceKmRoad>7.291</DistanceKmRoad>
-    <DistanceKmWalk>5.82</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100050</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 50</Details>
-    <Addres> בוגרשוב 25, תל אביב</Addres>
-    <Latitude>32.0769875</Latitude>
-    <Longitude>34.7698549</Longitude>
-    <Name>Customer50</Name>
-    <Phone>0523140138</Phone>
-    <Weight>4</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>5.332738530082187</DistanceKm>
-    <DistanceKmRoad>10.607</DistanceKmRoad>
-    <DistanceKmWalk>5.951</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100027</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 27</Details>
-    <Addres> הרצל 60, ראשון לציון</Addres>
-    <Latitude>31.9656402</Latitude>
-    <Longitude>34.8025163</Longitude>
-    <Name>Customer27</Name>
-    <Phone>0595825177</Phone>
-    <Weight>1</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>14.36037775321585</DistanceKm>
-    <DistanceKmRoad>19.145</DistanceKmRoad>
-    <DistanceKmWalk>18.843</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100023</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 23</Details>
-    <Addres> נמיר 50, תל אביב</Addres>
-    <Latitude>32.0850486</Latitude>
-    <Longitude>34.7953535</Longitude>
-    <Name>Customer23</Name>
-    <Phone>0566673546</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>2.7686276574066593</DistanceKm>
-    <DistanceKmRoad>3.666</DistanceKmRoad>
-    <DistanceKmWalk>3.252</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100024</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 24</Details>
-    <Addres> בן גוריון 25, גבעת שמואל</Addres>
-    <Latitude>32.0952663</Latitude>
-    <Longitude>34.8220752</Longitude>
-    <Name>Customer24</Name>
-    <Phone>0590839164</Phone>
-    <Weight>6</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>0.2006615306842094</DistanceKm>
-    <DistanceKmRoad>0.421</DistanceKmRoad>
-    <DistanceKmWalk>0.308</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100014</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 14</Details>
-    <Addres> עין גנים 40, פתח תקווה</Addres>
-    <Latitude>32.086933</Latitude>
-    <Longitude>34.894794</Longitude>
-    <Name>Customer14</Name>
-    <Phone>0576082643</Phone>
-    <Weight>13</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>REFUSED</OrderStatus>
-    <DistanceKm>6.809175743870694</DistanceKm>
-    <DistanceKmRoad>8.738</DistanceKmRoad>
-    <DistanceKmWalk>7.412</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100040</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 40</Details>
-    <Addres> שנקר 20, חולון</Addres>
-    <Latitude>32.0261601</Latitude>
-    <Longitude>34.7765943</Longitude>
-    <Name>Customer40</Name>
-    <Phone>0553956955</Phone>
-    <Weight>7</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>8.68027695886047</DistanceKm>
-    <DistanceKmRoad>11.279</DistanceKmRoad>
-    <DistanceKmWalk>10.237</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100046</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 46</Details>
-    <Addres> לוי אשכול 15, ראשון לציון</Addres>
-    <Latitude>31.9754762</Latitude>
-    <Longitude>34.7770157</Longitude>
-    <Name>Customer46</Name>
-    <Phone>0575168470</Phone>
-    <Weight>1</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>13.831997592278265</DistanceKm>
-    <DistanceKmRoad>20.073</DistanceKmRoad>
-    <DistanceKmWalk>16.88</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100047</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 47</Details>
-    <Addres> שדרות ירושלים 30, רמת גן</Addres>
-    <Latitude>32.0847242</Latitude>
-    <Longitude>34.8297262</Longitude>
-    <Name>Customer47</Name>
-    <Phone>0524435723</Phone>
-    <Weight>1</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>1.1774111915412198</DistanceKm>
-    <DistanceKmRoad>1.349</DistanceKmRoad>
-    <DistanceKmWalk>1.335</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100032</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 32</Details>
-    <Addres> דרך השלום 40, גבעתיים</Addres>
-    <Latitude>32.0694025</Latitude>
-    <Longitude>34.8022553</Longitude>
-    <Name>Customer32</Name>
-    <Phone>0514522494</Phone>
-    <Weight>9</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>3.324358628056517</DistanceKm>
-    <DistanceKmRoad>4.712</DistanceKmRoad>
-    <DistanceKmWalk>4.245</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100007</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 7</Details>
-    <Addres> שטמפפר 15, פתח תקווה</Addres>
-    <Latitude>32.0901497</Latitude>
-    <Longitude>34.8855149</Longitude>
-    <Name>Customer7</Name>
-    <Phone>0589930023</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>5.906828246041569</DistanceKm>
-    <DistanceKmRoad>7.737</DistanceKmRoad>
-    <DistanceKmWalk>6.262</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100013</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 13</Details>
-    <Addres> המאבק 25, גבעתיים</Addres>
-    <Latitude>32.0638384</Latitude>
-    <Longitude>34.8099736</Longitude>
-    <Name>Customer13</Name>
-    <Phone>0548915661</Phone>
-    <Weight>14</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>3.5298712564942867</DistanceKm>
-    <DistanceKmRoad>4.389</DistanceKmRoad>
-    <DistanceKmWalk>4.217</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100038</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 38</Details>
     <Addres> קריניצי 20, רמת גן</Addres>
     <Latitude>32.0797548</Latitude>
     <Longitude>34.8172104</Longitude>
     <Name>Customer38</Name>
-    <Phone>0502813302</Phone>
-    <Weight>14</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
+    <Phone>0526362079</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
     <DistanceKm>1.633645092662819</DistanceKm>
     <DistanceKmRoad>1.907</DistanceKmRoad>
     <DistanceKmWalk>1.833</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100043</Id>
+    <Id>100022</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 22</Details>
+    <Addres> סוקולוב 40, הרצליה</Addres>
+    <Latitude>32.1669612</Latitude>
+    <Longitude>34.844759</Longitude>
+    <Name>Customer22</Name>
+    <Phone>0537927619</Phone>
+    <Weight>5</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>8.409906452960929</DistanceKm>
+    <DistanceKmRoad>16.277</DistanceKmRoad>
+    <DistanceKmWalk>9.419</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100014</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 14</Details>
+    <Addres> לה גווארדיה 20, תל אביב</Addres>
+    <Latitude>32.059112</Latitude>
+    <Longitude>34.788742</Longitude>
+    <Name>Customer14</Name>
+    <Phone>0522489758</Phone>
+    <Weight>1</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>5.010889072759089</DistanceKm>
+    <DistanceKmRoad>7.291</DistanceKmRoad>
+    <DistanceKmWalk>5.82</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100044</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 44</Details>
+    <Addres> ויצמן 10, יהוד</Addres>
+    <Latitude>32.0300273</Latitude>
+    <Longitude>34.8924598</Longitude>
+    <Name>Customer44</Name>
+    <Phone>0561192567</Phone>
+    <Weight>9</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>9.639050761004953</DistanceKm>
+    <DistanceKmRoad>18.607</DistanceKmRoad>
+    <DistanceKmWalk>11.744</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100012</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 12</Details>
+    <Addres> אבא הלל 15, רמת גן</Addres>
+    <Latitude>32.085569</Latitude>
+    <Longitude>34.803969</Longitude>
+    <Name>Customer12</Name>
+    <Phone>0529543180</Phone>
+    <Weight>12</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>1.9993763015851111</DistanceKm>
+    <DistanceKmRoad>2.578</DistanceKmRoad>
+    <DistanceKmWalk>2.267</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100046</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 46</Details>
+    <Addres> בן גוריון 25, גבעת שמואל</Addres>
+    <Latitude>32.0952663</Latitude>
+    <Longitude>34.8220752</Longitude>
+    <Name>Customer46</Name>
+    <Phone>0584868056</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>0.2006615306842094</DistanceKm>
+    <DistanceKmRoad>0.421</DistanceKmRoad>
+    <DistanceKmWalk>0.308</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100043</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 43</Details>
-    <Addres> יוספטל 60, בת ים</Addres>
-    <Latitude>32.0165585</Latitude>
-    <Longitude>34.7464493</Longitude>
-    <Name>Customer43</Name>
-    <Phone>0504044349</Phone>
-    <Weight>10</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>11.198085748433718</DistanceKm>
-    <DistanceKmRoad>16.092</DistanceKmRoad>
-    <DistanceKmWalk>12.857</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100019</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 19</Details>
-    <Addres> ירושלים 15, בני ברק</Addres>
-    <Latitude>32.0857512</Latitude>
-    <Longitude>34.8300664</Longitude>
-    <Name>Customer19</Name>
-    <Phone>0564743758</Phone>
-    <Weight>6</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>1.102448617211477</DistanceKm>
-    <DistanceKmRoad>1.231</DistanceKmRoad>
-    <DistanceKmWalk>1.217</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100030</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 30</Details>
-    <Addres> הירקון 5, בני ברק</Addres>
-    <Latitude>32.0965116</Latitude>
-    <Longitude>34.822183</Longitude>
-    <Name>Customer30</Name>
-    <Phone>0551247369</Phone>
-    <Weight>2</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>0.3295272429014937</DistanceKm>
-    <DistanceKmRoad>0.327</DistanceKmRoad>
-    <DistanceKmWalk>0.437</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100042</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 42</Details>
     <Addres> רוטשילד 20, בת ים</Addres>
     <Latitude>32.026609</Latitude>
     <Longitude>34.7454099</Longitude>
-    <Name>Customer42</Name>
-    <Phone>0505898581</Phone>
-    <Weight>8</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
+    <Name>Customer43</Name>
+    <Phone>0530485788</Phone>
+    <Weight>14</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
     <DistanceKm>10.435986358040557</DistanceKm>
     <DistanceKmRoad>14.696</DistanceKmRoad>
     <DistanceKmWalk>11.652</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100048</Id>
+    <Id>100017</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 17</Details>
+    <Addres> נגבה 25, רמת גן</Addres>
+    <Latitude>32.070547</Latitude>
+    <Longitude>34.8249663</Longitude>
+    <Name>Customer17</Name>
+    <Phone>0517784731</Phone>
+    <Weight>13</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>2.5725939690841426</DistanceKm>
+    <DistanceKmRoad>3.026</DistanceKmRoad>
+    <DistanceKmWalk>2.884</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100024</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 24</Details>
+    <Addres> המאבק 25, גבעתיים</Addres>
+    <Latitude>32.0638384</Latitude>
+    <Longitude>34.8099736</Longitude>
+    <Name>Customer24</Name>
+    <Phone>0561531812</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>3.5298712564942867</DistanceKm>
+    <DistanceKmRoad>4.389</DistanceKmRoad>
+    <DistanceKmWalk>4.217</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100041</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 41</Details>
+    <Addres> הופיין 25, חולון</Addres>
+    <Latitude>32.0141212</Latitude>
+    <Longitude>34.7685729</Longitude>
+    <Name>Customer41</Name>
+    <Phone>0535378538</Phone>
+    <Weight>14</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>10.21767484160803</DistanceKm>
+    <DistanceKmRoad>12.662</DistanceKmRoad>
+    <DistanceKmWalk>11.698</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100018</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 48</Details>
+    <Details>Order details for order 18</Details>
+    <Addres> יפת 80, יפו (תל אביב)</Addres>
+    <Latitude>32.0464433</Latitude>
+    <Longitude>34.7523983</Longitude>
+    <Name>Customer18</Name>
+    <Phone>0598829249</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>8.46800551622545</DistanceKm>
+    <DistanceKmRoad>12.889</DistanceKmRoad>
+    <DistanceKmWalk>8.511</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100005</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 5</Details>
     <Addres> שבעת הכוכבים 10, הרצליה</Addres>
     <Latitude>32.1636245</Latitude>
     <Longitude>34.8243901</Longitude>
-    <Name>Customer48</Name>
-    <Phone>0570236710</Phone>
-    <Weight>3</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
+    <Name>Customer5</Name>
+    <Phone>0530003406</Phone>
+    <Weight>12</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
     <OrderStatus>CONCELLED</OrderStatus>
     <DistanceKm>7.785388046237609</DistanceKm>
     <DistanceKmRoad>12.923</DistanceKmRoad>
     <DistanceKmWalk>9.945</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100036</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 36</Details>
-    <Addres> אבן גבירול 70, תל אביב</Addres>
-    <Latitude>32.0806057</Latitude>
-    <Longitude>34.7815385</Longitude>
-    <Name>Customer36</Name>
-    <Phone>0576796772</Phone>
-    <Weight>5</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>4.160732294322267</DistanceKm>
-    <DistanceKmRoad>5.393</DistanceKmRoad>
-    <DistanceKmWalk>4.886</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100033</Id>
+    <Id>100011</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 33</Details>
-    <Addres> רוטשילד 50, פתח תקווה</Addres>
-    <Latitude>32.0903978</Latitude>
-    <Longitude>34.8804676</Longitude>
-    <Name>Customer33</Name>
-    <Phone>0591680683</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>5.430559500691765</DistanceKm>
-    <DistanceKmRoad>7.675</DistanceKmRoad>
-    <DistanceKmWalk>5.723</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100015</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 15</Details>
-    <Addres> הירדן 40, רמת גן</Addres>
-    <Latitude>32.066254</Latitude>
-    <Longitude>34.8281993</Longitude>
-    <Name>Customer15</Name>
-    <Phone>0563692580</Phone>
+    <Details>Order details for order 11</Details>
+    <Addres> הירקון 150, תל אביב</Addres>
+    <Latitude>32.0837404</Latitude>
+    <Longitude>34.7693911</Longitude>
+    <Name>Customer11</Name>
+    <Phone>0541422104</Phone>
     <Weight>3</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>3.082890475328103</DistanceKm>
-    <DistanceKmRoad>3.809</DistanceKmRoad>
-    <DistanceKmWalk>3.52</DistanceKmWalk>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>5.163496006837668</DistanceKm>
+    <DistanceKmRoad>9.225</DistanceKmRoad>
+    <DistanceKmWalk>6.139</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100009</Id>
+    <Id>100002</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 9</Details>
-    <Addres> השומר 5, בני ברק</Addres>
-    <Latitude>32.0815759</Latitude>
-    <Longitude>34.8217171</Longitude>
-    <Name>Customer9</Name>
-    <Phone>0549275925</Phone>
-    <Weight>6</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>1.3441846165781315</DistanceKm>
-    <DistanceKmRoad>1.97</DistanceKmRoad>
-    <DistanceKmWalk>1.509</DistanceKmWalk>
+    <Details>Order details for order 2</Details>
+    <Addres> אלוף שדה 15, רמת גן</Addres>
+    <Latitude>32.0594879</Latitude>
+    <Longitude>34.8249646</Longitude>
+    <Name>Customer2</Name>
+    <Phone>0512221303</Phone>
+    <Weight>8</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>3.8000219110957776</DistanceKm>
+    <DistanceKmRoad>4.698</DistanceKmRoad>
+    <DistanceKmWalk>4.569</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100044</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 44</Details>
-    <Addres> שינקין 20, תל אביב</Addres>
-    <Latitude>32.0693286</Latitude>
-    <Longitude>34.7725233</Longitude>
-    <Name>Customer44</Name>
-    <Phone>0586646690</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>5.464764199241504</DistanceKm>
-    <DistanceKmRoad>7.396</DistanceKmRoad>
-    <DistanceKmWalk>6.205</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100034</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 34</Details>
-    <Addres> הרב שך 10, בני ברק</Addres>
-    <Latitude>32.0864414</Latitude>
-    <Longitude>34.8357055</Longitude>
-    <Name>Customer34</Name>
-    <Phone>0539262707</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>1.4428646629844977</DistanceKm>
-    <DistanceKmRoad>2.044</DistanceKmRoad>
-    <DistanceKmWalk>1.7</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100001</Id>
+    <Id>100035</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 1</Details>
-    <Addres> יפת 80, יפו (תל אביב)</Addres>
-    <Latitude>32.0464433</Latitude>
-    <Longitude>34.7523983</Longitude>
-    <Name>Customer1</Name>
-    <Phone>0562762166</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>8.46800551622545</DistanceKm>
-    <DistanceKmRoad>12.889</DistanceKmRoad>
-    <DistanceKmWalk>8.511</DistanceKmWalk>
+    <Details>Order details for order 35</Details>
+    <Addres> סוקולוב 50, חולון</Addres>
+    <Latitude>32.0227089</Latitude>
+    <Longitude>34.7745575</Longitude>
+    <Name>Customer35</Name>
+    <Phone>0559833331</Phone>
+    <Weight>13</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>9.108575683249992</DistanceKm>
+    <DistanceKmRoad>11.404</DistanceKmRoad>
+    <DistanceKmWalk>10.429</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100047</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 47</Details>
+    <Addres> דרך מנחם בגין 120, תל אביב</Addres>
+    <Latitude>32.071223</Latitude>
+    <Longitude>34.7898718</Longitude>
+    <Name>Customer47</Name>
+    <Phone>0543929763</Phone>
+    <Weight>6</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>3.9889715613405663</DistanceKm>
+    <DistanceKmRoad>5.442</DistanceKmRoad>
+    <DistanceKmWalk>4.494</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100040</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 40</Details>
+    <Addres> שיינקין 15, גבעתיים</Addres>
+    <Latitude>32.0748186</Latitude>
+    <Longitude>34.8107739</Longitude>
+    <Name>Customer40</Name>
+    <Phone>0547048527</Phone>
+    <Weight>8</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>2.3844448559790847</DistanceKm>
+    <DistanceKmRoad>2.974</DistanceKmRoad>
+    <DistanceKmWalk>2.884</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100003</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 3</Details>
+    <Addres> דיזנגוף 100, תל אביב</Addres>
+    <Latitude>32.0793963</Latitude>
+    <Longitude>34.7740011</Longitude>
+    <Name>Customer3</Name>
+    <Phone>0529775675</Phone>
+    <Weight>4</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>4.874791688330585</DistanceKm>
+    <DistanceKmRoad>6.268</DistanceKmRoad>
+    <DistanceKmWalk>5.571</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100049</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 49</Details>
+    <Addres> בן יהודה 50, תל אביב</Addres>
+    <Latitude>32.0780449</Latitude>
+    <Longitude>34.7688332</Longitude>
+    <Name>Customer49</Name>
+    <Phone>0544614896</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>5.3841331752044255</DistanceKm>
+    <DistanceKmRoad>7.231</DistanceKmRoad>
+    <DistanceKmWalk>6.157</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100028</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 28</Details>
+    <Addres> בלפור 40, בת ים</Addres>
+    <Latitude>32.0261767</Latitude>
+    <Longitude>34.7449781</Longitude>
+    <Name>Customer28</Name>
+    <Phone>0588191583</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>10.498811066950152</DistanceKm>
+    <DistanceKmRoad>14.614</DistanceKmRoad>
+    <DistanceKmWalk>11.734</DistanceKmWalk>
   </Order>
   <Order>
     <Id>100016</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 16</Details>
-    <Addres> דסלר 4, בני ברק</Addres>
-    <Latitude>32.0818569</Latitude>
-    <Longitude>34.8315636</Longitude>
+    <Addres> הרב קוק 20, הרצליה</Addres>
+    <Latitude>32.161374</Latitude>
+    <Longitude>34.8408944</Longitude>
     <Name>Customer16</Name>
-    <Phone>0501902939</Phone>
-    <Weight>8</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>1.5394039417625676</DistanceKm>
-    <DistanceKmRoad>2.697</DistanceKmRoad>
-    <DistanceKmWalk>1.74</DistanceKmWalk>
+    <Phone>0563102792</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>7.721205943110178</DistanceKm>
+    <DistanceKmRoad>8.778</DistanceKmRoad>
+    <DistanceKmWalk>8.642</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100006</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 6</Details>
+    <Addres> סירקין 12, גבעתיים</Addres>
+    <Latitude>32.0775637</Latitude>
+    <Longitude>34.814622</Longitude>
+    <Name>Customer6</Name>
+    <Phone>0562405991</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.9499761658266175</DistanceKm>
+    <DistanceKmRoad>2.702</DistanceKmRoad>
+    <DistanceKmWalk>2.297</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100042</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 42</Details>
+    <Addres> בורוכוב 8, גבעתיים</Addres>
+    <Latitude>32.0775935</Latitude>
+    <Longitude>34.8029331</Longitude>
+    <Name>Customer42</Name>
+    <Phone>0523693823</Phone>
+    <Weight>9</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>2.5943196537810813</DistanceKm>
+    <DistanceKmRoad>3.526</DistanceKmRoad>
+    <DistanceKmWalk>3.065</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100001</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 1</Details>
+    <Addres> לוי אשכול 15, ראשון לציון</Addres>
+    <Latitude>31.9754762</Latitude>
+    <Longitude>34.7770157</Longitude>
+    <Name>Customer1</Name>
+    <Phone>0541427307</Phone>
+    <Weight>13</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>13.831997592278265</DistanceKm>
+    <DistanceKmRoad>20.073</DistanceKmRoad>
+    <DistanceKmWalk>16.88</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100034</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 34</Details>
+    <Addres> עליית הנוער 10, גבעתיים</Addres>
+    <Latitude>32.0770387</Latitude>
+    <Longitude>34.8020075</Longitude>
+    <Name>Customer34</Name>
+    <Phone>0574021238</Phone>
+    <Weight>1</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>2.7001154492580963</DistanceKm>
+    <DistanceKmRoad>3.997</DistanceKmRoad>
+    <DistanceKmWalk>3.232</DistanceKmWalk>
   </Order>
   <Order>
     <Id>100037</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 37</Details>
-    <Addres> כצנלסון 50, גבעתיים</Addres>
-    <Latitude>32.0750742</Latitude>
-    <Longitude>34.8076031</Longitude>
+    <Addres> משה דיין 20, ראשון לציון</Addres>
+    <Latitude>32.0009662</Latitude>
+    <Longitude>34.7665794</Longitude>
     <Name>Customer37</Name>
-    <Phone>0544139337</Phone>
-    <Weight>12</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
+    <Phone>0536623258</Phone>
+    <Weight>8</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
     <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>2.518319952849395</DistanceKm>
-    <DistanceKmRoad>4.016</DistanceKmRoad>
-    <DistanceKmWalk>3.061</DistanceKmWalk>
+    <DistanceKm>11.591659605647417</DistanceKm>
+    <DistanceKmRoad>16.891</DistanceKmRoad>
+    <DistanceKmWalk>13.088</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100045</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 45</Details>
+    <Addres> המסגר 15, תל אביב</Addres>
+    <Latitude>32.0628255</Latitude>
+    <Longitude>34.7850239</Longitude>
+    <Name>Customer45</Name>
+    <Phone>0536566700</Phone>
+    <Weight>1</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>4.948825581388848</DistanceKm>
+    <DistanceKmRoad>7.517</DistanceKmRoad>
+    <DistanceKmWalk>5.476</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100008</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 8</Details>
+    <Addres> אבן גבירול 70, תל אביב</Addres>
+    <Latitude>32.0806057</Latitude>
+    <Longitude>34.7815385</Longitude>
+    <Name>Customer8</Name>
+    <Phone>0585178708</Phone>
+    <Weight>1</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>4.160732294322267</DistanceKm>
+    <DistanceKmRoad>5.393</DistanceKmRoad>
+    <DistanceKmWalk>4.886</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100029</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 29</Details>
+    <Addres> ז'בוטינסקי 55, רמת גן</Addres>
+    <Latitude>32.0854799</Latitude>
+    <Longitude>34.8101674</Longitude>
+    <Name>Customer29</Name>
+    <Phone>0587472027</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.506134049503399</DistanceKm>
+    <DistanceKmRoad>1.772</DistanceKmRoad>
+    <DistanceKmWalk>1.697</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100031</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 31</Details>
+    <Addres> פינסקר 8, פתח תקווה</Addres>
+    <Latitude>32.0907496</Latitude>
+    <Longitude>34.8845311</Longitude>
+    <Name>Customer31</Name>
+    <Phone>0504376507</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>5.810287201777098</DistanceKm>
+    <DistanceKmRoad>7.92</DistanceKmRoad>
+    <DistanceKmWalk>6.31</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100021</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 21</Details>
+    <Addres> הירקון 5, בני ברק</Addres>
+    <Latitude>32.0965116</Latitude>
+    <Longitude>34.822183</Longitude>
+    <Name>Customer21</Name>
+    <Phone>0527136367</Phone>
+    <Weight>12</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>0.3295272429014937</DistanceKm>
+    <DistanceKmRoad>0.327</DistanceKmRoad>
+    <DistanceKmWalk>0.437</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100030</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 30</Details>
+    <Addres> ארלוזורוב 10, רמת גן</Addres>
+    <Latitude>32.0794038</Latitude>
+    <Longitude>34.8138358</Longitude>
+    <Name>Customer30</Name>
+    <Phone>0570835193</Phone>
+    <Weight>9</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.7987018468542617</DistanceKm>
+    <DistanceKmRoad>2.233</DistanceKmRoad>
+    <DistanceKmWalk>2.159</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100048</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 48</Details>
+    <Addres> הרב שך 10, בני ברק</Addres>
+    <Latitude>32.0864414</Latitude>
+    <Longitude>34.8357055</Longitude>
+    <Name>Customer48</Name>
+    <Phone>0598335637</Phone>
+    <Weight>10</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.4428646629844977</DistanceKm>
+    <DistanceKmRoad>2.044</DistanceKmRoad>
+    <DistanceKmWalk>1.7</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100009</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 9</Details>
+    <Addres> ארלוזורוב 90, תל אביב</Addres>
+    <Latitude>32.0854282</Latitude>
+    <Longitude>34.7806379</Longitude>
+    <Name>Customer9</Name>
+    <Phone>0598012065</Phone>
+    <Weight>13</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>4.088473329191639</DistanceKm>
+    <DistanceKmRoad>5.603</DistanceKmRoad>
+    <DistanceKmWalk>4.724</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100026</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 26</Details>
+    <Addres> רוטשילד 45, תל אביב</Addres>
+    <Latitude>32.0642206</Latitude>
+    <Longitude>34.7747952</Longitude>
+    <Name>Customer26</Name>
+    <Phone>0517609596</Phone>
+    <Weight>12</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>5.591761823430013</DistanceKm>
+    <DistanceKmRoad>6.615</DistanceKmRoad>
+    <DistanceKmWalk>6.204</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100050</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 50</Details>
+    <Addres> ז'בוטינסקי 80, פתח תקווה</Addres>
+    <Latitude>32.091785</Latitude>
+    <Longitude>34.8641828</Longitude>
+    <Name>Customer50</Name>
+    <Phone>0501190446</Phone>
+    <Weight>10</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>3.8899617834175784</DistanceKm>
+    <DistanceKmRoad>5.401</DistanceKmRoad>
+    <DistanceKmWalk>4.11</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100033</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 33</Details>
+    <Addres> שדרות ירושלים 30, רמת גן</Addres>
+    <Latitude>32.0847242</Latitude>
+    <Longitude>34.8297262</Longitude>
+    <Name>Customer33</Name>
+    <Phone>0545938029</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.1774111915412198</DistanceKm>
+    <DistanceKmRoad>1.349</DistanceKmRoad>
+    <DistanceKmWalk>1.335</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100019</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 19</Details>
+    <Addres> ז'בוטינסקי 100, בני ברק</Addres>
+    <Latitude>32.0917476</Latitude>
+    <Longitude>34.8321991</Longitude>
+    <Name>Customer19</Name>
+    <Phone>0573498794</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>0.8961511605511564</DistanceKm>
+    <DistanceKmRoad>1.109</DistanceKmRoad>
+    <DistanceKmWalk>1.095</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100010</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 10</Details>
+    <Addres> רוקח 10, רמת גן</Addres>
+    <Latitude>32.0876832</Latitude>
+    <Longitude>34.8111166</Longitude>
+    <Name>Customer10</Name>
+    <Phone>0533393056</Phone>
+    <Weight>5</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.2952401384992114</DistanceKm>
+    <DistanceKmRoad>2.103</DistanceKmRoad>
+    <DistanceKmWalk>1.626</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100015</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 15</Details>
+    <Addres> סלומון 12, פתח תקווה</Addres>
+    <Latitude>32.0846599</Latitude>
+    <Longitude>34.8805418</Longitude>
+    <Name>Customer15</Name>
+    <Phone>0525940442</Phone>
+    <Weight>6</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>5.516596018444514</DistanceKm>
+    <DistanceKmRoad>8.231</DistanceKmRoad>
+    <DistanceKmWalk>6.309</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100020</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 20</Details>
+    <Addres> דסלר 4, בני ברק</Addres>
+    <Latitude>32.0818569</Latitude>
+    <Longitude>34.8315636</Longitude>
+    <Name>Customer20</Name>
+    <Phone>0526561457</Phone>
+    <Weight>6</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.5394039417625676</DistanceKm>
+    <DistanceKmRoad>2.697</DistanceKmRoad>
+    <DistanceKmWalk>1.74</DistanceKmWalk>
   </Order>
   <Order>
     <Id>100039</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 39</Details>
-    <Addres> רמב''ם 10, גבעתיים</Addres>
-    <Latitude>32.0700634</Latitude>
-    <Longitude>34.8038533</Longitude>
+    <Addres> רבי עקיבא 50, בני ברק</Addres>
+    <Latitude>32.0876045</Latitude>
+    <Longitude>34.8278091</Longitude>
     <Name>Customer39</Name>
-    <Phone>0547515575</Phone>
-    <Weight>14</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
+    <Phone>0546772243</Phone>
+    <Weight>4</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
     <OrderStatus>COMPLETED</OrderStatus>
-    <DistanceKm>3.177520887212316</DistanceKm>
-    <DistanceKmRoad>4.371</DistanceKmRoad>
-    <DistanceKmWalk>3.933</DistanceKmWalk>
+    <DistanceKm>0.8106792052240024</DistanceKm>
+    <DistanceKmRoad>0.912</DistanceKmRoad>
+    <DistanceKmWalk>0.898</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100017</Id>
+    <Id>100007</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 7</Details>
+    <Addres> הרצל 60, רמת גן</Addres>
+    <Latitude>32.0850858</Latitude>
+    <Longitude>34.8155354</Longitude>
+    <Name>Customer7</Name>
+    <Phone>0537557930</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.1780665716551981</DistanceKm>
+    <DistanceKmRoad>1.949</DistanceKmRoad>
+    <DistanceKmWalk>1.528</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100032</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 32</Details>
+    <Addres> ירושלים 15, בני ברק</Addres>
+    <Latitude>32.0857512</Latitude>
+    <Longitude>34.8300664</Longitude>
+    <Name>Customer32</Name>
+    <Phone>0532106753</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.102448617211477</DistanceKm>
+    <DistanceKmRoad>1.231</DistanceKmRoad>
+    <DistanceKmWalk>1.217</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100027</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 17</Details>
-    <Addres> הופיין 25, חולון</Addres>
-    <Latitude>32.0141212</Latitude>
-    <Longitude>34.7685729</Longitude>
-    <Name>Customer17</Name>
-    <Phone>0552609022</Phone>
+    <Details>Order details for order 27</Details>
+    <Addres> העצמאות 30, בת ים</Addres>
+    <Latitude>32.0231832</Latitude>
+    <Longitude>34.7465895</Longitude>
+    <Name>Customer27</Name>
+    <Phone>0522282855</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>10.635862115948113</DistanceKm>
+    <DistanceKmRoad>14.429</DistanceKmRoad>
+    <DistanceKmWalk>11.887</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100013</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 13</Details>
+    <Addres> ביאליק 15, רמת השרון</Addres>
+    <Latitude>32.137793</Latitude>
+    <Longitude>34.840278</Longitude>
+    <Name>Customer13</Name>
+    <Phone>0569076642</Phone>
+    <Weight>4</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>5.17598577363027</DistanceKm>
+    <DistanceKmRoad>6.589</DistanceKmRoad>
+    <DistanceKmWalk>6.503</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100036</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 36</Details>
+    <Addres> שלמה המלך 20, קריית אונו</Addres>
+    <Latitude>32.0544159</Latitude>
+    <Longitude>34.8603455</Longitude>
+    <Name>Customer36</Name>
+    <Phone>0590597255</Phone>
     <Weight>5</Weight>
-    <OrderDate>2026-01-25T20:19:18.0000000</OrderDate>
-    <OrderStatus>CONCELLED</OrderStatus>
-    <DistanceKm>10.21767484160803</DistanceKm>
-    <DistanceKmRoad>12.662</DistanceKmRoad>
-    <DistanceKmWalk>11.698</DistanceKmWalk>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>5.605395774791734</DistanceKm>
+    <DistanceKmRoad>8.697</DistanceKmRoad>
+    <DistanceKmWalk>7.055</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100023</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 23</Details>
+    <Addres> יגאל אלון 60, תל אביב</Addres>
+    <Latitude>32.0619207</Latitude>
+    <Longitude>34.7927464</Longitude>
+    <Name>Customer23</Name>
+    <Phone>0508319890</Phone>
+    <Weight>14</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>4.5299101150789465</DistanceKm>
+    <DistanceKmRoad>8.326</DistanceKmRoad>
+    <DistanceKmWalk>5.292</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100004</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 4</Details>
+    <Addres> כהנמן 60, בני ברק</Addres>
+    <Latitude>32.0845043</Latitude>
+    <Longitude>34.8399999</Longitude>
+    <Name>Customer4</Name>
+    <Phone>0551662470</Phone>
+    <Weight>3</Weight>
+    <OrderDate>2026-01-26T03:32:06.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.8995712464671097</DistanceKm>
+    <DistanceKmRoad>2.55</DistanceKmRoad>
+    <DistanceKmWalk>2.213</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

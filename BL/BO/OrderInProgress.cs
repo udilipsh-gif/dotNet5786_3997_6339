@@ -104,13 +104,13 @@ public class OrderInProgress
     /// Gets the current status of the order in the delivery process.
     /// </summary>
     /// <value>An <see cref="OrderStatus"/> value indicating the order's current state (typically DELIVERING for orders in progress).</value>
-    public required OrderStatus OrderStatus { get; init; }
+    public required OrderStatus OrderStatus { get; set; }
     
     /// <summary>
     /// Gets the schedule status indicating if the delivery is on time, at risk, or late.
     /// </summary>
     /// <value>A <see cref="ScheduleStatus"/> value representing the delivery timeline status relative to expected delivery time.</value>
-    public required ScheduleStatus ScheduleStatus { get; init; }
+    public required ScheduleStatus ScheduleStatus { get; set; }
     
     /// <summary>
     /// Gets the time remaining until the maximum delivery deadline.
@@ -120,7 +120,7 @@ public class OrderInProgress
     /// This value is dynamically calculated and helps couriers prioritize deliveries.
     /// A negative value indicates the order is already late.
     /// </remarks>
-    public required TimeSpan TimeRemaining { get; init; }
+    public required TimeSpan TimeRemaining { get; set; }
 
     public override string ToString() => this.ToStringProperty();                    
 }

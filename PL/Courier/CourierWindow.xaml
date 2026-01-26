@@ -14,13 +14,14 @@
         Loaded="CourierWindow_Loaded"
         Closed="CourierWindow_Closed">
 
-    <Grid Margin="20">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="1" 
+            <Border Grid.Column="1" 
                 Margin="20,0"
                 Background="#FFF8E1" 
                 BorderBrush="{StaticResource AccentColor}" 
@@ -30,166 +31,173 @@
                 Width="200"
                 Visibility="{Binding CurrentCourier.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}}">
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                <TextBlock Text="📦 משלוח בתהליך" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentColor}" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                    <TextBlock Text="📦 משלוח בתהליך" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentColor}" HorizontalAlignment="Center" Margin="0,0,0,15"/>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <ContentControl Content="{Binding CurrentCourier.OrderInProgress}">
-                        <ContentControl.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel>
-                                    <TextBlock Text="פרטי הזמנה" FontWeight="Bold" Margin="0,10,0,5"/>
-                                    <TextBlock Text="{Binding OrderId, StringFormat='מספר הזמנה: {0}'}"/>
-                                    <TextBlock Text="{Binding TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}, StringFormat='סוג: {0}'}"/>
-                                    <TextBlock Text="{Binding Details}" TextWrapping="Wrap" Margin="0,5" FontStyle="Italic"/>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ContentControl Content="{Binding CurrentCourier.OrderInProgress}">
+                            <ContentControl.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="פרטי הזמנה" FontWeight="Bold" Margin="0,10,0,5"/>
+                                        <TextBlock Text="{Binding OrderId, StringFormat='מספר הזמנה: {0}'}"/>
+                                        <TextBlock Text="{Binding TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}, StringFormat='סוג: {0}'}"/>
+                                        <TextBlock Text="{Binding Details}" TextWrapping="Wrap" Margin="0,5" FontStyle="Italic"/>
 
-                                    <Separator Margin="0,10"/>
+                                        <Separator Margin="0,10"/>
 
-                                    <TextBlock Text="יעד ומרחק" FontWeight="Bold" Margin="0,0,0,5"/>
-                                    <TextBlock Text="{Binding Address}" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Distance, StringFormat='מרחק אווירי: {0:N2} ק״מ'}"/>
-                                    <TextBlock Text="{Binding ActualDistance, StringFormat='מרחק בפועל: {0:N2} ק״מ'}"/>
+                                        <TextBlock Text="יעד ומרחק" FontWeight="Bold" Margin="0,0,0,5"/>
+                                        <TextBlock Text="{Binding Address}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding Distance, StringFormat='מרחק אווירי: {0:N2} ק״מ'}"/>
+                                        <TextBlock Text="{Binding ActualDistance, StringFormat='מרחק בפועל: {0:N2} ק״מ'}"/>
 
-                                    <Separator Margin="0,10"/>
+                                        <Separator Margin="0,10"/>
 
-                                    <TextBlock Text="לקוח" FontWeight="Bold" Margin="0,0,0,5"/>
-                                    <TextBlock Text="{Binding CustomerName}"/>
-                                    <TextBlock Text="{Binding CustomerPhone}"/>
+                                        <TextBlock Text="לקוח" FontWeight="Bold" Margin="0,0,0,5"/>
+                                        <TextBlock Text="{Binding CustomerName}"/>
+                                        <TextBlock Text="{Binding CustomerPhone}"/>
 
-                                    <Separator Margin="0,10"/>
+                                        <Separator Margin="0,10"/>
 
-                                    <TextBlock Text="זמנים" FontWeight="Bold" Margin="0,0,0,5"/>
-                                    <TextBlock Text="{Binding OrderTime, StringFormat='נוצר: {0:dd/MM/yyyy HH:mm}'}"/>
-                                    <TextBlock Text="{Binding StartDeliveryTime, StringFormat='יצא: {0:dd/MM/yyyy HH:mm}'}"/>
-                                    <TextBlock Text="{Binding TimeRemaining, Converter={StaticResource TimeSpanConverter}, StringFormat='נותר: {0:dd\\:hh\\:mm}'}" FontWeight="Bold" Foreground="{StaticResource PrimaryColor}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ContentControl.ContentTemplate>
-                    </ContentControl>
-                </ScrollViewer>
-            </Grid>
-        </Border>
+                                        <TextBlock Text="זמנים" FontWeight="Bold" Margin="0,0,0,5"/>
+                                        <TextBlock Text="{Binding OrderTime, StringFormat='נוצר: {0:dd/MM/yyyy HH:mm}'}"/>
+                                        <TextBlock Text="{Binding StartDeliveryTime, StringFormat='יצא: {0:dd/MM/yyyy HH:mm}'}"/>
+                                        <TextBlock Text="{Binding DisplayTimeRemaining, 
+                                              RelativeSource={RelativeSource AncestorType=Window}, 
+                                              Converter={StaticResource TimeSpanConverter}, 
+                                              StringFormat='נותר: {0:dd\\:hh\\:mm}'}" 
+                                                       FontWeight="Bold" 
+                                                       TextWrapping="Wrap" 
+                                                       Foreground="{StaticResource PrimaryColor}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
 
-        <Border Grid.Column="0" Width="500" Background="{StaticResource SurfaceColor}" 
+            <Border Grid.Column="0" Width="500" Background="{StaticResource SurfaceColor}" 
                 BorderBrush="{StaticResource BorderColor}" 
                 BorderThickness="1" CornerRadius="8" Padding="15,15,5,15">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Text="פרטי שליח" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
+                    <TextBlock Grid.Row="0" Text="פרטי שליח" Style="{StaticResource HeaderTextStyle}" HorizontalAlignment="Left"/>
 
-                <ScrollViewer Grid.Row="1" Padding="10">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="10"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <Label Content="תעודת זהות:"/>
-                                <TextBox Text="{Binding CurrentCourier.Id, Mode=TwoWay}" IsReadOnly="{Binding IsUpdateMode}" MaxLength="9" local:Tools.NumericOnly="True"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <Label Content="שם מלא:"/>
-                                <TextBox Text="{Binding CurrentCourier.Name, Mode=TwoWay}"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="10"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <Label Content="טלפון:"/>
-                                <TextBox Text="{Binding CurrentCourier.Phone, Mode=TwoWay}" MaxLength="10" local:Tools.NumericOnly="True"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <Label Content="אימייל:"/>
-                                <TextBox Text="{Binding CurrentCourier.Email, Mode=TwoWay}"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <Label Content="סיסמה:"/>
-                        <PasswordBox DataContext="{Binding CurrentCourier.Password, Mode=TwoWay}" PasswordChanged="PasswordChanged"/>
-
-                        <Separator Margin="0,15"/>
-
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="10"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0">
-                                <Label Content="סוג כלי רכב:"/>
-                                <ComboBox ItemsSource="{Binding VehicleTypesList}" SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
-                            <StackPanel Grid.Column="2">
-                                <Label Content="מרחק מקסימלי (ק״מ):"/>
-                                <TextBox Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}" local:Tools.NumericOnly="True"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <CheckBox Content="שליח פעיל במערכת" IsChecked="{Binding CurrentCourier.Active, Mode=TwoWay}" Margin="0,10"/>
-
-                        <GroupBox Header="סטטיסטיקות" Margin="0,15,0,0" Padding="10">
-                            <Grid>
+                    <ScrollViewer Grid.Row="1" Padding="10">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0" Margin="5">
-                                    <Label Content="התחיל לעבוד:" FontSize="12"/>
-                                    <TextBox Text="{Binding CurrentCourier.WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" IsReadOnly="True" Background="#F5F5F5"/>
+                                <StackPanel Grid.Column="0">
+                                    <Label Content="תעודת זהות:"/>
+                                    <TextBox Text="{Binding CurrentCourier.Id, Mode=TwoWay}" IsReadOnly="{Binding IsUpdateMode}" MaxLength="9" local:Tools.NumericOnly="True"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="1" Margin="5">
-                                    <Label Content="בזמן:" FontSize="12"/>
-                                    <TextBox Text="{Binding CurrentCourier.DeliveryOnTime}" IsReadOnly="True" Background="#E8F5E9"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Margin="5">
-                                    <Label Content="באיחור:" FontSize="12"/>
-                                    <TextBox Text="{Binding CurrentCourier.DeliveryLate}" IsReadOnly="True" Background="#FFEBEE"/>
+                                <StackPanel Grid.Column="2">
+                                    <Label Content="שם מלא:"/>
+                                    <TextBox Text="{Binding CurrentCourier.Name, Mode=TwoWay}"/>
                                 </StackPanel>
                             </Grid>
-                        </GroupBox>
 
-                    </StackPanel>
-                </ScrollViewer>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <Label Content="טלפון:"/>
+                                    <TextBox Text="{Binding CurrentCourier.Phone, Mode=TwoWay}" MaxLength="10" local:Tools.NumericOnly="True"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <Label Content="אימייל:"/>
+                                    <TextBox Text="{Binding CurrentCourier.Email, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Grid>
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,20,0,0">
-                    <Button Content="{Binding ButtonText, Converter={StaticResource ValueToHebrewConverter}}"
+                            <Label Content="סיסמה:"/>
+                            <PasswordBox DataContext="{Binding CurrentCourier.Password, Mode=TwoWay}" PasswordChanged="PasswordChanged"/>
+
+                            <Separator Margin="0,15"/>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <Label Content="סוג כלי רכב:"/>
+                                    <ComboBox ItemsSource="{Binding VehicleTypesList}" SelectedItem="{Binding CurrentCourier.TypeShipment, Mode=TwoWay}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <Label Content="מרחק מקסימלי (ק״מ):"/>
+                                    <TextBox Text="{Binding CurrentCourier.MaxDistanceDelivery, Mode=TwoWay}" local:Tools.NumericOnly="True"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <CheckBox Content="שליח פעיל במערכת" IsChecked="{Binding CurrentCourier.Active, Mode=TwoWay}" Margin="0,10"/>
+
+                            <GroupBox Header="סטטיסטיקות" Margin="0,15,0,0" Padding="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Margin="5">
+                                        <Label Content="התחיל לעבוד:" FontSize="12"/>
+                                        <TextBox Text="{Binding CurrentCourier.WorkingSince, StringFormat='{}{0:dd/MM/yyyy}'}" IsReadOnly="True" Background="#F5F5F5"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="5">
+                                        <Label Content="בזמן:" FontSize="12"/>
+                                        <TextBox Text="{Binding CurrentCourier.DeliveryOnTime}" IsReadOnly="True" Background="#E8F5E9"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Margin="5">
+                                        <Label Content="באיחור:" FontSize="12"/>
+                                        <TextBox Text="{Binding CurrentCourier.DeliveryLate}" IsReadOnly="True" Background="#FFEBEE"/>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,20,0,0">
+                        <Button Content="{Binding ButtonText, Converter={StaticResource ValueToHebrewConverter}}"
                             Tag="{Binding ButtonText}"
                             Click="btnAddUpdate_Click"
                             Width="150"/>
 
-                    <Button Content="מחק שליח" 
+                        <Button Content="מחק שליח" 
                             Click="btnDelete_Click" 
                             Style="{StaticResource DestructiveButtonStyle}"
                             Visibility="{Binding DeleteButtonVisibility}"
                             Width="120"
                             Margin="20,0,0,0"/>
-                </StackPanel>
-            </Grid>
-        </Border>
-    </Grid>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
 </Window>

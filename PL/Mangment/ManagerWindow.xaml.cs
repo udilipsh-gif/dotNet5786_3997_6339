@@ -2,7 +2,9 @@
 using PL.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,22 +57,30 @@ namespace PL
         /// Represents a single item in the statistics dashboard.
         /// Used for binding to the ItemsControl in the UI.
         /// </summary>
-        public class StatisticItem
+        public class StatisticItem : INotifyPropertyChanged
         {
-            /// <summary>
-            /// The underlying Enum value (OrderStatus or ScheduleStatus).
-            /// </summary>
             public object Id { get; set; } = 0;
-
-            /// <summary>
-            /// The display name for the button.
-            /// </summary>
             public string Name { get; set; } = string.Empty;
 
-            /// <summary>
-            /// The current count/value to display.
-            /// </summary>
-            public int Value { get; set; }
+            private int _value;
+            public int Value
+            {
+                get => _value;
+                set
+                {
+                    if (_value != value)
+                    {
+                        _value = value;
+                        OnPropertyChanged(); // <--- זה הקסם שמעדכן רק את המספר
+                    }
+                }
+            }
+
+            public event PropertyChangedEventHandler? PropertyChanged;
+            protected void OnPropertyChanged([CallerMemberName] string? name = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            }
         }
 
         #endregion
@@ -157,6 +167,11 @@ namespace PL
         /// </summary>
         private void ManagerWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            if (CombinedStatistics == null)
+            {
+                CombinedStatistics = InitialStatsTemplate.ToList();
+            }
+
             // Initial fetch
             ClockObserver();
             StatisticObserver();
@@ -246,7 +261,6 @@ namespace PL
         /// </summary>
         private void StatisticObserver()
         {
-            // בדיקת נעילה
             if (_statsMutex.CheckAndSetLoadInProgressOrRestartRequired())
                 return;
 
@@ -254,21 +268,41 @@ namespace PL
             {
                 try
                 {
-                    var newStats = await s_bl.Order.GetAllOrderStatistic(_userId);
+                    // שליפת הנתונים החדשים מה-BL
+                    var newStatsValues = await s_bl.Order.GetAllOrderStatistic(_userId);
 
-                    if (newStats != null)
+                    if (newStatsValues != null)
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            var template = InitialStatsTemplate;
-                            CombinedStatistics = template.Zip(newStats, (item, count) =>
+                            // המרה לרשימה כדי שנוכל לגשת לפי אינדקס
+                            var currentList = CombinedStatistics as IList<StatisticItem>;
+
+                            if (currentList != null && currentList.Count == newStatsValues.Count())
                             {
-                                item.Value = count;
-                                return item;
-                            }).ToList();
+                                int i = 0;
+                                foreach (var newValue in newStatsValues)
+                                {
+                                    // עדכון הערך בלבד - ה-UI יתעדכן אוטומטית בגלל ה-PropertyChanged
+                                    if (currentList[i].Value != newValue)
+                                    {
+                                        currentList[i].Value = newValue;
+                                    }
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                // מקרה חירום: אם הרשימות לא תואמות באורך, נבנה מחדש (כמו בקוד הישן)
+                                var template = InitialStatsTemplate;
+                                CombinedStatistics = template.Zip(newStatsValues, (item, count) =>
+                                {
+                                    item.Value = count;
+                                    return item;
+                                }).ToList();
+                            }
                         });
                     }
-                   
                 }
                 catch (BlNoAccessException)
                 {
