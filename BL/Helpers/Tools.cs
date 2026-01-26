@@ -1,13 +1,8 @@
 ﻿using DalApi;
-using BO;
 using System.Collections;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Helpers;
 
@@ -648,9 +643,9 @@ internal static class Tools
 
         string endUrl = "/exec";
 
-        string scriptUrl = $"{headUrl}{AdminManager.GetConfig().ScriptUrl}{endUrl}";          //"https://script.google.com/macros/s/AKfycbzS7AZyOGCduI2uCPFxzLoWJ9TKADvwMJEca8Lm2WZprBMjTj8vAvwL3Y1F-Gdesv-gNg/exec";
+        string scriptUrl = $"{headUrl}{AdminManager.GetConfig().ScriptUrl}{endUrl}";   
 
-        string scriptPass = AdminManager.GetConfig().ScriptPass;                                                                ///"sdfjsak8796978akljdf54gdfgr44";
+        string scriptPass = AdminManager.GetConfig().ScriptPass;                                                       
 
         string name = "חנות הספרים- מיני פרוייקט";
 
@@ -664,7 +659,7 @@ internal static class Tools
             HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
             if (!response.IsSuccessStatusCode)
             {
-                throw new BLNoSendEmailException($"{response.StatusCode}");
+                throw new BO.BLNoSendEmailException($"{response.StatusCode}");
 
             }
 
@@ -672,7 +667,7 @@ internal static class Tools
         }
         catch (Exception ex)//שלב 7
         {
-            throw new BLNoSendEmailException($"{ex.Message}");
+            throw new BO.BLNoSendEmailException($"{ex.Message}");
             //Console.WriteLine($"Exception in SendEmail: {ex.Message}");
         }
 
@@ -695,13 +690,13 @@ internal static class Tools
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + response.StatusCode);
+                throw new BO.BLNoSendSmsException("שגיאה בשליחת ההודעה: " + response.StatusCode);
             }
 
         }
         catch (Exception ex)
         {
-            throw new BLNoSendSmsException("שגיאה בשליחת ההודעה: " + ex.Message);
+            throw new BO.BLNoSendSmsException("שגיאה בשליחת ההודעה: " + ex.Message);
         }
     }
 

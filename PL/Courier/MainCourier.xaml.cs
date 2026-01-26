@@ -36,11 +36,16 @@ public partial class MainCourier : Window, INotifyPropertyChanged
     /// Mutex for managing concurrent observer callbacks and preventing race conditions.
     /// </summary>
     private readonly ObserverMutex _Mutex = new();
-    
+
+    /// <summary>
+    /// Mutex for managing concurrent clock updates and preventing race conditions.
+    /// </summary>
+    private readonly ObserverMutex _ClockMutex = new();
+
     #endregion
 
     #region INotifyPropertyChanged Implementation
-    
+
     /// <summary>
     /// Occurs when a property value changes.
     /// </summary>
@@ -428,7 +433,7 @@ public partial class MainCourier : Window, INotifyPropertyChanged
 
     private async void ClockObserver()
     {
-        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
+        if (_ClockMutex.CheckAndSetLoadInProgressOrRestartRequired())
             return;
         try
         {
@@ -449,7 +454,7 @@ public partial class MainCourier : Window, INotifyPropertyChanged
         }
         finally
         {
-            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+            if (await _ClockMutex.UnsetLoadInProgressAndCheckRestartRequested())
                 ClockObserver();
         }
     }

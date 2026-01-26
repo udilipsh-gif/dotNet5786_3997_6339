@@ -29,6 +29,8 @@ internal static class OrderManager
         public BO.OrderStatus Status { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime MaxDeliveryTime { get; set; }
+        public DateTime RiskThreshold { get; set; } // הרגע שבו ההזמנה הופכת ל-INRISK
+        public DateTime LateThreshold { get; set; } // הרגע שבו ההזמנה הופכת ל-LATE
         public BO.ScheduleStatus? FinalScheduleStatus { get; set; }
         public DateTime? DeliveryTime { get; set; }
     }
@@ -40,13 +42,12 @@ internal static class OrderManager
     {
         lock (_cacheLock)
         {
-            if (_ordersCache != null) return; // כבר מאותחל
+            if (_ordersCache != null) return;
             _ordersCache = new Dictionary<int, OrderCacheInfo>();
         }
 
         List<DO.Order> allOrders;
         List<DO.Delivery> allDeliveries;
-        TimeSpan maxDeliveryTimeSpan = AdminManager.GetConfig().MaxDeliveryTime;
 
         lock (AdminManager.BlMutex)
         {
@@ -54,7 +55,6 @@ internal static class OrderManager
             allDeliveries = s_dal.Delivery.ReadAll().ToList();
         }
 
-        // מיפוי משלוחים להזמנות (לוקחים את האחרון לכל הזמנה)
         var deliveriesMap = allDeliveries
             .GroupBy(d => d.OrderId)
             .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).FirstOrDefault());
@@ -64,34 +64,7 @@ internal static class OrderManager
         foreach (var order in allOrders)
         {
             var delivery = deliveriesMap.GetValueOrDefault(order.Id);
-            var orderStatus = Tools.GetOrderStatus(order, delivery);
-            var maxTime = order.OrderDate + maxDeliveryTimeSpan;
-
-            var cacheItem = new OrderCacheInfo
-            {
-                Status = orderStatus,
-                OrderDate = order.OrderDate,
-                MaxDeliveryTime = maxTime,
-                DeliveryTime = delivery?.TimeEndDelivery
-            };
-
-            // אם ההזמנה סגורה - נחשב את הסטטוס לו"ז עכשיו ונשמור אותו לנצח
-            if (orderStatus == BO.OrderStatus.COMPLETED || orderStatus == BO.OrderStatus.CANCELLED)
-            {
-                // כאן אנו משתמשים בלוגיקה פנימית במקום לקרוא ל-Tools הכבד
-                if (orderStatus == BO.OrderStatus.COMPLETED)
-                {
-                    cacheItem.FinalScheduleStatus = (delivery?.TimeEndDelivery <= maxTime)
-                        ? BO.ScheduleStatus.ONTYME
-                        : BO.ScheduleStatus.LATE;
-                }
-                else // CANCELLED
-                {
-                    cacheItem.FinalScheduleStatus = BO.ScheduleStatus.CANCELLED;
-                }
-            }
-
-            tempCache[order.Id] = cacheItem;
+            tempCache[order.Id] = s_createCacheInfo(order, delivery);
         }
 
         lock (_cacheLock)
@@ -441,9 +414,8 @@ internal static class OrderManager
 
     internal static void UpdateCacheItem(int orderId)
     {
-        if (_ordersCache == null) return; // אם המטמון עוד לא נוצר, לא צריך לעדכן (הוא ייווצר מעודכן)
+        if (_ordersCache == null) return;
 
-        // שליפת המידע העדכני מה-DB (קורה רק להזמנה אחת בודדת!)
         DO.Order? doOrder;
         DO.Delivery? delivery;
 
@@ -457,35 +429,53 @@ internal static class OrderManager
 
         if (doOrder == null) return;
 
-        var status = Tools.GetOrderStatus(doOrder, delivery);
-        var maxTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
-
-        var newItem = new OrderCacheInfo
-        {
-            Status = status,
-            OrderDate = doOrder.OrderDate,
-            MaxDeliveryTime = maxTime,
-            DeliveryTime = delivery?.TimeEndDelivery,
-            FinalScheduleStatus = null
-        };
-
-        // חישוב סופי אם נדרש
-        if (status == BO.OrderStatus.COMPLETED)
-        {
-            newItem.FinalScheduleStatus = (delivery?.TimeEndDelivery <= maxTime)
-                ? BO.ScheduleStatus.ONTYME
-                : BO.ScheduleStatus.LATE;
-        }
-        else if (status == BO.OrderStatus.CANCELLED)
-        {
-            newItem.FinalScheduleStatus = BO.ScheduleStatus.CANCELLED;
-        }
+        var newItem = s_createCacheInfo(doOrder, delivery);
 
         lock (_cacheLock)
         {
             _ordersCache[orderId] = newItem;
         }
     }
+
+    internal static bool CheckStatusChanges(DateTime oldClock, DateTime newClock)
+{
+    if (_ordersCache == null) return false;
+
+    bool anyChange = false;
+
+    lock (_cacheLock)
+    {
+        // רצים רק על המילון - אפס קריאות ל-DAL!
+        foreach (var kvp in _ordersCache)
+        {
+            var id = kvp.Key;
+            var info = kvp.Value;
+
+            // מדלגים על הזמנות סגורות
+            if (info.Status == BO.OrderStatus.COMPLETED || 
+                info.Status == BO.OrderStatus.CANCELLED ||
+                info.Status == BO.OrderStatus.REFUSED)
+                continue;
+
+            bool changed = false;
+
+            // האם חצינו את קו הסיכון?
+            if (oldClock < info.RiskThreshold && newClock >= info.RiskThreshold)
+                changed = true;
+
+            // האם חצינו את קו האיחור?
+            else if (oldClock < info.LateThreshold && newClock >= info.LateThreshold)
+                changed = true;
+
+            if (changed)
+            {
+                Observer.NotifyItemUpdated(id); // עדכון נקודתי לממשק
+                anyChange = true;
+            }
+        }
+    }
+    return anyChange;
+}
 
     /// <summary>
     /// Validates all required fields of an order.
@@ -846,6 +836,58 @@ internal static class OrderManager
             DO.TypeOfOrder.DELIVER_IMMEDIATELY => courierType == DO.TheTypeShipment.MOTORCYCLE,
             _ => false
         };
+    }
+
+    private static OrderCacheInfo s_createCacheInfo(DO.Order order, DO.Delivery? delivery)
+    {
+        var config = AdminManager.GetConfig();
+        var status = Tools.GetOrderStatus(order, delivery);
+        var maxTime = order.OrderDate + config.MaxDeliveryTime;
+
+        // חישוב זמן מאמץ משוער (כמו ב-Tools, אבל מחושב פעם אחת בלבד)
+        TimeSpan estimatedEffort;
+
+        if (status == BO.OrderStatus.DELIVERING && delivery != null)
+        {
+            // אם במשלוח: מרחק חלקי מהירות קטנוע (או מהירות רכב ממוצעת אם רוצים לדייק יותר)
+            double dist = delivery.ActualDistance ?? Tools.GetDistance(order);
+            estimatedEffort = TimeSpan.FromHours(dist / config.AvgSpeedMotorcycle);
+        }
+        else // OPEN
+        {
+            // אם פתוח: מרחק אווירי חלקי הליכה
+            double dist = Tools.GetDistance(order);
+            estimatedEffort = TimeSpan.FromHours(dist / config.AvgSpeedFoot);
+        }
+
+        // חישוב נקודות הציון בזמן
+        DateTime lateThreshold = maxTime - estimatedEffort;
+        DateTime riskThreshold = lateThreshold - config.RiskRange;
+
+        var info = new OrderCacheInfo
+        {
+            Status = status,
+            OrderDate = order.OrderDate,
+            MaxDeliveryTime = maxTime,
+            RiskThreshold = riskThreshold,
+            LateThreshold = lateThreshold,
+            DeliveryTime = delivery?.TimeEndDelivery,
+            FinalScheduleStatus = null
+        };
+
+        // אם סגור - מקבעים את הסטטוס הסופי
+        if (status == BO.OrderStatus.COMPLETED)
+        {
+            info.FinalScheduleStatus = (delivery?.TimeEndDelivery <= maxTime)
+                ? BO.ScheduleStatus.ONTYME
+                : BO.ScheduleStatus.LATE;
+        }
+        else if (status == BO.OrderStatus.CANCELLED || status == BO.OrderStatus.REFUSED)
+        {
+            info.FinalScheduleStatus = BO.ScheduleStatus.CANCELLED;
+        }
+
+        return info;
     }
 
     public static Task UpdateDistanceForOrders()

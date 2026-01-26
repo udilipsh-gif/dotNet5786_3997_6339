@@ -61,14 +61,8 @@ internal static class AdminManager
     [MethodImpl(MethodImplOptions.Synchronized)]
     internal static void SetConfig(BO.Config configuration)
     {
-        // הקוד הקיים שלך כאן תקין לחלוטין
-        // ... (השאר את הלוגיקה הקיימת של SetConfig) ...
         bool configChanged = false; // stage 5
         var config = AdminManager.GetConfig();
-        // ... העתק את כל התוכן הקיים ...
-
-        // הערה לשיפור (אופציונלי): הקריאה ל-GoogleMapsService בתוך ה-Setter היא סינכרונית (Task.Run(...).Result).
-        // זה עלול "לתקוע" את הממשק לשנייה אם האינטרנט איטי, אבל לפרויקט הזה זה בסדר גמור.
 
         if (config.StoreAddress != configuration.StoreAddress)
         {
@@ -95,8 +89,6 @@ internal static class AdminManager
             ConfigUpdatedObservers?.Invoke();
     }
 
-    // === תיקון 1: איפוס המילון בפונקציות ה-DB ===
-
     internal static async Task ResetDB()
     {
         // 1. איפוס ה-Cache ב-OrderManager (חובה!)
@@ -121,7 +113,6 @@ internal static class AdminManager
 
     internal static async Task InitializeDB()
     {
-        // 1. איפוס ה-Cache ב-OrderManager (חובה!)
         OrderManager.ResetCache();
 
         await Task.Run(() =>
@@ -149,7 +140,6 @@ internal static class AdminManager
     private static int s_interval = 1;
     private static volatile bool s_stop = false;
 
-    // ... (Start, Stop, ThrowOnSimulatorIsRunning נשארים זהים) ...
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static void ThrowOnSimulatorIsRunning()
     {
@@ -203,15 +193,9 @@ internal static class AdminManager
         }
     }
 
-    // === סקירה של PeriodicSystemUpdates ===
-
     public static void PeriodicSystemUpdates(DateTime oldClock, DateTime newClock)
     {
-        // הערה חשובה: השורה הבאה מונעת עדכון אם לא עברה שעה שלמה בסימולציה.
-        // זה מצוין עבור בדיקת אי-פעילות (כדי לא להעמיס), 
-        // אבל אם אתה מצפה שמשהו יקרה *מייד* כשהזמן זז (פחות משעה), תצטרך לשנות את זה.
-        // עבור הדרישות הנוכחיות (פיטור שליחים לא פעילים) - זה תקין.
-        if (oldClock + TimeSpan.FromHours(1) >= newClock)
+        if (newClock <= oldClock)
             return;
 
         var config = AdminManager.GetConfig();
@@ -221,66 +205,51 @@ internal static class AdminManager
 
         bool anyListChange = false;
 
+        bool ordersChanged = false;
+
         try
         {
             TimeSpan maxInactivity = config.MaxTimeInactivity;
-
             IEnumerable<DO.Courier> couriers;
             ILookup<int, DO.Delivery> deliveriesByCourier;
 
             lock (AdminManager.BlMutex)
                 couriers = s_dal.Courier.ReadAll(c => c.Active);
-
             lock (AdminManager.BlMutex)
-                deliveriesByCourier = s_dal.Delivery.ReadAll()
-                                                    .ToLookup(d => d.CourierId);
+                deliveriesByCourier = s_dal.Delivery.ReadAll().ToLookup(d => d.CourierId);
 
             foreach (var courier in couriers)
             {
                 var courierDeliveries = deliveriesByCourier[courier.Id];
-
-                // אם השליח באמצע משלוח כרגע - הוא פעיל
-                bool isCurrentlyDelivering = courierDeliveries.Any(d => d.EndDelivery == null);
-                if (isCurrentlyDelivering)
-                    continue;
+                if (courierDeliveries.Any(d => d.EndDelivery == null)) continue;
 
                 DateTime lastActivityTime;
+                var lastCompleted = courierDeliveries.Where(d => d.EndDelivery != null).MaxBy(d => d.TimeEndDelivery);
 
-                var lastCompletedDelivery = courierDeliveries
-                                            .Where(d => d.EndDelivery != null)
-                                            .OrderByDescending(d => d.TimeEndDelivery)
-                                            .FirstOrDefault();
-
-                if (lastCompletedDelivery != null && lastCompletedDelivery.TimeEndDelivery.HasValue)
-                {
-                    lastActivityTime = lastCompletedDelivery.TimeEndDelivery.Value;
-                }
-                else
-                {
-                    lastActivityTime = courier.WorkingSince;
-                }
+                lastActivityTime = lastCompleted?.TimeEndDelivery ?? courier.WorkingSince;
 
                 if (newClock - lastActivityTime > maxInactivity)
                 {
-                    var updatedCourier = courier with { Active = false };
-
-                    lock (AdminManager.BlMutex)
-                        s_dal.Courier.Update(updatedCourier);
-
+                    var updated = courier with { Active = false };
+                    lock (AdminManager.BlMutex) s_dal.Courier.Update(updated);
                     anyListChange = true;
-
-                    // חשוב לעדכן גם את המטמון של השליחים אם יש כזה, או פשוט להודיע למסך
-                    CourierManager.Observer.NotifyItemUpdated(updatedCourier.Id);
+                    CourierManager.Observer.NotifyItemUpdated(updated.Id);
                 }
             }
+
+            ordersChanged = OrderManager.CheckStatusChanges(oldClock, newClock);
+
         }
         finally
         {
             if (anyListChange)
-            {
                 CourierManager.Observer.NotifyListUpdated();
-            }
 
+            if (ordersChanged)
+            {
+                OrderManager.Observer.NotifyListUpdated();
+            }
+            
             s_periodicMutex.UnsetInProgress();
         }
     }

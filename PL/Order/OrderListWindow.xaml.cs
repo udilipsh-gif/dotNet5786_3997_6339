@@ -2,9 +2,11 @@
 using PL.Helpers;
 using System.Collections.ObjectModel;
 using System.Net.Mail;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace PL;
 
@@ -14,11 +16,15 @@ public partial class OrderListWindow : Window, IWindowUpdater
 
     private int CURRENT_MANAGER_ID = Tools.GetSafeFromBl<int>(() => s_bl.Admin.GetConfig().ManagerId);
 
+    private DateTime CURRENT_DATE;
+
     public OrderListWindow(BO.OrderStatus? orderStatus, BO.ScheduleStatus? scheduleStatus, BO.TypeOfOrder? typeOfOrder)
     {
         SelectedScheduleFilter = scheduleStatus;
         SelectedTypeFilter = typeOfOrder;
         SelectedOrderStatusFilter = orderStatus;
+
+        CURRENT_DATE = Tools.GetSafeFromBl<DateTime>(() => s_bl.Admin.GetClock());
 
         InitializeComponent();
     }
@@ -50,9 +56,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
     }
 
 
-    /// <summary>
-    /// סינון לי עמידה בזמנים
-    /// </summary>
+    
     public BO.ScheduleStatus? SelectedScheduleFilter
     {
         get => (BO.ScheduleStatus?)GetValue(SelectedScheduleFilterProperty);
@@ -90,47 +94,94 @@ public partial class OrderListWindow : Window, IWindowUpdater
             typeof(OrderListWindow), new PropertyMetadata(null));
 
 
-    private readonly ObserverMutex _Mutex = new(); //stage 7
-    private void LoadOrders()
-    {
-        Func<BO.OrderInList, bool> filterPredicate = order =>
-            (SelectedScheduleFilter == null || order.ScheduleStatus == SelectedScheduleFilter) &&
-            (SelectedTypeFilter == null || order.TypeOfOrder == SelectedTypeFilter) &&
-            (SelectedOrderStatusFilter == null || order.OrderStatus == SelectedOrderStatusFilter);
 
-        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+
+    private readonly ObserverMutex _ListMutex = new(); //stage 7
+    private readonly ObserverMutex _ClockMutex = new(); //stage 7
+
+    private async void LoadOrders()
+    {
+        if (_ListMutex.CheckAndSetLoadInProgressOrRestartRequired())
             return;
 
-        Dispatcher.BeginInvoke(async () =>
+        BO.ScheduleStatus? scheduleFilter = null;
+        BO.TypeOfOrder? typeFilter = null;
+        BO.OrderStatus? statusFilter = null;
+
+        Dispatcher.Invoke(() =>
         {
-            try
+            scheduleFilter = SelectedScheduleFilter;
+            typeFilter = SelectedTypeFilter;
+            statusFilter = SelectedOrderStatusFilter;
+        });
+
+        try
             {
+                Func<BO.OrderInList, bool> filterPredicate = order =>
+                    (scheduleFilter == null || order.ScheduleStatus == scheduleFilter) &&
+                    (typeFilter == null || order.TypeOfOrder == typeFilter) &&
+                    (statusFilter == null || order.OrderStatus == statusFilter);
+
                 var filteredResults = await s_bl.Order.ReadAll(CURRENT_MANAGER_ID, filterPredicate, BO.OrderInListField.OrderId);
 
-                if (OrderList == null)
+                Dispatcher.Invoke(() =>
                 {
-                    OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
-                }
-                else
-                {
-                    OrderList.Clear();
-                    foreach (var item in filteredResults)
+                    if (OrderList == null)
+                        OrderList = new ObservableCollection<BO.OrderInList>(filteredResults);
+                    else
                     {
-                        OrderList.Add(item);
+                        OrderList.Clear();
+                        foreach (var item in filteredResults)
+                            OrderList.Add(item);
                     }
-                }
+                });
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading orders: {ex.Message}", "שגיאה ברשימת ההזמנות");
+                Dispatcher.Invoke(() =>
+                    MessageBox.Show($"Error loading orders: {ex.Message}", "שגיאה ברשימת ההזמנות"));
             }
             finally
             {
-                if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                if (await _ListMutex.UnsetLoadInProgressAndCheckRestartRequested())
                     LoadOrders();
             }
-        });
+       
+    }
 
+    private async void ClockObserver()
+    {
+        if (_ClockMutex.CheckAndSetLoadInProgressOrRestartRequired())
+            return;
+
+        try
+        {
+            var newDate = s_bl.Admin.GetClock();
+            var buffer = newDate - CURRENT_DATE;
+
+            // ✅ גישה ל-OrderList על ה-UI thread
+            await Dispatcher.InvokeAsync(() =>
+            {
+                if (OrderList != null)
+                {
+                    foreach (var order in OrderList)
+                    {
+                        order.TimeLeftForDelivery -= buffer;
+                    }
+                }
+            });
+
+            CURRENT_DATE = newDate;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Clock Error: {ex.Message}");
+        }
+        finally
+        {
+            if (await _ClockMutex.UnsetLoadInProgressAndCheckRestartRequested())
+                ClockObserver();
+        }
     }
 
     public void UpdateState(params object?[] args)
@@ -152,6 +203,8 @@ public partial class OrderListWindow : Window, IWindowUpdater
     {
         Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
+
         orderListObserver();
     }
 
@@ -159,6 +212,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
     {
         Tools.ResetRequested -= () => this.Close();
         Tools.RunSafe(() => s_bl.Order.RemoveObserver(orderListObserver));
+        Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
     }
 
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

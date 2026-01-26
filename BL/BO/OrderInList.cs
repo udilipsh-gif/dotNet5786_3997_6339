@@ -1,4 +1,6 @@
 ﻿using Helpers;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace BO;
 
@@ -10,8 +12,20 @@ namespace BO;
 /// including delivery tracking, status information, and timing metrics. It is optimized for
 /// displaying multiple orders efficiently without loading full order details.
 /// </remarks>
-public class OrderInList
+public class OrderInList : INotifyPropertyChanged
 {
+    /// <summary>
+    /// Occurs when a property value changes.
+    /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Raises the PropertyChanged event for the specified property.
+    /// </summary>
+    /// <param name="propertyName">The name of the property that changed. If omitted, uses the caller member name.</param>
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
     /// <summary>
     /// Gets the unique identifier of the delivery associated with this order.
     /// </summary>
@@ -43,16 +57,49 @@ public class OrderInList
     public required OrderStatus OrderStatus { get; init; }
 
     /// <summary>
+    /// Backing field for ScheduleStatus property.
+    /// </summary>
+    private ScheduleStatus _ScheduleStatus;
+
+    /// <summary>
     /// Gets the schedule status indicating if the delivery is on time, at risk, or late.
     /// </summary>
     /// <value>A <see cref="ScheduleStatus"/> value representing the delivery timeline status relative to expected delivery time.</value>
-    public required ScheduleStatus ScheduleStatus { get; init; }
+    public ScheduleStatus ScheduleStatus
+    {
+        get => _ScheduleStatus;
+        set
+        {
+            if (_ScheduleStatus != value)
+            {
+                _ScheduleStatus = value;
+                OnPropertyChanged();
+}
+        }
+    }
+
+    /// <summary>
+    /// Backing field for TimeRemaining property.
+    /// </summary>
+    private TimeSpan _TimeLeftForDelivery;
+
 
     /// <summary>
     /// Gets the time remaining until the maximum delivery deadline.
     /// </summary>
     /// <value>A TimeSpan representing how much time is left before the order becomes late.</value>
-    public required TimeSpan TimeLeftForDelivery { get; init; }
+    public TimeSpan TimeLeftForDelivery
+    {
+        get => _TimeLeftForDelivery;
+        set
+        {
+            if (_TimeLeftForDelivery != value)
+            {
+                _TimeLeftForDelivery = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the total time allocated for delivering this order.
