@@ -118,31 +118,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Backing field for the DisplayTimeRemaining property.
-    /// </summary>
-    private TimeSpan? _displayTimeRemaining;
-    
-    /// <summary>
-    /// Gets or sets the time remaining for the courier's current delivery.
-    /// </summary>
-    /// <value>
-    /// A <see cref="TimeSpan"/> representing the time left to complete the delivery,
-    /// or <c>null</c> if no delivery is in progress.
-    /// </value>
-    public TimeSpan? DisplayTimeRemaining
-    {
-        get => _displayTimeRemaining;
-        set
-        {
-            if (_displayTimeRemaining != value)
-            {
-                _displayTimeRemaining = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    /// <summary>
     /// Gets a value indicating whether the window is in update mode.
     /// </summary>
     /// <value>
@@ -396,7 +371,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                         await Dispatcher.BeginInvoke(() => 
                         {
                             CurrentCourier = courier;
-                            DisplayTimeRemaining = courier.OrderInProgress?.TimeRemaining;
                         });
                 }
 
@@ -408,12 +382,10 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                     if (CurrentCourier != freshCourier)
                     {
                         CurrentCourier = freshCourier;
-                        DisplayTimeRemaining = freshCourier.OrderInProgress?.TimeRemaining;
                     }
                     else
                     {
                         OnPropertyChanged(nameof(CurrentCourier));
-                        DisplayTimeRemaining = freshCourier.OrderInProgress?.TimeRemaining;
                     }
                 });
             }
@@ -457,14 +429,10 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
             await Dispatcher.BeginInvoke(() =>
             {
-                if (DisplayTimeRemaining.HasValue)
-                {
-                    if (DisplayTimeRemaining > TimeSpan.Zero && (DisplayTimeRemaining - buffer) <= TimeSpan.Zero)
-                        CourierObserver();
-                    
-                    DisplayTimeRemaining -= buffer;
-                    CURRENT_DATE = newDate;
-                }
+                if (CurrentCourier?.OrderInProgress is not null)
+                    CurrentCourier.OrderInProgress.TimeRemaining -= buffer;
+
+                CURRENT_DATE = newDate;
             });
         }
         catch (Exception ex)

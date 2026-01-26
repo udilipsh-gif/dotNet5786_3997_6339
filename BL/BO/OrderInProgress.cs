@@ -1,6 +1,7 @@
-﻿
+﻿using Helpers;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-using Helpers;
 
 namespace BO;
 
@@ -13,8 +14,21 @@ namespace BO;
 /// location information, timing metrics, and status tracking. It is used to monitor and manage
 /// deliveries that are currently in progress.
 /// </remarks>
-public class OrderInProgress
+public class OrderInProgress : INotifyPropertyChanged
 {
+    /// <summary>
+    /// Occurs when a property value changes.
+    /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Raises the PropertyChanged event for the specified property.
+    /// </summary>
+    /// <param name="propertyName">The name of the property that changed. If omitted, uses the caller member name.</param>
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+
     /// <summary>
     /// Gets the unique identifier for the delivery.
     /// </summary>
@@ -111,16 +125,33 @@ public class OrderInProgress
     /// </summary>
     /// <value>A <see cref="ScheduleStatus"/> value representing the delivery timeline status relative to expected delivery time.</value>
     public required ScheduleStatus ScheduleStatus { get; set; }
-    
+
     /// <summary>
-    /// Gets the time remaining until the maximum delivery deadline.
+    /// Backing field for TimeRemaining property.
+    /// </summary>
+    private TimeSpan _timeRemaining;
+
+    /// <summary>
+    /// Gets or sets the time remaining until the maximum delivery deadline.
     /// </summary>
     /// <value>A TimeSpan representing how much time is left before the order becomes late.</value>
     /// <remarks>
     /// This value is dynamically calculated and helps couriers prioritize deliveries.
     /// A negative value indicates the order is already late.
+    /// Automatically notifies the UI when changed.
     /// </remarks>
-    public required TimeSpan TimeRemaining { get; set; }
+    public TimeSpan TimeRemaining
+    {
+        get => _timeRemaining;
+        set
+        {
+            if (_timeRemaining != value)
+            {
+                _timeRemaining = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public override string ToString() => this.ToStringProperty();                    
 }

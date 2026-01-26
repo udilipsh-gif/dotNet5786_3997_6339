@@ -133,31 +133,6 @@ public partial class MainCourier : Window, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Backing field for the DisplayTimeRemaining property.
-    /// </summary>
-    private TimeSpan? _displayTimeRemaining;
-    
-    /// <summary>
-    /// Gets or sets the time remaining for the current delivery.
-    /// </summary>
-    /// <value>
-    /// A <see cref="TimeSpan"/> representing the time left to complete the delivery,
-    /// or <c>null</c> if no delivery is in progress.
-    /// </value>
-    public TimeSpan? DisplayTimeRemaining
-    {
-        get => _displayTimeRemaining;
-        set
-        {
-            if (_displayTimeRemaining != value)
-            {
-                _displayTimeRemaining = value;
-                OnPropertyChanged(); 
-            }
-        }
-    }
-
-    /// <summary>
     /// Gets the list of available vehicle types for courier selection.
     /// </summary>
     /// <value>
@@ -195,7 +170,7 @@ public partial class MainCourier : Window, INotifyPropertyChanged
         GetCurier();
         Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Courier.AddObserver(USERID, GetCurier));
-        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(GetCurier));
+        Tools.RunSafe(() => s_bl.Admin.AddClockObserver(ClockObserver));
     }
 
     /// <summary>
@@ -210,7 +185,7 @@ public partial class MainCourier : Window, INotifyPropertyChanged
         if (USERID != 0)
         {
             Tools.RunSafe(() => s_bl.Courier.RemoveObserver(USERID, GetCurier));
-            Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(GetCurier));
+            Tools.RunSafe(() => s_bl.Admin.RemoveClockObserver(ClockObserver));
         }
     }
 
@@ -414,7 +389,6 @@ public partial class MainCourier : Window, INotifyPropertyChanged
                         await Dispatcher.BeginInvoke(() =>
                         {
                             CurrentCourier = courier;
-                            DisplayTimeRemaining = courier.OrderInProgress?.TimeRemaining;
                         });
                 }
 
@@ -426,12 +400,10 @@ public partial class MainCourier : Window, INotifyPropertyChanged
                     if (CurrentCourier != freshCourier)
                     {
                         CurrentCourier = freshCourier;
-                        DisplayTimeRemaining = freshCourier.OrderInProgress?.TimeRemaining;
                     }
                     else
                     {
                         OnPropertyChanged(nameof(CurrentCourier));
-                        DisplayTimeRemaining = freshCourier.OrderInProgress?.TimeRemaining;
                     }
                 });
             }
@@ -453,6 +425,34 @@ public partial class MainCourier : Window, INotifyPropertyChanged
             }
         });
     }
-    
+
+    private async void ClockObserver()
+    {
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
+            return;
+        try
+        {
+            var newDate = s_bl.Admin.GetClock();
+            var buffer = newDate - CURRENT_DATE;
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                if (CurrentCourier?.OrderInProgress is not null)
+                    CurrentCourier.OrderInProgress.TimeRemaining -= buffer;
+
+                CURRENT_DATE = newDate;
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Clock Error: {ex.Message}");
+        }
+        finally
+        {
+            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                ClockObserver();
+        }
+    }
+
     #endregion
 }

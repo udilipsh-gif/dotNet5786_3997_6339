@@ -67,8 +67,7 @@
                                         <TextBlock Text="זמנים" FontWeight="Bold" Margin="0,0,0,5"/>
                                         <TextBlock Text="{Binding OrderTime, StringFormat='נוצר: {0:dd/MM/yyyy HH:mm}'}"/>
                                         <TextBlock Text="{Binding StartDeliveryTime, StringFormat='יצא: {0:dd/MM/yyyy HH:mm}'}"/>
-                                        <TextBlock Text="{Binding DisplayTimeRemaining, 
-                                              RelativeSource={RelativeSource AncestorType=Window}, 
+                                        <TextBlock Text="{Binding TimeRemaining, 
                                               Converter={StaticResource TimeSpanConverter}, 
                                               StringFormat='נותר: {0:dd\\:hh\\:mm}'}" 
                                                        FontWeight="Bold" 
