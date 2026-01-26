@@ -25,15 +25,15 @@
                 Padding="10">
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="ניהול שליחים" Click="btnCourierList_Click" Width="120" Margin="5"/>
-                <Button Content="ניהול הזמנות" Click="btnOrderList_Click" Width="120" Margin="5"
+                <Button Content="ניהול שליחים" Command="{Binding btnCourierList_Click}" Width="120" Margin="5"/>
+                <Button Content="ניהול הזמנות" Command="{Binding btnOrderList_Click}" Width="120" Margin="5"
                         ToolTip="טבלת הזמנות - הצג רשימה, מיין וסנן"/>
-                <Button Content="הגדרות" Click="btnConfig_Click" Width="120" Margin="5"/>
+                <Button Content="הגדרות" Command="{Binding btnConfig_Click}" Width="120" Margin="5"/>
 
                 <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                    <Button Content="איפוס נתונים" Click="ResetDB" Width="120" Margin="5"
+                    <Button Content="איפוס נתונים" Command="{Binding btnResetDB_Click}" Width="120" Margin="5"
                             Style="{StaticResource DestructiveButtonStyle}"/>
-                    <Button Content="אתחול נתונים" Click="InitDB" Width="120" Margin="5"
+                    <Button Content="אתחול נתונים" Command="{Binding btnInitDB_Click}" Width="120" Margin="5"
                             Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>
             </StackPanel>
@@ -76,12 +76,12 @@
                                Margin="0,0,10,0" 
                                FontWeight="Bold"/>
 
-                    <Button Content="דקה" Tag="Minute" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
-                    <Button Content="שעה" Tag="Hour" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
-                    <Button Content="יום" Tag="Day" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
-                    <Button Content="שבוע" Tag="Week" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
-                    <Button Content="חודש" Tag="Month" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
-                    <Button Content="שנה" Tag="Year" Click="ClockForward_Click" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="דקה" CommandParameter="Minute" Command="{Binding btnClockForward_Click}" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="שעה" CommandParameter="Hour" Command="{Binding btnClockForward_Click}" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="יום" CommandParameter="Day" Command="{Binding btnClockForward_Click}" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="שבוע" CommandParameter="Week" Command="{Binding btnClockForward_Click}" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="חודש" CommandParameter="Month" Command="{Binding btnClockForward_Click}" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
+                    <Button Content="שנה" CommandParameter="Year" Command="{Binding btnClockForward_Click}" Style="{StaticResource SecondaryButtonStyle}" Width="60" Margin="2"/>
                 </WrapPanel>
             </Grid>
 
@@ -103,7 +103,7 @@
                              IsEnabled="{Binding RunStopSimulator}" 
                              local:Tools.NumericOnly="True"/>
 
-                    <Button Click="btnSimulator_Click" 
+                    <Button Command="{Binding btnSimulator_Click}"
                             Margin="0,5" 
                             Content="{Binding RunStopSimulator, Mode=OneWay, Converter={StaticResource RunStopSimulatorConverter}}"/>
                 </StackPanel>
@@ -122,14 +122,14 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button Style="{StaticResource StatisticButtonStyle}"
-                                Click="btnStatistic_Click"
-                                Tag="{Binding Id}"
+                                Command="{Binding DataContext.btnStatistic_Click, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding Id}"
                                 Width="200"  
                                 Margin="10"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
 
-            </ItemsControl>
+            </ItemsControl> 
         </ScrollViewer>
     </Grid>
 </Window>

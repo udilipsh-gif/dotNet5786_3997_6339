@@ -428,5 +428,8 @@ internal static class AdminManager //stage 4
         }
     }
 
+    public static bool IsSimulatorStop()
+        => s_thread == null;
+
     #endregion Stage 7 base
 }

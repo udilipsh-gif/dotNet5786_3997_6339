@@ -1,4 +1,5 @@
 ﻿using BO;
+using DO;
 using PL.Helpers;
 using System;
 using System.Collections.Generic;
@@ -85,7 +86,18 @@ namespace PL
 
         #endregion
 
-        #region Dependency Properties
+        #region Dependency Properties & Commands
+
+        public ICommand btnCourierList_Click { get; private set; }
+        public ICommand btnOrderList_Click { get; private set; }
+        public ICommand btnConfig_Click { get; private set; }
+        public ICommand btnResetDB_Click { get; private set; }
+        public ICommand btnInitDB_Click { get; private set; }
+        public ICommand btnClockForward_Click { get; private set; }
+        public ICommand btnSimulator_Click { get; private set; }
+        public ICommand btnStatistic_Click { get; private set; }
+
+
 
         /// <summary>
         /// Collection of statistics items displayed in the dashboard.
@@ -157,9 +169,21 @@ namespace PL
         /// <param name="id">The ID of the user logging in.</param>
         public ManagerWindow(int id)
         {
-            InitializeComponent();
+            btnCourierList_Click = new Tools.RelayCommand(CourierList);
+            btnOrderList_Click = new Tools.RelayCommand(OrderList);
+            btnConfig_Click = new Tools.RelayCommand(Config);
+            btnResetDB_Click = new Tools.RelayCommand(ResetDB, IsSimulatorStop);
+            btnInitDB_Click = new Tools.RelayCommand(InitDB, IsSimulatorStop);
+            btnClockForward_Click = new Tools.RelayCommand(ClockForward, IsSimulatorStop);
+            btnSimulator_Click = new Tools.RelayCommand(Simulator);
+            btnStatistic_Click = new Tools.RelayCommand(Statistic);
+
+
             _userId = id;
+
             DataContext = this;
+
+            InitializeComponent();
         }
 
         /// <summary>
@@ -196,6 +220,10 @@ namespace PL
         #endregion
 
         #region Observers & Logic
+
+        private bool IsSimulatorStop(object? parameter)
+            => s_bl.Admin.IsSimulatorStop();
+        
 
         /// <summary>
         /// Helper property to generate the initial template for statistics (with 0 values).
@@ -239,11 +267,11 @@ namespace PL
             if (_clockMutex.CheckAndSetLoadInProgressOrRestartRequired())
                 return;
 
-            Task.Run(async() =>
+            Task.Run(async () =>
             {
                 var currentTime = s_bl.Admin.GetClock();
 
-                _=Dispatcher.BeginInvoke(() =>
+                _ = Dispatcher.BeginInvoke(() =>
                 {
                     CurrentTime = currentTime;
 
@@ -268,7 +296,6 @@ namespace PL
             {
                 try
                 {
-                    // שליפת הנתונים החדשים מה-BL
                     var newStatsValues = await s_bl.Order.GetAllOrderStatistic(_userId);
 
                     if (newStatsValues != null)
@@ -283,7 +310,6 @@ namespace PL
                                 int i = 0;
                                 foreach (var newValue in newStatsValues)
                                 {
-                                    // עדכון הערך בלבד - ה-UI יתעדכן אוטומטית בגלל ה-PropertyChanged
                                     if (currentList[i].Value != newValue)
                                     {
                                         currentList[i].Value = newValue;
@@ -293,7 +319,6 @@ namespace PL
                             }
                             else
                             {
-                                // מקרה חירום: אם הרשימות לא תואמות באורך, נבנה מחדש (כמו בקוד הישן)
                                 var template = InitialStatsTemplate;
                                 CombinedStatistics = template.Zip(newStatsValues, (item, count) =>
                                 {
@@ -327,28 +352,26 @@ namespace PL
         /// <summary>
         /// Opens the Courier List window.
         /// </summary>
-        private void btnCourierList_Click(object sender, RoutedEventArgs e)
+        private void CourierList(object? parameter)
             => Tools.OpenOrActivateWindow<CourierListWindow>(this);
 
         /// <summary>
         /// Opens the Order List window.
         /// </summary>
-        private void btnOrderList_Click(object sender, RoutedEventArgs e)
-            => Tools.OpenOrActivateWindow<OrderListWindow>(this);
+        private void OrderList(object? parameter)
+            => Tools.OpenOrActivateWindow<OrderListWindow>(this, (BO.OrderStatus?)null, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
 
         /// <summary>
         /// Opens the Configuration window.
         /// </summary>
-        private void btnConfig_Click(object sender, RoutedEventArgs e)
+        private void Config(object? parameter)
             => Tools.OpenOrActivateWindow<ConfigWindow>(this);
 
         /// <summary>
         /// Toggles the Time Simulator On/Off.
         /// </summary>
-        private async void btnSimulator_Click(object sender, RoutedEventArgs e)
+        private async void Simulator(object? parameter)
         {
-            if (sender is null) return;
-
             if (RunStopSimulator)
             {
                 int speed = ClockSpeed;
@@ -365,15 +388,13 @@ namespace PL
         /// <summary>
         /// Advances the system clock by a specific unit based on the button clicked.
         /// </summary>
-        private void ClockForward_Click(object sender, RoutedEventArgs e)
+        private void ClockForward(object? parameter)
         {
-            if (sender is FrameworkElement element && element.Tag != null)
+            if (parameter is string value)
             {
-                string tagValue = element.Tag.ToString() ?? string.Empty;
-
                 try
                 {
-                    var unit = tagValue switch
+                    var unit = value switch
                     {
                         "Minute" => BO.TimeUnit.MINUTE,
                         "Hour" => BO.TimeUnit.HOUR,
@@ -400,11 +421,11 @@ namespace PL
         /// <summary>
         /// Filters the order list based on the clicked statistic button.
         /// </summary>
-        private void btnStatistic_Click(object sender, RoutedEventArgs e)
+        private void Statistic(object? parameter)
         {
-            if (sender is FrameworkElement element && element.Tag != null)
+            if (parameter is not null)
             {
-                switch (element.Tag)
+                switch (parameter)
                 {
                     case BO.OrderStatus orderStatus:
                         Tools.OpenOrActivateWindow<OrderListWindow>(this, orderStatus, (BO.ScheduleStatus?)null, (BO.TypeOfOrder?)null);
@@ -424,7 +445,7 @@ namespace PL
         /// <summary>
         /// Resets the database after user confirmation.
         /// </summary>
-        private async void ResetDB(object sender, RoutedEventArgs e)
+        private async void ResetDB(object? parameter)
         {
             if (MessageBox.Show("Delete all data?", "ResetDB",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -436,7 +457,7 @@ namespace PL
         /// <summary>
         /// Initializes the database with sample data.
         /// </summary>
-        private async void InitDB(object sender, RoutedEventArgs e)
+        private async void InitDB(object? parameter)
         {
             if (MessageBox.Show("Do you want to initialize all data?", "InitDB",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -466,7 +487,7 @@ namespace PL
             {
                 IsWindowEnabled = true;
                 Mouse.OverrideCursor = null;
-                StatisticObserver(); // Force refresh stats
+                StatisticObserver();
             }
         }
 

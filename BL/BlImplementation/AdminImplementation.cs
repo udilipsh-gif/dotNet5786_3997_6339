@@ -161,4 +161,8 @@ internal class AdminImplementation : IAdmin
 
     public void StopSimulator()
         => AdminManager.Stop(); //stage 7
+
+    public bool IsSimulatorStop() => AdminManager.IsSimulatorStop();
+
+
 }

@@ -146,16 +146,12 @@ public static class Tools
     {
         try
         {
-            // כאן אנחנו מפעילים את הפונקציה שנשלחה
             return functionToRun();
         }
         catch (Exception ex)
         {
-            // הצגת הודעה למשתמש
             MessageBox.Show($"לא הצלחנו לקבל תשובה מ s_bl: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-            // במקרה של שגיאה, חייבים להחזיר משהו.
-            // default(T) יחזיר 0 למספרים, או null לאובייקטים.
             return defaultValue;
         }
     }
