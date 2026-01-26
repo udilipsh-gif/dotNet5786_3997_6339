@@ -1,4 +1,5 @@
 ﻿using DalApi;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Helpers;
@@ -244,7 +245,10 @@ internal static class OrderManager
         object? filterValue,
         BO.OrderInListField? orderBy = BO.OrderInListField.OrderStatus)
     {
-        Func<BO.OrderInList, bool> filterPredicate = s_getFilterPredicate(filter, filterValue);
+        Func<BO.OrderInList, bool> filterPredicate;
+        lock (AdminManager.BlMutex)
+            filterPredicate = s_getFilterPredicate(filter, filterValue);
+
         return await ReadAll(filterPredicate, orderBy);
     }
 

@@ -316,7 +316,7 @@
         <Style x:Key="StatisticButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource SurfaceColor}"/>
             <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="15,10"/>
             <Setter Property="Margin" Value="0,5"/>

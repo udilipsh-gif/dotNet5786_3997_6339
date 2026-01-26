@@ -215,7 +215,9 @@ internal static class Tools
     /// </exception>
     public static async Task<BO.ScheduleStatus> GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
     {
-        var config = AdminManager.GetConfig();
+        BO.Config config;
+        lock (AdminManager.BlMutex)
+            config = AdminManager.GetConfig();
         TimeSpan riskRange = config?.RiskRange ??
             throw new Exception("Risk range not configured");
 

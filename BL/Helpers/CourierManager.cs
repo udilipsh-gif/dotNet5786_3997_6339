@@ -529,7 +529,9 @@ internal static class CourierManager
     /// </remarks>
     private static int s_getDeliveryOnTimeCount(IEnumerable<DO.Delivery>? courierDeliveries)
     {
-        var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
+        TimeSpan maxDeliveryTime;
+        lock (AdminManager.BlMutex)
+             maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
         if (courierDeliveries is null)
             return 0;
@@ -552,7 +554,9 @@ internal static class CourierManager
     /// </remarks>
     private static int s_getDeliveryLateCount(IEnumerable<DO.Delivery>? courierDeliveries)
     {
-        var maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
+        TimeSpan maxDeliveryTime;
+        lock (AdminManager.BlMutex)
+            maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
         if (courierDeliveries is null)
             return 0;
