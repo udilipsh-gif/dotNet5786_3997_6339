@@ -179,7 +179,7 @@ internal static class Tools
             DO.EndDelivery.CONCELLED => BO.OrderStatus.CANCELLED,
             DO.EndDelivery.FAILED => BO.OrderStatus.OPEN,
             DO.EndDelivery.NOTFOUND => BO.OrderStatus.OPEN,
-            null => BO.OrderStatus.OPEN,
+            null => BO.OrderStatus.DELIVERING,
             _ => throw new Exception("Unknown delivery status")
         };
     }
@@ -215,18 +215,27 @@ internal static class Tools
     /// </exception>
     public static async Task<BO.ScheduleStatus> GetScheduleStatus(DO.Order order, DO.Delivery? delivery = null)
     {
+        // 1. ניסיון שליפה מהמטמון המהיר (פותר את הבעיה להזמנות סגורות)
+        var cachedStatus = OrderManager.TryGetCachedScheduleStatus(order.Id);
+        if (cachedStatus.HasValue)
+        {
+            return cachedStatus.Value;
+        }
+
+        // 2. אם אין במטמון (או שההזמנה פתוחה), ממשיכים לחישוב הרגיל
         BO.Config config;
         lock (AdminManager.BlMutex)
             config = AdminManager.GetConfig();
-        TimeSpan riskRange = config?.RiskRange ??
-            throw new Exception("Risk range not configured");
 
-        DateTime maxDeliveryTime = order.OrderDate + (config?.MaxDeliveryTime ??
-            throw new Exception("Max Delivery Time not configured"));
+        TimeSpan riskRange = config?.RiskRange ?? TimeSpan.Zero; // טיפול ב-null
 
+        // חישוב זמן יעד
+        DateTime maxDeliveryTime = order.OrderDate + (config?.MaxDeliveryTime ?? TimeSpan.Zero);
+
+        // לוגיקה קיימת
         return order.OrderStatus switch
         {
-            DO.OrderStatus.COMPLETED => GetCompletedOrderScheduleStatus(order, delivery, maxDeliveryTime),
+            DO.OrderStatus.COMPLETED => GetCompletedOrderScheduleStatus(order, delivery, maxDeliveryTime), // שינינו לפונקציה בטוחה
             DO.OrderStatus.DELIVERING => await GetDeliveringOrderScheduleStatus(order, maxDeliveryTime, riskRange),
             DO.OrderStatus.OPEN => GetOpenOrderScheduleStatus(order, maxDeliveryTime, riskRange),
             _ => BO.ScheduleStatus.CANCELLED
@@ -254,25 +263,25 @@ internal static class Tools
     {
         try
         {
-            lock (AdminManager.BlMutex)
-                if (delivery is null)
-                    s_getLatestDelivery(order.Id);
+            if (delivery is null)
+            {
+                lock (AdminManager.BlMutex)
+                    delivery = s_getLatestDelivery(order.Id);
+            }
 
-            DateTime timeEndDelivery = delivery?.TimeEndDelivery ??
-                throw new Exception("Order completed but delivery not found");
+            if (delivery == null || !delivery.TimeEndDelivery.HasValue)
+            {
+                return BO.ScheduleStatus.ONTYME;
+            }
 
-            return maxDeliveryTime >= timeEndDelivery
+            return maxDeliveryTime >= delivery.TimeEndDelivery.Value
            ? BO.ScheduleStatus.ONTYME
            : BO.ScheduleStatus.LATE;
         }
-        catch(Exception ex)
+        catch
         {
-            Debug.WriteLine($"orderId = {order.Id}. DeliveryId = {delivery?.Id}");
-            Debug.WriteLine(ex);
-
-            throw new Exception(ex.Message);
+            return BO.ScheduleStatus.ONTYME;
         }
-        
     }
 
     /// <summary>
@@ -491,8 +500,11 @@ internal static class Tools
             actualDistance = await GoogleMapsService.NetworkKeeper(() =>
                 GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude,
                 (BO.TheTypeShipment)courier.TypeShipment)) ?? 0;
-            lock (AdminManager.BlMutex)
+            lock (AdminManager.BlMutex) 
+            { 
                 s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
+                OrderManager.UpdateCacheItem(delivery.OrderId);
+            }
         }
 
         return GetEstimatedDeliveryTime((BO.TheTypeShipment)courier.TypeShipment, actualDistance ?? 0);

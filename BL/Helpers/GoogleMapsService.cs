@@ -20,7 +20,13 @@ public static class GoogleMapsService
     /// Shared HTTP client instance for making API requests.
     /// Reused across all requests to avoid socket exhaustion.
     /// </summary>
-    private static readonly HttpClient s_httpClient = new();
+    private static readonly HttpClient s_httpClient = new()
+    {
+         DefaultRequestHeaders =
+         {
+             { "User-Agent", UserAgent }
+         }
+    };
 
     private static readonly SemaphoreSlim _gateKeeper = new SemaphoreSlim(10);
 
@@ -76,6 +82,10 @@ public static class GoogleMapsService
         public string DistanceText { get; set; } = string.Empty;
     }
 
+    static GoogleMapsService()
+    {
+        s_httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
+    }
 
     /// <summary>
     /// Clears the route cache.
@@ -108,7 +118,7 @@ public static class GoogleMapsService
     /// </summary>
     private static void s_prepareHttpClient()
     {
-       
+
 
         s_httpClient.DefaultRequestHeaders.Clear();
         s_httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
@@ -278,7 +288,7 @@ public static class GoogleMapsService
                                                     BO.TheTypeShipment shipmentType,
                                                     int width = 400, int height = 300)
     {
-        var route = await GoogleMapsService.NetworkKeeper(() => 
+        var route = await GoogleMapsService.NetworkKeeper(() =>
             GetRouteFromStore(destLat, destLng, shipmentType));
         if (route == null || string.IsNullOrEmpty(route.EncodedPolyline))
             return null;
@@ -419,7 +429,7 @@ public static class GoogleMapsService
         {
             await Task.Delay(100);
             T result = await action();
-            
+
             return result;
         }
         finally

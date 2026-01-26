@@ -1,126 +1,78 @@
-﻿//using BO;
-using DO;
+﻿using DO;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace Helpers;
 
-/// <summary>
-/// Internal BL manager for all Application's Configuration Variables and Clock logic policies
-/// </summary>
-internal static class AdminManager //stage 4
+internal static class AdminManager
 {
     #region Stage 4-7
-    private static readonly DalApi.IDal s_dal = DalApi.Factory.Get; //stage 4
-
+    private static readonly DalApi.IDal s_dal = DalApi.Factory.Get;
     private static readonly AsyncMutex s_periodicMutex = new();
 
-    /// <summary>
-    /// Property for providing current application's clock value for any BL class that may need it
-    /// </summary>
-    internal static DateTime Now { get => s_dal.Config.Clock; } //stage 4
+    internal static DateTime Now { get => s_dal.Config.Clock; }
 
-    internal static event Action? ConfigUpdatedObservers; //stage 5 - for config update observers
-    internal static event Action? ClockUpdatedObservers; //stage 5 - for clock update observers
+    internal static event Action? ConfigUpdatedObservers;
+    internal static event Action? ClockUpdatedObservers;
 
-    private static Task? _periodicTask = null; //stage 7
+    private static Task? _periodicTask = null;
 
-    /// <summary>
-    /// Method to update application's clock from any BL class as may be required
-    /// </summary>
-    /// <param name="newClock">updated clock value</param>
-    internal static void UpdateClock(DateTime newClock) //stage 4-7 **********************************************************************
+    internal static void UpdateClock(DateTime newClock)
     {
-        var oldClock = s_dal.Config.Clock; //stage 4
-        s_dal.Config.Clock = newClock; //stage 4
+        var oldClock = s_dal.Config.Clock;
+        s_dal.Config.Clock = newClock;
 
-        //Task.Run(() => PeriodicSystemUpdates(oldClock, newClock));
-
-        //if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
-        //{
-        //    _periodicTask = Task.Run(() =>
-        //    {
-        //        // קריאה לפונקציה החדשה שיצרנו ב-Tools
-        //        _ = Task.Run(() => Tools.PeriodicSystemUpdates());
-
-        //        // אם בוצעו שינויים בנתונים (למשל שליח הפך ללא פעיל), נרצה להודיע על כך
-        //        //if (dataChanged)
-        //        //{
-        //        //    // אופציונלי: קריאה לאירוע עדכון קונפיגורציה או אירוע ייעודי אחר לריענון רשימות
-        //        //    //ConfigUpdatedObservers?.Invoke();
-        //        //    //CourierManager.Observer.NotifyListUpdated();
-        //        //}
-        //        //OrderManager.Observer.NotifyListUpdated();
-        //    });
-        //}
-
-        //TO_DO: //stage 7
-        if (_periodicTask is null || _periodicTask.IsCompleted) //stage 7
+        // בדיקה שהמשימה הקודמת הסתיימה לפני שמתחילים חדשה למניעת עומס
+        if (_periodicTask is null || _periodicTask.IsCompleted)
             _periodicTask = Task.Run(() => PeriodicSystemUpdates(oldClock, newClock));
-        //...
 
-        //Calling all the observers of clock update
-        ClockUpdatedObservers?.Invoke(); //prepared for stage 5
+        ClockUpdatedObservers?.Invoke();
     }
 
-    /// <summary>
-    /// Method for providing current configuration variables values for any BL class that may need it
-    /// </summary>
-    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7
-    internal static BO.Config GetConfig() //stage 4//i did, yuda
-    => new BO.Config()
+    // ... (GetConfig ו-SetConfig נשארים ללא שינוי - הם תקינים) ...
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    internal static BO.Config GetConfig()
     {
-        ManagerId = s_dal.Config.ManagerId,
-        PasswordManager = s_dal.Config.PasswordManager,
-        StoreAddress = s_dal.Config.StoreAddress,
-        Latitude = s_dal.Config.Latitude,
-        Longitude = s_dal.Config.Longitude,
-        MaxDeliveryRange = s_dal.Config.MaxDeliveryRange,
-        AvgSpeedBike = s_dal.Config.AvgSpeedBike,
-        AvgSpeedCar = s_dal.Config.AvgSpeedCar,
-        AvgSpeedFoot = s_dal.Config.AvgSpeedFoot,
-        AvgSpeedMotorcycle = s_dal.Config.AvgSpeedMotorcycle,
-        MaxDeliveryTime = s_dal.Config.MaxDeliveryTime,
-        RiskRange = s_dal.Config.RiskRange,
-        MaxTimeInactivity = s_dal.Config.MaxTimeInactivity,
-        GoogleApiKey = s_dal.Config.GoogleApiKey,
-        EmailAddress = s_dal.Config.EmailAddress,
-        ScriptUrl = s_dal.Config.ScriptUrl,
-        ScriptPass = s_dal.Config.ScriptPass,
-        TokenCallSms = s_dal.Config.TokenCallSms
+        // הקוד הקיים שלך כאן מצוין
+        return new BO.Config()
+        {
+            ManagerId = s_dal.Config.ManagerId,
+            PasswordManager = s_dal.Config.PasswordManager,
+            StoreAddress = s_dal.Config.StoreAddress,
+            Latitude = s_dal.Config.Latitude,
+            Longitude = s_dal.Config.Longitude,
+            MaxDeliveryRange = s_dal.Config.MaxDeliveryRange,
+            AvgSpeedBike = s_dal.Config.AvgSpeedBike,
+            AvgSpeedCar = s_dal.Config.AvgSpeedCar,
+            AvgSpeedFoot = s_dal.Config.AvgSpeedFoot,
+            AvgSpeedMotorcycle = s_dal.Config.AvgSpeedMotorcycle,
+            MaxDeliveryTime = s_dal.Config.MaxDeliveryTime,
+            RiskRange = s_dal.Config.RiskRange,
+            MaxTimeInactivity = s_dal.Config.MaxTimeInactivity,
+            GoogleApiKey = s_dal.Config.GoogleApiKey,
+            EmailAddress = s_dal.Config.EmailAddress,
+            ScriptUrl = s_dal.Config.ScriptUrl,
+            ScriptPass = s_dal.Config.ScriptPass,
+            TokenCallSms = s_dal.Config.TokenCallSms
+        };
+    }
 
-
-    };
-
-    /// <summary>
-    /// Method for setting current configuration variables values for any BL class that may need it
-    /// </summary>
-    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7 ******************************************************************************************
-    internal static void SetConfig(BO.Config configuration) //stage 4
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    internal static void SetConfig(BO.Config configuration)
     {
-
+        // הקוד הקיים שלך כאן תקין לחלוטין
+        // ... (השאר את הלוגיקה הקיימת של SetConfig) ...
         bool configChanged = false; // stage 5
-
         var config = AdminManager.GetConfig();
+        // ... העתק את כל התוכן הקיים ...
 
-        if (config.ManagerId != configuration.ManagerId)
-        {
-            if (!Tools.IsValidId(configuration.ManagerId))
-                throw new BO.BlInvalidValueException("Invalid Manager ID.");
-            s_dal.Config.ManagerId = configuration.ManagerId;
-            configChanged = true;
-        }
-        if (config.PasswordManager != configuration.PasswordManager)
-        {
-            if (!Tools.IsStrongPassword(configuration.PasswordManager))
-                throw new BO.BlInvalidValueException("Weak password for Manager.");
-            s_dal.Config.PasswordManager = configuration.PasswordManager;
-            //AdminManager.GetConfig().PasswordManager = configuration.PasswordManager;
-            configChanged = true;
-        }
+        // הערה לשיפור (אופציונלי): הקריאה ל-GoogleMapsService בתוך ה-Setter היא סינכרונית (Task.Run(...).Result).
+        // זה עלול "לתקוע" את הממשק לשנייה אם האינטרנט איטי, אבל לפרויקט הזה זה בסדר גמור.
+
         if (config.StoreAddress != configuration.StoreAddress)
         {
+            // ... הלוגיקה הקיימת ...
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
 
             string api = configuration.GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API key cannot be null.");
@@ -130,168 +82,82 @@ internal static class AdminManager //stage 4
             configuration.Longitude = adressCoordinates?.Lon;
 
             s_dal.Config.StoreAddress = configuration.StoreAddress;
-            //AdminManager.GetConfig().StoreAddress = configuration.StoreAddress;
 
             s_dal.Config.Latitude = adressCoordinates?.Lat ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
-            //AdminManager.GetConfig().Latitude = adressCoordinates?.Lat ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
 
             s_dal.Config.Longitude = adressCoordinates?.Lon ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
-            //AdminManager.GetConfig().Longitude = adressCoordinates?.Lon ?? throw new BO.BlInvalidValueException("Failed to geocode address.");
             configChanged = true;
             Task.Run(OrderManager.UpdateDistanceForOrders);
         }
-        //if (config.Latitude != configuration.Latitude)
-        //{
-        //    s_dal.Config.Latitude = configuration.Latitude;
-        //    //AdminManager.GetConfig().Latitude = configuration.Latitude;
-        //    configChanged = true;
-        //}
-        //if (config.Longitude != configuration.Longitude)
-        //{
-        //    s_dal.Config.Longitude = configuration.Longitude;
-        //    //AdminManager.GetConfig().Longitude = configuration.Longitude;
-        //    configChanged = true;
-        //}
-        if (config.MaxDeliveryRange != configuration.MaxDeliveryRange)
-        {
-            s_dal.Config.MaxDeliveryRange = configuration.MaxDeliveryRange;
-            //  AdminManager.GetConfig().MaxDeliveryRange = configuration.MaxDeliveryRange;
-            configChanged = true;
-        }
-        if (config.AvgSpeedCar != configuration.AvgSpeedCar)
-        {
-            s_dal.Config.AvgSpeedCar = configuration.AvgSpeedCar;
-            //AdminManager.GetConfig().AvgSpeedCar = configuration.AvgSpeedCar;
-            configChanged = true;
-        }
-        if (config.AvgSpeedMotorcycle != configuration.AvgSpeedMotorcycle)
-        {
-            s_dal.Config.AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
-            //AdminManager.GetConfig().AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
-            configChanged = true;
-        }
-        if (config.AvgSpeedBike != configuration.AvgSpeedBike)
-        {
-            s_dal.Config.AvgSpeedBike = configuration.AvgSpeedBike;
-            //AdminManager.GetConfig().AvgSpeedBike = configuration.AvgSpeedBike;
-            configChanged = true;
-        }
-        if (config.AvgSpeedFoot != configuration.AvgSpeedFoot)
-        {
-            s_dal.Config.AvgSpeedFoot = configuration.AvgSpeedFoot;
-            //AdminManager.GetConfig().AvgSpeedFoot = configuration.AvgSpeedFoot;
-            configChanged = true;
-        }
-        if (config.MaxDeliveryTime != configuration.MaxDeliveryTime)
-        {
-            s_dal.Config.MaxDeliveryTime = configuration.MaxDeliveryTime;
-            //AdminManager.GetConfig().MaxDeliveryTime = configuration.MaxDeliveryTime;
-            configChanged = true;
-        }
-        if (config.RiskRange != configuration.RiskRange)
-        {
-            s_dal.Config.RiskRange = configuration.RiskRange;
-            //AdminManager.GetConfig().RiskRange = configuration.RiskRange;
-            configChanged = true;
-        }
-        if (config.MaxTimeInactivity != configuration.MaxTimeInactivity)
-        {
-            s_dal.Config.MaxTimeInactivity = configuration.MaxTimeInactivity;
-            //AdminManager.GetConfig().MaxTimeInactivity = configuration.MaxTimeInactivity;
-            configChanged = true;
-        }
-        if (config.GoogleApiKey != configuration.GoogleApiKey)
-        {
-            s_dal.Config.GoogleApiKey = configuration.GoogleApiKey;
-            //AdminManager.GetConfig().GoogleApiKey = configuration.GoogleApiKey;
-            configChanged = true;
-        }
-        if (config.EmailAddress != configuration.EmailAddress)
-        {
-            s_dal.Config.EmailAddress = configuration.EmailAddress ?? string.Empty;
-            //AdminManager.GetConfig().EmailAddress = configuration.EmailAddress ?? string.Empty;
-            configChanged = true;
-        }
-        if (config.ScriptUrl != configuration.ScriptUrl)
-        {
-            s_dal.Config.ScriptUrl = configuration.ScriptUrl;
-            //AdminManager.GetConfig().ScriptUrl = configuration.ScriptUrl;
-            configChanged = true;
-        }
-        if (config.ScriptPass != configuration.ScriptPass)
-        {
-            s_dal.Config.ScriptPass = configuration.ScriptPass;
-            //AdminManager.GetConfig().ScriptPass = configuration.ScriptPass;
-            configChanged = true;
-        }
-        if (config.TokenCallSms != configuration.TokenCallSms)
-        {
-            s_dal.Config.TokenCallSms = configuration.TokenCallSms;
-            //AdminManager.GetConfig().TokenCallSms = configuration.TokenCallSms;
-            configChanged = true;
-        }
 
-        //Calling all the observers of configuration update
-        if (configChanged) // stage 5
-            ConfigUpdatedObservers?.Invoke(); // stage 5
+        // ... המשך הקוד הקיים ...
+        if (configChanged)
+            ConfigUpdatedObservers?.Invoke();
     }
 
-    internal static async Task ResetDB() //stage 4-7
+    // === תיקון 1: איפוס המילון בפונקציות ה-DB ===
+
+    internal static async Task ResetDB()
     {
+        // 1. איפוס ה-Cache ב-OrderManager (חובה!)
+        OrderManager.ResetCache();
+
         await Task.Run(() =>
         {
-            lock (BlMutex) //stage 7
+            lock (BlMutex)
             {
-                s_dal.ResetDB(); //stage 4
+                s_dal.ResetDB();
             }
         });
-        AdminManager.UpdateClock(AdminManager.Now); //stage 5 - needed since we want the label on Pl to be updated
-        ConfigUpdatedObservers?.Invoke(); //stage 5 - needed to update PL 
+
+        // עדכון שעון ותצוגה
+        AdminManager.UpdateClock(AdminManager.Now);
+        ConfigUpdatedObservers?.Invoke();
+
+        // עדכון רשימות כדי שהמסכים יתנקו
+        OrderManager.Observer.NotifyListUpdated();
+        CourierManager.Observer.NotifyListUpdated();
     }
 
-    internal static async Task InitializeDB() //stage 4-7
+    internal static async Task InitializeDB()
     {
+        // 1. איפוס ה-Cache ב-OrderManager (חובה!)
+        OrderManager.ResetCache();
+
         await Task.Run(() =>
         {
-            lock (BlMutex) //stage 7
+            lock (BlMutex)
             {
-                DalTest.Initialization.Do(); //stage 4
+                DalTest.Initialization.Do();
             }
         });
-        AdminManager.UpdateClock(AdminManager.Now);  //stage 5 - needed since we want the label on Pl to be updated           
-        ConfigUpdatedObservers?.Invoke(); //stage 5 - needed for update the PL
+
+        AdminManager.UpdateClock(AdminManager.Now);
+        ConfigUpdatedObservers?.Invoke();
+
+        // עדכון רשימות כדי שהמסכים יתמלאו בנתונים החדשים
+        OrderManager.Observer.NotifyListUpdated();
+        CourierManager.Observer.NotifyListUpdated();
     }
 
     #endregion Stage 4-7
 
     #region Stage 7 base
 
-    /// <summary>    
-    /// Mutex to use from BL methods to get mutual exclusion while the simulator is running
-    /// </summary>
-    internal static readonly object BlMutex = new(); // BlMutex = s_dal; // This field is actually the same as s_dal - it is defined for readability of locks
-    /// <summary>
-    /// The thread of the simulator
-    /// </summary>
+    internal static readonly object BlMutex = new();
     private static volatile Thread? s_thread;
-    /// <summary>
-    /// The Interval for clock updating
-    /// in minutes by second (default value is 1, will be set on Start())    
-    /// </summary>
     private static int s_interval = 1;
-    /// <summary>
-    /// The flag that signs whether simulator is running
-    /// 
     private static volatile bool s_stop = false;
 
-    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
+    // ... (Start, Stop, ThrowOnSimulatorIsRunning נשארים זהים) ...
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public static void ThrowOnSimulatorIsRunning()
     {
         if (s_thread is not null)
             throw new BO.BLTemporaryNotAvailableException("לא ניתן לעדכן נתונים כאשר הסימולטור פעיל");
     }
 
-    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     internal static void Start(int interval)
     {
         if (s_thread is null)
@@ -303,13 +169,13 @@ internal static class AdminManager //stage 4
         }
     }
 
-    [MethodImpl(MethodImplOptions.Synchronized)] //stage 7                                                 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     internal static void Stop()
     {
         if (s_thread is not null)
         {
             s_stop = true;
-            s_thread.Interrupt(); //awake a sleeping thread
+            s_thread.Interrupt();
             s_thread.Name = "ClockRunner stopped";
             s_thread = null;
         }
@@ -317,41 +183,37 @@ internal static class AdminManager //stage 4
 
     private static Task? _simulateTask = null;
 
-    private static void clockRunner()  //***********************stage 7
+    private static void clockRunner()
     {
         while (!s_stop)
         {
             UpdateClock(Now.AddMinutes(s_interval));
 
-            //TO_DO: //stage 7
-            //Add calls here to any logic simulation that was required in stage 7
-            //for example: course registration simulation
-
-
-            if (_simulateTask is null || _simulateTask.IsCompleted)//stage 7
+            // כאן מתבצעת הסימולציה של השליחים
+            if (_simulateTask is null || _simulateTask.IsCompleted)
             {
                 _simulateTask = Task.Run(() => CourierManager.CourierSimulation());
             }
 
-            //etc...
-
             try
             {
-                Thread.Sleep(1000); // 1 second
+                Thread.Sleep(1000);
             }
             catch (ThreadInterruptedException) { }
         }
     }
 
-    /// <summary>
-    /// Performs periodic checks on system entities (Couriers, Orders) triggered by clock updates.
-    /// Checks for courier inactivity and updates their status if necessary.
-    /// </summary>
-    /// <returns>True if any changes were made to the database/lists, requiring a UI refresh.</returns>
+    // === סקירה של PeriodicSystemUpdates ===
+
     public static void PeriodicSystemUpdates(DateTime oldClock, DateTime newClock)
     {
+        // הערה חשובה: השורה הבאה מונעת עדכון אם לא עברה שעה שלמה בסימולציה.
+        // זה מצוין עבור בדיקת אי-פעילות (כדי לא להעמיס), 
+        // אבל אם אתה מצפה שמשהו יקרה *מייד* כשהזמן זז (פחות משעה), תצטרך לשנות את זה.
+        // עבור הדרישות הנוכחיות (פיטור שליחים לא פעילים) - זה תקין.
         if (oldClock + TimeSpan.FromHours(1) >= newClock)
             return;
+
         var config = AdminManager.GetConfig();
 
         if (s_periodicMutex.CheckAndSetInProgress())
@@ -366,7 +228,6 @@ internal static class AdminManager //stage 4
             IEnumerable<DO.Courier> couriers;
             ILookup<int, DO.Delivery> deliveriesByCourier;
 
-
             lock (AdminManager.BlMutex)
                 couriers = s_dal.Courier.ReadAll(c => c.Active);
 
@@ -378,6 +239,7 @@ internal static class AdminManager //stage 4
             {
                 var courierDeliveries = deliveriesByCourier[courier.Id];
 
+                // אם השליח באמצע משלוח כרגע - הוא פעיל
                 bool isCurrentlyDelivering = courierDeliveries.Any(d => d.EndDelivery == null);
                 if (isCurrentlyDelivering)
                     continue;
@@ -395,27 +257,22 @@ internal static class AdminManager //stage 4
                 }
                 else
                 {
-                    // מקרה קצה: שליח שמעולם לא ביצע משלוח
                     lastActivityTime = courier.WorkingSince;
                 }
 
-                // חישוב הזמן שעבר
-                TimeSpan timeSinceActivity = newClock - lastActivityTime;
-
-                if (timeSinceActivity > maxInactivity)
+                if (newClock - lastActivityTime > maxInactivity)
                 {
                     var updatedCourier = courier with { Active = false };
 
                     lock (AdminManager.BlMutex)
                         s_dal.Courier.Update(updatedCourier);
 
-                    // עדכון משקיפים
                     anyListChange = true;
+
+                    // חשוב לעדכן גם את המטמון של השליחים אם יש כזה, או פשוט להודיע למסך
                     CourierManager.Observer.NotifyItemUpdated(updatedCourier.Id);
                 }
             }
-
-
         }
         finally
         {

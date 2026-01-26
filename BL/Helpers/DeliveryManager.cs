@@ -1,5 +1,6 @@
 ﻿using BO;
 using DalApi;
+using DO;
 using System.Threading.Tasks;
 
 namespace Helpers;
@@ -309,6 +310,8 @@ internal static class DeliveryManager
         lock (AdminManager.BlMutex)
             s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
 
+        OrderManager.UpdateCacheItem(order.Id);
+
         s_notifyAllObservers(delivery.OrderId, courier.Id);
 
         s_sendEmilNewDelivery(delivery);
@@ -358,6 +361,9 @@ internal static class DeliveryManager
             s_dal.Delivery.Update(delivery);
             UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
         }
+
+        OrderManager.UpdateCacheItem(delivery.OrderId);
+
         s_notifyDeliveryCompleted(deliveryId, delivery.OrderId, courierId);
     }
 

@@ -619,7 +619,7 @@ namespace PL
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message, "שגיאה חלון ניהול", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -740,7 +740,7 @@ namespace PL
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, "שגיאה חלון ניהול");
             }
             finally
             {

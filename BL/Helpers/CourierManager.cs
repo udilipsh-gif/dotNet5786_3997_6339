@@ -702,6 +702,7 @@ internal static class CourierManager
 
                                 if (s_rand.Next(1, 100) <= 50 && randomOrder is BO.OpenOrderInList order)
                                 {
+
                                     await DeliveryManager.StartDelivery(courier.Id, order.OrderId);
                                     anyListChange = true;
                                 }
@@ -740,7 +741,8 @@ internal static class CourierManager
                                     else if (chance <= 20) endStatus = BO.EndDelivery.NOTFOUND; // 15%
                                     else endStatus = BO.EndDelivery.DELIVERED;                  // 80%
 
-                                    s_completeDeliveryNotObserv(courier.Id, currentDeliveryId, endStatus);
+                                    lock (AdminManager.BlMutex)
+                                        s_completeDeliveryNotObserv(courier.Id, currentDeliveryId, endStatus);
                                     anyListChange = true;
                                 }
                                 else if (s_rand.Next(1, 100) <= 10)
@@ -781,10 +783,13 @@ internal static class CourierManager
                         TimeEndDelivery = AdminManager.Now
                     };
 
+                    lock (AdminManager.BlMutex)
+                    {
+                        s_dal.Delivery.Update(updatedDelivery);
+                        DeliveryManager.UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
+                    }
 
-                    DeliveryManager.UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
-                    s_dal.Delivery.Update(updatedDelivery);
-
+                    OrderManager.UpdateCacheItem(delivery.OrderId);
 
                     Observer.NotifyItemUpdated(courierId);
                     OrderManager.Observer.NotifyItemUpdated(delivery.OrderId);

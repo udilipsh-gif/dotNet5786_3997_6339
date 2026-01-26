@@ -122,7 +122,7 @@ public partial class OrderListWindow : Window, IWindowUpdater
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading orders: {ex.Message}");
+                MessageBox.Show($"Error loading orders: {ex.Message}", "שגיאה ברשימת ההזמנות");
             }
             finally
             {

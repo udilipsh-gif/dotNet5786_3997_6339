@@ -24,55 +24,141 @@ internal static class OrderManager
     /// </summary>
     internal static readonly ObserverManager Observer = new();
 
-    /// <summary>
-    /// Retrieves statistical counts of orders grouped by order status and schedule status.
-    /// </summary>
-    /// <returns>
-    /// An integer array where:
-    /// <list type="bullet">
-    ///   <item><description>Indices 0 to maxStatusVal contain counts for each OrderStatus value</description></item>
-    ///   <item><description>Indices (maxStatusVal + 1) onwards contain counts for each ScheduleStatus value</description></item>
-    /// </list>
-    /// </returns>
-    /// <remarks>
-    /// This method groups all orders by their status and schedule status, providing
-    /// a comprehensive overview of order distribution across different states.
-    /// </remarks>
+    private class OrderCacheInfo
+    {
+        public BO.OrderStatus Status { get; set; }
+        public DateTime OrderDate { get; set; }
+        public DateTime MaxDeliveryTime { get; set; }
+        public BO.ScheduleStatus? FinalScheduleStatus { get; set; }
+        public DateTime? DeliveryTime { get; set; }
+    }
+
+    private static Dictionary<int, OrderCacheInfo>? _ordersCache = null;
+    private static readonly object _cacheLock = new object(); // מנעול לסנכרון
+
+    private static async Task InitCache()
+    {
+        lock (_cacheLock)
+        {
+            if (_ordersCache != null) return; // כבר מאותחל
+            _ordersCache = new Dictionary<int, OrderCacheInfo>();
+        }
+
+        List<DO.Order> allOrders;
+        List<DO.Delivery> allDeliveries;
+        TimeSpan maxDeliveryTimeSpan = AdminManager.GetConfig().MaxDeliveryTime;
+
+        lock (AdminManager.BlMutex)
+        {
+            allOrders = s_dal.Order.ReadAll().ToList();
+            allDeliveries = s_dal.Delivery.ReadAll().ToList();
+        }
+
+        // מיפוי משלוחים להזמנות (לוקחים את האחרון לכל הזמנה)
+        var deliveriesMap = allDeliveries
+            .GroupBy(d => d.OrderId)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).FirstOrDefault());
+
+        var tempCache = new Dictionary<int, OrderCacheInfo>();
+
+        foreach (var order in allOrders)
+        {
+            var delivery = deliveriesMap.GetValueOrDefault(order.Id);
+            var orderStatus = Tools.GetOrderStatus(order, delivery);
+            var maxTime = order.OrderDate + maxDeliveryTimeSpan;
+
+            var cacheItem = new OrderCacheInfo
+            {
+                Status = orderStatus,
+                OrderDate = order.OrderDate,
+                MaxDeliveryTime = maxTime,
+                DeliveryTime = delivery?.TimeEndDelivery
+            };
+
+            // אם ההזמנה סגורה - נחשב את הסטטוס לו"ז עכשיו ונשמור אותו לנצח
+            if (orderStatus == BO.OrderStatus.COMPLETED || orderStatus == BO.OrderStatus.CANCELLED)
+            {
+                // כאן אנו משתמשים בלוגיקה פנימית במקום לקרוא ל-Tools הכבד
+                if (orderStatus == BO.OrderStatus.COMPLETED)
+                {
+                    cacheItem.FinalScheduleStatus = (delivery?.TimeEndDelivery <= maxTime)
+                        ? BO.ScheduleStatus.ONTYME
+                        : BO.ScheduleStatus.LATE;
+                }
+                else // CANCELLED
+                {
+                    cacheItem.FinalScheduleStatus = BO.ScheduleStatus.CANCELLED;
+                }
+            }
+
+            tempCache[order.Id] = cacheItem;
+        }
+
+        lock (_cacheLock)
+        {
+            _ordersCache = tempCache;
+        }
+
+        await Task.CompletedTask;
+    }
+
+    internal static void ResetCache()
+    {
+        lock (_cacheLock)
+        {
+            _ordersCache = null; // איפוס המילון - הוא ייבנה מחדש בקריאה הבאה
+        }
+    }
+
+
+
     public static async Task<int[]> GetAllOrderStatistic()
     {
-        Debug.WriteLine($"📊 GetAllOrderStatistic called at {AdminManager.Now}");
-        
-        List<DO.Order> allOrders;
-        lock (AdminManager.BlMutex)
-            allOrders = s_dal.Order.ReadAll().ToList();
+        // אתחול חד פעמי אם צריך
+        if (_ordersCache == null) await InitCache();
 
         int maxStatusVal = (int)Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>().Max();
         int maxScheduleVal = (int)Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>().Max();
-
         int[] results = new int[maxStatusVal + 1 + maxScheduleVal + 1];
 
-        var statusGroups = allOrders
-            .GroupBy(o => o.OrderStatus)
-            .Select(g => new { Index = (int)g.Key, Count = g.Count() });
+        DateTime now = AdminManager.Now; // שמירת הזמן הנוכחי לחישוב
+        TimeSpan riskRange = AdminManager.GetConfig().RiskRange; // קריאה אחת לקונפיג
 
-        foreach (var item in statusGroups)
+        lock (_cacheLock)
         {
-            results[item.Index] = item.Count;
+            if (_ordersCache == null) return results; // הגנה
+
+            foreach (var item in _ordersCache.Values)
+            {
+                // 1. ספירת סטטוס הזמנה (פשוט ומהיר)
+                results[(int)item.Status]++;
+
+                // 2. ספירת סטטוס לו"ז
+                BO.ScheduleStatus currentScheduleStatus;
+
+                if (item.FinalScheduleStatus.HasValue)
+                {
+                    // אם זה שמור (הזמנה סגורה) - קח מהמטמון
+                    currentScheduleStatus = item.FinalScheduleStatus.Value;
+                }
+                else
+                {
+                    // אם ההזמנה פתוחה - חשב בזיכרון (פעולה מתמטית פשוטה וללא DB)
+                    TimeSpan timeLeft = item.MaxDeliveryTime - now;
+
+                    // לוגיקה מקוצרת לחישוב מצב
+                    if (timeLeft < TimeSpan.Zero)
+                        currentScheduleStatus = BO.ScheduleStatus.LATE;
+                    else if (timeLeft <= riskRange)
+                        currentScheduleStatus = BO.ScheduleStatus.INRISK;
+                    else
+                        currentScheduleStatus = BO.ScheduleStatus.ONTYME;
+                }
+
+                results[maxStatusVal + 1 + (int)currentScheduleStatus]++;
+            }
         }
 
-        var scheduleTasks = allOrders.Select(async o => await Tools.GetScheduleStatus(o));
-
-        var scheduleResults = await Task.WhenAll(scheduleTasks);
-        var scheduleGroups = scheduleResults
-            .GroupBy(s => s)
-            .Select(g => new { Index = (int)g.Key + maxStatusVal + 1, Count = g.Count() });
-
-        foreach (var item in scheduleGroups)
-        {
-            results[item.Index] = item.Count;
-        }
-
-        Debug.WriteLine($"✅ GetAllOrderStatistic completed");
         return results;
     }
 
@@ -127,9 +213,13 @@ internal static class OrderManager
 
         lock (AdminManager.BlMutex)
             s_dal.Order.Create(doOrder);
+
+        UpdateCacheItem(doOrder.Id);
+
         Observer.NotifyListUpdated();
 
         s_sendEmailNewOrder(doOrder);
+
     }
 
     /// <summary>
@@ -211,6 +301,9 @@ internal static class OrderManager
         };
         lock (AdminManager.BlMutex)
             s_dal.Order.Update(doOrder);
+
+        UpdateCacheItem(doOrder.Id);
+
         Observer.NotifyItemUpdated(boOrder.Id);
         Observer.NotifyListUpdated();
     }
@@ -341,9 +434,57 @@ internal static class OrderManager
         }
 
 
-
+        UpdateCacheItem(doOrder.Id);
         Observer.NotifyItemUpdated(orderId);
         Observer.NotifyListUpdated();
+    }
+
+    internal static void UpdateCacheItem(int orderId)
+    {
+        if (_ordersCache == null) return; // אם המטמון עוד לא נוצר, לא צריך לעדכן (הוא ייווצר מעודכן)
+
+        // שליפת המידע העדכני מה-DB (קורה רק להזמנה אחת בודדת!)
+        DO.Order? doOrder;
+        DO.Delivery? delivery;
+
+        lock (AdminManager.BlMutex)
+        {
+            doOrder = s_dal.Order.Read(orderId);
+            delivery = s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
+                                     .OrderByDescending(d => d.Id)
+                                     .FirstOrDefault();
+        }
+
+        if (doOrder == null) return;
+
+        var status = Tools.GetOrderStatus(doOrder, delivery);
+        var maxTime = doOrder.OrderDate + AdminManager.GetConfig().MaxDeliveryTime;
+
+        var newItem = new OrderCacheInfo
+        {
+            Status = status,
+            OrderDate = doOrder.OrderDate,
+            MaxDeliveryTime = maxTime,
+            DeliveryTime = delivery?.TimeEndDelivery,
+            FinalScheduleStatus = null
+        };
+
+        // חישוב סופי אם נדרש
+        if (status == BO.OrderStatus.COMPLETED)
+        {
+            newItem.FinalScheduleStatus = (delivery?.TimeEndDelivery <= maxTime)
+                ? BO.ScheduleStatus.ONTYME
+                : BO.ScheduleStatus.LATE;
+        }
+        else if (status == BO.OrderStatus.CANCELLED)
+        {
+            newItem.FinalScheduleStatus = BO.ScheduleStatus.CANCELLED;
+        }
+
+        lock (_cacheLock)
+        {
+            _ordersCache[orderId] = newItem;
+        }
     }
 
     /// <summary>
@@ -396,6 +537,27 @@ internal static class OrderManager
             TotalTimeOfDelivery = Tools.GetTotalTimeOfDelivery(doOrder, orderStatus, latestDelivery?.TimeEndDelivery),
             NumberOfDeliveryAttempts = orderDeliveries.Count
         };
+    }
+
+    internal static BO.ScheduleStatus? TryGetCachedScheduleStatus(int orderId)
+    {
+        // אם המטמון לא קיים, אין מנוס מחישוב רגיל
+        if (_ordersCache == null) return null;
+
+        lock (_cacheLock)
+        {
+            if (_ordersCache.TryGetValue(orderId, out var info))
+            {
+                // אם ההזמנה סגורה, יש לנו סטטוס סופי שמור
+                if (info.FinalScheduleStatus.HasValue)
+                    return info.FinalScheduleStatus.Value;
+
+                // אם ההזמנה פתוחה, המטמון לא מחזיק סטטוס לו"ז (כי הוא משתנה כל רגע)
+                // ולכן נחזיר null כדי שהלוגיקה הרגילה תחשב אותו לפי הזמן הנוכחי
+                return null;
+            }
+        }
+        return null;
     }
 
     /// <summary>
