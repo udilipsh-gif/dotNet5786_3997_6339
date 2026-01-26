@@ -13,23 +13,23 @@ public partial class MapPopupWindow : Window
     public int UserId { get; }
     public string? MapImageUrl
     {
-        get => (string) GetValue(MapImageUrlProperty);
+        get => (string?)GetValue(MapImageUrlProperty);
         set => SetValue(MapImageUrlProperty, value);
     }
 
     public static readonly DependencyProperty MapImageUrlProperty =
     DependencyProperty.Register("MapImageUrl", typeof(string),
-    typeof(MapPopupWindow), new PropertyMetadata(string.Empty));
+    typeof(MapPopupWindow), new PropertyMetadata(null)); 
 
     public string? RouteInfo
     {
-        get => (string)GetValue(RouteInfoProperty);
+        get => (string?)GetValue(RouteInfoProperty);
         set => SetValue(RouteInfoProperty, value);
     }
 
     public static readonly DependencyProperty RouteInfoProperty =
     DependencyProperty.Register("RouteInfo", typeof(string),
-    typeof(MapPopupWindow), new PropertyMetadata(string.Empty));
+    typeof(MapPopupWindow), new PropertyMetadata(null)); 
 
     public event Action<OpenOrderInList>? OnCollectClicked;
 

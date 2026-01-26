@@ -191,7 +191,7 @@
                         <Button Content="מחק שליח" 
                             Click="btnDelete_Click" 
                             Style="{StaticResource DestructiveButtonStyle}"
-                            Visibility="{Binding DeleteButtonVisibility}"
+                            IsEnabled="{Binding IsCanDelete}"
                             Width="120"
                             Margin="20,0,0,0"/>
                     </StackPanel>

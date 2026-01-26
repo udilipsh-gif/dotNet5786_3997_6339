@@ -212,7 +212,7 @@
                                                                            TextWrapping="Wrap" 
                                                                            Foreground="{StaticResource PrimaryColor}"/>
                                         <TextBlock Text="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}, StringFormat='מצב הזמנה: {0}'}"
-                                                                  Background="{Binding ScheduleStatusScheduleStatus, Converter={StaticResource StatusToColorConverter}}"/>
+                                                                  Background="{Binding ScheduleStatus, Converter={StaticResource StatusToColorConverter}}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ContentControl.ContentTemplate>

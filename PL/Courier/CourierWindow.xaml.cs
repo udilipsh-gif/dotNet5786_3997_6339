@@ -122,6 +122,21 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
         }
     }
 
+    private bool _IsCanDelete = true;
+
+    public bool IsCanDelete
+    {
+        get => _IsCanDelete;
+        set
+        {
+            if (_IsCanDelete != value)
+            {
+                _IsCanDelete = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     /// <summary>
     /// Gets a value indicating whether the window is in update mode.
     /// </summary>
@@ -359,11 +374,19 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
         if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
             return;
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             try
             {
                 BO.Courier? freshCourier = null;
+
+                if (IsCanDelete)
+                {
+                    bool canDelete = true;
+                    await Task.Run(() => canDelete = !s_bl.Delivery.ReadAll(d => d.CourierId == CURRENT_ID).Any());
+                    await Dispatcher.BeginInvoke(() => IsCanDelete = canDelete);
+
+                }
 
                 await foreach (var courier in s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID))
                 {
@@ -373,7 +396,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                       ?? throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
 
                     if (CurrentCourier is null)
-                        await Dispatcher.BeginInvoke(() => 
+                        await Dispatcher.BeginInvoke(() =>
                         {
                             CurrentCourier = courier;
                         });
@@ -393,6 +416,14 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                         OnPropertyChanged(nameof(CurrentCourier));
                     }
                 });
+
+                if (IsCanDelete)
+                {
+                    bool canDelete = true;
+                    await Task.Run(() => canDelete = !s_bl.Delivery.ReadAll(d => d.CourierId == CURRENT_ID).Any());
+                    await Dispatcher.BeginInvoke(() => IsCanDelete = canDelete);
+
+                }
             }
             catch (BO.BlDoesNotExistException)
             {

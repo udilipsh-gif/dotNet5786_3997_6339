@@ -62,6 +62,8 @@ namespace BlApi
         /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier is not found.</exception>
         Task<IEnumerable<BO.OpenOrderInList>> GetOpen(int id, int courierId, TypeOfOrder? filter, OpenOrderInListField? sort);
 
+        IEnumerable<DO.Delivery> ReadAll(Func<DO.Delivery, bool>? customPredicate = null);
+
         Task<GoogleMapsService.RouteInfo?> GetRouteFromStore(double destLat, double destLng, TheTypeShipment shipmentType);
 
         Task<string?> GetStaticMapUrlFromStore(double destLat, double destLng, TheTypeShipment shipmentType, int width = 400, int height = 300);

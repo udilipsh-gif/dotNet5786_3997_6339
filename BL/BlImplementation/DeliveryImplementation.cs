@@ -102,7 +102,9 @@ internal class DeliveryImplementation : IDelivery
 
     public async Task<GoogleMapsService.RouteInfo?> GetRouteFromStore(double destLat, double destLng, BO.TheTypeShipment shipmentType)
         => await DeliveryManager.GetRouteFromStore(destLat, destLng, shipmentType);
-    
+
+    public IEnumerable<DO.Delivery> ReadAll(Func<DO.Delivery, bool>? customPredicate = null)
+        => DeliveryManager.ReadAll(customPredicate);
 
     /// <summary>
     /// Retrieves a static map URL from the store to the destination using Google Maps.
