@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:PL"
              
              StartupUri="MainWindow.xaml">
+    
     <Application.Resources>
         <SolidColorBrush x:Key="PrimaryColor" Color="#2196F3"/>
         <SolidColorBrush x:Key="PrimaryDarkColor" Color="#1976D2"/>
