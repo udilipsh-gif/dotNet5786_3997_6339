@@ -45,6 +45,7 @@
                   SelectionMode="Single"
                   FlowDirection="RightToLeft">
 
+
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn Header="פעולה" Width="Auto" HeaderStyle="{StaticResource WrappedHeaderStyle}">
@@ -76,9 +77,7 @@
 
                 <DataGridTextColumn Header="מזהה"
                                     Binding="{Binding OrderId}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="סוג"
                                     Binding="{Binding TypeOfOrder, Converter={StaticResource EnumDescriptionConverter}}"
@@ -96,40 +95,28 @@
 
                 <DataGridTextColumn Header="כתובת איסוף"
                      Binding="{Binding Path=DataContext.StoreAddress, RelativeSource={RelativeSource AncestorType=Window}  }"
-                     Width="Auto"
-                     ElementStyle="{StaticResource WrappedTextCellStyle}"
-                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                     Width="Auto"/>
 
                 <DataGridTextColumn Header="כתובת נמען"
                      Binding="{Binding Address}"
-                     Width="Auto"
-                     ElementStyle="{StaticResource WrappedTextCellStyle}"
-                     HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                     Width="Auto"/>
 
 
                 <DataGridTextColumn Header="מרחק אווירי"
                                     Binding="{Binding DistanceKm, StringFormat=N2}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="מרחק בפועל"
                                     Binding="{Binding ActualDistance}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="משקל"
                                     Binding="{Binding Weight}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="הערכת זמן"
                                     Binding="{Binding EstimatedDeliveryTime, Converter={StaticResource TimeSpanConverter}}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="סטטוס"
                                     Binding="{Binding ScheduleStatus, Converter={StaticResource EnumDescriptionConverter}}"
@@ -146,15 +133,11 @@
 
                 <DataGridTextColumn Header="זמן לסיום"
                                     Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="זמן כולל"
                                     Binding="{Binding MaxDeliveryTime, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
-                                    Width="Auto"
-                                    ElementStyle="{StaticResource WrappedTextCellStyle}"
-                                    HeaderStyle="{StaticResource WrappedHeaderStyle}"/>
+                                    Width="Auto"/>
 
             </DataGrid.Columns>
         </DataGrid>
