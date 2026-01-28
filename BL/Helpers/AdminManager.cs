@@ -34,7 +34,6 @@ internal static class AdminManager
     [MethodImpl(MethodImplOptions.Synchronized)]
     internal static BO.Config GetConfig()
     {
-        // הקוד הקיים שלך כאן מצוין
         return new BO.Config()
         {
             ManagerId = s_dal.Config.ManagerId,
@@ -62,11 +61,28 @@ internal static class AdminManager
     internal static void SetConfig(BO.Config configuration)
     {
         bool configChanged = false; // stage 5
+
         var config = AdminManager.GetConfig();
+
+        if (config.ManagerId != configuration.ManagerId)
+        {
+            if (!Tools.IsValidId(configuration.ManagerId))
+                throw new BO.BlInvalidValueException("Invalid Manager ID.");
+            s_dal.Config.ManagerId = configuration.ManagerId;
+            configChanged = true;
+        }
+        if (config.PasswordManager != configuration.PasswordManager)
+        {
+            if (!Tools.IsStrongPassword(configuration.PasswordManager))
+                throw new BO.BlInvalidValueException("Weak password for Manager.");
+            s_dal.Config.PasswordManager = configuration.PasswordManager;
+            //AdminManager.GetConfig().PasswordManager = configuration.PasswordManager;
+            configChanged = true;
+        }
 
         if (config.StoreAddress != configuration.StoreAddress)
         {
-            // ... הלוגיקה הקיימת ...
+            
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
 
             string api = configuration.GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API key cannot be null.");
@@ -84,7 +100,85 @@ internal static class AdminManager
             Task.Run(OrderManager.UpdateDistanceForOrders);
         }
 
-        // ... המשך הקוד הקיים ...
+        if (config.MaxDeliveryRange != configuration.MaxDeliveryRange)
+        {
+            s_dal.Config.MaxDeliveryRange = configuration.MaxDeliveryRange;
+            //  AdminManager.GetConfig().MaxDeliveryRange = configuration.MaxDeliveryRange;
+            configChanged = true;
+        }
+        if (config.AvgSpeedCar != configuration.AvgSpeedCar)
+        {
+            s_dal.Config.AvgSpeedCar = configuration.AvgSpeedCar;
+            //AdminManager.GetConfig().AvgSpeedCar = configuration.AvgSpeedCar;
+            configChanged = true;
+        }
+        if (config.AvgSpeedMotorcycle != configuration.AvgSpeedMotorcycle)
+        {
+            s_dal.Config.AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
+            //AdminManager.GetConfig().AvgSpeedMotorcycle = configuration.AvgSpeedMotorcycle;
+            configChanged = true;
+        }
+        if (config.AvgSpeedBike != configuration.AvgSpeedBike)
+        {
+            s_dal.Config.AvgSpeedBike = configuration.AvgSpeedBike;
+            //AdminManager.GetConfig().AvgSpeedBike = configuration.AvgSpeedBike;
+            configChanged = true;
+        }
+        if (config.AvgSpeedFoot != configuration.AvgSpeedFoot)
+        {
+            s_dal.Config.AvgSpeedFoot = configuration.AvgSpeedFoot;
+            //AdminManager.GetConfig().AvgSpeedFoot = configuration.AvgSpeedFoot;
+            configChanged = true;
+        }
+        if (config.MaxDeliveryTime != configuration.MaxDeliveryTime)
+        {
+            s_dal.Config.MaxDeliveryTime = configuration.MaxDeliveryTime;
+            //AdminManager.GetConfig().MaxDeliveryTime = configuration.MaxDeliveryTime;
+            configChanged = true;
+        }
+        if (config.RiskRange != configuration.RiskRange)
+        {
+            s_dal.Config.RiskRange = configuration.RiskRange;
+            //AdminManager.GetConfig().RiskRange = configuration.RiskRange;
+            configChanged = true;
+        }
+        if (config.MaxTimeInactivity != configuration.MaxTimeInactivity)
+        {
+            s_dal.Config.MaxTimeInactivity = configuration.MaxTimeInactivity;
+            //AdminManager.GetConfig().MaxTimeInactivity = configuration.MaxTimeInactivity;
+            configChanged = true;
+        }
+        if (config.GoogleApiKey != configuration.GoogleApiKey)
+        {
+            s_dal.Config.GoogleApiKey = configuration.GoogleApiKey;
+            //AdminManager.GetConfig().GoogleApiKey = configuration.GoogleApiKey;
+            configChanged = true;
+        }
+        if (config.EmailAddress != configuration.EmailAddress)
+        {
+            s_dal.Config.EmailAddress = configuration.EmailAddress ?? string.Empty;
+            //AdminManager.GetConfig().EmailAddress = configuration.EmailAddress ?? string.Empty;
+            configChanged = true;
+        }
+        if (config.ScriptUrl != configuration.ScriptUrl)
+        {
+            s_dal.Config.ScriptUrl = configuration.ScriptUrl;
+            //AdminManager.GetConfig().ScriptUrl = configuration.ScriptUrl;
+            configChanged = true;
+        }
+        if (config.ScriptPass != configuration.ScriptPass)
+        {
+            s_dal.Config.ScriptPass = configuration.ScriptPass;
+            //AdminManager.GetConfig().ScriptPass = configuration.ScriptPass;
+            configChanged = true;
+        }
+        if (config.TokenCallSms != configuration.TokenCallSms)
+        {
+            s_dal.Config.TokenCallSms = configuration.TokenCallSms;
+            //AdminManager.GetConfig().TokenCallSms = configuration.TokenCallSms;
+            configChanged = true;
+        }
+
         if (configChanged)
             ConfigUpdatedObservers?.Invoke();
     }

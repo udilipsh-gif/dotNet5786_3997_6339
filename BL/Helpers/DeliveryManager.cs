@@ -94,7 +94,14 @@ internal static class DeliveryManager
         if (currentStatus is not BO.OrderStatus.OPEN)
             throw new BO.BlInvalidOperationException("Order is not open for selection");
 
-        await DeliveryManager.Create(doOrder, doCourier);
+        try
+        {
+            await DeliveryManager.Create(doOrder, doCourier);
+        }
+        catch(Exception ex)
+        {
+            throw new BO.BlInvalidOperationException(ex.Message);
+        }
     }
 
     /// <summary>
@@ -301,18 +308,22 @@ internal static class DeliveryManager
             TypeShipment = courier.TypeShipment,
             OrderDate = AdminManager.Now,
             ActualDistance = actualDistance,
-            EndDelivery = null,
-            TimeEndDelivery = null
+            EndDelivery = actualDistance is not null? null : DO.EndDelivery.FAILED,
+            TimeEndDelivery = actualDistance is not null ? null : AdminManager.Now
         };
 
         lock (AdminManager.BlMutex)
             s_dal.Delivery.Create(delivery);
         lock (AdminManager.BlMutex)
-            s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
+            if(actualDistance is not null)
+                s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
 
         OrderManager.UpdateCacheItem(order.Id);
 
         s_notifyAllObservers(delivery.OrderId, courier.Id);
+
+        if (actualDistance is null)
+            throw new BO.BlInvalidOperationException("חישוב המסלול נכשל.");
 
         s_sendEmilNewDelivery(delivery);
     }
@@ -347,7 +358,7 @@ internal static class DeliveryManager
     ///   <item><description>FAILED/NOTFOUND → Order OPEN (available for retry)</description></item>
     /// </list>
     /// </remarks>
-    public static void Deliver(int courierId, int deliveryId, BO.EndDelivery endDelivery)
+    public static void DeliverEnd(int courierId, int deliveryId, BO.EndDelivery endDelivery)
     {
         DO.Delivery delivery = Tools.GetAndValidateDelivery(deliveryId, courierId);
 

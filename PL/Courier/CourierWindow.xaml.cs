@@ -402,9 +402,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                         });
                 }
 
-                if (freshCourier == null)
-                    throw new BO.BlDoesNotExistException($"The Courier with id: {CURRENT_ID} does not exist");
-
                 await Dispatcher.BeginInvoke(() =>
                 {
                     if (CurrentCourier != freshCourier)
@@ -416,14 +413,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                         OnPropertyChanged(nameof(CurrentCourier));
                     }
                 });
-
-                if (IsCanDelete)
-                {
-                    bool canDelete = true;
-                    await Task.Run(() => canDelete = !s_bl.Delivery.ReadAll(d => d.CourierId == CURRENT_ID).Any());
-                    await Dispatcher.BeginInvoke(() => IsCanDelete = canDelete);
-
-                }
             }
             catch (BO.BlDoesNotExistException)
             {

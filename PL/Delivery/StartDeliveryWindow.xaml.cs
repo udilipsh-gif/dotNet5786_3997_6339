@@ -31,6 +31,14 @@ public partial class StartDeliveryWindow : Window
     public static readonly DependencyProperty StoreAddressProperty =
         DependencyProperty.Register("StoreAddress", typeof(string), typeof(StartDeliveryWindow), new PropertyMetadata(null));
 
+    public bool OrderListEmpty
+    {
+        get { return (bool)GetValue(OrderListEmptyProperty); }
+        set { SetValue(OrderListEmptyProperty, value); }
+    }
+
+    public static readonly DependencyProperty OrderListEmptyProperty =
+        DependencyProperty.Register("OrderListEmpty", typeof(bool), typeof(StartDeliveryWindow), new PropertyMetadata(false));
 
 
     public IEnumerable<Tools.SelectionItem> EnumTypeOfOrder
@@ -131,6 +139,9 @@ public partial class StartDeliveryWindow : Window
                     }
                 }
 
+                if (!DeliveryList.Any())
+                    OrderListEmpty = true;
+
 
             }
             catch (Exception ex)
@@ -226,11 +237,11 @@ public partial class StartDeliveryWindow : Window
         }
     }
 
-    private void CollectOrderInternal(BO.OpenOrderInList selectedOrder)
+    private async void CollectOrderInternal(BO.OpenOrderInList selectedOrder)
     {
         try
         {
-            s_bl.Delivery.StartDelivery(UserId, courierId, selectedOrder.OrderId);
+            await s_bl.Delivery.StartDelivery(UserId, courierId, selectedOrder.OrderId);
 
             MessageBox.Show("המשלוח התחיל בהצלחה!", "הצלחה",
                 MessageBoxButton.OK, MessageBoxImage.Information);

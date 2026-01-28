@@ -37,7 +37,7 @@ namespace BlApi
         /// <remarks>
         /// Managers can complete any delivery. Couriers can only complete their own assigned deliveries.
         /// </remarks>
-        void Deliver(int id, int courierId, int deliveryId, BO.EndDelivery endDelivery);
+        void DeliverEnd(int id, int courierId, int deliveryId, BO.EndDelivery endDelivery);
 
         /// <summary>
         /// Retrieves all completed deliveries for a specific courier with optional filtering and sorting.

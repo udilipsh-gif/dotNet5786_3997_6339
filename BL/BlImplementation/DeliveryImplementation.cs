@@ -44,13 +44,13 @@ internal class DeliveryImplementation : IDelivery
     /// <remarks>
     /// Managers can complete any delivery. Couriers can only complete their own assigned deliveries.
     /// </remarks>
-    public void Deliver(int id, int courierId, int deliveryId, BO.EndDelivery endDelivery)
+    public void DeliverEnd(int id, int courierId, int deliveryId, BO.EndDelivery endDelivery)
     {
         AdminManager.ThrowOnSimulatorIsRunning();
 
         if (!Tools.CheckManger(id) && id != courierId)
             throw new BO.BlNoAccessException();
-        DeliveryManager.Deliver(courierId, deliveryId, endDelivery);
+        DeliveryManager.DeliverEnd(courierId, deliveryId, endDelivery);
     }
 
     /// <summary>

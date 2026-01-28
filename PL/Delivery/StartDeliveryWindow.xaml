@@ -7,7 +7,8 @@
         Title="בחירת הזמנה"
         Loaded="StartDeliveryWindow_Loaded"
         Closed="StartDeliveryWindow_Closed"
-        Height="450" Width="1010"
+        Height="450" 
+        SizeToContent="Width"
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -36,6 +37,8 @@
                       SelectedIndex="0"
                       ToolTip="בחר סוג משלוח להצגה בטבלה"/>
         </StackPanel>
+        
+        
 
         <DataGrid Grid.Row="1"
                   x:Name="OrdersGrid"
@@ -141,5 +144,11 @@
 
             </DataGrid.Columns>
         </DataGrid>
+
+        <StackPanel Grid.Row="1" 
+                    Visibility="{Binding OrderListEmpty, Converter={StaticResource BoolToVisibilityConverter}}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="אין הזמנות ברשימה" ></TextBlock>
+        </StackPanel>
     </Grid>
 </Window>

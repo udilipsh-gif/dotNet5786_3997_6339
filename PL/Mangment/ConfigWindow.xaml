@@ -44,7 +44,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="מזהה מנהל:"/>
-                            <TextBox Grid.Column="1" Text="{Binding Configuration.ManagerId, Mode=TwoWay}" MaxLength="9" local:Tools.NumericOnly="True"/>
+                            <TextBox Grid.Column="1" Text="{Binding Configuration.ManagerId}" MaxLength="9" local:Tools.NumericOnly="True"/>
                         </Grid>
 
                         <Grid Margin="0,0,0,10">
@@ -53,7 +53,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="סיסמת מנהל:"/>
-                            <TextBox Grid.Column="1" Text="{Binding Configuration.PasswordManager, Mode=TwoWay}"/>
+                            <TextBox Grid.Column="1" Text="{Binding Configuration.PasswordManager}"/>
                         </Grid>
 
                         <Grid Margin="0,0,0,10">
@@ -62,7 +62,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Content="כתובת חנות:"/>
-                            <TextBox Grid.Column="1" Text="{Binding Configuration.StoreAddress, Mode=TwoWay}"/>
+                            <TextBox Grid.Column="1" Text="{Binding Configuration.StoreAddress}"/>
                         </Grid>
                     </UniformGrid>
                 </Border>
@@ -83,20 +83,20 @@
 
                         <StackPanel Grid.Column="0" Margin="0,0,0,10">
                             <Label Content="רכב:"/>
-                            <TextBox Text="{Binding Configuration.AvgSpeedCar, Mode=TwoWay}" local:Tools.NumericOnly="True"/>
+                            <TextBox Text="{Binding Configuration.AvgSpeedCar}" local:Tools.NumericOnly="True"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Margin="0,0,0,10">
                             <Label Content="אופנוע:"/>
-                            <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle, Mode=TwoWay}" local:Tools.NumericOnly="True"/>
+                            <TextBox Text="{Binding Configuration.AvgSpeedMotorcycle}" local:Tools.NumericOnly="True"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Grid.Column="0">
                             <Label Content="אופניים:"/>
-                            <TextBox Text="{Binding Configuration.AvgSpeedBike, Mode=TwoWay}" local:Tools.NumericOnly="True"/>
+                            <TextBox Text="{Binding Configuration.AvgSpeedBike}" local:Tools.NumericOnly="True"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="2">
                             <Label Content="הליכה:"/>
-                            <TextBox Text="{Binding Configuration.AvgSpeedFoot, Mode=TwoWay}" local:Tools.NumericOnly="True"/>
+                            <TextBox Text="{Binding Configuration.AvgSpeedFoot}" local:Tools.NumericOnly="True"/>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -150,7 +150,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="טוקן סקריפט:"/>
-                        <TextBox Grid.Column="1" Text="{Binding Configuration.ScriptUrl, Mode=TwoWay}"/>
+                        <TextBox Grid.Column="1" Text="{Binding Configuration.ScriptUrl}"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,10">
@@ -159,7 +159,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="סיסמה לסקריפט:"/>
-                        <TextBox Grid.Column="1" Text="{Binding Configuration.ScriptPass, Mode=TwoWay}"/>
+                        <TextBox Grid.Column="1" Text="{Binding Configuration.ScriptPass}"/>
 
                     </Grid>
                     <Grid Margin="0,0,0,10">
@@ -168,7 +168,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="טוקן שיחות/סמס:"/>
-                        <TextBox Grid.Column="1" Text="{Binding Configuration.TokenCallSms, Mode=TwoWay}"/>
+                        <TextBox Grid.Column="1" Text="{Binding Configuration.TokenCallSms}"/>
                     </Grid>
                     </StackPanel>
                 </Border>

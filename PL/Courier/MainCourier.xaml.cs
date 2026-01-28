@@ -229,7 +229,7 @@ public partial class MainCourier : Window, INotifyPropertyChanged
             {
                 if (selectedReason is BO.EndDelivery status)
                 {
-                    s_bl.Delivery.Deliver(USERID, USERID, CurrentCourier.OrderInProgress.DeliveryId, status);
+                    s_bl.Delivery.DeliverEnd(USERID, USERID, CurrentCourier.OrderInProgress.DeliveryId, status);
 
                     MessageBox.Show("המשלוח הסתיים בהצלחה!", "הצלחה", MessageBoxButton.OK, MessageBoxImage.Information);
                 }

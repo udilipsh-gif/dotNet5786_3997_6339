@@ -293,7 +293,10 @@ public static class Initialization
                 DistanceKmWalk = double.Parse((string)address[4]) / 1000.0
             });
 
-            s_dal?.Config.Clock.AddMinutes(s_rand.Next(30, 60)); // שינוי התאריך לשבוע אחורה לכל הזמנה
+            if (s_dal != null && s_dal.Config != null)
+            {
+                s_dal.Config.Clock = s_dal.Config.Clock.AddMinutes(s_rand.Next(30, 60));
+            }
         }
     }
 

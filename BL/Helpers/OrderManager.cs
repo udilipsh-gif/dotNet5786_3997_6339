@@ -1,4 +1,5 @@
-﻿using DalApi;
+﻿using BO;
+using DalApi;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -377,7 +378,7 @@ internal static class OrderManager
     ///   <item><description>COMPLETED/CANCELLED: Cannot be cancelled (throws exception)</description></item>
     /// </list>
     /// </remarks>
-    public static async Task Cancel(int orderId, bool token = false)
+    public static async Task Cancel(int orderId, bool isSmsActive = false)
     {
         DO.Order doOrder;
         lock (AdminManager.BlMutex)
@@ -399,7 +400,18 @@ internal static class OrderManager
                 break;
 
             case DO.OrderStatus.DELIVERING:
-                await s_cancelDeliveringOrder(doOrder, orderId, token);
+                try
+                {
+                    await s_cancelDeliveringOrder(doOrder, orderId, isSmsActive);
+                }
+                catch (BO.BLNoSendSmsException ex)
+                {
+                    throw new BO.BLNoSendSmsException(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
                 break;
 
             default:
@@ -646,7 +658,7 @@ internal static class OrderManager
     /// <exception cref="BO.BlDoesNotExistException">
     /// Thrown when the delivery or courier is not found.
     /// </exception>
-    private static async Task s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool token)
+    private static async Task s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool IsSmsActive)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
  
@@ -682,7 +694,6 @@ internal static class OrderManager
                   $"הזמנה מספר {orderId} בוטלה על ידי המנהל.");
 
         }
-
         catch (BO.BLNoSendEmailException ex)
         {
             exceptionMail = new BO.BLNoSendEmailException($"Failed to send email notification {ex.Message}");
@@ -690,7 +701,7 @@ internal static class OrderManager
 
         try
         {
-            if (token)
+            if (IsSmsActive)
             {
                 await Tools.SendSms(
                       courier.Phone,
@@ -704,7 +715,7 @@ internal static class OrderManager
         }
         try
         {
-            if (exceptionMail is not null && exceptionSms is not null)
+            if ((exceptionMail is not null && !IsSmsActive) || (exceptionSms is not null && exceptionMail is not null))
                 throw new BO.BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
         }
 

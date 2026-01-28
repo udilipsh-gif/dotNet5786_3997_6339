@@ -122,11 +122,11 @@
 
                 <DataGridTextColumn Header="זמן לסיום" 
                                     Binding="{Binding TimeLeftForDelivery, Converter={StaticResource TimeSpanConverter}}" 
-                                    Width="120"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="זמן טיפול כולל" 
                                     Binding="{Binding TotalTimeOfDelivery, Converter={StaticResource TimeSpanConverter}}" 
-                                    Width="120"/>
+                                    Width="Auto"/>
 
                 <DataGridTextColumn Header="ניסיונות" Binding="{Binding NumberOfDeliveryAttempts}" Width="65"/>
 
