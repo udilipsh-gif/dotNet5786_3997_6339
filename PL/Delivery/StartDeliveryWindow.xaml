@@ -37,8 +37,8 @@
                       SelectedIndex="0"
                       ToolTip="בחר סוג משלוח להצגה בטבלה"/>
         </StackPanel>
-        
-        
+
+
 
         <DataGrid Grid.Row="1"
                   x:Name="OrdersGrid"
@@ -148,7 +148,27 @@
         <StackPanel Grid.Row="1" 
                     Visibility="{Binding OrderListEmpty, Converter={StaticResource BoolToVisibilityConverter}}"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="אין הזמנות ברשימה" ></TextBlock>
+            <TextBlock Text="אין הזמנות זמינות למשלוח"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Foreground="Gray"/>
         </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Visibility="{Binding OrderListEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border CornerRadius="150"
+                ClipToBounds="True"   
+                Margin="0,40,20,40">
+                <MediaElement Source="/Images/video_empty_orders.mp4" 
+                   HorizontalAlignment="Right"   
+                   VerticalAlignment="Bottom"                 
+                   Width="300" Height="300" 
+                   LoadedBehavior="Play" 
+                   Volume="60"
+                   UnloadedBehavior="Play" 
+                   Stretch="UniformToFill" />
+            </Border>
+        </StackPanel>
+
     </Grid>
 </Window>

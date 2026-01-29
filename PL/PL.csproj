@@ -16,9 +16,13 @@
 
   <ItemGroup>
     <None Remove="Images\image_login.png" />
+    <None Remove="Images\video_empty_orders.mp4" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Images\video_empty_orders.mp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\לוגו אייקון (1).ico" />
   </ItemGroup>
 
