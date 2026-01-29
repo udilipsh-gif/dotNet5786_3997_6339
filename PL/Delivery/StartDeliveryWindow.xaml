@@ -154,7 +154,7 @@
                        Foreground="Gray"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1"
+        <!--<StackPanel Grid.Row="1"
                     Visibility="{Binding OrderListEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
             <Border CornerRadius="150"
                 ClipToBounds="True"   
@@ -168,7 +168,7 @@
                    UnloadedBehavior="Play" 
                    Stretch="UniformToFill" />
             </Border>
-        </StackPanel>
+        </StackPanel>-->
 
     </Grid>
 </Window>
