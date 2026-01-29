@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <config>
   <NextOrderId>100051</NextOrderId>
-  <NextDeliveryId>200056</NextDeliveryId>
-  <Clock>02/02/2026 09:07:25</Clock>
+  <NextDeliveryId>200081</NextDeliveryId>
+  <Clock>04/02/2026 10:05:22</Clock>
   <ManagerId>1</ManagerId>
   <PasswordManager>1</PasswordManager>
   <StoreAddress>בר כוכבא 21 בני ברק</StoreAddress>
@@ -17,8 +17,8 @@
   <RiskRange>1.00:00:00</RiskRange>
   <MaxTimeInactivity>100.00:00:00</MaxTimeInactivity>
   <GoogleApiKey>AIzaSyA-LjTOw9o47TICCR-4zQDUQoQYp1tSzGk</GoogleApiKey>
-  <EmailAddress>david48483@gmail.com</EmailAddress>
-  <ScriptUrl>AKfycbwzaZwF0Lv9iFC2_SWqSAgaIBUQlBDLLqJ9GlAxUS6dJCf4Sm7BqjcQy0nID1Zbip-0jQ</ScriptUrl>
+  <EmailAddress>ddavidov@g.jct.ac.il</EmailAddress>
+  <ScriptUrl>AKfycbyIlSh0oe9uFaJX9XpBx0U_IJ70uYaLd_7jZyLvnYE1D94oA47HelVQdO00PzIOqrvNIg</ScriptUrl>
   <ScriptPass>sdfjsak8796978akljdf54gdfgr44</ScriptPass>
   <TokenCallSms>WU1BUElL.apik_j2szxGbBK7FSC2mHXJ1MBQ.f3eQocFPKykDUClg3fsSXpuvpodW5qgiZKAlpST5a8c</TokenCallSms>
 </config>
