@@ -312,7 +312,7 @@ internal static class AdminManager
             lock (AdminManager.BlMutex)
                 deliveriesByCourier = s_dal.Delivery.ReadAll().ToLookup(d => d.CourierId);
 
-            foreach (var courier in couriers)
+            foreach (var courier in couriers.ToList())
             {
                 var courierDeliveries = deliveriesByCourier[courier.Id];
                 if (courierDeliveries.Any(d => d.EndDelivery == null)) continue;
