@@ -2,6 +2,7 @@
 using DalApi;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Helpers;
@@ -688,7 +689,7 @@ internal static class CourierManager
         {
             if (courier.DeliveryId is null)
             {
-                if (s_rand.Next(1, 100) <= 100)
+                if (s_rand.Next(1, 100) <= 15)
                 {
                     simulationTasks.Add(Task.Run(async () =>
                     {
@@ -708,7 +709,10 @@ internal static class CourierManager
                                 }
                             }
                         }
-                        catch { }
+                        catch (Exception ex) {
+                            Debug.WriteLine("Error occurred while simulating courier activity:");
+                            Debug.WriteLine(ex);
+                        }
                     }));
                 }
             }
@@ -737,9 +741,9 @@ internal static class CourierManager
                                     int chance = s_rand.Next(1, 100);
                                     BO.EndDelivery endStatus;
 
-                                    if (chance <= 5) endStatus = BO.EndDelivery.REFUSED;       // 5%
-                                    else if (chance <= 20) endStatus = BO.EndDelivery.NOTFOUND; // 15%
-                                    else endStatus = BO.EndDelivery.DELIVERED;                  // 80%
+                                    if (chance <= 5) endStatus = BO.EndDelivery.REFUSED;       
+                                    else if (chance <= 20) endStatus = BO.EndDelivery.NOTFOUND; 
+                                    else endStatus = BO.EndDelivery.DELIVERED;                  
 
                                     lock (AdminManager.BlMutex)
                                         s_completeDeliveryNotObserv(courier.Id, currentDeliveryId, endStatus);

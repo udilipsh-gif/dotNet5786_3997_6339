@@ -81,7 +81,7 @@ public partial class StartDeliveryWindow : Window
 
         this.EnumTypeOfOrder = enumTypeOfOrder ?? new List<Tools.SelectionItem>();
 
-       
+
         this.StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
 
         InitializeComponent();
@@ -92,7 +92,7 @@ public partial class StartDeliveryWindow : Window
         Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Order.AddObserver(orderListObserver));
         Tools.RunSafe(() => s_bl.Courier.AddObserver(UserId, orderListObserver));
-       // Tools.RunSafe(() => s_bl.Admin.AddConfigObserver(orderListObserver));
+        // Tools.RunSafe(() => s_bl.Admin.AddConfigObserver(orderListObserver));
 
         UpdateOrdersList();
 
@@ -112,20 +112,19 @@ public partial class StartDeliveryWindow : Window
 
     private readonly ObserverMutex _Mutex = new(); //stage 7
 
-    private void UpdateOrdersList()
+    private async void UpdateOrdersList()
     {
         if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
             return;
 
-        Dispatcher.BeginInvoke(async () =>
+        try
         {
-            try
+            StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
+
+            var DeliveryList = await s_bl.Delivery.GetOpen(UserId, courierId, SelectedFilter, null);
+
+            await Dispatcher.BeginInvoke(() =>
             {
-                StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
-
-                var DeliveryList = await s_bl.Delivery.GetOpen(UserId, courierId, SelectedFilter, null);
-
-
                 if (DeliveryListView == null)
                 {
                     DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
@@ -141,23 +140,27 @@ public partial class StartDeliveryWindow : Window
 
                 if (!DeliveryList.Any())
                     OrderListEmpty = true;
+            });
 
 
             }
-            catch (Exception ex)
+        catch (Exception ex)
+        {
+            await Dispatcher.BeginInvoke(() =>
             {
                 MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}", "שגיאה",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 DeliveryListView = new ObservableCollection<BO.OpenOrderInList>();
                 return;
-            }
-            finally
-            {
-                if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
-                    UpdateOrdersList();
-            }
-        });
+            });
+        }
+        finally
+        {
+            if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                UpdateOrdersList();
+        }
     }
+    
 
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         => UpdateOrdersList();

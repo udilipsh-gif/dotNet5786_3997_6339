@@ -308,11 +308,11 @@ internal static class AdminManager
             ILookup<int, DO.Delivery> deliveriesByCourier;
 
             lock (AdminManager.BlMutex)
-                couriers = s_dal.Courier.ReadAll(c => c.Active);
+                couriers = s_dal.Courier.ReadAll(c => c.Active).ToList();
             lock (AdminManager.BlMutex)
                 deliveriesByCourier = s_dal.Delivery.ReadAll().ToLookup(d => d.CourierId);
 
-            foreach (var courier in couriers.ToList())
+            foreach (var courier in couriers)
             {
                 var courierDeliveries = deliveriesByCourier[courier.Id];
                 if (courierDeliveries.Any(d => d.EndDelivery == null)) continue;

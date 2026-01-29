@@ -22,7 +22,7 @@ public static class GoogleMapsService
     /// </summary>
     private static readonly HttpClient s_httpClient = new()
     {
-         DefaultRequestHeaders =
+        DefaultRequestHeaders =
          {
              { "User-Agent", UserAgent }
          }
@@ -113,10 +113,10 @@ public static class GoogleMapsService
     /// </summary>
     private static void s_prepareHttpClient()
     {
-
-
-        s_httpClient.DefaultRequestHeaders.Clear();
-        s_httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
+        if (!s_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
+        {
+            s_httpClient.DefaultRequestHeaders.Add("User-Agent", UserAgent);
+        }
     }
 
     /// <summary>
