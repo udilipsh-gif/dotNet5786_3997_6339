@@ -135,11 +135,50 @@
 
                     <StackPanel Grid.Row="2" Margin="0,20,0,0">
                         <StackPanel Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}">
-                            <Button Content="יציאה למשלוח חדש" 
+
+                            <Grid>
+
+                                <ProgressBar IsIndeterminate="True" 
+                         Width="150" Height="30"
+                         HorizontalAlignment="Center">
+                                    <ProgressBar.Style>
+                                        <Style TargetType="ProgressBar">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsOrderInProgress}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ProgressBar.Style>
+                                </ProgressBar>
+
+                                <Button Content="יציאה למשלוח חדש" 
+                                        
+                    Click="StartDelivery_Click" 
+                    IsEnabled="{Binding CurrentCourier.Active}"
+                    Background="{StaticResource AccentColor}" Foreground="Black">
+                                    <Button.Style>
+                                        <Style TargetType="Button"
+                                             BasedOn ="{StaticResource SecondaryButtonStyle}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsOrderInProgress}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                            </Grid>
+
+                            <!--<Button Content="יציאה למשלוח חדש" 
                                 Click="StartDelivery_Click" 
-                                Visibility="{Binding CurrentCourier.OrderInProgress, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter=Invert}"
+                                Visibility="{Binding IsOrderInProgress, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}"
+                                 
                                 IsEnabled="{Binding CurrentCourier.Active}"
-                                Background="{StaticResource AccentColor}" Foreground="Black"/>
+                                Background="{StaticResource AccentColor}" Foreground="Black"/>-->
 
                             <Button Content="עריכת פרטים" Click="EditCureier_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                             <Button Content="היסטוריית משלוחים" Click="CureierDeliveryHistory_Click" Style="{StaticResource SecondaryButtonStyle}"/>

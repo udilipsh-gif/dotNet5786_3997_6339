@@ -1,9 +1,7 @@
 ﻿using PL.Helpers;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -114,36 +112,51 @@ public partial class StartDeliveryWindow : Window
 
     private async void UpdateOrdersList()
     {
+        BO.TypeOfOrder? selectedFilter = null;
+
         if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
             return;
 
         try
         {
-            StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
-
-            var DeliveryList = await s_bl.Delivery.GetOpen(UserId, courierId, SelectedFilter, null);
-
-            await Dispatcher.BeginInvoke(() =>
+            Dispatcher.Invoke(() =>//חייב טרד ראשי, הוא דפנדסי
             {
+                selectedFilter= SelectedFilter;
+
+            });
+
+            var Result  =await Task.Run(async () =>//חישוב כבד ברקע
+            {
+                var DeliveryList= await s_bl.Delivery.GetOpen(UserId, courierId, selectedFilter, null);
+                var storeAddress = s_bl.Admin.GetConfig().StoreAddress;
+                return(storeAddress, DeliveryList);
+            });
+
+           
+
+            await Dispatcher.BeginInvoke(() =>//חוזר לטרד הראשי לעדכון הUI
+            {
+
+                StoreAddress = Result.storeAddress; 
                 if (DeliveryListView == null)
                 {
-                    DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
+                    DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(Result.DeliveryList);
                 }
                 else
                 {
                     DeliveryListView.Clear(); // מחיקת הישנים
-                    foreach (var item in DeliveryList)
+                    foreach (var item in Result.DeliveryList)
                     {
                         DeliveryListView.Add(item); // הוספת החדשים
                     }
                 }
 
-                if (!DeliveryList.Any())
+                if (!Result.DeliveryList.Any())
                     OrderListEmpty = true;
             });
 
 
-            }
+        }
         catch (Exception ex)
         {
             await Dispatcher.BeginInvoke(() =>
@@ -160,7 +173,102 @@ public partial class StartDeliveryWindow : Window
                 UpdateOrdersList();
         }
     }
-    
+    private void UTTTTpdateOrdersList()//פחות יעיל מהפונקציה מעל
+    {
+        if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+            return;
+
+        Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
+
+                var DeliveryList = await s_bl.Delivery.GetOpen(UserId, courierId, SelectedFilter, null);
+
+
+                if (DeliveryListView == null)
+                {
+                    DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
+                }
+                else
+                {
+                    DeliveryListView.Clear(); // מחיקת הישנים
+                    foreach (var item in DeliveryList)
+                    {
+                        DeliveryListView.Add(item); // הוספת החדשים
+                    }
+                }
+
+                if (!DeliveryList.Any())
+                    OrderListEmpty = true;
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}", "שגיאה",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                DeliveryListView = new ObservableCollection<BO.OpenOrderInList>();
+                return;
+            }
+            finally
+            {
+                if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+                    UpdateOrdersList();
+            }
+        });
+    }
+    //private async void UpdateOrdersList()//זה מה שניסינו לעשות, שיגאה בגישה לכתובת מטרד משני
+    //{
+    //    if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())//הדלקת פלאג בפונקציה שמציינת שהריצה בעיצומה ואם מישהו ביקש ריסטארט בזמן הזה
+    //        return;
+
+    //    try
+    //    {
+    //        StoreAddress = s_bl.Admin.GetConfig().StoreAddress;
+
+    //        var DeliveryList = await s_bl.Delivery.GetOpen(UserId, courierId, SelectedFilter, null);
+
+    //        await Dispatcher.BeginInvoke(() =>
+    //        {
+    //            if (DeliveryListView == null)
+    //            {
+    //                DeliveryListView = new ObservableCollection<BO.OpenOrderInList>(DeliveryList);
+    //            }
+    //            else
+    //            {
+    //                DeliveryListView.Clear(); // מחיקת הישנים
+    //                foreach (var item in DeliveryList)
+    //                {
+    //                    DeliveryListView.Add(item); // הוספת החדשים
+    //                }
+    //            }
+
+    //            if (!DeliveryList.Any())
+    //                OrderListEmpty = true;
+    //        });
+
+
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        await Dispatcher.BeginInvoke(() =>
+    //        {
+    //            MessageBox.Show($"שגיאה בטעינת הנתונים: {ex.Message}", "שגיאה",
+    //                MessageBoxButton.OK, MessageBoxImage.Error);
+    //            DeliveryListView = new ObservableCollection<BO.OpenOrderInList>();
+    //            return;
+    //        });
+    //    }
+    //    finally
+    //    {
+    //        if (await _Mutex.UnsetLoadInProgressAndCheckRestartRequested())
+    //            UpdateOrdersList();
+    //    }
+    //}
+
+
 
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         => UpdateOrdersList();

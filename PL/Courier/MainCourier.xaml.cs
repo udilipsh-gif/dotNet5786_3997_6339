@@ -116,7 +116,7 @@ public partial class MainCourier : Window, INotifyPropertyChanged
     /// <summary>
     /// Backing field for the IsOrderInProgress property.
     /// </summary>
-    private bool _IsOrderInProgress = false;
+    private bool? _IsOrderInProgress = null;
     
     /// <summary>
     /// Gets or sets a value indicating whether the courier has an active order in progress.
@@ -124,7 +124,7 @@ public partial class MainCourier : Window, INotifyPropertyChanged
     /// <value>
     /// <c>true</c> if an order is currently being delivered; otherwise, <c>false</c>.
     /// </value>
-    public bool IsOrderInProgress
+    public bool? IsOrderInProgress
     {
         get => _IsOrderInProgress;
         set
@@ -171,7 +171,8 @@ public partial class MainCourier : Window, INotifyPropertyChanged
     /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
     private void MainCourier_Loaded(object sender, RoutedEventArgs e)
     {
-        IsOrderInProgress = false;
+       
+        
         GetCurier();
         Tools.ResetRequested += () => this.Close();
         Tools.RunSafe(() => s_bl.Courier.AddObserver(USERID, GetCurier));
@@ -389,26 +390,32 @@ public partial class MainCourier : Window, INotifyPropertyChanged
 
                     freshCourier = courier
                       ?? throw new BO.BlDoesNotExistException($"The Courier with id: {USERID} does not exist");
-
-                    if (CurrentCourier is null)
+                   
+                   
+                    if (CurrentCourier is null)//עדכון ראשון ויחיד כאן אחרי שחזרנו מהיילד, אין לנו ערך במשלוח כלל
                         await Dispatcher.BeginInvoke(() =>
                         {
                             CurrentCourier = courier;
+                           
                         });
                 }
 
                 if (freshCourier == null)
                     throw new BO.BlDoesNotExistException($"The Courier with id: {USERID} does not exist");
 
-                await Dispatcher.BeginInvoke(() =>
+                await Dispatcher.BeginInvoke(() =>//עדכון שני וסופי כולל השדה משלוח פעיל
                 {
+                    //########################################################
+                    IsOrderInProgress = freshCourier.OrderInProgress != null;//עכשיו אנחנו מאפשרים את הכפתור יציאה למשלוח אם אין משלוח פעיל
+                    //########################################################
+
                     if (CurrentCourier != freshCourier)
                     {
-                        CurrentCourier = freshCourier;
+                        CurrentCourier = freshCourier;//עבור מקרה בו יש קיראה חזורת ולכן הפרש קוריור כולו שונה
                     }
                     else
                     {
-                        OnPropertyChanged(nameof(CurrentCourier));
+                        OnPropertyChanged(nameof(CurrentCourier));//מאלץ עדכון, שהרי הרפרנס לא שונה רק השדה משלוח פעיל
                     }
                 });
             }
