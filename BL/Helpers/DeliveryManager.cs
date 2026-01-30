@@ -296,7 +296,7 @@ internal static class DeliveryManager
         if (!courier.Active)
             throw new BO.BlInvalidOperationException("שגיאה שליח לא פעיל");
 
-        var actualDistance = await GoogleMapsService.NetworkKeeper(() => 
+        var actualDistance = await GoogleMapsService.NetworkKeeper(() =>
             GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude,
             (BO.TheTypeShipment)courier.TypeShipment));
 
@@ -308,12 +308,16 @@ internal static class DeliveryManager
             TypeShipment = courier.TypeShipment,
             OrderDate = AdminManager.Now,
             ActualDistance = actualDistance,
-            EndDelivery = actualDistance is not null? null : DO.EndDelivery.FAILED,
+            EndDelivery = actualDistance is not null ? null : DO.EndDelivery.FAILED,
             TimeEndDelivery = actualDistance is not null ? null : AdminManager.Now
         };
 
         lock (AdminManager.BlMutex)
+        {
+            if(s_dal.Delivery.ReadAll(d => d.OrderId == order.Id && d.EndDelivery == null).Any())
+                throw new BO.BlInvalidOperationException("Order is already being delivered by another courier.");
             s_dal.Delivery.Create(delivery);
+        }
         lock (AdminManager.BlMutex)
             if(actualDistance is not null)
                 s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
