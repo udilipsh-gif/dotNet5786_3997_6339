@@ -82,7 +82,7 @@ internal static class AdminManager
 
         if (config.StoreAddress != configuration.StoreAddress)
         {
-            
+
             string address = configuration.StoreAddress ?? throw new BO.BlInvalidValueException("Store address cannot be null.");
 
             string api = configuration.GoogleApiKey ?? throw new BO.BlInvalidValueException("Google API key cannot be null.");
@@ -180,7 +180,11 @@ internal static class AdminManager
         }
 
         if (configChanged)
+        {
             ConfigUpdatedObservers?.Invoke();
+            OrderManager.ResetCache();
+            OrderManager.Observer.NotifyListUpdated();
+        }
     }
 
     internal static async Task ResetDB()

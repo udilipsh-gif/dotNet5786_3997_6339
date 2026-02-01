@@ -80,7 +80,7 @@ internal static class OrderManager
     {
         lock (_cacheLock)
         {
-            _ordersCache = null; // איפוס המילון - הוא ייבנה מחדש בקריאה הבאה
+            _ordersCache = null; 
         }
     }
 
@@ -119,7 +119,6 @@ internal static class OrderManager
 
             foreach (var item in _ordersCache.Values)
             {
-                // 1. ספירת סטטוס הזמנה (פשוט ומהיר)
                 results[(int)item.Status]++;
 
                 // 2. ספירת סטטוס לו"ז
@@ -132,10 +131,8 @@ internal static class OrderManager
                 }
                 else
                 {
-                    // אם ההזמנה פתוחה - חשב בזיכרון (פעולה מתמטית פשוטה וללא DB)
                     TimeSpan timeLeft = item.MaxDeliveryTime - now;
 
-                    // לוגיקה מקוצרת לחישוב מצב
                     if (timeLeft < TimeSpan.Zero)
                         currentScheduleStatus = BO.ScheduleStatus.LATE;
                     else if (timeLeft <= riskRange)
@@ -472,7 +469,6 @@ internal static class OrderManager
 
     lock (_cacheLock)
     {
-        // רצים רק על המילון - אפס קריאות ל-DAL!
         foreach (var kvp in _ordersCache)
         {
             var id = kvp.Key;
@@ -558,19 +554,15 @@ internal static class OrderManager
 
     internal static BO.ScheduleStatus? TryGetCachedScheduleStatus(int orderId)
     {
-        // אם המטמון לא קיים, אין מנוס מחישוב רגיל
         if (_ordersCache == null) return null;
 
         lock (_cacheLock)
         {
             if (_ordersCache.TryGetValue(orderId, out var info))
             {
-                // אם ההזמנה סגורה, יש לנו סטטוס סופי שמור
                 if (info.FinalScheduleStatus.HasValue)
                     return info.FinalScheduleStatus.Value;
 
-                // אם ההזמנה פתוחה, המטמון לא מחזיק סטטוס לו"ז (כי הוא משתנה כל רגע)
-                // ולכן נחזיר null כדי שהלוגיקה הרגילה תחשב אותו לפי הזמן הנוכחי
                 return null;
             }
         }
@@ -938,7 +930,6 @@ internal static class OrderManager
 
                         lock (AdminManager.BlMutex)
                             s_dal.Order.Update(order with { DistanceKm = newDistance });
-
                     }
                     else
                         throw new BO.BlDoesNotExistException("כתובת חנות לא מעודכנת");
