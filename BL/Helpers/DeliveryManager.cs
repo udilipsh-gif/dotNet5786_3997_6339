@@ -374,10 +374,10 @@ internal static class DeliveryManager
         };
         lock (AdminManager.BlMutex) {
             s_dal.Delivery.Update(delivery);
+            OrderManager.UpdateCacheItem(delivery.OrderId);
             UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
         }
 
-        OrderManager.UpdateCacheItem(delivery.OrderId);
 
         s_notifyDeliveryCompleted(deliveryId, delivery.OrderId, courierId);
     }

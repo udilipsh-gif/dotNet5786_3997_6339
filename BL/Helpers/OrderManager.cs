@@ -91,6 +91,21 @@ internal static class OrderManager
         // אתחול חד פעמי אם צריך
         if (_ordersCache == null) await InitCache();
 
+        bool isEmpty;
+        lock (_cacheLock)
+        {
+            isEmpty = _ordersCache != null && _ordersCache.Count == 0;
+        }
+
+        if (isEmpty)
+        {
+            lock (_cacheLock)
+            {
+                _ordersCache = null; 
+            }
+            await InitCache(); 
+        }
+
         int maxStatusVal = (int)Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>().Max();
         int maxScheduleVal = (int)Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>().Max();
         int[] results = new int[maxStatusVal + 1 + maxScheduleVal + 1];
