@@ -6,7 +6,6 @@ using System.Text;
 
 namespace Helpers;
 
-
 /// <summary>
 /// Provides utility methods for distance calculations, validation, status determination,
 /// and external API integration for the delivery system.
@@ -270,8 +269,8 @@ internal static class Tools
             }
 
             return maxDeliveryTime >= delivery.TimeEndDelivery.Value
-           ? BO.ScheduleStatus.ONTYME
-           : BO.ScheduleStatus.LATE;
+            ? BO.ScheduleStatus.ONTYME
+            : BO.ScheduleStatus.LATE;
         }
         catch
         {
@@ -495,8 +494,8 @@ internal static class Tools
             actualDistance = await GoogleMapsService.NetworkKeeper(() =>
                 GoogleMapsService.GetActualDistance(order.Latitude, order.Longitude,
                 (BO.TheTypeShipment)courier.TypeShipment)) ?? 0;
-            lock (AdminManager.BlMutex) 
-            { 
+            lock (AdminManager.BlMutex)
+            {
                 s_dal.Delivery.Update(delivery with { ActualDistance = actualDistance });
                 OrderManager.UpdateCacheItem(delivery.OrderId);
             }
@@ -592,88 +591,58 @@ internal static class Tools
     public static bool CheckManger(int id)
         => id == AdminManager.GetConfig().ManagerId;
 
-    ///// <summary>
-    ///// Sends an email using SMTP via Gmail's SMTP server.
-    ///// </summary>
-    ///// <param name="toEmail">The recipient's email address.</param>
-    ///// <param name="subject">The email subject line.</param>
-    ///// <param name="body">The email body content.</param>
-    ///// <exception cref="SmtpException">
-    ///// Thrown when the email fails to send or the recipient address is empty.
-    ///// </exception>
-    ///// <remarks>
-    ///// Uses Gmail's SMTP server (smtp.gmail.com) on port 587 with TLS encryption.
-    ///// Requires valid Gmail credentials configured in the code.
-    ///// </remarks>
-    //public static void SendEmail(string toEmail, string subject, string body)
-    //{
-    //    if (string.IsNullOrWhiteSpace(toEmail))
-    //        throw new SmtpException("Recipient email address is empty");
+    // ... (Commented out legacy SMTP code omitted for brevity) ...
 
-    //    try
-    //    {
-    //        using MailMessage mail = new MailMessage();
-    //        using SmtpClient smtpServer = new SmtpClient("smtp.gmail.com");
-
-    //        string fromEmail;
-    //        fromEmail = AdminManager.GetConfig().EmailAddress ?? String.Empty;
-    //        string password = "1234 5678 @#$% Asdf";
-
-    //        mail.From = new MailAddress(fromEmail);
-    //        mail.To.Add(toEmail);
-    //        mail.Subject = subject;
-    //        mail.Body = body;
-
-    //        smtpServer.Port = 587;
-    //        smtpServer.Credentials = new NetworkCredential(fromEmail, password);
-    //        smtpServer.EnableSsl = true;
-
-    //        smtpServer.Send(mail);
-    //    }
-    //    catch (SmtpException ex)
-
-    //    {
-    //        throw new SmtpException($"{ex.Message}");
-    //    }
-    //}
     private static readonly HttpClient client = new HttpClient();
+
+    /// <summary>
+    /// Sends an email asynchronously using a Google Apps Script deployment (HTTP GET).
+    /// Used as an alternative to SMTP to bypass port restrictions.
+    /// </summary>
+    /// <param name="toEmail">The recipient's email address.</param>
+    /// <param name="subject">The email subject line.</param>
+    /// <param name="body">The email body content.</param>
+    /// <exception cref="BO.BLNoSendEmailException">Thrown if the Google Script returns a non-success status code or connection fails.</exception>
     public static async Task SendEmailSkript(string toEmail, string subject, string body)
     {
         string headUrl = "https://script.google.com/macros/s/";
 
         string endUrl = "/exec";
 
-        string scriptUrl = $"{headUrl}{AdminManager.GetConfig().ScriptUrl}{endUrl}";   
+        string scriptUrl = $"{headUrl}{AdminManager.GetConfig().ScriptUrl}{endUrl}";
 
-        string scriptPass = AdminManager.GetConfig().ScriptPass;                                                       
+        string scriptPass = AdminManager.GetConfig().ScriptPass;
 
         string name = "חנות הספרים- מיני פרוייקט";
 
         string requestUrl = $"{scriptUrl}?pas={scriptPass}" +
-                                $"&address={Uri.EscapeDataString(toEmail)}" +
-                                $"&sub={Uri.EscapeDataString(subject)}" +
-                                $"&body={Uri.EscapeDataString(body)}" +
-                                $"&from={Uri.EscapeDataString(name)}";
+                            $"&address={Uri.EscapeDataString(toEmail)}" +
+                            $"&sub={Uri.EscapeDataString(subject)}" +
+                            $"&body={Uri.EscapeDataString(body)}" +
+                            $"&from={Uri.EscapeDataString(name)}";
         try
         {
-            HttpResponseMessage response = await client.GetAsync(requestUrl);//אסינכרוני לשלב 7
+            HttpResponseMessage response = await client.GetAsync(requestUrl);
             if (!response.IsSuccessStatusCode)
             {
                 throw new BO.BLNoSendEmailException($"{response.StatusCode}");
-
             }
-
-
         }
-        catch (Exception ex)//שלב 7
+        catch (Exception ex)
         {
             throw new BO.BLNoSendEmailException($"{ex.Message}");
-            //Console.WriteLine($"Exception in SendEmail: {ex.Message}");
         }
 
         return;
     }
 
+    /// <summary>
+    /// Sends an SMS notification asynchronously using the Call2All API.
+    /// </summary>
+    /// <param name="phone">The recipient's phone number.</param>
+    /// <param name="name">The sender's name or title to appear in the message context.</param>
+    /// <param name="body">The SMS message content.</param>
+    /// <exception cref="BO.BLNoSendSmsException">Thrown if the API returns a failure status code or connection fails.</exception>
     public static async Task SendSms(string phone, string name, string body)
     {
         //string encodedMessage = Uri.EscapeDataString(name+" "+body);
@@ -684,7 +653,6 @@ internal static class Tools
         try
         {
             HttpResponseMessage response = await client.GetAsync(tokenUrl);
-
 
             string result = await response.Content.ReadAsStringAsync();
 
@@ -725,18 +693,19 @@ internal static class Tools
         return delivery;
     }
 
+    /// <summary>
+    /// Converts a technical OrderType enum value to a user-friendly Hebrew string and a matching emoji.
+    /// </summary>
+    /// <param name="typeOrder">The order type enum value.</param>
+    /// <returns>A tuple containing the Hebrew description (Item1) and an emoji icon (Item2).</returns>
     public static (string word, string imoje) ConvertTipeOrderToHebrew(DO.TypeOfOrder typeOrder)
     {
         return typeOrder switch
         {
-            DO.TypeOfOrder.STANDART => ("רגיל","🚶‍"),
-            DO.TypeOfOrder.FAST_DELIVERY => ("משלוח מהיר","🏃‍♂️"),
-            DO.TypeOfOrder.DELIVER_IMMEDIATELY => ("משלוח מיידי","🚀"),
-            _ => ("לא ידוע","❓")
+            DO.TypeOfOrder.STANDART => ("רגיל", "🚶‍"),
+            DO.TypeOfOrder.FAST_DELIVERY => ("משלוח מהיר", "🏃‍♂️"),
+            DO.TypeOfOrder.DELIVER_IMMEDIATELY => ("משלוח מיידי", "🚀"),
+            _ => ("לא ידוע", "❓")
         };
     }
-
-
-
-
 }

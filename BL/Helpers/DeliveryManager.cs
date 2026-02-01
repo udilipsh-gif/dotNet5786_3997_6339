@@ -28,18 +28,11 @@ internal static class DeliveryManager
     /// <summary>
     /// Retrieves all deliveries from the data access layer.
     /// </summary>
-    /// <param name="sort">
-    /// Optional sorting criterion for deliveries. 
-    /// Currently not implemented - parameter is ignored.
-    /// </param>
+    /// <param name="customPredicate">Optional filter predicate.</param>
     /// <returns>
     /// An <see cref="IEnumerable{T}"/> of <see cref="DO.Delivery"/> objects 
     /// representing all deliveries in the system.
     /// </returns>
-    /// <remarks>
-    /// Note: The sort parameter is currently not utilized in the implementation.
-    /// All deliveries are returned in their default order from the data access layer.
-    /// </remarks>
     internal static IEnumerable<DO.Delivery> ReadAll(Func<DO.Delivery, bool>? customPredicate = null)
     {
         Func<DO.Delivery, bool> filter = customPredicate ?? (_ => true);
@@ -98,7 +91,7 @@ internal static class DeliveryManager
         {
             await DeliveryManager.Create(doOrder, doCourier);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw new BO.BlInvalidOperationException(ex.Message);
         }
@@ -115,10 +108,6 @@ internal static class DeliveryManager
     /// Results are filtered to show only one delivery per order (the most recent).
     /// </returns>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier is not found.</exception>
-    /// <remarks>
-    /// Only returns deliveries that have ended (EndDelivery is not null).
-    /// Results are deduplicated by OrderId to show only the most recent delivery attempt for each order.
-    /// </remarks>
     public static async Task<List<BO.ClosedDeliveryInList>> GetClosed(
     int courierId,
     BO.TypeOfOrder? filter,
@@ -200,11 +189,6 @@ internal static class DeliveryManager
     /// including distance calculations, time constraints, and schedule status.
     /// </returns>
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier is not found.</exception>
-    /// <remarks>
-    /// Only returns orders with OPEN status that are within the courier's
-    /// maximum delivery distance capability and match the courier's vehicle capabilities.
-    /// Results can be filtered by order type and sorted by various fields.
-    /// </remarks>
     public static async Task<List<BO.OpenOrderInList>> GetOpen(
         int courierId,
         BO.TypeOfOrder? filter,
@@ -314,12 +298,12 @@ internal static class DeliveryManager
 
         lock (AdminManager.BlMutex)
         {
-            if(s_dal.Delivery.ReadAll(d => d.OrderId == order.Id && d.EndDelivery == null).Any())
+            if (s_dal.Delivery.ReadAll(d => d.OrderId == order.Id && d.EndDelivery == null).Any())
                 throw new BO.BlInvalidOperationException("Order is already being delivered by another courier.");
             s_dal.Delivery.Create(delivery);
         }
         lock (AdminManager.BlMutex)
-            if(actualDistance is not null)
+            if (actualDistance is not null)
                 s_dal.Order.Update(order with { OrderStatus = DO.OrderStatus.DELIVERING });
 
         OrderManager.UpdateCacheItem(order.Id);
@@ -372,7 +356,8 @@ internal static class DeliveryManager
             EndDelivery = (DO.EndDelivery)endDelivery,
             TimeEndDelivery = AdminManager.Now
         };
-        lock (AdminManager.BlMutex) {
+        lock (AdminManager.BlMutex)
+        {
             s_dal.Delivery.Update(delivery);
             OrderManager.UpdateCacheItem(delivery.OrderId);
             UpdateOrderStatusAfterDelivery(delivery.OrderId, endDelivery);
@@ -399,8 +384,6 @@ internal static class DeliveryManager
                 $"Maximum distance: {courier.MaxDistanceDelivery} km");
         }
     }
-
-
 
     /// <summary>
     /// Updates the order status based on the delivery outcome.
@@ -456,14 +439,29 @@ internal static class DeliveryManager
         CourierManager.Observer.NotifyListUpdated();
     }
 
+    /// <summary>
+    /// Retrieves route information (distance and duration) from the store to a specified destination.
+    /// </summary>
+    /// <param name="destLat">The destination latitude.</param>
+    /// <param name="destLng">The destination longitude.</param>
+    /// <param name="shipmentType">The type of shipment (determines travel mode).</param>
+    /// <returns>A <see cref="GoogleMapsService.RouteInfo"/> object, or null if retrieval fails.</returns>
     public static async Task<GoogleMapsService.RouteInfo?> GetRouteFromStore(
-                     double destLat, double destLng, BO.TheTypeShipment shipmentType)
+                      double destLat, double destLng, BO.TheTypeShipment shipmentType)
         => await GoogleMapsService.NetworkKeeper(() =>
             GoogleMapsService.GetRouteFromStore(destLat, destLng, shipmentType));
 
-
+    /// <summary>
+    /// Generates a static map image URL showing the route from the store to the destination.
+    /// </summary>
+    /// <param name="destLat">The destination latitude.</param>
+    /// <param name="destLng">The destination longitude.</param>
+    /// <param name="shipmentType">The type of shipment (affects path rendering).</param>
+    /// <param name="width">The width of the requested image (default 400).</param>
+    /// <param name="height">The height of the requested image (default 300).</param>
+    /// <returns>A string containing the URL for the static map image, or null on failure.</returns>
     public static async Task<string?> GetStaticMapUrlFromStore(double destLat, double destLng,
-                               BO.TheTypeShipment shipmentType, int width = 400, int height = 300)
+                                   BO.TheTypeShipment shipmentType, int width = 400, int height = 300)
         => await GoogleMapsService.GetStaticMapUrlFromStore(destLat, destLng, shipmentType, width, height);
 
     /// <summary>
@@ -532,9 +530,6 @@ internal static class DeliveryManager
         };
     }
 
-
-
-
     /// <summary>
     /// Gets the permitted order types for a given shipment type.
     /// </summary>
@@ -557,12 +552,16 @@ internal static class DeliveryManager
         };
     }
 
+    /// <summary>
+    /// Sends an email notification to the courier about the new delivery assignment.
+    /// </summary>
+    /// <param name="delivery">The newly created delivery object.</param>
     private static async void s_sendEmilNewDelivery(DO.Delivery delivery)
     {
         DO.Courier courier;
 
         lock (AdminManager.BlMutex)
-            courier = s_dal.Courier.Read(delivery.CourierId) ?? throw new BlDoesNotExistException($"courier whith {delivery.CourierId} not found");                        //CourierManager.Read(delivery.CourierId);
+            courier = s_dal.Courier.Read(delivery.CourierId) ?? throw new BlDoesNotExistException($"courier whith {delivery.CourierId} not found");                                         //CourierManager.Read(delivery.CourierId);
 
         DO.Order order;
 

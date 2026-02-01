@@ -115,36 +115,26 @@ internal static class CourierManager
     }
 
     /// <summary>
-    /// Retrieves a specific courier by their unique identifier.
+    /// Asynchronously retrieves a specific courier by their unique identifier using an async stream.
     /// </summary>
     /// <param name="id">The unique identifier of the courier to retrieve.</param>
     /// <returns>
-    /// A <see cref="BO.Courier"/> object with complete courier details including delivery statistics
-    /// and current order in progress.
+    /// An async stream (<see cref="IAsyncEnumerable{T}"/>) that yields the courier object in two stages:
+    /// <list type="number">
+    ///   <item><description>First yield: Basic courier details and statistics (fast).</description></item>
+    ///   <item><description>Second yield: Enriched object with active delivery details including route calculation (slower).</description></item>
+    /// </list>
     /// </returns>
     /// <exception cref="BO.BlDoesNotExistException">
     /// Thrown when the courier with the specified ID does not exist.
     /// </exception>
     /// <remarks>
-    /// This method enriches the courier data with calculated fields:
-    /// <list type="bullet">
-    ///   <item><description>DeliveryOnTime: Count of deliveries completed within the maximum delivery time</description></item>
-    ///   <item><description>DeliveryLate: Count of deliveries completed after the maximum delivery time</description></item>
-    ///   <item><description>OrderInProgress: Details of the current active delivery, if any</description></item>
-    /// </list>
+    /// This pattern allows the UI to display basic information immediately while heavy calculations
+    /// (like Google Maps API calls for the active order) run in the background.
     /// </remarks>
-    //internal static async Task<BO.Courier?> Read(int id)
-    //{
-    //    DO.Courier doCourier;
-    //    lock (AdminManager.BlMutex)
-    //        doCourier = s_dal.Courier.Read(id)
-    //            ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
-
-    //    return await s_convertToBObject(doCourier);
-    //}
     public static async IAsyncEnumerable<BO.Courier> Read(int id)
     {
-        // 1. שליפת הנתונים הגולמיים (מהירה ובטוחה בתוך נעילה)
+        // 1. Raw data retrieval (fast and thread-safe)
         DO.Courier doCourier;
         IEnumerable<DO.Delivery> allDeliveries;
 
@@ -156,7 +146,7 @@ internal static class CourierManager
             allDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == id).ToList();
         }
 
-        // 2. בניית האובייקט הבסיסי (ללא חישובים כבדים)
+        // 2. Build basic object (without heavy calculations)
         var boCourier = new BO.Courier
         {
             Id = doCourier.Id,
@@ -170,74 +160,28 @@ internal static class CourierManager
             WorkingSince = doCourier.WorkingSince,
             DeliveryOnTime = s_getDeliveryOnTimeCount(allDeliveries),
             DeliveryLate = s_getDeliveryLateCount(allDeliveries),
-            OrderInProgress = null // בינתיים ריק
+            OrderInProgress = null // Initially null
         };
 
-        // === הזרמה ראשונה: נתונים בסיסיים ל-UI ===
+        // === First Yield: Basic data for UI ===
         yield return boCourier;
 
-        // 3. בדיקה האם יש צורך בחישוב כבד (רק אם יש משלוח פעיל)
+        // 3. Check for active delivery requiring heavy calculation
         var activeDelivery = allDeliveries.FirstOrDefault(d => d.EndDelivery == null);
 
         if (activeDelivery != null)
         {
-            // ביצוע החישוב הכבד (פנייה לגוגל וכו')
-            // שים לב: זה קורה מחוץ לנעילה הראשית כי s_getOrderInProgress מטפל בנעילות בעצמו איפה שצריך
+            // Perform heavy calculation (Google Maps API etc.)
+            // Note: This happens outside the main lock as s_getOrderInProgress handles its own locking
             var heavyOrderDetails = await s_getOrderInProgress(allDeliveries);
 
-            // עדכון האובייקט הקיים
+            // Update the existing object
             boCourier.OrderInProgress = heavyOrderDetails;
 
-            // === הזרמה שנייה: נתונים מלאים ===
+            // === Second Yield: Full data ===
             yield return boCourier;
         }
     }
-////#####################################################################################################################תוספת שלי לחישוב קל
-//    internal static BO.Courier? Read(int id, string light)
-//    {
-//        DO.Courier doCourier;
-//        lock (AdminManager.BlMutex)
-//            doCourier = s_dal.Courier.Read(id)
-//                ?? throw new BO.BlDoesNotExistException($"Courier with ID={id} does not exist");
-
-//        IEnumerable<DO.Delivery> allDeliveries;
-
-//        lock (AdminManager.BlMutex)
-//            allDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == doCourier.Id).ToList();
-
-//        return new BO.Courier
-//        {
-//            Id = doCourier.Id,
-//            Name = doCourier.Name,
-//            Phone = doCourier.Phone,
-//            Email = doCourier.Email,
-//            Password = doCourier.Password,
-//            Active = doCourier.Active,
-//            MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
-//            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
-//            WorkingSince = doCourier.WorkingSince,
-//            DeliveryOnTime = s_getDeliveryOnTimeCount(allDeliveries),
-//            DeliveryLate = s_getDeliveryLateCount(allDeliveries),
-//            OrderInProgress = new OrderInProgress()
-//            {
-//                DeliveryId = -1,
-//                OrderId = -1,
-//                TypeOfOrder =BO.TypeOfOrder.STANDART,
-//                Address = "",
-//                Distance = 0,
-//                CustomerName = "",
-//                CustomerPhone = "",
-//                OrderTime = DateTime.MinValue,
-//                StartDeliveryTime = DateTime.MinValue,
-//                EstimatedDeliveryTime = DateTime.MinValue,
-//                MaxDeliveryTime = DateTime.MinValue,
-//                OrderStatus = BO.OrderStatus.OPEN ,
-//                ScheduleStatus = BO.ScheduleStatus.ONTYME ,
-//                TimeRemaining = TimeSpan.Zero
-//            }
-//        };
-//    }
-////###############################################################################################################עד כאן
 
     /// <summary>
     /// Updates an existing courier's information in the system.
@@ -445,40 +389,10 @@ internal static class CourierManager
     }
 
     /// <summary>
-    /// Converts a data object courier to a business object courier with enriched data.
-    /// </summary>
-    /// <param name="doCourier">The data object to convert.</param>
-    /// <returns>A business object courier with calculated statistics.</returns>
-    private static async Task<BO.Courier> s_convertToBObject(DO.Courier doCourier)
-    {
-        IEnumerable<DO.Delivery> allDeliveries;
-
-        lock (AdminManager.BlMutex)
-            allDeliveries = s_dal.Delivery.ReadAll(d => d.CourierId == doCourier.Id).ToList();
-
-        var orderInProgress = await s_getOrderInProgress(allDeliveries);
-
-        return new BO.Courier
-        {
-            Id = doCourier.Id,
-            Name = doCourier.Name,
-            Phone = doCourier.Phone,
-            Email = doCourier.Email,
-            Password = doCourier.Password,
-            Active = doCourier.Active,
-            MaxDistanceDelivery = doCourier.MaxDistanceDelivery,
-            TypeShipment = (BO.TheTypeShipment)doCourier.TypeShipment,
-            WorkingSince = doCourier.WorkingSince,
-            DeliveryOnTime = s_getDeliveryOnTimeCount(allDeliveries),
-            DeliveryLate = s_getDeliveryLateCount(allDeliveries),
-            OrderInProgress = orderInProgress
-        };
-    }
-
-    /// <summary>
     /// Converts a data object courier to a CourierInList summary object.
     /// </summary>
     /// <param name="doCourier">The data object to convert.</param>
+    /// <param name="courierDeliveries">Collection of deliveries associated with this courier.</param>
     /// <returns>A CourierInList object with summary information.</returns>
     private static BO.CourierInList s_convertToCourierInList(DO.Courier doCourier, IEnumerable<DO.Delivery> courierDeliveries)
     {
@@ -521,18 +435,13 @@ internal static class CourierManager
     /// <summary>
     /// Calculates the number of on-time deliveries completed by a courier.
     /// </summary>
-    /// <param name="doCourier">The courier to calculate statistics for.</param>
+    /// <param name="courierDeliveries">Collection of deliveries to check.</param>
     /// <returns>The count of deliveries completed within the maximum allowed delivery time.</returns>
-    /// <remarks>
-    /// A delivery is considered on-time if the time between OrderDate and TimeEndDelivery
-    /// is less than or equal to the MaxDeliveryTime configured in the system.
-    /// Only deliveries with EndDelivery status of DELIVERED are counted.
-    /// </remarks>
     private static int s_getDeliveryOnTimeCount(IEnumerable<DO.Delivery>? courierDeliveries)
     {
         TimeSpan maxDeliveryTime;
         lock (AdminManager.BlMutex)
-             maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
+            maxDeliveryTime = AdminManager.GetConfig().MaxDeliveryTime;
 
         if (courierDeliveries is null)
             return 0;
@@ -546,13 +455,8 @@ internal static class CourierManager
     /// <summary>
     /// Calculates the number of late deliveries completed by a courier.
     /// </summary>
-    /// <param name="doCourier">The courier to calculate statistics for.</param>
+    /// <param name="courierDeliveries">Collection of deliveries to check.</param>
     /// <returns>The count of deliveries completed after the maximum allowed delivery time.</returns>
-    /// <remarks>
-    /// A delivery is considered late if the time between OrderDate and TimeEndDelivery
-    /// exceeds the MaxDeliveryTime configured in the system.
-    /// Only deliveries with EndDelivery status of DELIVERED are counted.
-    /// </remarks>
     private static int s_getDeliveryLateCount(IEnumerable<DO.Delivery>? courierDeliveries)
     {
         TimeSpan maxDeliveryTime;
@@ -571,19 +475,11 @@ internal static class CourierManager
     /// <summary>
     /// Retrieves the current order in progress for a specific courier.
     /// </summary>
-    /// <param name="courierId">The unique identifier of the courier.</param>
+    /// <param name="deliveries">Collection of deliveries to search.</param>
     /// <returns>
     /// An <see cref="BO.OrderInProgress"/> object if the courier has an active delivery,
     /// or null if no delivery is currently in progress.
     /// </returns>
-    /// <remarks>
-    /// This method searches for deliveries that:
-    /// <list type="bullet">
-    ///   <item><description>Are assigned to the specified courier</description></item>
-    ///   <item><description>Have not yet ended (EndDelivery is null)</description></item>
-    ///   <item><description>Are associated with an order in DELIVERING status</description></item>
-    /// </list>
-    /// </remarks>
     private static async Task<BO.OrderInProgress?> s_getOrderInProgress(IEnumerable<DO.Delivery> deliveries)
     {
 
@@ -605,16 +501,6 @@ internal static class CourierManager
     /// <exception cref="BO.BlDoesNotExistException">
     /// Thrown when the order or courier associated with the delivery is not found.
     /// </exception>
-    /// <remarks>
-    /// This method retrieves the associated order and calculates:
-    /// <list type="bullet">
-    ///   <item><description>Distance from store to delivery address</description></item>
-    ///   <item><description>Estimated delivery time based on courier speed and distance</description></item>
-    ///   <item><description>Maximum allowed delivery time</description></item>
-    ///   <item><description>Schedule status (on-time, at-risk, or late)</description></item>
-    ///   <item><description>Time remaining until the delivery deadline</description></item>
-    /// </list>
-    /// </remarks>
     private static async Task<BO.OrderInProgress> s_createOrderInProgress(DO.Delivery delivery)
     {
         DO.Order order;
@@ -628,7 +514,6 @@ internal static class CourierManager
             ?? throw new BO.BlDoesNotExistException("Courier not found");
 
         var estimatedTimeTask = Tools.GetEstimatedDeliveryTime(delivery);
-
 
         var actualDistanceTask = GoogleMapsService.NetworkKeeper(() =>
             GoogleMapsService.GetActualDistance(
@@ -652,7 +537,7 @@ internal static class CourierManager
 
         timeRemaining = maxDeliveryTime - AdminManager.Now;
 
-        // 4. יצירת האובייקט
+        // 4. Create object
         return new BO.OrderInProgress
         {
             DeliveryId = delivery.Id,
@@ -674,6 +559,17 @@ internal static class CourierManager
         };
     }
 
+    /// <summary>
+    /// Runs a simulation of courier activities.
+    /// </summary>
+    /// <remarks>
+    /// <para>Simulates random actions for all active couriers:</para>
+    /// <list type="bullet">
+    ///   <item><description>Idle couriers may pick up new suitable orders.</description></item>
+    ///   <item><description>Active couriers check delivery progress and may complete deliveries or face cancellations.</description></item>
+    /// </list>
+    /// <para>Updates are performed asynchronously and observers are notified of changes.</para>
+    /// </remarks>
     public static async Task CourierSimulation()
     {
         int managerId = AdminManager.GetConfig().ManagerId;
@@ -687,9 +583,10 @@ internal static class CourierManager
 
         foreach (var courier in allCouriers)
         {
+            // Case 1: Courier is idle (no active delivery)
             if (courier.DeliveryId is null)
             {
-                if (s_rand.Next(1, 100) <= 15)
+                if (s_rand.Next(1, 100) <= 15) // 15% chance to start a new job
                 {
                     simulationTasks.Add(Task.Run(async () =>
                     {
@@ -703,19 +600,20 @@ internal static class CourierManager
 
                                 if (s_rand.Next(1, 100) <= 50 && randomOrder is BO.OpenOrderInList order)
                                 {
-
                                     await DeliveryManager.StartDelivery(courier.Id, order.OrderId);
                                     anyListChange = true;
                                 }
                             }
                         }
-                        catch (Exception ex) {
+                        catch (Exception ex)
+                        {
                             Debug.WriteLine("Error occurred while simulating courier activity:");
                             Debug.WriteLine(ex);
                         }
                     }));
                 }
             }
+            // Case 2: Courier is delivering
             else
             {
                 int currentDeliveryId = courier.DeliveryId.Value;
@@ -736,19 +634,21 @@ internal static class CourierManager
                             {
                                 DateTime estimatedArrival = delivery.OrderDate + duration.Value;
 
+                                // Delivery logic: Check if time has passed
                                 if (AdminManager.Now >= estimatedArrival)
                                 {
                                     int chance = s_rand.Next(1, 100);
                                     BO.EndDelivery endStatus;
 
-                                    if (chance <= 5) endStatus = BO.EndDelivery.REFUSED;       
-                                    else if (chance <= 20) endStatus = BO.EndDelivery.NOTFOUND; 
-                                    else endStatus = BO.EndDelivery.DELIVERED;                  
+                                    if (chance <= 5) endStatus = BO.EndDelivery.REFUSED;
+                                    else if (chance <= 20) endStatus = BO.EndDelivery.NOTFOUND;
+                                    else endStatus = BO.EndDelivery.DELIVERED;
 
                                     lock (AdminManager.BlMutex)
                                         s_completeDeliveryNotObserv(courier.Id, currentDeliveryId, endStatus);
                                     anyListChange = true;
                                 }
+                                // Cancellation logic: Small chance to cancel while delivering
                                 else if (s_rand.Next(1, 100) <= 10)
                                 {
                                     await OrderManager.Cancel(delivery.OrderId);
@@ -770,6 +670,12 @@ internal static class CourierManager
         }
     }
 
+    /// <summary>
+    /// Completes a delivery without triggering standard UI notifications (used internally by simulation).
+    /// </summary>
+    /// <param name="courierId">The courier ID.</param>
+    /// <param name="deliveryId">The delivery ID.</param>
+    /// <param name="endDelivery">The final status.</param>
     private static void s_completeDeliveryNotObserv(int courierId, int deliveryId, BO.EndDelivery endDelivery)
     {
         try

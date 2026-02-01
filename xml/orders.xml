@@ -417,22 +417,6 @@
     <DistanceKmWalk>11.652</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100040</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 40</Details>
-    <Addres> נגבה 25, רמת גן</Addres>
-    <Latitude>32.070547</Latitude>
-    <Longitude>34.8249663</Longitude>
-    <Name>Customer40</Name>
-    <Phone>0586105721</Phone>
-    <Weight>6</Weight>
-    <OrderDate>2026-02-03T05:31:26.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>2.5725939690841426</DistanceKm>
-    <DistanceKmRoad>3.026</DistanceKmRoad>
-    <DistanceKmWalk>2.884</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100041</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 41</Details>
@@ -561,22 +545,6 @@
     <DistanceKmWalk>10.636</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100050</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 50</Details>
-    <Addres> הראה 80, רמת גן</Addres>
-    <Latitude>32.0817288</Latitude>
-    <Longitude>34.8254736</Longitude>
-    <Name>Customer50</Name>
-    <Phone>0502940727</Phone>
-    <Weight>13</Weight>
-    <OrderDate>2026-02-03T13:13:26.0000000</OrderDate>
-    <OrderStatus>OPEN</OrderStatus>
-    <DistanceKm>1.343451793204207</DistanceKm>
-    <DistanceKmRoad>1.741</DistanceKmRoad>
-    <DistanceKmWalk>1.599</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100006</Id>
     <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
     <Details>Order details for order 6</Details>
@@ -625,22 +593,6 @@
     <DistanceKmWalk>7.055</DistanceKmWalk>
   </Order>
   <Order>
-    <Id>100020</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 20</Details>
-    <Addres> עין גנים 40, פתח תקווה</Addres>
-    <Latitude>32.086933</Latitude>
-    <Longitude>34.894794</Longitude>
-    <Name>Customer20</Name>
-    <Phone>0569101937</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-02-02T15:06:26.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>6.809175743870694</DistanceKm>
-    <DistanceKmRoad>8.738</DistanceKmRoad>
-    <DistanceKmWalk>7.412</DistanceKmWalk>
-  </Order>
-  <Order>
     <Id>100002</Id>
     <TypeOfOrder>STANDART</TypeOfOrder>
     <Details>Order details for order 2</Details>
@@ -655,22 +607,6 @@
     <DistanceKm>5.3841331752044255</DistanceKm>
     <DistanceKmRoad>7.231</DistanceKmRoad>
     <DistanceKmWalk>6.157</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100038</Id>
-    <TypeOfOrder>STANDART</TypeOfOrder>
-    <Details>Order details for order 38</Details>
-    <Addres> אוסישקין 50, רמת השרון</Addres>
-    <Latitude>32.1422739</Latitude>
-    <Longitude>34.8434807</Longitude>
-    <Name>Customer38</Name>
-    <Phone>0575132416</Phone>
-    <Weight>11</Weight>
-    <OrderDate>2026-02-03T04:15:26.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>5.7453704967910735</DistanceKm>
-    <DistanceKmRoad>7.103</DistanceKmRoad>
-    <DistanceKmWalk>7.016</DistanceKmWalk>
   </Order>
   <Order>
     <Id>100009</Id>
@@ -703,22 +639,6 @@
     <DistanceKm>10.635862115948113</DistanceKm>
     <DistanceKmRoad>14.429</DistanceKmRoad>
     <DistanceKmWalk>11.887</DistanceKmWalk>
-  </Order>
-  <Order>
-    <Id>100011</Id>
-    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
-    <Details>Order details for order 11</Details>
-    <Addres> ז'בוטינסקי 80, פתח תקווה</Addres>
-    <Latitude>32.091785</Latitude>
-    <Longitude>34.8641828</Longitude>
-    <Name>Customer11</Name>
-    <Phone>0580563069</Phone>
-    <Weight>10</Weight>
-    <OrderDate>2026-02-02T08:59:26.0000000</OrderDate>
-    <OrderStatus>DELIVERING</OrderStatus>
-    <DistanceKm>3.8899617834175784</DistanceKm>
-    <DistanceKmRoad>5.401</DistanceKmRoad>
-    <DistanceKmWalk>4.11</DistanceKmWalk>
   </Order>
   <Order>
     <Id>100039</Id>
@@ -799,5 +719,85 @@
     <DistanceKm>0.8961511605511564</DistanceKm>
     <DistanceKmRoad>1.109</DistanceKmRoad>
     <DistanceKmWalk>1.095</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100020</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 20</Details>
+    <Addres> עין גנים 40, פתח תקווה</Addres>
+    <Latitude>32.086933</Latitude>
+    <Longitude>34.894794</Longitude>
+    <Name>Customer20</Name>
+    <Phone>0569101937</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-02-02T15:06:26.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>6.809175743870694</DistanceKm>
+    <DistanceKmRoad>8.738</DistanceKmRoad>
+    <DistanceKmWalk>7.412</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100011</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 11</Details>
+    <Addres> ז'בוטינסקי 80, פתח תקווה</Addres>
+    <Latitude>32.091785</Latitude>
+    <Longitude>34.8641828</Longitude>
+    <Name>Customer11</Name>
+    <Phone>0580563069</Phone>
+    <Weight>10</Weight>
+    <OrderDate>2026-02-02T08:59:26.0000000</OrderDate>
+    <OrderStatus>REFUSED</OrderStatus>
+    <DistanceKm>3.8899617834175784</DistanceKm>
+    <DistanceKmRoad>5.401</DistanceKmRoad>
+    <DistanceKmWalk>4.11</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100038</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 38</Details>
+    <Addres> אוסישקין 50, רמת השרון</Addres>
+    <Latitude>32.1422739</Latitude>
+    <Longitude>34.8434807</Longitude>
+    <Name>Customer38</Name>
+    <Phone>0575132416</Phone>
+    <Weight>11</Weight>
+    <OrderDate>2026-02-03T04:15:26.0000000</OrderDate>
+    <OrderStatus>OPEN</OrderStatus>
+    <DistanceKm>5.7453704967910735</DistanceKm>
+    <DistanceKmRoad>7.103</DistanceKmRoad>
+    <DistanceKmWalk>7.016</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100040</Id>
+    <TypeOfOrder>FAST_DELIVERY</TypeOfOrder>
+    <Details>Order details for order 40</Details>
+    <Addres> נגבה 25, רמת גן</Addres>
+    <Latitude>32.070547</Latitude>
+    <Longitude>34.8249663</Longitude>
+    <Name>Customer40</Name>
+    <Phone>0586105721</Phone>
+    <Weight>6</Weight>
+    <OrderDate>2026-02-03T05:31:26.0000000</OrderDate>
+    <OrderStatus>CONCELLED</OrderStatus>
+    <DistanceKm>2.5725939690841426</DistanceKm>
+    <DistanceKmRoad>3.026</DistanceKmRoad>
+    <DistanceKmWalk>2.884</DistanceKmWalk>
+  </Order>
+  <Order>
+    <Id>100050</Id>
+    <TypeOfOrder>STANDART</TypeOfOrder>
+    <Details>Order details for order 50</Details>
+    <Addres> הראה 80, רמת גן</Addres>
+    <Latitude>32.0817288</Latitude>
+    <Longitude>34.8254736</Longitude>
+    <Name>Customer50</Name>
+    <Phone>0502940727</Phone>
+    <Weight>13</Weight>
+    <OrderDate>2026-02-03T13:13:26.0000000</OrderDate>
+    <OrderStatus>COMPLETED</OrderStatus>
+    <DistanceKm>1.343451793204207</DistanceKm>
+    <DistanceKmRoad>1.741</DistanceKmRoad>
+    <DistanceKmWalk>1.599</DistanceKmWalk>
   </Order>
 </ArrayOfOrder>

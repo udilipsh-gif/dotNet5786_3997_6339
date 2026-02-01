@@ -10,8 +10,8 @@ namespace Helpers;
 /// </summary>
 /// <remarks>
 /// This static class handles all order-related operations including creation, retrieval,
-/// updates, cancellations, and querying. It serves as an intermediary between the data
-/// access layer and the business logic layer, performing necessary conversions and validations.
+/// updates, cancellations, and querying. It implements a Caching mechanism to optimize
+/// statistics calculation and status tracking for the simulation.
 /// </remarks>
 internal static class OrderManager
 {
@@ -25,20 +25,29 @@ internal static class OrderManager
     /// </summary>
     internal static readonly ObserverManager Observer = new();
 
+    /// <summary>
+    /// Internal class to hold cached information about an order.
+    /// Used to quickly calculate statistics and track status changes without full DB reads.
+    /// </summary>
     private class OrderCacheInfo
     {
         public BO.OrderStatus Status { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime MaxDeliveryTime { get; set; }
-        public DateTime RiskThreshold { get; set; } // הרגע שבו ההזמנה הופכת ל-INRISK
-        public DateTime LateThreshold { get; set; } // הרגע שבו ההזמנה הופכת ל-LATE
-        public BO.ScheduleStatus? FinalScheduleStatus { get; set; }
+        public DateTime RiskThreshold { get; set; } // The time when the order becomes AT RISK
+        public DateTime LateThreshold { get; set; } // The time when the order becomes LATE
+        public BO.ScheduleStatus? FinalScheduleStatus { get; set; } // Fixed status for closed orders
         public DateTime? DeliveryTime { get; set; }
     }
 
     private static Dictionary<int, OrderCacheInfo>? _ordersCache = null;
-    private static readonly object _cacheLock = new object(); // מנעול לסנכרון
+    private static readonly object _cacheLock = new object(); // Synchronization lock
 
+    #region Caching Logic
+
+    /// <summary>
+    /// Initializes the order cache by reading all orders and deliveries from the DAL.
+    /// </summary>
     private static async Task InitCache()
     {
         lock (_cacheLock)
@@ -56,6 +65,7 @@ internal static class OrderManager
             allDeliveries = s_dal.Delivery.ReadAll().ToList();
         }
 
+        // Map deliveries to orders for quick lookup
         var deliveriesMap = allDeliveries
             .GroupBy(d => d.OrderId)
             .ToDictionary(g => g.Key, g => g.OrderByDescending(d => d.Id).FirstOrDefault());
@@ -76,19 +86,126 @@ internal static class OrderManager
         await Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Clears the current cache, forcing a reload on the next access.
+    /// </summary>
     internal static void ResetCache()
     {
         lock (_cacheLock)
         {
-            _ordersCache = null; 
+            _ordersCache = null;
         }
     }
 
+    /// <summary>
+    /// Updates a specific order entry in the cache.
+    /// Should be called whenever an order is Created, Updated, or Cancelled.
+    /// </summary>
+    /// <param name="orderId">The ID of the order to update.</param>
+    internal static void UpdateCacheItem(int orderId)
+    {
+        if (_ordersCache == null) return;
 
+        DO.Order? doOrder;
+        DO.Delivery? delivery;
 
+        lock (AdminManager.BlMutex)
+        {
+            doOrder = s_dal.Order.Read(orderId);
+            delivery = s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
+                                     .OrderByDescending(d => d.Id)
+                                     .FirstOrDefault();
+        }
+
+        if (doOrder == null) return;
+
+        var newItem = s_createCacheInfo(doOrder, delivery);
+
+        lock (_cacheLock)
+        {
+            _ordersCache[orderId] = newItem;
+        }
+    }
+
+    /// <summary>
+    /// Checks if any active order has changed its schedule status (Risk/Late) due to time progression.
+    /// Used by the Simulator clock.
+    /// </summary>
+    /// <param name="oldClock">The previous clock time.</param>
+    /// <param name="newClock">The new clock time.</param>
+    /// <returns>True if at least one order changed status; otherwise, false.</returns>
+    internal static bool CheckStatusChanges(DateTime oldClock, DateTime newClock)
+    {
+        if (_ordersCache == null) return false;
+
+        bool anyChange = false;
+
+        lock (_cacheLock)
+        {
+            foreach (var kvp in _ordersCache)
+            {
+                var id = kvp.Key;
+                var info = kvp.Value;
+
+                // Skip closed orders
+                if (info.Status == BO.OrderStatus.COMPLETED ||
+                    info.Status == BO.OrderStatus.CANCELLED ||
+                    info.Status == BO.OrderStatus.REFUSED)
+                    continue;
+
+                bool changed = false;
+
+                // Check if we crossed the Risk threshold
+                if (oldClock < info.RiskThreshold && newClock >= info.RiskThreshold)
+                    changed = true;
+
+                // Check if we crossed the Late threshold
+                else if (oldClock < info.LateThreshold && newClock >= info.LateThreshold)
+                    changed = true;
+
+                if (changed)
+                {
+                    Observer.NotifyItemUpdated(id); // Notify specific item update
+                    anyChange = true;
+                }
+            }
+        }
+        return anyChange;
+    }
+
+    /// <summary>
+    /// Attempts to retrieve the ScheduleStatus from the cache to avoid recalculation.
+    /// </summary>
+    internal static BO.ScheduleStatus? TryGetCachedScheduleStatus(int orderId)
+    {
+        if (_ordersCache == null) return null;
+
+        lock (_cacheLock)
+        {
+            if (_ordersCache.TryGetValue(orderId, out var info))
+            {
+                if (info.FinalScheduleStatus.HasValue)
+                    return info.FinalScheduleStatus.Value;
+
+                return null;
+            }
+        }
+        return null;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Calculates statistics for all orders in the system.
+    /// </summary>
+    /// <returns>
+    /// An array of integers containing counts. 
+    /// Indices [0..MaxStatus] contain OrderStatus counts.
+    /// Indices [MaxStatus+1..End] contain ScheduleStatus counts.
+    /// </returns>
     public static async Task<int[]> GetAllOrderStatistic()
     {
-        // אתחול חד פעמי אם צריך
+        // One-time initialization if needed
         if (_ordersCache == null) await InitCache();
 
         bool isEmpty;
@@ -101,36 +218,38 @@ internal static class OrderManager
         {
             lock (_cacheLock)
             {
-                _ordersCache = null; 
+                _ordersCache = null;
             }
-            await InitCache(); 
+            await InitCache();
         }
 
         int maxStatusVal = (int)Enum.GetValues(typeof(BO.OrderStatus)).Cast<BO.OrderStatus>().Max();
         int maxScheduleVal = (int)Enum.GetValues(typeof(BO.ScheduleStatus)).Cast<BO.ScheduleStatus>().Max();
         int[] results = new int[maxStatusVal + 1 + maxScheduleVal + 1];
 
-        DateTime now = AdminManager.Now; // שמירת הזמן הנוכחי לחישוב
-        TimeSpan riskRange = AdminManager.GetConfig().RiskRange; // קריאה אחת לקונפיג
+        DateTime now = AdminManager.Now;
+        TimeSpan riskRange = AdminManager.GetConfig().RiskRange;
 
         lock (_cacheLock)
         {
-            if (_ordersCache == null) return results; // הגנה
+            if (_ordersCache == null) return results;
 
             foreach (var item in _ordersCache.Values)
             {
+                // 1. Count Order Status
                 results[(int)item.Status]++;
 
-                // 2. ספירת סטטוס לו"ז
+                // 2. Count Schedule Status
                 BO.ScheduleStatus currentScheduleStatus;
 
                 if (item.FinalScheduleStatus.HasValue)
                 {
-                    // אם זה שמור (הזמנה סגורה) - קח מהמטמון
+                    // Use cached final status for closed orders
                     currentScheduleStatus = item.FinalScheduleStatus.Value;
                 }
                 else
                 {
+                    // Calculate dynamic status for open orders
                     TimeSpan timeLeft = item.MaxDeliveryTime - now;
 
                     if (timeLeft < TimeSpan.Zero)
@@ -152,17 +271,10 @@ internal static class OrderManager
     /// Creates a new order in the system.
     /// </summary>
     /// <param name="boOrder">The business object representing the order to create.</param>
-    /// <exception cref="BO.BlInvalidValueException">
-    /// Thrown when order details, address, name, or phone number are invalid or empty,
-    /// or when geocoding the address fails.
-    /// </exception>
-    /// <exception cref="BO.BlInvalidOperationException">
-    /// Thrown when the delivery distance exceeds the maximum allowed range.
-    /// </exception>
+    /// <exception cref="BO.BlInvalidValueException">Thrown when validation fails or geocoding fails.</exception>
+    /// <exception cref="BO.BlInvalidOperationException">Thrown when the delivery distance exceeds the maximum allowed range.</exception>
     /// <remarks>
-    /// <para>Validates all required fields and geocodes the delivery address before creation.</para>
-    /// <para>The order date is automatically set to the current system time.</para>
-    /// <para>The order ID is auto-generated by the data layer.</para>
+    /// Flow: Validate -> Geocode -> Check Distance -> Save to DB -> Update Cache -> Notify Observers -> Send Email.
     /// </remarks>
     public static async Task Create(BO.Order boOrder)
     {
@@ -205,21 +317,13 @@ internal static class OrderManager
         Observer.NotifyListUpdated();
 
         s_sendEmailNewOrder(doOrder);
-
     }
 
     /// <summary>
     /// Retrieves a specific order by its unique identifier.
     /// </summary>
     /// <param name="id">The unique identifier of the order to retrieve.</param>
-    /// <returns>
-    /// A business logic Order object with complete details including calculated fields,
-    /// or null if no order with the specified ID exists.
-    /// </returns>
-    /// <remarks>
-    /// This method enriches the data layer order with calculated fields such as distance,
-    /// estimated delivery time, order status, and associated delivery attempts.
-    /// </remarks>
+    /// <returns>A business logic Order object or null if not found.</returns>
     public static async Task<BO.Order?> Read(int id)
     {
         DO.Order? doOrder;
@@ -257,14 +361,6 @@ internal static class OrderManager
     /// Updates an existing order in the system.
     /// </summary>
     /// <param name="boOrder">The business logic order object with updated information.</param>
-    /// <exception cref="BO.BlInvalidValueException">
-    /// Thrown when order details, address, name, or phone number are invalid or empty,
-    /// or when geocoding the address fails.
-    /// </exception>
-    /// <remarks>
-    /// Validates all required fields including phone number and updates address coordinates
-    /// by geocoding the address. If geocoding fails, an exception is thrown.
-    /// </remarks>
     public static async Task Update(BO.Order boOrder)
     {
         s_validateOrderFields(boOrder);
@@ -295,30 +391,16 @@ internal static class OrderManager
     }
 
     /// <summary>
-    /// Attempts to delete an order from the system.
+    /// Attempts to delete an order. Not supported in this system.
     /// </summary>
-    /// <param name="id">The unique identifier of the order to delete.</param>
-    /// <exception cref="BO.BlInvalidOperationException">Always thrown as orders cannot be deleted.</exception>
-    /// <remarks>
-    /// Order deletion is not permitted in this system. Orders should be cancelled instead
-    /// using the <see cref="Cancel(int)"/> method.
-    /// </remarks>
     public static void Delete(int id)
     {
         throw new BO.BlInvalidOperationException("Order cannot be deleted. Use Cancel instead.");
     }
 
     /// <summary>
-    /// Retrieves all orders from the system with optional filtering and sorting.
+    /// Retrieves all orders with optional filtering and sorting.
     /// </summary>
-    /// <param name="filter">The field to filter by, or null for no filtering.</param>
-    /// <param name="filterValue">The value to match for the specified filter field.</param>
-    /// <param name="orderBy">The field to sort by (default is OrderStatus).</param>
-    /// <returns>A list of orders in list view format, filtered and sorted as specified.</returns>
-    /// <remarks>
-    /// Converts data layer orders to business logic OrderInList objects,
-    /// applies the specified filter predicate, and sorts by the requested field.
-    /// </remarks>
     public static async Task<List<BO.OrderInList>> ReadAll(
         BO.OrderInListField? filter,
         object? filterValue,
@@ -333,16 +415,13 @@ internal static class OrderManager
 
     /// <summary>
     /// Retrieves all orders from the system with a custom filter predicate.
+    /// Optimized to fetch deliveries in bulk.
     /// </summary>
-    /// <param name="customPredicate">Custom filter function, or null to include all orders.</param>
-    /// <param name="orderBy">The field to sort by (default is OrderId).</param>
-    /// <returns>A list of orders in list view format, filtered and sorted as specified.</returns>
     public static async Task<List<BO.OrderInList>> ReadAll(
         Func<BO.OrderInList, bool>? customPredicate = null,
         BO.OrderInListField? orderBy = BO.OrderInListField.OrderId)
     {
         Dictionary<int, List<DO.Delivery>>? deliveriesMap;
-
         List<DO.Order> allDoOrders;
 
         lock (AdminManager.BlMutex)
@@ -355,10 +434,10 @@ internal static class OrderManager
         lock (AdminManager.BlMutex)
             allDoOrders = s_dal.Order.ReadAll().ToList();
 
-
         Func<BO.OrderInList, bool> filter = customPredicate ?? (_ => true);
         Func<BO.OrderInList, object> sortSelector = s_getSortSelector(orderBy);
 
+        // Run conversion in parallel for performance
         var conversionTasks = allDoOrders.Select(doOrder =>
             s_convertToBoOrderOptimized(doOrder, deliveriesMap)
         );
@@ -371,25 +450,12 @@ internal static class OrderManager
         return [.. result];
     }
 
-
     /// <summary>
     /// Cancels an existing order based on its current status.
     /// </summary>
-    /// <param name="orderId">The unique identifier of the order to cancel.</param>
-    /// <exception cref="BO.BlDoesNotExistException">
-    /// Thrown when the order or associated delivery is not found.
-    /// </exception>
-    /// <exception cref="BO.BlInvalidOperationException">
-    /// Thrown when the order cannot be cancelled due to its current status.
-    /// </exception>
-    /// <remarks>
-    /// Cancellation behavior depends on the order status:
-    /// <list type="bullet">
-    ///   <item><description>OPEN/REFUSED: Creates a cancellation delivery record</description></item>
-    ///   <item><description>DELIVERING: Updates the current delivery with cancellation status and notifies courier via email</description></item>
-    ///   <item><description>COMPLETED/CANCELLED: Cannot be cancelled (throws exception)</description></item>
-    /// </list>
-    /// </remarks>
+    /// <param name="orderId">The unique identifier of the order.</param>
+    /// <param name="isSmsActive">Whether to send SMS notification to the courier (if delivering).</param>
+    /// <exception cref="BO.BlInvalidOperationException">Thrown if order is already completed or cancelled.</exception>
     public static async Task Cancel(int orderId, bool isSmsActive = false)
     {
         DO.Order doOrder;
@@ -406,12 +472,13 @@ internal static class OrderManager
                 throw new BO.BlInvalidOperationException("לא ניתן לבטל, ההזמנה בוטלה בעבר.");
 
             case DO.OrderStatus.OPEN:
-
             case DO.OrderStatus.REFUSED:
+                // Simple cancel for open orders
                 s_cancelOpenOrder(doOrder);
                 break;
 
             case DO.OrderStatus.DELIVERING:
+                // Complex cancel for delivering orders (notify courier)
                 try
                 {
                     await s_cancelDeliveringOrder(doOrder, orderId, isSmsActive);
@@ -430,81 +497,16 @@ internal static class OrderManager
                 throw new BO.BlInvalidOperationException("Invalid order status.");
         }
 
-
         UpdateCacheItem(doOrder.Id);
         Observer.NotifyItemUpdated(orderId);
         Observer.NotifyListUpdated();
     }
 
-    internal static void UpdateCacheItem(int orderId)
-    {
-        if (_ordersCache == null) return;
-
-        DO.Order? doOrder;
-        DO.Delivery? delivery;
-
-        lock (AdminManager.BlMutex)
-        {
-            doOrder = s_dal.Order.Read(orderId);
-            delivery = s_dal.Delivery.ReadAll(d => d.OrderId == orderId)
-                                     .OrderByDescending(d => d.Id)
-                                     .FirstOrDefault();
-        }
-
-        if (doOrder == null) return;
-
-        var newItem = s_createCacheInfo(doOrder, delivery);
-
-        lock (_cacheLock)
-        {
-            _ordersCache[orderId] = newItem;
-        }
-    }
-
-    internal static bool CheckStatusChanges(DateTime oldClock, DateTime newClock)
-{
-    if (_ordersCache == null) return false;
-
-    bool anyChange = false;
-
-    lock (_cacheLock)
-    {
-        foreach (var kvp in _ordersCache)
-        {
-            var id = kvp.Key;
-            var info = kvp.Value;
-
-            // מדלגים על הזמנות סגורות
-            if (info.Status == BO.OrderStatus.COMPLETED || 
-                info.Status == BO.OrderStatus.CANCELLED ||
-                info.Status == BO.OrderStatus.REFUSED)
-                continue;
-
-            bool changed = false;
-
-            // האם חצינו את קו הסיכון?
-            if (oldClock < info.RiskThreshold && newClock >= info.RiskThreshold)
-                changed = true;
-
-            // האם חצינו את קו האיחור?
-            else if (oldClock < info.LateThreshold && newClock >= info.LateThreshold)
-                changed = true;
-
-            if (changed)
-            {
-                Observer.NotifyItemUpdated(id); // עדכון נקודתי לממשק
-                anyChange = true;
-            }
-        }
-    }
-    return anyChange;
-}
+    #region Private Helpers
 
     /// <summary>
     /// Validates all required fields of an order.
     /// </summary>
-    /// <param name="order">The order to validate.</param>
-    /// <exception cref="BO.BlInvalidValueException">Thrown when any required field is invalid.</exception>
     private static void s_validateOrderFields(BO.Order order)
     {
         if (string.IsNullOrEmpty(order.Name))
@@ -523,9 +525,6 @@ internal static class OrderManager
     /// <summary>
     /// Converts a data layer order to a business logic OrderInList object using pre-fetched deliveries.
     /// </summary>
-    /// <param name="doOrder">The data layer order to convert.</param>
-    /// <param name="deliveriesMap">Pre-fetched deliveries grouped by order ID.</param>
-    /// <returns>An OrderInList object with calculated fields.</returns>
     private static async Task<BO.OrderInList> s_convertToBoOrderOptimized(
         DO.Order doOrder,
         Dictionary<int, List<DO.Delivery>> deliveriesMap)
@@ -552,30 +551,9 @@ internal static class OrderManager
         };
     }
 
-    internal static BO.ScheduleStatus? TryGetCachedScheduleStatus(int orderId)
-    {
-        if (_ordersCache == null) return null;
-
-        lock (_cacheLock)
-        {
-            if (_ordersCache.TryGetValue(orderId, out var info))
-            {
-                if (info.FinalScheduleStatus.HasValue)
-                    return info.FinalScheduleStatus.Value;
-
-                return null;
-            }
-        }
-        return null;
-    }
-
     /// <summary>
     /// Creates a list of all delivery attempts associated with a specific order.
     /// </summary>
-    /// <param name="orderId">The unique identifier of the order.</param>
-    /// <returns>
-    /// A list of DeliveryPerOrderInList objects, or null if no deliveries exist.
-    /// </returns>
     private static List<BO.DeliveryPerOrderInList>? s_createDeliveryPerOrderInList(int orderId)
     {
         List<DO.Delivery> deliveries;
@@ -589,9 +567,8 @@ internal static class OrderManager
 
         lock (AdminManager.BlMutex)
             couriers = s_dal.Courier.ReadAll(c => courierIds.Contains(c.Id))
-                           .ToDictionary(c => c.Id); // מילון לגישה מהירה
+                           .ToDictionary(c => c.Id);
 
-        // 3. יצירת הרשימה בזיכרון
         return deliveries.Select(d =>
         {
             var courier = couriers.GetValueOrDefault(d.CourierId);
@@ -599,7 +576,7 @@ internal static class OrderManager
             {
                 DeliveryId = d.Id,
                 CourierId = d.CourierId,
-                CourierName = courier != null ? courier.Name : string.Empty, // טיפול ב-Null למקרה קיצון
+                CourierName = courier != null ? courier.Name : string.Empty,
                 TypeShipment = courier != null ? (BO.TheTypeShipment)courier.TypeShipment : BO.TheTypeShipment.FOOT,
                 OrderDate = d.OrderDate,
                 EndDelivery = d.EndDelivery.HasValue ? (BO.EndDelivery)d.EndDelivery : null,
@@ -609,11 +586,8 @@ internal static class OrderManager
     }
 
     /// <summary>
-    /// Calculates the estimated delivery time for an order.
+    /// Calculates the estimated delivery time for an order based on active deliveries.
     /// </summary>
-    /// <param name="doOrder">The data layer order.</param>
-    /// <param name="deliveries">List of delivery attempts for the order.</param>
-    /// <returns>The estimated delivery time, or null if not applicable.</returns>
     private static async Task<DateTime?> s_calculateEstimatedDeliveryTime(
         DO.Order doOrder,
         List<BO.DeliveryPerOrderInList>? deliveries)
@@ -631,9 +605,8 @@ internal static class OrderManager
     }
 
     /// <summary>
-    /// Cancels an order that is in OPEN or REFUSED status.
+    /// Handles the cancellation of an order that is currently OPEN or REFUSED.
     /// </summary>
-    /// <param name="doOrder">The order to cancel.</param>
     private static void s_cancelOpenOrder(DO.Order doOrder)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
@@ -649,7 +622,8 @@ internal static class OrderManager
             TimeEndDelivery = AdminManager.Now,
             ActualDistance = 0
         };
-        lock (AdminManager.BlMutex) { 
+        lock (AdminManager.BlMutex)
+        {
             s_dal.Order.Update(doOrder);
             s_dal.Delivery.Create(delivery);
         }
@@ -658,17 +632,12 @@ internal static class OrderManager
     }
 
     /// <summary>
-    /// Cancels an order that is currently being delivered.
+    /// Handles the cancellation of an order that is currently DELIVERING.
+    /// Sends notification emails/SMS to the courier.
     /// </summary>
-    /// <param name="doOrder">The order to cancel.</param>
-    /// <param name="orderId">The order ID for notification purposes.</param>
-    /// <exception cref="BO.BlDoesNotExistException">
-    /// Thrown when the delivery or courier is not found.
-    /// </exception>
     private static async Task s_cancelDeliveringOrder(DO.Order doOrder, int orderId, bool IsSmsActive)
     {
         doOrder = doOrder with { OrderStatus = DO.OrderStatus.CONCELLED };
- 
 
         DO.Delivery? delivery;
         lock (AdminManager.BlMutex)
@@ -676,6 +645,7 @@ internal static class OrderManager
                         orderby d.Id descending
                         select d).FirstOrDefault()
                ?? throw new BO.BlDoesNotExistException("לא נמצא משלוח עבור הזמנה זו");
+
         lock (AdminManager.BlMutex)
         {
             s_dal.Delivery.Update(delivery with
@@ -691,6 +661,7 @@ internal static class OrderManager
             courier = s_dal.Courier.Read(delivery.CourierId)
                 ?? throw new BO.BlDoesNotExistException("Courier not found");
 
+        // Notification logic
         Exception? exceptionMail = null;
         Exception? exceptionSms = null;
         try
@@ -720,12 +691,12 @@ internal static class OrderManager
         {
             exceptionSms = new BO.BLNoSendSmsException("Failed to send sms notification");
         }
+
         try
         {
             if ((exceptionMail is not null && !IsSmsActive) || (exceptionSms is not null && exceptionMail is not null))
                 throw new BO.BLNoSendSmsException($"לא נשלחה הודעה כלל למוביל, {exceptionSms} {exceptionMail}");
         }
-
         finally
         {
             CourierManager.Observer.NotifyItemUpdated(delivery.CourierId);
@@ -735,14 +706,16 @@ internal static class OrderManager
         }
     }
 
+    /// <summary>
+    /// Sends email notifications to potential couriers about a new available order.
+    /// </summary>
     private static async void s_sendEmailNewOrder(DO.Order doOrder)
     {
-
         Dictionary<int, int> deliveriesMap;
 
         lock (AdminManager.BlMutex)
             deliveriesMap = s_dal.Delivery.ReadAll(d => d.EndDelivery is null)
-               .ToDictionary(d => d.CourierId, d => d.Id);
+                .ToDictionary(d => d.CourierId, d => d.Id);
 
         List<DO.Courier> list_courier;
 
@@ -751,7 +724,7 @@ internal static class OrderManager
              courier.Active == true &&
              s_matchTypeShipmentAndOrder(courier.TypeShipment, doOrder.TypeOfOrder) &&
              courier.MaxDistanceDelivery >= doOrder.DistanceKm &&
-             !deliveriesMap.ContainsKey(courier.Id)) // סינון שליחים שאין להם משלוח פעיל
+             !deliveriesMap.ContainsKey(courier.Id)) // Filter couriers who are busy
              ?.ToList()
                 ?? new List<DO.Courier>();
 
@@ -784,26 +757,15 @@ internal static class OrderManager
           "
                     );
                     return null;
-                }
-                );
+                });
             }
         }
-        catch
-        { }
-
+        catch { }
     }
 
-
-
     /// <summary>
-    /// Creates a filter predicate function based on the specified field and value.
+    /// Creates a filter predicate based on enum field and value.
     /// </summary>
-    /// <param name="filter">The field to filter by, or null for no filtering.</param>
-    /// <param name="filterValue">The value to match against the specified field.</param>
-    /// <returns>A predicate function for filtering orders.</returns>
-    /// <exception cref="BO.BlInvalidValueException">
-    /// Thrown when a filter field is specified but no filter value is provided.
-    /// </exception>
     private static Func<BO.OrderInList, bool> s_getFilterPredicate(
         BO.OrderInListField? filter,
         object? filterValue)
@@ -826,10 +788,8 @@ internal static class OrderManager
     }
 
     /// <summary>
-    /// Creates a sort selector function based on the specified field.
+    /// Creates a sort selector based on enum field.
     /// </summary>
-    /// <param name="sort">The field to sort by, or null to use default sorting.</param>
-    /// <returns>A selector function that extracts the specified field value.</returns>
     private static Func<BO.OrderInList, object> s_getSortSelector(BO.OrderInListField? sort)
     {
         return sort switch
@@ -856,29 +816,33 @@ internal static class OrderManager
         };
     }
 
+    /// <summary>
+    /// Creates a cache info object for an order.
+    /// Calculates thresholds for Risk and Late status based on distances and speed.
+    /// </summary>
     private static OrderCacheInfo s_createCacheInfo(DO.Order order, DO.Delivery? delivery)
     {
         var config = AdminManager.GetConfig();
         var status = Tools.GetOrderStatus(order, delivery);
         var maxTime = order.OrderDate + config.MaxDeliveryTime;
 
-        // חישוב זמן מאמץ משוער (כמו ב-Tools, אבל מחושב פעם אחת בלבד)
+        // Calculate estimated effort duration
         TimeSpan estimatedEffort;
 
         if (status == BO.OrderStatus.DELIVERING && delivery != null)
         {
-            // אם במשלוח: מרחק חלקי מהירות קטנוע (או מהירות רכב ממוצעת אם רוצים לדייק יותר)
+            // If delivering: partial distance / motorcycle speed (or car speed)
             double dist = delivery.ActualDistance ?? Tools.GetDistance(order);
             estimatedEffort = TimeSpan.FromHours(dist / config.AvgSpeedMotorcycle);
         }
         else // OPEN
         {
-            // אם פתוח: מרחק אווירי חלקי הליכה
+            // If open: aerial distance / walking speed (conservative estimate)
             double dist = Tools.GetDistance(order);
             estimatedEffort = TimeSpan.FromHours(dist / config.AvgSpeedFoot);
         }
 
-        // חישוב נקודות הציון בזמן
+        // Calculate time thresholds
         DateTime lateThreshold = maxTime - estimatedEffort;
         DateTime riskThreshold = lateThreshold - config.RiskRange;
 
@@ -893,7 +857,7 @@ internal static class OrderManager
             FinalScheduleStatus = null
         };
 
-        // אם סגור - מקבעים את הסטטוס הסופי
+        // Fix final status for closed orders
         if (status == BO.OrderStatus.COMPLETED)
         {
             info.FinalScheduleStatus = (delivery?.TimeEndDelivery <= maxTime)
@@ -908,6 +872,10 @@ internal static class OrderManager
         return info;
     }
 
+    /// <summary>
+    /// Batch update of all open orders' distances. 
+    /// Typically used after the store's location changes.
+    /// </summary>
     public static Task UpdateDistanceForOrders()
     {
         return Task.Run(() =>
@@ -940,5 +908,6 @@ internal static class OrderManager
             Observer.NotifyListUpdated();
         });
     }
-}
 
+    #endregion
+}

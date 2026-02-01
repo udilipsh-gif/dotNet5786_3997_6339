@@ -12,28 +12,6 @@
     <WorkingSince>0001-01-01T00:00:00.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>254133923</Id>
-    <Name>Dani Levy</Name>
-    <Phone>0586645669</Phone>
-    <Email>dani.levy@courier.com</Email>
-    <Password>Pass#402177</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>1</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
-    <WorkingSince>2025-04-04T00:41:26.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>274433168</Id>
-    <Name>Eli Amar</Name>
-    <Phone>0516743581</Phone>
-    <Email>eli.amar@courier.com</Email>
-    <Password>Pass#353130</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>0.6726356201455225</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-06-13T00:41:26.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>216464139</Id>
     <Name>Yair Cohen</Name>
     <Phone>0582998229</Phone>
@@ -54,28 +32,6 @@
     <MaxDistanceDelivery>3.2529959600168157</MaxDistanceDelivery>
     <TypeShipment>FOOT</TypeShipment>
     <WorkingSince>2025-11-06T00:41:26.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>300974873</Id>
-    <Name>Dina Klein</Name>
-    <Phone>0564940596</Phone>
-    <Email>dina.klein@courier.com</Email>
-    <Password>Pass#137913</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>1.5671241799370383</MaxDistanceDelivery>
-    <TypeShipment>FOOT</TypeShipment>
-    <WorkingSince>2025-04-20T00:41:26.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>397134566</Id>
-    <Name>Shira Israelof</Name>
-    <Phone>0557990559</Phone>
-    <Email>shira.israelof@courier.com</Email>
-    <Password>Pass#276348</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>1</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
-    <WorkingSince>2025-03-27T00:41:26.0000000</WorkingSince>
   </Courier>
   <Courier>
     <Id>376587914</Id>
@@ -122,17 +78,6 @@
     <WorkingSince>2026-01-26T00:41:26.0000000</WorkingSince>
   </Courier>
   <Courier>
-    <Id>370926239</Id>
-    <Name>Itay Mizrahi</Name>
-    <Phone>0515047486</Phone>
-    <Email>itay.mizrahi@courier.com</Email>
-    <Password>Pass#255947</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>2</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
-    <WorkingSince>2025-07-04T00:41:26.0000000</WorkingSince>
-  </Courier>
-  <Courier>
     <Id>398924136</Id>
     <Name>Noa Ben-David</Name>
     <Phone>0522681551</Phone>
@@ -175,17 +120,6 @@
     <MaxDistanceDelivery>4</MaxDistanceDelivery>
     <TypeShipment>BIKE</TypeShipment>
     <WorkingSince>2025-11-25T00:41:26.0000000</WorkingSince>
-  </Courier>
-  <Courier>
-    <Id>248017039</Id>
-    <Name>Lior Kaplan</Name>
-    <Phone>0593507994</Phone>
-    <Email>lior.kaplan@courier.com</Email>
-    <Password>Pass#165548</Password>
-    <Active>true</Active>
-    <MaxDistanceDelivery>4</MaxDistanceDelivery>
-    <TypeShipment>BIKE</TypeShipment>
-    <WorkingSince>2025-07-15T00:41:26.0000000</WorkingSince>
   </Courier>
   <Courier>
     <Id>371185266</Id>
@@ -241,5 +175,71 @@
     <MaxDistanceDelivery>25</MaxDistanceDelivery>
     <TypeShipment>CAR</TypeShipment>
     <WorkingSince>2025-05-20T00:41:26.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>254133923</Id>
+    <Name>Dani Levy</Name>
+    <Phone>0586645669</Phone>
+    <Email>dani.levy@courier.com</Email>
+    <Password>Pass#402177</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>1</MaxDistanceDelivery>
+    <TypeShipment>BIKE</TypeShipment>
+    <WorkingSince>2025-04-04T00:41:26.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>274433168</Id>
+    <Name>Eli Amar</Name>
+    <Phone>0516743581</Phone>
+    <Email>eli.amar@courier.com</Email>
+    <Password>Pass#353130</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>0.6726356201455225</MaxDistanceDelivery>
+    <TypeShipment>FOOT</TypeShipment>
+    <WorkingSince>2025-06-13T00:41:26.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>300974873</Id>
+    <Name>Dina Klein</Name>
+    <Phone>0564940596</Phone>
+    <Email>dina.klein@courier.com</Email>
+    <Password>Pass#137913</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>1.5671241799370383</MaxDistanceDelivery>
+    <TypeShipment>FOOT</TypeShipment>
+    <WorkingSince>2025-04-20T00:41:26.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>397134566</Id>
+    <Name>Shira Israelof</Name>
+    <Phone>0557990559</Phone>
+    <Email>shira.israelof@courier.com</Email>
+    <Password>Pass#276348</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>1</MaxDistanceDelivery>
+    <TypeShipment>BIKE</TypeShipment>
+    <WorkingSince>2025-03-27T00:41:26.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>370926239</Id>
+    <Name>Itay Mizrahi</Name>
+    <Phone>0515047486</Phone>
+    <Email>itay.mizrahi@courier.com</Email>
+    <Password>Pass#255947</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>2</MaxDistanceDelivery>
+    <TypeShipment>BIKE</TypeShipment>
+    <WorkingSince>2025-07-04T00:41:26.0000000</WorkingSince>
+  </Courier>
+  <Courier>
+    <Id>248017039</Id>
+    <Name>Lior Kaplan</Name>
+    <Phone>0593507994</Phone>
+    <Email>lior.kaplan@courier.com</Email>
+    <Password>Pass#165548</Password>
+    <Active>false</Active>
+    <MaxDistanceDelivery>4</MaxDistanceDelivery>
+    <TypeShipment>BIKE</TypeShipment>
+    <WorkingSince>2025-07-15T00:41:26.0000000</WorkingSince>
   </Courier>
 </ArrayaOfCouriers>
