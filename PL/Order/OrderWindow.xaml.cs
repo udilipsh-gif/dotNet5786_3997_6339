@@ -1,20 +1,7 @@
-﻿using BO;
-using PL.Helpers;
-using System;
-using System.Collections.Generic;
+﻿using PL.Helpers;
 using System.ComponentModel;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PL;
 
@@ -174,7 +161,7 @@ public partial class OrderWindow : Window, INotifyPropertyChanged
         {
             MessageBox.Show(ex.Message);
         }
-        catch (BLNoSendSmsException ex)
+        catch (BO.BLNoSendSmsException ex)
         {
             MessageBox.Show($"הזמנה מס' {CurrentID} בוטלה בהצלחה ({ex.Message})");
 

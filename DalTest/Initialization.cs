@@ -266,7 +266,7 @@ public static class Initialization
 
         for (int i = 0; i < 50 && availableAddresses.Count > 0; i++)
         {
-            double storeLat = s_dal?.Config.Latitude ?? throw new InvalidOperationException("Store latitude is not set.");
+            double storeLat = s_dal?.Config?.Latitude ?? throw new InvalidOperationException("Store latitude is not set.");
             double storeLng = s_dal?.Config.Longitude ?? throw new InvalidOperationException("Store longitude is not set.");
 
             int addressIndex = s_rand.Next(0, availableAddresses.Count);
