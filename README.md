@@ -59,7 +59,7 @@
     * גישה לנתונים (XML / List) דרך ממשק אחיד (`IDal`).
 
 ### 🛠️ טכנולוגיות וכלים
-* **Language:** C# .NET 6/7/8
+* **Language:** C# .NET 8
 * **UI:** Windows Presentation Foundation (WPF)
 * **Concurrency:** `Task`, `async/await`, `Mutex`, `IAsyncEnumerable`.
 * **External APIs:** Google Maps Platform (Geocoding, Distance Matrix, Static Maps).
@@ -71,11 +71,11 @@
 
 ### דרישות קדם
 * Visual Studio 2022 ומעלה.
-* .NET SDK תואם.
+* .NET SDK 8.0.
 * חיבור לאינטרנט (עבור שירותי מפות ומייל).
 
 ### הגדרות (Config)
-כדי שהמערכת תעבוד במלואה (מפות ומיילים), יש לוודא שקובץ ה-XML של הקונפיגורציה (`xml/config.xml`) מכיל מפתחות תקינים עבור:
+כדי שהמערכת תעבוד במלואה (מפות ומיילים), יש לוודא שקובץ ה-XML של הקונפיגורציה (`xml/data-config.xml`) מכיל מפתחות תקינים עבור:
 * `GoogleApiKey`
 * `ScriptUrl` (לשליחת מיילים)
 * `TokenCallSms` (לשליחת SMS)
@@ -99,7 +99,7 @@
 
 ### 👨‍💻 קרדיטים (Credits)
 
-**פותח ע"י:** דוד דוידוביץ ויהודה ליפשיץ
+**פותח ע"י:** דוד דוידוביץ ויהודה ליפשיץ        
 **בהנחיית:** ד"ר דן זילברשטיין
 
 *הוגש כחלק מפרויקט לימודי במדעי המחשב.*
