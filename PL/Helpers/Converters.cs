@@ -9,6 +9,10 @@ using System.Windows.Media;
 
 namespace PL;
 
+/// <summary>
+/// Converts an Enum value to a boolean based on a parameter match.
+/// Typically used for binding multiple RadioButtons to a single Enum property.
+/// </summary>
 public class EnumToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -38,34 +42,30 @@ public class EnumToBooleanConverter : IValueConverter
         return Binding.DoNothing;
     }
 }
-//public class EnumToStringConverter : IValueConverter
-//{
-//    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-//    {
-//        return value.ToString() ?? string.Empty;
-//    }
-//    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-//    {
-//        throw new NotImplementedException();
-//    }
-//}
 
+/// <summary>
+/// Converts a null value or an empty collection to Visibility.Collapsed (hidden).
+/// Supports an "Invert" parameter to reverse the logic.
+/// </summary>
 public class NullToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         bool isNullOrEmpty = value == null;
 
-        // בדיקה אם זו רשימה ריקה
+        // Check if it's an empty collection
         if (!isNullOrEmpty && value is ICollection collection)
         {
             isNullOrEmpty = collection.Count == 0;
         }
 
+        // Handle Inversion (Show if null)
         if (parameter != null && parameter.ToString() == "Invert")
         {
             return isNullOrEmpty ? Visibility.Visible : Visibility.Collapsed;
         }
+
+        // Default: Hide if null
         return isNullOrEmpty ? Visibility.Collapsed : Visibility.Visible;
     }
 
@@ -75,6 +75,11 @@ public class NullToVisibilityConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Converts a boolean value to Visibility.
+/// True becomes Visible, False becomes Collapsed.
+/// Supports an "Invert" parameter to reverse the logic.
+/// </summary>
 public class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -83,10 +88,11 @@ public class BoolToVisibilityConverter : IValueConverter
         {
             if (parameter != null && parameter.ToString() == "Invert")
             {
-                // אם אנחנו במצב עריכה -> תסתיר את התצוגה הרגילה
+                // Inverted: True -> Collapsed
                 return boolValue ? Visibility.Collapsed : Visibility.Visible;
             }
 
+            // Default: True -> Visible
             return boolValue ? Visibility.Visible : Visibility.Collapsed;
         }
         return Visibility.Collapsed;
@@ -98,7 +104,9 @@ public class BoolToVisibilityConverter : IValueConverter
     }
 }
 
-
+/// <summary>
+/// Returns true if the value is null, otherwise false.
+/// </summary>
 public class NullToBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -112,6 +120,9 @@ public class NullToBooleanConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Converts a boolean value to a Hebrew string ("פעיל" / "לא פעיל").
+/// </summary>
 public class BooleanToHebrewConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -129,6 +140,9 @@ public class BooleanToHebrewConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Maps technical string values (like "Add", "Update", "true") to user-friendly Hebrew display strings.
+/// </summary>
 public class ValueToHebrewConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -164,7 +178,10 @@ public class ValueToHebrewConverter : IValueConverter
     }
 }
 
-
+/// <summary>
+/// Converts an Enum value to its Description attribute text.
+/// If no Description attribute exists, returns the Enum name.
+/// </summary>
 public class EnumDescriptionConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -186,13 +203,16 @@ public class EnumDescriptionConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Extracts the total whole hours from a TimeSpan.
+/// </summary>
 public class TotalHoursConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is TimeSpan timeSpan)
         {
-            // המרה ל-(int) חותכת את השארית ומחזירה רק שעות שלמות כולל ימים
+            // Returns total hours truncated to int (including days converted to hours)
             return (int)timeSpan.TotalHours;
         }
         return 0;
@@ -202,10 +222,7 @@ public class TotalHoursConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
-
-
 }
-
 
 /// <summary>
 /// Converts between TimeSpan values and their string representation in "days:hours" format for UI binding.
@@ -221,16 +238,6 @@ public class SpanTimeConverter : IValueConverter
     /// <summary>
     /// Converts a TimeSpan value to a string in "DD:HH" format for display.
     /// </summary>
-    /// <param name="value">The TimeSpan value to convert.</param>
-    /// <param name="targetType">The type of the binding target property (typically string).</param>
-    /// <param name="parameter">Optional parameter (not used in this converter).</param>
-    /// <param name="culture">Culture information for formatting.</param>
-    /// <returns>
-    /// A string in "DD:HH" format representing days and hours, or "00:00" if the value is not a TimeSpan.
-    /// </returns>
-    /// <remarks>
-    /// Example: A TimeSpan of 2 days and 5 hours converts to "02:05".
-    /// </remarks>
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is TimeSpan ts)
@@ -243,17 +250,6 @@ public class SpanTimeConverter : IValueConverter
     /// <summary>
     /// Converts a string in "DD:HH" format back to a TimeSpan value.
     /// </summary>
-    /// <param name="value">The string value to convert (expected format: "DD:HH").</param>
-    /// <param name="targetType">The type of the binding target property (typically TimeSpan).</param>
-    /// <param name="parameter">Optional parameter (not used in this converter).</param>
-    /// <param name="culture">Culture information for parsing.</param>
-    /// <returns>
-    /// A TimeSpan value representing the parsed days and hours, or TimeSpan.Zero if parsing fails.
-    /// </returns>
-    /// <remarks>
-    /// Example: The string "02:05" converts to a TimeSpan of 2 days and 5 hours.
-    /// If the string format is invalid or cannot be parsed, returns TimeSpan.Zero.
-    /// </remarks>
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is string input)
@@ -270,21 +266,24 @@ public class SpanTimeConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Formats a TimeSpan into a verbose Hebrew string (e.g., "X days, Y hours...").
+/// </summary>
 public class TimeSpanToShortStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is TimeSpan timeSpan)
         {
-            // אם שלילי - לא להציג כלום
+            // Negative check
             if (timeSpan <= TimeSpan.Zero)
                 return "00:00:00";
 
-            // אם יותר מיום - הצג ימים
+            // If more than a day, include days in the string
             if (timeSpan.TotalDays >= 1)
                 return $"{(int)timeSpan.TotalDays} ימים, {timeSpan.Hours:D2} שעות ו{timeSpan.Minutes:D2} דקות";
 
-            // אחרת הצג שעות:דקות
+            // Otherwise show hours and minutes
             return $"{(int)timeSpan.TotalHours:D2} שעות ו {timeSpan.Minutes:D2} דקות";
         }
         return string.Empty;
@@ -296,6 +295,10 @@ public class TimeSpanToShortStringConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Returns one size (double) if the value is null/empty, and another size if it has value.
+/// Used for dynamic layout sizing (e.g., Grid Rows/Columns).
+/// </summary>
 public class NullToSizeConverter : IValueConverter
 {
     public double NullSize { get; set; }
@@ -303,19 +306,19 @@ public class NullToSizeConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        // בדיקה אם הערך הוא Null
+        // Check for null
         if (value == null)
         {
             return NullSize;
         }
 
-        // בדיקה אם זו רשימה ריקה
+        // Check for empty collection
         if (value is ICollection collection && collection.Count == 0)
         {
             return NullSize;
         }
 
-        // אופציונלי: אם זה סטרינג ריק
+        // Check for empty string
         if (value is string str && string.IsNullOrEmpty(str))
         {
             return NullSize;
@@ -330,18 +333,19 @@ public class NullToSizeConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Determines if an Order can be cancelled based on its status.
+/// Returns true only for OPEN, REFUSED, or DELIVERING.
+/// </summary>
 public class OrderStatusToCancelConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        // בדיקה אם הערך הוא null
         if (value == null) return false;
 
-        // המרה ל-String או ל-Enum שלך. נניח שזה עובד מול המחרוזת או ה-Enum
         string status = value.ToString() ?? string.Empty;
 
-        // הלוגיקה שהייתה לך ב-Triggers:
-        // פעיל רק אם: OPEN, REFUSED, DELIVERING
+        // Logic matches Trigger conditions:
         return status == "OPEN" || status == "REFUSED" || status == "DELIVERING";
     }
 
@@ -351,16 +355,18 @@ public class OrderStatusToCancelConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Controls visibility based on Order Status.
+/// Visible only when status is "DELIVERING".
+/// </summary>
 public class OrderStatusToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        // בדיקה אם הערך הוא null
         if (value == null) return Visibility.Collapsed;
-        // המרה ל-String או ל-Enum שלך. נניח שזה עובד מול המחרוזת או ה-Enum
+
         string status = value.ToString() ?? string.Empty;
-        // הלוגיקה שהייתה לך ב-Triggers:
-        // גלוי רק אם: OPEN, REFUSED, DELIVERING
+
         return (status == "DELIVERING") ? Visibility.Visible : Visibility.Collapsed;
     }
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -368,11 +374,15 @@ public class OrderStatusToVisibilityConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converts the Simulator state (Running/Stopped) to appropriate button text.
+/// </summary>
 public class RunStopSimulatorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-       if(value is bool isRunning)
+        if (value is bool isRunning)
         {
             return isRunning ? "הפעל סימולציה" : "עצור סימולציה";
         }
@@ -384,71 +394,73 @@ public class RunStopSimulatorConverter : IValueConverter
     }
 }
 
+/// <summary>
+/// Converts a status string or boolean to a specific SolidColorBrush.
+/// Used for color-coding rows or elements based on state (Green=Good, Red=Bad, etc.).
+/// </summary>
 public class StatusToColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null) return Brushes.Transparent;
-        if(value is bool bo)
-            return bo? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9")) // ירוק
-                        : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEBEE")); // אדום
 
-        // המרה ל-String כדי שנוכל לבדוק את השם (עובד גם אם ה-Enum מסוגים שונים)
-        if(value.ToString() is string str && str != string.Empty )
+        // Handle Boolean values
+        if (value is bool bo)
+            return bo ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9")) // Light Green
+                      : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEBEE")); // Light Red
+
+        // Handle String/Enum values
+        if (value.ToString() is string str && str != string.Empty)
         {
- // החזרת צבעים בהתאם לסטטוס
-        switch (str)
-        {
-            // מצבים חיוביים / סופיים (ירוק בהיר)
-            case "STANDART":
-            case "רגיל":
-            case "COMPLETED":
-            case "נמסר":
-            case "DELIVERED":
-            case "נמסר בהצלחה":
-            case "True":
-            case "פעיל":
-            case "ONTYME":
-            case "בזמן":
-                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9")); // ירוק
+            switch (str)
+            {
+                // Positive / Final states (Light Green)
+                case "STANDART":
+                case "רגיל":
+                case "COMPLETED":
+                case "נמסר":
+                case "DELIVERED":
+                case "נמסר בהצלחה":
+                case "True":
+                case "פעיל":
+                case "ONTYME":
+                case "בזמן":
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9"));
 
-            // מצבי אמצע / תהליך (צהוב/כתום בהיר)
-            case "FAST_DELIVERY":
-            case "מהיר":
-            case "DELIVERING":
-            case "במשלוח":
-            
-            case "NOTFOUND":
-            case "כתובת/לקוח לא נמצא":
-                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF3E0")); // כתום
+                // Process / Warning states (Light Orange/Yellow)
+                case "FAST_DELIVERY":
+                case "מהיר":
+                case "DELIVERING":
+                case "במשלוח":
+                case "NOTFOUND":
+                case "כתובת/לקוח לא נמצא":
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF3E0"));
 
-            // מצבים התחלתיים (כחול/אפור בהיר)
-            case "פתוח":
-            case "OPEN":
-            case "INRISK":
-            case "בסיכון":
+                // Initial states (Light Blue)
+                case "פתוח":
+                case "OPEN":
+                case "INRISK":
+                case "בסיכון":
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E3F2FD"));
 
+                // Negative / Error states (Light Red)
+                case "DELIVER_IMMEDIATELY":
+                case "מיידי":
+                case "סורב על ידי הלקוח":
+                case "REFUSED":
+                case "בוטל":
+                case "CANCELLED":
+                case "LATE":
+                case "באיחור":
+                case "FAILED":
+                case "נכשל":
+                case "False":
+                case "לא פעיל":
+                    return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEBEE"));
 
-                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E3F2FD")); // כחול
-
-            // מצבים שליליים (אדום בהיר)
-            case "DELIVER_IMMEDIATELY":
-            case "מיידי":
-            case "סורב על ידי הלקוח":
-            case "REFUSED":
-            case "בוטל":
-            case "CANCELLED":
-            case "LATE":
-            case "באיחור":
-            case "FAILED":
-            case "נכשל":
-            case "False":
-            case "לא פעיל":
-                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEBEE")); // אדום
-
-            default:
-                return Brushes.Transparent;
-        }
+                default:
+                    return Brushes.Transparent;
+            }
         }
         return Brushes.Transparent;
     }

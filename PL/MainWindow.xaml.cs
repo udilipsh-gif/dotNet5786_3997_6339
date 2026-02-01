@@ -1,6 +1,4 @@
 ﻿using PL.Helpers;
-using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,7 +17,7 @@ namespace PL
         private const string ROLE_COURIER = "Courier";
 
         /// <summary>
-        /// Instance of the Business Logic layer.
+        /// The singleton access point to the Business Logic layer.
         /// </summary>
         private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
@@ -174,6 +172,9 @@ namespace PL
         /// <summary>
         /// Handles navigation to the appropriate window based on the user role.
         /// </summary>
+        /// <param name="role">The role of the user (e.g., Manager, Courier).</param>
+        /// <param name="userId">The unique ID of the user logging in.</param>
+        /// <exception cref="BO.BlNoAccessException">Thrown when the provided role is unrecognized.</exception>
         private void NavigateToUserDashboard(string? role, int userId)
         {
             switch (role)
@@ -197,8 +198,10 @@ namespace PL
         }
 
         /// <summary>
-        /// Helper method to display message boxes.
+        /// Helper method to display message boxes with a consistent title.
         /// </summary>
+        /// <param name="message">The text to display to the user.</param>
+        /// <param name="icon">The icon indicating the severity (Error, Warning, etc.).</param>
         private void ShowMessage(string message, MessageBoxImage icon)
         {
             MessageBox.Show(message, "כניסה למערכת", MessageBoxButton.OK, icon);

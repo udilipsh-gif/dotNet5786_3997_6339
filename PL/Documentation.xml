@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProjectDocumentation>
+  <Project>
+    <Name>PL (Presentation Layer)</Name>
+    <Description>WPF-based presentation layer for the delivery management system. Provides a user interface for managers and couriers to interact with the business logic layer.</Description>
+    <TargetFramework>.NET 8.0</TargetFramework>
+    <ProjectType>WPF Application</ProjectType>
+    <Language>C# 12.0</Language>
+    <FlowDirection>RightToLeft</FlowDirection>
+    <UILanguage>Hebrew</UILanguage>
+  </Project>
+
+  <Architecture>
+    <Pattern>MVVM (Model-View-ViewModel)</Pattern>
+    <Description>The project uses WPF with code-behind and dependency properties, following a simplified MVVM pattern with value converters and data binding.</Description>
+    <Layers>
+      <Layer>
+        <Name>Presentation</Name>
+        <Description>XAML views and code-behind files that define the user interface</Description>
+      </Layer>
+      <Layer>
+        <Name>ViewModels</Name>
+        <Description>Dependency properties and observable patterns implemented in code-behind</Description>
+      </Layer>
+      <Layer>
+        <Name>Business Logic Interface</Name>
+        <Description>Interfaces with the BL layer through BlApi.Factory.Get()</Description>
+      </Layer>
+    </Layers>
+  </Architecture>
+
+  <MainComponents>
+    <Component>
+      <Name>App.xaml / App.xaml.cs</Name>
+      <Type>Application Entry Point</Type>
+      <Description>Main application class that initializes the WPF application and defines global resources including styles, colors, and value converters.</Description>
+      <Responsibilities>
+        <Responsibility>Application initialization</Responsibility>
+        <Responsibility>Global resource dictionary management</Responsibility>
+        <Responsibility>Application-wide styles and converters</Responsibility>
+      </Responsibilities>
+    </Component>
+
+    <Component>
+      <Name>MainWindow.xaml / MainWindow.xaml.cs</Name>
+      <Type>Login Window</Type>
+      <Description>The entry point window providing user authentication for managers and couriers. Displays current system clock and handles role-based navigation.</Description>
+      <Features>
+        <Feature>User authentication with ID and password</Feature>
+        <Feature>Role-based navigation (Manager/Courier)</Feature>
+        <Feature>System clock display with observer pattern</Feature>
+        <Feature>RelayCommand for login logic</Feature>
+        <Feature>Thread-safe clock updates using ObserverMutex</Feature>
+      </Features>
+      <DependencyProperties>
+        <Property Name="UserId" Type="string" Description="Two-way bound user ID input"/>
+        <Property Name="CurrentTime" Type="DateTime" Description="System clock display"/>
+      </DependencyProperties>
+    </Component>
+  </MainComponents>
+
+  <Windows>
+    <WindowCategory Name="Order Management">
+      <Window>
+        <Name>OrderWindow.xaml / OrderWindow.xaml.cs</Name>
+        <Description>Window for creating new orders or viewing/updating existing orders. Displays order details, delivery history, and allows order cancellation.</Description>
+        <Features>
+          <Feature>Create new orders with customer details</Feature>
+          <Feature>Update existing order information</Feature>
+          <Feature>Cancel orders with optional SMS notification</Feature>
+          <Feature>Real-time order status updates via observer pattern</Feature>
+          <Feature>Display delivery history for the order</Feature>
+          <Feature>Address validation and geocoding</Feature>
+        </Features>
+        <DependencyProperties>
+          <Property Name="CurrentOrder" Type="BO.Order" Description="The order being displayed or edited"/>
+          <Property Name="ButtonText" Type="string" DefaultValue="Add" Description="Dynamic button text (Add/Update)"/>
+        </DependencyProperties>
+        <Modes>
+          <Mode Name="Create" Condition="id = 0">New order creation with empty form</Mode>
+          <Mode Name="Update" Condition="id != 0">Edit existing order with populated data</Mode>
+        </Modes>
+      </Window>
+
+      <Window>
+        <Name>OrderListWindow.xaml / OrderListWindow.xaml.cs</Name>
+        <Description>List view for displaying and filtering orders. Supports sorting, filtering by status, and navigation to individual orders.</Description>
+        <Features>
+          <Feature>Display all orders in a DataGrid</Feature>
+          <Feature>Filter by order status (Open, Delivering, Completed, etc.)</Feature>
+          <Feature>Filter by schedule status (OnTime, AtRisk, Late)</Feature>
+          <Feature>Filter by type of order (Standard, Fast, Immediate)</Feature>
+          <Feature>Sort by multiple criteria</Feature>
+          <Feature>Double-click to open order details</Feature>
+          <Feature>Real-time list updates via observer pattern</Feature>
+        </Features>
+      </Window>
+    </WindowCategory>
+
+    <WindowCategory Name="Courier Management">
+      <Window>
+        <Name>CourierWindow.xaml / CourierWindow.xaml.cs</Name>
+        <Description>Window for creating new couriers or viewing/updating existing courier details. Allows management of courier information and status.</Description>
+        <Features>
+          <Feature>Create new couriers with credentials</Feature>
+          <Feature>Update courier information</Feature>
+          <Feature>Set courier active/inactive status</Feature>
+          <Feature>Configure shipment type (Car, Motorcycle, Bike, Foot)</Feature>
+          <Feature>Set maximum delivery distance</Feature>
+          <Feature>Password management</Feature>
+        </Features>
+        <Modes>
+          <Mode Name="Create" Condition="id = 0">New courier registration</Mode>
+          <Mode Name="Update" Condition="id != 0">Edit existing courier profile</Mode>
+        </Modes>
+      </Window>
+
+      <Window>
+        <Name>CourierListWindow.xaml / CourierListWindow.xaml.cs</Name>
+        <Description>List view for displaying and managing couriers. Supports filtering by active status and sorting.</Description>
+        <Features>
+          <Feature>Display all couriers in a list</Feature>
+          <Feature>Filter by active/inactive status</Feature>
+          <Feature>Sort by various fields (Name, ID, Phone, etc.)</Feature>
+          <Feature>Navigate to courier details</Feature>
+          <Feature>Real-time list updates</Feature>
+        </Features>
+      </Window>
+
+      <Window>
+        <Name>MainCourier.xaml / MainCourier.xaml.cs</Name>
+        <Description>Main dashboard for logged-in couriers. Displays available orders, current deliveries, and delivery history.</Description>
+        <Features>
+          <Feature>View available orders matching courier capabilities</Feature>
+          <Feature>Accept delivery assignments</Feature>
+          <Feature>View current active deliveries</Feature>
+          <Feature>Complete or fail deliveries</Feature>
+          <Feature>View delivery history and statistics</Feature>
+          <Feature>Real-time updates for assigned deliveries</Feature>
+        </Features>
+      </Window>
+
+      <Window>
+        <Name>CourierDeliveryHistoryWindow.xaml / CourierDeliveryHistoryWindow.xaml.cs</Name>
+        <Description>Displays complete delivery history for a specific courier with filtering options.</Description>
+        <Features>
+          <Feature>View all completed deliveries</Feature>
+          <Feature>Filter by order type</Feature>
+          <Feature>Sort by multiple criteria</Feature>
+          <Feature>Display delivery statistics</Feature>
+        </Features>
+      </Window>
+    </WindowCategory>
+
+    <WindowCategory Name="Delivery Management">
+      <Window>
+        <Name>StartDeliveryWindow.xaml / StartDeliveryWindow.xaml.cs</Name>
+        <Description>Window for assigning orders to couriers and initiating deliveries.</Description>
+        <Features>
+          <Feature>Select order from open orders list</Feature>
+          <Feature>View order details including location</Feature>
+          <Feature>Select available courier based on capabilities</Feature>
+          <Feature>Initiate delivery assignment</Feature>
+          <Feature>Display estimated delivery time</Feature>
+        </Features>
+      </Window>
+
+      <Window>
+        <Name>CloseDeliveryWindow.xaml / CloseDeliveryWindow.xaml.cs</Name>
+        <Description>Window for completing or failing active deliveries.</Description>
+        <Features>
+          <Feature>View active delivery details</Feature>
+          <Feature>Mark delivery as completed</Feature>
+          <Feature>Mark delivery as failed/refused/not found</Feature>
+          <Feature>Record actual delivery time</Feature>
+          <Feature>Update order status accordingly</Feature>
+        </Features>
+      </Window>
+
+      <Window>
+        <Name>MapPopupWindow.xaml / MapPopupWindow.xaml.cs</Name>
+        <Description>Popup window displaying delivery location on a map.</Description>
+        <Features>
+          <Feature>Display delivery address on Google Maps</Feature>
+          <Feature>Show route from store to delivery location</Feature>
+          <Feature>Calculate distance and estimated time</Feature>
+          <Feature>Interactive map controls</Feature>
+        </Features>
+      </Window>
+    </WindowCategory>
+
+    <WindowCategory Name="Management">
+      <Window>
+        <Name>ManagerWindow.xaml / ManagerWindow.xaml.cs</Name>
+        <Description>Main dashboard for manager users. Provides access to all system management features.</Description>
+        <Features>
+          <Feature>Navigate to orders management</Feature>
+          <Feature>Navigate to couriers management</Feature>
+          <Feature>Access system configuration</Feature>
+          <Feature>View system statistics</Feature>
+          <Feature>Start/stop delivery simulator</Feature>
+          <Feature>Control system clock</Feature>
+          <Feature>Reset database</Feature>
+          <Feature>Initialize sample data</Feature>
+        </Features>
+      </Window>
+
+      <Window>
+        <Name>ConfigWindow.xaml / ConfigWindow.xaml.cs</Name>
+        <Description>System configuration window for managing operational parameters.</Description>
+        <Features>
+          <Feature>Configure store address with geocoding</Feature>
+          <Feature>Set maximum delivery range</Feature>
+          <Feature>Configure average speeds for different vehicle types</Feature>
+          <Feature>Set maximum delivery time</Feature>
+          <Feature>Configure risk range for late deliveries</Feature>
+          <Feature>Set maximum courier inactivity time</Feature>
+          <Feature>Manage API keys and external service credentials</Feature>
+          <Feature>Update manager credentials</Feature>
+        </Features>
+      </Window>
+    </WindowCategory>
+  </Windows>
+
+  <Helpers>
+    <Helper>
+      <Name>Tools</Name>
+      <Type>Static Utility Class</Type>
+      <Location>PL\Helpers\Tools.cs</Location>
+      <Description>Provides utility methods and helper functions used throughout the PL project.</Description>
+      <Methods>
+        <Method>
+          <Name>OpenOrActivateWindow&lt;T&gt;</Name>
+          <Description>Opens a new window or activates an existing one of the specified type. Supports owner windows and predicates for matching existing windows.</Description>
+          <Parameters>
+            <Parameter Name="matchPredicate" Type="Predicate&lt;T&gt;?" Description="Optional predicate to match existing windows"/>
+            <Parameter Name="owner" Type="Window?" Description="Optional owner window"/>
+            <Parameter Name="args" Type="object?[]" Description="Constructor arguments for new window"/>
+          </Parameters>
+        </Method>
+        <Method>
+          <Name>SetSoftOwner</Name>
+          <Description>Extension method to set a soft owner relationship between windows (centers child, closes child when parent closes).</Description>
+        </Method>
+        <Method>
+          <Name>GetDescription</Name>
+          <Description>Extension method to get the Description attribute value from enum values.</Description>
+        </Method>
+        <Method>
+          <Name>GetEnumList&lt;T&gt;</Name>
+          <Description>Converts enum values to a list of SelectionItems for ComboBox binding with Hebrew descriptions.</Description>
+        </Method>
+        <Method>
+          <Name>GetSafeFromBl&lt;T&gt;</Name>
+          <Description>Safely executes a BL function and returns default value on exception.</Description>
+        </Method>
+        <Method>
+          <Name>RunSafe</Name>
+          <Description>Safely executes an action and displays error message box on exception.</Description>
+        </Method>
+        <Method>
+          <Name>TriggerReset</Name>
+          <Description>Triggers the ResetRequested event to notify all windows of a database reset.</Description>
+        </Method>
+      </Methods>
+      <AttachedProperties>
+        <Property Name="NumericOnly" Description="Attached property to restrict TextBox input to numeric values only"/>
+        <Property Name="MoveFocusTo" Description="Attached property to move focus to another control when Enter is pressed"/>
+      </AttachedProperties>
+      <InnerClasses>
+        <Class Name="RelayCommand">
+          <Description>Implementation of ICommand for MVVM command binding.</Description>
+        </Class>
+        <Class Name="SelectionItem">
+          <Description>Data transfer object for ComboBox items with ID and display name.</Description>
+        </Class>
+      </InnerClasses>
+    </Helper>
+
+    <Helper>
+      <Name>Converters</Name>
+      <Type>Value Converters Collection</Type>
+      <Location>PL\Helpers\Converters.cs</Location>
+      <Description>Collection of IValueConverter implementations for XAML data binding conversions.</Description>
+      <Converters>
+        <Converter>
+          <Name>EnumToBooleanConverter</Name>
+          <Description>Converts enum values to boolean for RadioButton binding</Description>
+          <Usage>RadioButton IsChecked binding with enum properties</Usage>
+        </Converter>
+        <Converter>
+          <Name>NullToVisibilityConverter</Name>
+          <Description>Converts null/empty values to Visibility (Collapsed for null, Visible for not null)</Description>
+          <Parameters>Supports "Invert" parameter to reverse logic</Parameters>
+        </Converter>
+        <Converter>
+          <Name>BoolToVisibilityConverter</Name>
+          <Description>Converts boolean to Visibility</Description>
+          <Parameters>Supports "Invert" parameter</Parameters>
+        </Converter>
+        <Converter>
+          <Name>NullToBooleanConverter</Name>
+          <Description>Returns true if value is null, false otherwise</Description>
+        </Converter>
+        <Converter>
+          <Name>BooleanToHebrewConverter</Name>
+          <Description>Converts boolean to Hebrew text ("����"/"�� ����")</Description>
+        </Converter>
+        <Converter>
+          <Name>ValueToHebrewConverter</Name>
+          <Description>Converts English string values to Hebrew equivalents</Description>
+          <Mappings>
+            <Mapping From="Add" To="���"/>
+            <Mapping From="Update" To="����"/>
+            <Mapping From="true" To="����"/>
+            <Mapping From="false" To="�� ����"/>
+          </Mappings>
+        </Converter>
+        <Converter>
+          <Name>EnumDescriptionConverter</Name>
+          <Description>Converts enum values to their Description attribute text</Description>
+          <Usage>Display enum values with Hebrew descriptions</Usage>
+        </Converter>
+        <Converter>
+          <Name>TotalHoursConverter</Name>
+          <Description>Converts TimeSpan to total hours as integer</Description>
+        </Converter>
+        <Converter>
+          <Name>SpanTimeConverter</Name>
+          <Description>Bidirectional converter between TimeSpan and "DD:HH" format string</Description>
+          <Format>Days:Hours (both zero-padded to 2 digits)</Format>
+        </Converter>
+        <Converter>
+          <Name>TimeSpanToShortStringConverter</Name>
+          <Description>Converts TimeSpan to user-friendly Hebrew text</Description>
+          <Examples>
+            <Example>"2 ����, 05 ���� �03 ����"</Example>
+            <Example>"03 ���� � 15 ����"</Example>
+          </Examples>
+        </Converter>
+        <Converter>
+          <Name>NullToSizeConverter</Name>
+          <Description>Returns different size values based on null/not-null</Description>
+          <Properties>
+            <Property Name="NullSize" Description="Size to return when value is null"/>
+            <Property Name="NotNullSize" Description="Size to return when value is not null"/>
+          </Properties>
+        </Converter>
+        <Converter>
+          <Name>OrderStatusToCancelConverter</Name>
+          <Description>Determines if cancel button should be enabled based on order status</Description>
+          <EnabledFor>OPEN, REFUSED, DELIVERING</EnabledFor>
+        </Converter>
+        <Converter>
+          <Name>OrderStatusToVisibilityConverter</Name>
+          <Description>Shows SMS checkbox only for DELIVERING status</Description>
+        </Converter>
+        <Converter>
+          <Name>RunStopSimulatorConverter</Name>
+          <Description>Converts simulator running state to Hebrew button text</Description>
+        </Converter>
+        <Converter>
+          <Name>StatusToColorConverter</Name>
+          <Description>Converts various status values to background colors</Description>
+          <ColorScheme>
+            <Color Name="Green" Value="#E8F5E9" Description="Positive/completed states"/>
+            <Color Name="Yellow" Value="#FFF3E0" Description="In-progress/warning states"/>
+            <Color Name="Blue" Value="#E3F2FD" Description="Initial/neutral states"/>
+            <Color Name="Red" Value="#FFEBEE" Description="Negative/failed states"/>
+          </ColorScheme>
+        </Converter>
+      </Converters>
+    </Helper>
+
+    <Helper>
+      <Name>ObserverMutex</Name>
+      <Type>Thread Synchronization Helper</Type>
+      <Location>PL\Helpers\ObserverMutex.cs</Location>
+      <Description>Provides thread-safe synchronization for observer pattern updates in WPF. Prevents race conditions when multiple observer notifications occur.</Description>
+      <Methods>
+        <Method Name="CheckAndSetLoadInProgressOrRestartRequired">
+          <Description>Checks if update is in progress and sets flag. Returns true if update should be skipped.</Description>
+        </Method>
+        <Method Name="UnsetLoadInProgressAndCheckRestartRequested">
+          <Description>Clears in-progress flag and returns true if another update was requested during execution.</Description>
+        </Method>
+      </Methods>
+      <Usage>Used in observer callbacks to prevent concurrent UI updates</Usage>
+    </Helper>
+
+    <Helper>
+      <Name>UserControlTools</Name>
+      <Type>Reusable User Control</Type>
+      <Location>PL\Helpers\UserControlTools.xaml / UserControlTools.xaml.cs</Location>
+      <Description>Custom user control providing reusable UI components.</Description>
+    </Helper>
+  </Helpers>
+
+  <Interfaces>
+    <Interface>
+      <Name>IWindowUpdater</Name>
+      <Location>PL\IWindowUpdater.cs</Location>
+      <Description>Interface for windows that support state updates without closing and reopening.</Description>
+      <Methods>
+        <Method>
+          <Name>UpdateState</Name>
+          <Parameters>params object?[] args</Parameters>
+          <Description>Updates the window's state with provided arguments when window is reactivated instead of creating new instance.</Description>
+        </Method>
+      </Methods>
+      <Usage>Implemented by windows that should update their content when activated from OpenOrActivateWindow</Usage>
+    </Interface>
+  </Interfaces>
+
+  <Enums>
+    <Enum>
+      <Name>CourierFieldSort</Name>
+      <Location>PL\Enums.cs</Location>
+      <Description>Wrapper class providing IEnumerable access to BO.CourierFieldSort enum for XAML binding.</Description>
+      <Usage>ComboBox ItemsSource for courier sorting options</Usage>
+    </Enum>
+    <Enum>
+      <Name>CourierFieldFilter</Name>
+      <Location>PL\Enums.cs</Location>
+      <Description>Wrapper class for BO.CourierFieldFilter enum (All, IsActive, InActive).</Description>
+      <Usage>ComboBox ItemsSource for courier filtering options</Usage>
+    </Enum>
+    <Enum>
+      <Name>OrderFilterScheduleStatus</Name>
+      <Location>PL\Enums.cs</Location>
+      <Description>Wrapper for BO.ScheduleStatus with nullable support for "All" option.</Description>
+    </Enum>
+    <Enum>
+      <Name>OrderFilterTypeOfOrder</Name>
+      <Location>PL\Enums.cs</Location>
+      <Description>Wrapper for BO.TypeOfOrder enum.</Description>
+    </Enum>
+    <Enum>
+      <Name>OrderStatusFilterOptions</Name>
+      <Location>PL\Enums.cs</Location>
+      <Description>Wrapper for BO.OrderStatus with nullable support for "All" option.</Description>
+    </Enum>
+    <Enum>
+      <Name>SelectionItem</Name>
+      <Location>PL\Enums.cs</Location>
+      <Description>Data transfer object for ComboBox items (duplicate of Tools.SelectionItem).</Description>
+    </Enum>
+  </Enums>
+
+  <ObserverPattern>
+    <Description>The PL project extensively uses the Observer pattern for real-time UI updates.</Description>
+    <Observers>
+      <Observer>
+        <Name>Clock Observer</Name>
+        <Purpose>Updates UI with current system clock</Purpose>
+        <Registration>s_bl.Admin.AddClockObserver / RemoveClockObserver</Registration>
+        <Usage>MainWindow, OrderWindow, and other time-sensitive displays</Usage>
+      </Observer>
+      <Observer>
+        <Name>Order Observer</Name>
+        <Purpose>Updates UI when specific order changes</Purpose>
+        <Registration>s_bl.Order.AddObserver / RemoveObserver (per order ID)</Registration>
+        <Usage>OrderWindow for real-time order status updates</Usage>
+      </Observer>
+      <Observer>
+        <Name>List Observers</Name>
+        <Purpose>Updates lists when items are added/removed/changed</Purpose>
+        <Usage>OrderListWindow, CourierListWindow</Usage>
+      </Observer>
+    </Observers>
+    <ThreadSafety>
+      <Description>All observers use ObserverMutex to prevent race conditions</Description>
+      <Pattern>Dispatcher.BeginInvoke with async/await for UI thread marshalling</Pattern>
+    </ThreadSafety>
+  </ObserverPattern>
+
+  <DataBinding>
+    <Description>The project uses extensive WPF data binding with dependency properties and value converters.</Description>
+    <BindingPatterns>
+      <Pattern>
+        <Name>TwoWay Binding</Name>
+        <Usage>Form inputs (TextBox, RadioButton, CheckBox)</Usage>
+        <Example>Text="{Binding CurrentOrder.Name, Mode=TwoWay}"</Example>
+      </Pattern>
+      <Pattern>
+        <Name>OneWay Binding with Converters</Name>
+        <Usage>Read-only displays with formatting</Usage>
+        <Example>Text="{Binding OrderStatus, Converter={StaticResource EnumDescriptionConverter}}"</Example>
+      </Pattern>
+      <Pattern>
+        <Name>Command Binding</Name>
+        <Usage>Button clicks with ICommand</Usage>
+        <Example>Command="{Binding LoginCommand}" CommandParameter="{Binding ElementName=passwordBox}"</Example>
+      </Pattern>
+      <Pattern>
+        <Name>Conditional Visibility</Name>
+        <Usage>Show/hide UI elements based on data</Usage>
+        <Example>Visibility="{Binding CurrentOrder, Converter={StaticResource NullToVisibilityConverter}}"</Example>
+      </Pattern>
+    </BindingPatterns>
+  </DataBinding>
+
+  <Styling>
+    <Description>Consistent styling using StaticResource references to global ResourceDictionary.</Description>
+    <ColorScheme>
+      <Color Name="PrimaryColor" Value="Defined in App.xaml" Usage="Headers, important elements"/>
+      <Color Name="SurfaceColor" Value="Defined in App.xaml" Usage="Background for cards/panels"/>
+      <Color Name="BorderColor" Value="Defined in App.xaml" Usage="Border outlines"/>
+    </ColorScheme>
+    <Styles>
+      <Style Name="HeaderTextStyle" Usage="Window and section headers"/>
+      <Style Name="DestructiveButtonStyle" Usage="Delete and cancel buttons"/>
+      <Style Name="Button default" Usage="Primary action buttons"/>
+    </Styles>
+  </Styling>
+
+  <ErrorHandling>
+    <Strategy>Try-catch blocks with user-friendly Hebrew error messages</Strategy>
+    <Patterns>
+      <Pattern>
+        <Name>Safe BL Access</Name>
+        <Method>Tools.GetSafeFromBl&lt;T&gt;</Method>
+        <Description>Wraps BL calls with exception handling and default value return</Description>
+      </Pattern>
+      <Pattern>
+        <Name>Safe Action Execution</Name>
+        <Method>Tools.RunSafe</Method>
+        <Description>Wraps void actions with exception handling and MessageBox display</Description>
+      </Pattern>
+      <Pattern>
+        <Name>Specific Exception Handling</Name>
+        <Description>Catch specific BO exceptions (BlDoesNotExistException, BlInvalidValueException, etc.) and display appropriate messages</Description>
+      </Pattern>
+    </Patterns>
+  </ErrorHandling>
+
+  <Dependencies>
+    <ExternalProjects>
+      <Project Name="BlApi" Description="Business Logic API interfaces"/>
+      <Project Name="BO" Description="Business Objects (DTOs, Enums, Exceptions)"/>
+    </ExternalProjects>
+    <NuGetPackages>
+      <Package>Standard WPF packages for .NET 8.0</Package>
+    </NuGetPackages>
+  </Dependencies>
+
+  <BestPractices>
+    <Practice>
+      <Name>Window Lifecycle Management</Name>
+      <Description>Subscribe to observers in Window_Loaded, unsubscribe in Window_Closed to prevent memory leaks</Description>
+    </Practice>
+    <Practice>
+      <Name>Thread Safety</Name>
+      <Description>Use ObserverMutex for observer callbacks, Dispatcher.BeginInvoke for UI thread access</Description>
+    </Practice>
+    <Practice>
+      <Name>Resource Cleanup</Name>
+      <Description>Always unsubscribe from events and remove observers when window closes</Description>
+    </Practice>
+    <Practice>
+      <Name>Null Safety</Name>
+      <Description>Use null-conditional operators (?.) and null-coalescing operators (??) throughout</Description>
+    </Practice>
+    <Practice>
+      <Name>Localization Ready</Name>
+      <Description>All user-facing strings in Hebrew, enum descriptions use Description attributes</Description>
+    </Practice>
+    <Practice>
+      <Name>Single Responsibility</Name>
+      <Description>Each window has a clear, focused purpose</Description>
+    </Practice>
+    <Practice>
+      <Name>Reusable Components</Name>
+      <Description>Converters, helpers, and attached properties promote code reuse</Description>
+    </Practice>
+  </BestPractices>
+
+  <KeyFeatures>
+    <Feature>
+      <Name>Real-time Updates</Name>
+      <Description>Observer pattern ensures UI automatically reflects backend changes without manual refresh</Description>
+    </Feature>
+    <Feature>
+      <Name>Role-based Access</Name>
+      <Description>Different interfaces for managers vs couriers with appropriate permissions</Description>
+    </Feature>
+    <Feature>
+      <Name>Delivery Simulation</Name>
+      <Description>Manager can start/stop simulator and control system clock for testing</Description>
+    </Feature>
+    <Feature>
+      <Name>Interactive Maps</Name>
+      <Description>Google Maps integration for delivery location visualization</Description>
+    </Feature>
+    <Feature>
+      <Name>Comprehensive Filtering</Name>
+      <Description>Advanced filtering and sorting options for orders and couriers</Description>
+    </Feature>
+    <Feature>
+      <Name>Address Geocoding</Name>
+      <Description>Automatic conversion of addresses to coordinates using Google Geocoding API</Description>
+    </Feature>
+    <Feature>
+      <Name>SMS Notifications</Name>
+      <Description>Optional SMS alerts for couriers when orders are cancelled</Description>
+    </Feature>
+    <Feature>
+      <Name>Status Color Coding</Name>
+      <Description>Visual feedback through colored backgrounds based on status</Description>
+    </Feature>
+  </KeyFeatures>
+
+  <FileStructure>
+    <Directory Name="PL">
+      <Directory Name="Courier">
+        <Description>Courier-related windows</Description>
+        <Files>
+          <File>MainCourier.xaml / .cs</File>
+          <File>CourierWindow.xaml / .cs</File>
+          <File>CourierListWindow.xaml / .cs</File>
+          <File>CourierDeliveryHistoryWindow.xaml / .cs</File>
+        </Files>
+      </Directory>
+      <Directory Name="Order">
+        <Description>Order-related windows</Description>
+        <Files>
+          <File>OrderWindow.xaml / .cs</File>
+          <File>OrderListWindow.xaml / .cs</File>
+        </Files>
+      </Directory>
+      <Directory Name="Delivery">
+        <Description>Delivery management windows</Description>
+        <Files>
+          <File>StartDeliveryWindow.xaml / .cs</File>
+          <File>CloseDeliveryWindow.xaml / .cs</File>
+          <File>MapPopupWindow.xaml / .cs</File>
+        </Files>
+      </Directory>
+      <Directory Name="Mangment">
+        <Description>Management and configuration windows</Description>
+        <Files>
+          <File>ManagerWindow.xaml / .cs</File>
+          <File>ConfigWindow.xaml / .cs</File>
+        </Files>
+      </Directory>
+      <Directory Name="Helpers">
+        <Description>Helper classes and utilities</Description>
+        <Files>
+          <File>Tools.cs</File>
+          <File>Converters.cs</File>
+          <File>ObserverMutex.cs</File>
+          <File>UserControlTools.xaml / .cs</File>
+        </Files>
+      </Directory>
+      <Files>
+        <File>App.xaml / .cs</File>
+        <File>MainWindow.xaml / .cs</File>
+        <File>IWindowUpdater.cs</File>
+        <File>Enums.cs</File>
+        <File>AssemblyInfo.cs</File>
+      </Files>
+    </Directory>
+  </FileStructure>
+
+  <FutureImprovements>
+    <Improvement>
+      <Name>Full MVVM Implementation</Name>
+      <Description>Move logic from code-behind to dedicated ViewModel classes</Description>
+    </Improvement>
+    <Improvement>
+      <Name>Dependency Injection</Name>
+      <Description>Use DI container for better testability and decoupling</Description>
+    </Improvement>
+    <Improvement>
+      <Name>Unit Testing</Name>
+      <Description>Add unit tests for converters, commands, and business logic</Description>
+    </Improvement>
+    <Improvement>
+      <Name>Localization</Name>
+      <Description>Support multiple languages using resource files</Description>
+    </Improvement>
+    <Improvement>
+      <Name>Accessibility</Name>
+      <Description>Improve keyboard navigation and screen reader support</Description>
+    </Improvement>
+    <Improvement>
+      <Name>Responsive Design</Name>
+      <Description>Better handling of different screen sizes and resolutions</Description>
+    </Improvement>
+  </FutureImprovements>
+
+  <Notes>
+    <Note>The project follows Hebrew right-to-left flow direction throughout</Note>
+    <Note>All error messages and user-facing text are in Hebrew</Note>
+    <Note>The project uses .NET 8.0 and C# 12.0 features including primary constructors, required properties, and global usings</Note>
+    <Note>Thread safety is a priority with ObserverMutex pattern used extensively</Note>
+    <Note>The codebase includes comprehensive XML documentation comments in English for future developers</Note>
+  </Notes>
+</ProjectDocumentation>

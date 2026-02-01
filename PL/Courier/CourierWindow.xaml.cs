@@ -11,37 +11,36 @@ namespace PL;
 /// </summary>
 /// <remarks>
 /// This window allows managers to add, view, edit, and delete courier information.
-/// Couriers can also edit their own information through this window.
 /// Implements INotifyPropertyChanged for dynamic UI updates and uses the Observer pattern
 /// for real-time synchronization with the business logic layer.
 /// </remarks>
 public partial class CourierWindow : Window, INotifyPropertyChanged
 {
     #region Services & Constants
-    
+
     /// <summary>
     /// Business logic layer interface instance for accessing courier services.
     /// </summary>
     private static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-    
+
     /// <summary>
     /// The unique identifier of the current manager performing the operation.
     /// </summary>
     private readonly int CURRENT_MANAGER_ID = Tools.GetSafeFromBl(() => s_bl.Admin.GetConfig().ManagerId);
-    
+
     /// <summary>
-    /// Current date and time from the system clock.
+    /// Current date and time from the system clock simulation.
     /// </summary>
     private static DateTime CURRENT_DATE = Tools.GetSafeFromBl(() => s_bl.Admin.GetClock());
-    
+
     /// <summary>
     /// The unique identifier of the courier being managed.
-    /// Zero indicates add mode; non-zero indicates update mode.
+    /// Zero indicates 'Add' mode; non-zero indicates 'Update' mode.
     /// </summary>
     private int CURRENT_ID = 0;
-    
+
     /// <summary>
-    /// Mutex for managing concurrent observer callbacks and preventing race conditions.
+    /// Mutex for managing concurrent observer callbacks and preventing race conditions during data loading.
     /// </summary>
     private readonly ObserverMutex _Mutex = new();
 
@@ -53,7 +52,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     #endregion
 
     #region INotifyPropertyChanged Implementation
-    
+
     /// <summary>
     /// Occurs when a property value changes.
     /// </summary>
@@ -67,7 +66,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
+
     #endregion
 
     #region Properties
@@ -76,7 +75,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     /// Backing field for the CurrentCourier property.
     /// </summary>
     private BO.Courier? _currentCourier;
-    
+
     /// <summary>
     /// Gets or sets the current courier entity being displayed and managed.
     /// </summary>
@@ -101,7 +100,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     /// Backing field for the ButtonText property.
     /// </summary>
     private string _buttonText = "Add";
-    
+
     /// <summary>
     /// Gets or sets the text displayed on the submit button.
     /// </summary>
@@ -124,6 +123,13 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
     private bool _IsCanDelete = true;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the courier record can be deleted.
+    /// </summary>
+    /// <remarks>
+    /// This property is updated asynchronously. It is set to <c>false</c> if the courier
+    /// has an existing delivery history, preventing deletion to maintain data integrity.
+    /// </remarks>
     public bool IsCanDelete
     {
         get => _IsCanDelete;
@@ -146,11 +152,8 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     public bool IsUpdateMode => ButtonText == "Update";
 
     /// <summary>
-    /// Gets the list of available vehicle types for courier selection.
+    /// Gets the list of available vehicle types for courier selection (e.g., Car, Motorcycle).
     /// </summary>
-    /// <value>
-    /// An enumerable collection of <see cref="BO.TheTypeShipment"/> values.
-    /// </value>
     public IEnumerable<BO.TheTypeShipment> VehicleTypesList { get; } =
         Enum.GetValues(typeof(BO.TheTypeShipment)).Cast<BO.TheTypeShipment>();
 
@@ -183,12 +186,12 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     {
         Tools.ResetRequested += () => Close();
 
-        if (CURRENT_ID != 0) 
+        if (CURRENT_ID != 0)
         {
             ButtonText = "Update";
             try
             {
-                CourierObserver();
+                CourierObserver(); // Initial fetch
                 s_bl.Courier.AddObserver(CURRENT_ID, CourierObserver);
                 s_bl.Admin.AddClockObserver(ClockObserver);
             }
@@ -198,7 +201,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
                 Close();
             }
         }
-        else 
+        else
         {
             ButtonText = "Add";
 
@@ -221,10 +224,8 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
     /// <summary>
     /// Handles the Closed event of the CourierWindow.
-    /// Unregisters observers and cleans up resources.
+    /// Unregisters observers and cleans up resources to prevent memory leaks.
     /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void CourierWindow_Closed(object sender, EventArgs e)
     {
         Tools.ResetRequested -= () => Close();
@@ -241,15 +242,10 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
     /// <summary>
     /// Handles the Add/Update button click event.
-    /// Validates and saves the courier data to the business logic layer.
+    /// Validates input and saves the courier data to the business logic layer.
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-    /// <remarks>
-    /// Performs validation to ensure the courier name is not empty.
-    /// Creates a new courier if CURRENT_ID is 0, otherwise updates the existing courier.
-    /// Closes the window upon successful operation.
-    /// </remarks>
     /// <exception cref="BO.BlInvalidValueException">Thrown when courier data is invalid.</exception>
     /// <exception cref="BO.BlAlreadyExistsException">Thrown when attempting to create a courier with an existing ID.</exception>
     private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
@@ -262,7 +258,7 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
         try
         {
-            if (CURRENT_ID == 0) 
+            if (CURRENT_ID == 0)
             {
                 s_bl.Courier.Create(CURRENT_MANAGER_ID, CurrentCourier);
                 MessageBox.Show("Courier added successfully!");
@@ -293,12 +289,9 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     /// Handles the Delete button click event.
     /// Prompts for confirmation and deletes the current courier.
     /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
     /// <remarks>
-    /// Displays a confirmation dialog before proceeding with the deletion.
-    /// Only available in update mode when a courier already exists.
-    /// Closes the window upon successful deletion.
+    /// Requires confirmation via MessageBox.
+    /// Only allows deletion if <see cref="IsCanDelete"/> is true.
     /// </remarks>
     private void btnDelete_Click(object sender, RoutedEventArgs e)
     {
@@ -326,17 +319,11 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     #endregion
 
     #region Logic & Helpers
-    
+
     /// <summary>
     /// Handles the PasswordChanged event of the PasswordBox control.
-    /// Updates the courier's password when the user types in the password field.
+    /// Manually updates the courier's password property since PasswordBox does not support direct binding.
     /// </summary>
-    /// <param name="sender">The source of the event, expected to be a <see cref="PasswordBox"/>.</param>
-    /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-    /// <remarks>
-    /// The password is not bound directly due to security considerations in WPF.
-    /// This handler manually updates the courier's password property.
-    /// </remarks>
     private void PasswordChanged(object sender, RoutedEventArgs e)
     {
         if (sender is PasswordBox passwordBox && CurrentCourier != null)
@@ -346,29 +333,19 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Validates that only numeric input is allowed in a TextBox.
+    /// Validates that only numeric input is allowed in specific TextBoxes (e.g. ID, Phone).
     /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">The <see cref="System.Windows.Input.TextCompositionEventArgs"/> instance containing the event data.</param>
-    /// <remarks>
-    /// Used for TextBoxes that should only accept numeric values (e.g., phone number, ID).
-    /// Sets e.Handled to true if the input is not a digit, preventing the character from being entered.
-    /// </remarks>
     private void NumberValidationTextBox(object sender, System.Windows.Input.TextCompositionEventArgs e)
         => e.Handled = !e.Text.All(char.IsDigit);
 
     /// <summary>
     /// Asynchronously retrieves and updates the courier data from the business logic layer.
-    /// Implements the Observer pattern to receive real-time updates.
+    /// Also checks if the courier can be deleted based on delivery history.
     /// </summary>
     /// <remarks>
-    /// This method runs on a background thread to avoid blocking the UI.
-    /// Uses the ObserverMutex to prevent concurrent updates and race conditions.
-    /// Automatically updates the UI through the Dispatcher when new data arrives.
-    /// If the courier no longer exists in the system, the window is automatically closed.
-    /// Subscribes to receive updates whenever the courier data changes in the BL.
+    /// Runs on a background thread. Uses <see cref="ObserverMutex"/> to prevent race conditions.
+    /// Updates the UI via Dispatcher.
     /// </remarks>
-    /// <exception cref="BO.BlDoesNotExistException">Thrown when the courier with the specified ID does not exist.</exception>
     private void CourierObserver()
     {
         if (_Mutex.CheckAndSetLoadInProgressOrRestartRequired())
@@ -380,14 +357,15 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
             {
                 BO.Courier? freshCourier = null;
 
+                // Check delete permission (heavy operation)
                 if (IsCanDelete)
                 {
                     bool canDelete = true;
                     await Task.Run(() => canDelete = !s_bl.Delivery.ReadAll(d => d.CourierId == CURRENT_ID).Any());
                     await Dispatcher.BeginInvoke(() => IsCanDelete = canDelete);
-
                 }
 
+                // Fetch courier data stream
                 await foreach (var courier in s_bl.Courier.Read(CURRENT_MANAGER_ID, CURRENT_ID))
                 {
                     freshCourier = null;
@@ -436,13 +414,6 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
     /// <summary>
     /// Observes clock changes and updates the remaining delivery time accordingly.
     /// </summary>
-    /// <remarks>
-    /// This method is called automatically when the system clock advances.
-    /// Calculates the time difference and decrements the DisplayTimeRemaining property.
-    /// If the time reaches zero or below, triggers a courier data refresh to update the delivery status.
-    /// Runs asynchronously to avoid blocking the UI thread.
-    /// Uses the ObserverMutex to prevent race conditions when multiple clock updates occur simultaneously.
-    /// </remarks>
     private async void ClockObserver()
     {
         if (_ClockMutex.CheckAndSetLoadInProgressOrRestartRequired())
@@ -473,4 +444,3 @@ public partial class CourierWindow : Window, INotifyPropertyChanged
 
     #endregion
 }
-

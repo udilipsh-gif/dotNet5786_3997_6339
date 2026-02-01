@@ -1,6 +1,7 @@
 ﻿using DalApi;
 using DO;
 using System;
+using System.Threading.Tasks;
 
 namespace BO;
 internal class Program
@@ -166,7 +167,7 @@ internal class Program
     /// </list>
     /// The method displays menu options to the user and collects their choices before querying the business logic layer.
     /// </remarks>
-    private static IEnumerable<CourierInList> readAllCouriers(int requesterId)
+    private static async Task<IEnumerable<CourierInList>> readAllCouriers(int requesterId)
     {
         Console.WriteLine($@"
                 Filter couriers:                       
@@ -209,7 +210,7 @@ internal class Program
             _ => null
         };
 
-        return s_bl.Courier.ReadAll(requesterId, isActive, sort);
+        return await s_bl.Courier.ReadAll(requesterId, isActive, sort);
 
     }
     /// <summary>
@@ -228,7 +229,7 @@ internal class Program
     /// </list>
     /// The method displays menu options to the user and collects their choices before querying the business logic layer.
     /// </remarks>
-    private static IEnumerable<OrderInList> readAllOrders(int requesterId)
+    private static async Task<IEnumerable<OrderInList>> readAllOrders(int requesterId)
     {
         Console.WriteLine($@"
                 Filter orders:                       
@@ -333,7 +334,7 @@ internal class Program
             _ => null
         };
 
-        return s_bl.Order.ReadAll(requesterId, filter, valueChoice, sort);
+        return await s_bl.Order.ReadAll(requesterId, filter, valueChoice, sort);
     }
 
 
@@ -356,13 +357,19 @@ internal class Program
     /// </list>
     /// The user can exit without making changes by pressing 0.
     /// </remarks>
-    private static Courier updateCourier(int requesterId)
+    private static async Task<Courier> updateCourier(int requesterId)
     {
         Console.Write("Enter ID of courier to update: ");
         int id = GetIntInput();
 
-        var courier = s_bl.Courier.Read(requesterId, id)
-            ?? throw new BlDoesNotExistException($"Courier with ID {id} does not exist.");
+        BO.Courier? courier = null;
+
+        await foreach (var c in s_bl.Courier.Read(requesterId, id))
+        {
+            courier = c;
+        }
+        if(courier is null)
+            throw new BlDoesNotExistException($"Courier with ID {id} does not exist.");
 
         Console.WriteLine(@"
     Update of courier
@@ -481,12 +488,12 @@ internal class Program
     /// The user can exit without making changes by pressing 0.
     /// Other order properties (dates, status, etc.) are preserved from the original order.
     /// </remarks>
-    private static Order updateOrder(int requesterId)
+    private static async Task<Order> updateOrder(int requesterId)
     {
         Console.Write("Enter ID of order to update: ");
         int id = GetIntInput();
 
-        var order = s_bl.Order.Read(requesterId, id)
+        var order = await s_bl.Order.Read(requesterId, id)
             ?? throw new BlDoesNotExistException($"Order with ID {id} does not exist.");
 
         Console.WriteLine(@"
@@ -511,7 +518,7 @@ internal class Program
                     return;
                 }
                 ,
-                1 => () =>
+                1 => async () =>
                 {
                     Console.Write("Enter new type of order ( STANDART=0, FAST_DELIVERY=1,DELIVER_IMMEDIATELY=2): ");
                     int typeOfOrderInput = GetIntInput();
@@ -591,7 +598,7 @@ internal class Program
     /// </list>
     /// The method displays menu options to the user and collects their choices before querying the business logic layer.
     /// </remarks>
-    private static IEnumerable<ClosedDeliveryInList> getlistClosedDeliveries(int requesterId)
+    private static async Task<IEnumerable<ClosedDeliveryInList>> getlistClosedDeliveries(int requesterId)
     {
         Console.WriteLine("Enter courier id");
         int courierId = GetIntInput();
@@ -630,13 +637,13 @@ internal class Program
             3 => ClosedDeliveryInListField.TypeOfOrder,
             4 => ClosedDeliveryInListField.Address,
             5 => ClosedDeliveryInListField.ShipmentType,
-            6 => ClosedDeliveryInListField.AqualDistens,
-            7 => ClosedDeliveryInListField.DelyveryTime,
+            6 => ClosedDeliveryInListField.ActualDistance,
+            7 => ClosedDeliveryInListField.DeliveryTime,
             8 => ClosedDeliveryInListField.EndDelivery,
             9 => null,
             _ => null
         };
-        return s_bl.Order.GetClosed(requesterId, courierId, typeOfOrder, sort);
+        return await s_bl.Delivery.GetClosed(requesterId, courierId, typeOfOrder, sort);
     }
     /// <summary>
     /// Prompts the user to filter and sort open orders available for a specific courier, then retrieves the list.
@@ -653,7 +660,7 @@ internal class Program
     /// The method displays menu options to the user and collects their choices before querying the business logic layer.
     /// Only orders that are open and within the courier's delivery range are returned.
     /// </remarks>
-    private static IEnumerable<OpenOrderInList> getlistOpenOrders(int requesterId)
+    private static async Task<IEnumerable<OpenOrderInList>> getlistOpenOrders(int requesterId)
     {
         Console.WriteLine("Enter courier id");
         int courierId = GetIntInput();
@@ -691,7 +698,7 @@ internal class Program
             6 => null,
             _ => null
         };
-        return s_bl.Order.GetOpen(requesterId, courierId, typeOfOrder, sort);
+        return await s_bl.Delivery.GetOpen(requesterId, courierId, typeOfOrder, sort);
     }
     /// <summary>
     /// Prompts the user to enter new system configuration values through the console interface.
@@ -772,7 +779,7 @@ internal class Program
     /// All exceptions are caught and displayed to the console error stream.
     /// The menu loops until the user chooses to exit (option 0).
     /// </remarks>
-    private static void setCourier()
+    private static async Task setCourier()
     {
         Console.WriteLine("Set Courier Menu.");
         int requesterId = s_bl.Admin.GetConfig().ManagerId;
@@ -806,12 +813,17 @@ internal class Program
                     case 2:
                         Console.WriteLine("Enter courier id: ");
                         int id = GetIntInput();
-                        Courier? result = s_bl.Courier.Read(requesterId, id);
+                        Courier? result = null;
+                        await foreach (var item in s_bl.Courier.Read(requesterId, id))
+                          result = item;
+                        if (result is null)
+                            throw new BlDoesNotExistException($"Courier with ID {id} does not exist.");
+
                         Console.WriteLine(result);
                         break;
 
                     case 3:
-                        IEnumerable<CourierInList> couriers = readAllCouriers(requesterId);
+                        IEnumerable<CourierInList> couriers = await readAllCouriers(requesterId);
 
                         if (!couriers.Any())
                         {
@@ -825,7 +837,7 @@ internal class Program
                         break;
 
                     case 4:
-                        Courier updatedCourier = updateCourier(requesterId);
+                        Courier updatedCourier = await updateCourier(requesterId);
                         s_bl.Courier.Update(requesterId, updatedCourier);
                         break;
                     case 5:
@@ -869,7 +881,7 @@ internal class Program
     /// All exceptions are caught and displayed to the console error stream.
     /// The menu loops until the user chooses to exit (option 0).
     /// </remarks>
-    private static void setOrder()
+    private static async Task setOrder()
     {
         Console.WriteLine("Set Order Menu.");
         int requesterId = s_bl.Admin.GetConfig().ManagerId;
@@ -899,18 +911,18 @@ internal class Program
                         break;
                     case 1:
                         Order newOrder = createOrder();
-                        s_bl.Order.Create(requesterId, newOrder);
+                        await s_bl.Order.Create(requesterId, newOrder);
                         Console.WriteLine("Order created successfully!");
                         break;
                     case 2:
                         Console.WriteLine("Enter order id: ");
                         int id = GetIntInput();
-                        Order result = s_bl.Order.Read(requesterId, id)
+                        Order result = await s_bl.Order.Read(requesterId, id)
                             ?? throw new BlDoesNotExistException("$\"Ordr with ID {id} does not exist.\"");
                         Console.WriteLine(result);
                         break;
                     case 3:
-                        IEnumerable<OrderInList> orders = readAllOrders(requesterId);
+                        IEnumerable<OrderInList> orders = await readAllOrders(requesterId);
                         if (!orders.Any())
                         {
                             Console.WriteLine("No orders found.");
@@ -922,8 +934,8 @@ internal class Program
                         }
                         break;
                     case 4:
-                        Order updatedOrder = updateOrder(requesterId);
-                        s_bl.Order.Update(requesterId, updatedOrder);
+                        Order updatedOrder = await updateOrder(requesterId);
+                        await s_bl.Order.Update(requesterId, updatedOrder);
                         break;
                     case 5:
                         Console.WriteLine("Enter order id: ");
@@ -934,7 +946,7 @@ internal class Program
                     case 6:
                         Console.WriteLine("Enter order id to cancel: ");
                         int cancelId = GetIntInput();
-                        s_bl.Order.Cancel(requesterId, cancelId);
+                        await s_bl.Order.Cancel(requesterId, cancelId);
                         Console.WriteLine("Order canceled successfully!");
                         break;
                     case 7:
@@ -942,7 +954,7 @@ internal class Program
                         int orderId = GetIntInput();
                         Console.WriteLine("Enter courier id");
                         int courierId = GetIntInput();
-                        s_bl.Order.Deliver(requesterId, courierId, orderId, EndDelivery.DELIVERED);
+                        s_bl.Delivery.DeliverEnd(requesterId, courierId, orderId, EndDelivery.DELIVERED);
                         Console.WriteLine("Delivery reported successfully!");
                         break;
                     case 8:
@@ -950,12 +962,12 @@ internal class Program
                         orderId = GetIntInput();
                         Console.WriteLine("Enter courier id");
                         courierId = GetIntInput();
-                        s_bl.Order.StartDelivery(requesterId, courierId, orderId);
+                        await s_bl.Delivery.StartDelivery(requesterId, courierId, orderId);
                         Console.WriteLine("Delivery started successfully!");
                         break;
                     case 9:
 
-                        IEnumerable<ClosedDeliveryInList> closedDeliveryInLists = getlistClosedDeliveries(requesterId);
+                        IEnumerable<ClosedDeliveryInList> closedDeliveryInLists = await getlistClosedDeliveries(requesterId);
                         if (!closedDeliveryInLists.Any())
                         {
                             Console.WriteLine("No closed deliveries found.");
@@ -967,7 +979,7 @@ internal class Program
                         }
                         break;
                     case 10:
-                        IEnumerable<OpenOrderInList> openOrderInLists = getlistOpenOrders(requesterId);
+                        IEnumerable<OpenOrderInList> openOrderInLists = await getlistOpenOrders(requesterId);
                         if (!openOrderInLists.Any())
                         {
                             Console.WriteLine("No open orders found.");
