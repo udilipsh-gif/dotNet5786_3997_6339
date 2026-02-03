@@ -187,7 +187,7 @@ namespace PL
                     if (userId != 0)
                     {
                         var courierWindow = new MainCourier(userId);
-                        courierWindow.SetSoftOwner(this);
+                        courierWindow.SetSoftOwner(this);//רישום לאירוע סגירה חלון אבא
                         courierWindow.Show();
                     }
                     break;
